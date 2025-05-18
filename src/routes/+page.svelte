@@ -121,7 +121,6 @@
 
   <div
     class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"
-    style="transform: translateY({scrollY * -0.2}px);"
   ></div>
 </div>
 

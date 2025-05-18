@@ -3,9 +3,10 @@
   import Navbar from '$lib/components/layout/Navbar.svelte';
 </script>
 
+<a href="#main-content" class="sr-only focus:not-sr-only">Skip to main content</a>
 <Navbar />
 
-<main class="min-h-screen">
+<main id="main-content" class="min-h-screen">
   <slot />
 </main>
 
