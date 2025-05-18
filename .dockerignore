@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+.git
+.github
+.vscode
+.DS_Store
+.env
+.env.*
+!.env.example
+/build
+/functions/node_modules
+/functions/lib
