@@ -1,0 +1,860 @@
+import type { GGVerifySession } from '$types/firestore';
+  import type { Booking } from '$types/firestore';
+  import type { Listing } from '$types/firestore';
+  
+  // Route params
+  const bookingId = $page.params.bookingId;
+  const verifyType = $page.params.type as 'pre-rental' | 'post-rental';
+  
+  // Component state
+  let loading = true;
+  let error = '';
+  let currentStep = 0;
+  let sessionId = '';
+  let session: GGVerifySession | null = null;
+  let booking: Booking | null = null;
+  let listing: Listing | null = null;
+  let mediaUploads: { [key: string]: { url: string, type: 'photo' | 'video' } } = {};
+  let conditionNotes = '';
+  let accessoryInventory: string[] = [];
+  let listingAccessories: string[] = [];
+  
+  // Steps configuration - will vary based on gear category
+  let verifySteps = [
+    { id: 'overview', label: 'Overview', complete: false },
+    { id: 'photos', label: 'Photos', complete: false },
+    { id: 'accessories', label: 'Accessories', complete: false },
+    { id: 'test', label: 'Operational Test', complete: false },
+    { id: 'notes', label: 'Condition Notes', complete: false },
+    { id: 'review', label: 'Review & Submit', complete: false }
+  ];
+  
+  // Photo angles based on general categories
+  // In a real app, this would be more dynamic based on the specific gear type
+  let requiredPhotoAngles = [
+    { id: 'front', label: 'Front View', instructions: 'Take a clear photo of the front of the item' },
+    { id: 'back', label: 'Back View', instructions: 'Take a clear photo of the back of the item' },
+    { id: 'left', label: 'Left Side', instructions: 'Take a clear photo of the left side' },
+    { id: 'right', label: 'Right Side', instructions: 'Take a clear photo of the right side' },
+    { id: 'serial-number', label: 'Serial Number', instructions: 'Take a close-up of the serial number/model number' },
+    { id: 'any-damage', label: 'Any Existing Damage', instructions: 'Document any existing damage or wear', optional: true }
+  ];
+  
+  // Currently active photo/video being captured
+  let activeCapture = requiredPhotoAngles[0];
+  
+  onMount(async () => {
+    if (!$authStore.user) {
+      // Redirect to login if not authenticated
+      goto(`/auth?redirect=/booking/${bookingId}/verify/${verifyType}`);
+      return;
+    }
+    
+    try {
+      // Try to get location for the session
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            if (sessionId) {
+              updateSessionLocation(
+                sessionId, 
+                position.coords.latitude, 
+                position.coords.longitude
+              ).catch(err => console.error('Error updating location:', err));
+            }
+          },
+          err => console.warn('Location access denied:', err)
+        );
+      }
+      
+      // Load booking data
+      booking = await getBooking(bookingId);
+      
+      if (!booking) {
+        error = 'Booking not found';
+        loading = false;
+        return;
+      }
+      
+      // Check if user is authorized (must be renter or owner in the booking)
+      const userId = $authStore.user.uid;
+      if (booking.renterUid !== userId && booking.ownerUid !== userId) {
+        error = 'You are not authorized to access this booking';
+        loading = false;
+        return;
+      }
+      
+      // Load listing data to get gear details
+      listing = await getListing(booking.listingId);
+      
+      if (!listing) {
+        error = 'Listing details not found';
+        loading = false;
+        return;
+      }
+      
+      // Check if a session already exists
+      const sessions = await getSessionsForBooking(bookingId);
+      const existingSession = sessions.find(s => s.type === verifyType && s.status !== 'completed');
+      
+      if (existingSession) {
+        // Continue existing session
+        sessionId = existingSession.sessionId;
+        session = existingSession;
+        
+        // Restore any saved state
+        if (session.overallConditionNotes) {
+          conditionNotes = session.overallConditionNotes;
+        }
+        
+        if (session.accessoriesInventory.length > 0) {
+          accessoryInventory = [...session.accessoriesInventory];
+        }
+        
+        // Populate mediaUploads from existing session
+        session.media.forEach(media => {
+          mediaUploads[media.angle] = {
+            url: media.storagePath,
+            type: media.type
+          };
+        });
+        
+        // Update step completion status
+        updateStepCompletion();
+      } else {
+        // Create new session
+        sessionId = await createVerifySession(
+          bookingId,
+          booking.listingId,
+          userId,
+          verifyType
+        );
+        
+        // Get the newly created session
+        session = await getVerifySession(sessionId);
+      }
+      
+      // Get accessories list from listing specs
+      if (listing.specifications && listing.specifications.accessories) {
+        if (Array.isArray(listing.specifications.accessories)) {
+          listingAccessories = [...listing.specifications.accessories];
+        } else if (typeof listing.specifications.accessories === 'string') {
+          // Handle case where accessories might be a comma-separated string
+          listingAccessories = listing.specifications.accessories
+            .split(',')
+            .map(item => item.trim())
+            .filter(item => item.length > 0);
+        }
+      }
+      
+      // If no accessories defined, provide some common ones
+      if (listingAccessories.length === 0) {
+        listingAccessories = ['Carrying case', 'Manual', 'Charger/Adapter', 'Other accessories'];
+      }
+      
+      loading = false;
+    } catch (err) {
+      console.error('Error initializing GG Verify session:', err);
+      error = 'Failed to initialize verification session';
+      loading = false;
+    }
+  });
+  
+  // Update which steps are completed
+  function updateStepCompletion() {
+    // Overview is always complete after load
+    verifySteps[0].complete = true;
+    
+    // Photos step completion
+    const requiredAngles = requiredPhotoAngles.filter(angle => !angle.optional);
+    const capturedRequiredAngles = requiredAngles.filter(angle => angle.id in mediaUploads);
+    verifySteps[1].complete = capturedRequiredAngles.length === requiredAngles.length;
+    
+    // Accessories step
+    verifySteps[2].complete = accessoryInventory.length > 0;
+    
+    // Operational test
+    verifySteps[3].complete = mediaUploads['operational-test'] !== undefined;
+    
+    // Condition notes
+    verifySteps[4].complete = conditionNotes.trim().length > 0;
+    
+    // Review step completion is based on all previous steps
+    verifySteps[5].complete = verifySteps.slice(0, 5).every(step => step.complete);
+  }
+  
+  // Handle media capture completion
+  function handleCapture(event) {
+    const { type, url, angle } = event.detail;
+    
+    // Store the captured media info
+    mediaUploads[angle] = { url, type };
+    
+    // Update step completion
+    updateStepCompletion();
+    
+    // Auto-advance to next photo if in photo step
+    if (currentStep === 1) {
+      const currentIndex = requiredPhotoAngles.findIndex(a => a.id === angle);
+      if (currentIndex < requiredPhotoAngles.length - 1) {
+        activeCapture = requiredPhotoAngles[currentIndex + 1];
+      }
+    }
+  }
+  
+  // Handle changes to accessories inventory
+  async function handleAccessoryChange() {
+    try {
+      await updateAccessoryInventory(sessionId, accessoryInventory);
+      updateStepCompletion();
+    } catch (err) {
+      console.error('Error updating accessories:', err);
+      toast.error('Failed to update accessories');
+    }
+  }
+  
+  // Handle condition notes update
+  async function saveConditionNotes() {
+    try {
+      await updateConditionNotes(sessionId, conditionNotes);
+      toast.success('Condition notes saved');
+      updateStepCompletion();
+    } catch (err) {
+      console.error('Error saving condition notes:', err);
+      toast.error('Failed to save condition notes');
+    }
+  }
+  
+  // Navigate to a specific step
+  function goToStep(stepIndex) {
+    if (stepIndex >= 0 && stepIndex < verifySteps.length) {
+      currentStep = stepIndex;
+    }
+  }
+  
+  // Complete the verification process
+  async function completeVerification() {
+    try {
+      await completeVerifySession(sessionId);
+      
+      toast.success('Verification completed successfully');
+      
+      // Update booking status based on verify type
+      if (verifyType === 'pre-rental') {
+        // Update handover confirmation based on user role
+        const userId = $authStore.user.uid;
+        if (booking.renterUid === userId) {
+          await updateBooking(bookingId, {
+            handoverConfirmedByRenter: new Date()
+          });
+        } else if (booking.ownerUid === userId) {
+          await updateBooking(bookingId, {
+            handoverConfirmedByOwner: new Date()
+          });
+        }
+      } else if (verifyType === 'post-rental') {
+        // Update return confirmation based on user role
+        const userId = $authStore.user.uid;
+        if (booking.renterUid === userId) {
+          await updateBooking(bookingId, {
+            returnConfirmedByRenter: new Date()
+          });
+        } else if (booking.ownerUid === userId) {
+          await updateBooking(bookingId, {
+            returnConfirmedByOwner: new Date()
+          });
+        }
+      }
+      
+      // Redirect to booking details page
+      goto(`/booking/${bookingId}`);
+    } catch (err) {
+      console.error('Error completing verification:', err);
+      toast.error('Failed to complete verification');
+    }
+  }
+</script>
+
+<svelte:head>
+  <title>GG Verify - {verifyType === 'pre-rental' ? 'Pre-Rental' : 'Post-Rental'} Verification</title>
+</svelte:head>
+
+<div class="gg-verify-container">
+  {#if loading}
+    <div class="loading-state">
+      <p>Loading verification session...</p>
+    </div>
+  {:else if error}
+    <div class="error-state">
+      <p>{error}</p>
+      <Button on:click={() => goto(`/booking/${bookingId}`)}>Back to Booking</Button>
+    </div>
+  {:else}
+    <header class="verify-header">
+      <h1>GG Verify - {verifyType === 'pre-rental' ? 'Pre-Rental' : 'Post-Rental'}</h1>
+      <p>Documenting condition for {listing.title}</p>
+    </header>
+    
+    <div class="verify-progress">
+      <StepProgress 
+        steps={verifySteps} 
+        currentStep={currentStep} 
+        onStepClick={(index) => goToStep(index)} 
+      />
+    </div>
+    
+    <div class="verify-content">
+      {#if currentStep === 0}
+        <!-- Overview Step -->
+        <div class="overview-step">
+          <h2>GG Verify Overview</h2>
+          
+          <div class="overview-card">
+            <h3>Why We Verify</h3>
+            <p>
+              GG Verify helps protect both renters and owners by documenting 
+              the condition of gear before and after the rental period.
+            </p>
+          </div>
+          
+          <div class="overview-card">
+            <h3>Verification Process</h3>
+            <ul>
+              <li>Take photos from multiple angles</li>
+              <li>Document all included accessories</li>
+              <li>Record a short video showing the gear works correctly</li>
+              <li>Note any existing damage or wear</li>
+            </ul>
+          </div>
+          
+          <div class="overview-card">
+            <h3>This is a {verifyType === 'pre-rental' ? 'Pre-Rental' : 'Post-Rental'} Verification</h3>
+            <p>
+              {#if verifyType === 'pre-rental'}
+                Complete this verification before using the gear to document its
+                condition at the time of handover.
+              {:else}
+                Complete this verification after using the gear to document its
+                condition at the time of return.
+              {/if}
+            </p>
+          </div>
+          
+          <div class="step-actions">
+            <Button on:click={() => goToStep(1)} variant="primary">Begin Verification</Button>
+          </div>
+        </div>
+      {:else if currentStep === 1}
+        <!-- Photos Step -->
+        <div class="photos-step">
+          <h2>Capture Photos</h2>
+          
+          <div class="photo-progress">
+            {#each requiredPhotoAngles as angle, index}
+              <div 
+                class="photo-item" 
+                class:active={activeCapture.id === angle.id}
+                class:complete={angle.id in mediaUploads}
+                on:click={() => activeCapture = angle}
+              >
+                <span class="photo-number">{index + 1}</span>
+                <span class="photo-label">{angle.label}</span>
+                {#if angle.id in mediaUploads}
+                  <span class="photo-check">✓</span>
+                {/if}
+              </div>
+            {/each}
+          </div>
+          
+          <div class="capture-view">
+            <GGVerifyCapture
+              sessionId={sessionId}
+              mediaType="photo"
+              angle={activeCapture.id}
+              instructionText={activeCapture.instructions}
+              on:capture={handleCapture}
+            />
+          </div>
+          
+          <div class="captured-photos">
+            {#each Object.entries(mediaUploads) as [angle, media]}
+              {#if requiredPhotoAngles.some(a => a.id === angle)}
+                <div class="thumbnail">
+                  <img src={media.url} alt={`${angle} view`} />
+                  <span>{requiredPhotoAngles.find(a => a.id === angle)?.label}</span>
+                </div>
+              {/if}
+            {/each}
+          </div>
+          
+          <div class="step-actions">
+            <Button on:click={() => goToStep(0)} variant="outline">Back</Button>
+            <Button 
+              on:click={() => goToStep(2)} 
+              variant="primary"
+              disabled={!verifySteps[1].complete}
+            >
+              Next: Accessories
+            </Button>
+          </div>
+        </div>
+      {:else if currentStep === 2}
+        <!-- Accessories Step -->
+        <div class="accessories-step">
+          <h2>Accessories Checklist</h2>
+          <p>Check all accessories that are present with the gear:</p>
+          
+          <div class="accessories-list">
+            {#each listingAccessories as accessory}
+              <div class="accessory-item">
+                <Checkbox
+                  label={accessory}
+                  checked={accessoryInventory.includes(accessory)}
+                  on:change={(e) => {
+                    if (e.target.checked) {
+                      accessoryInventory = [...accessoryInventory, accessory];
+                    } else {
+                      accessoryInventory = accessoryInventory.filter(a => a !== accessory);
+                    }
+                    handleAccessoryChange();
+                  }}
+                />
+              </div>
+            {/each}
+          </div>
+          
+          <div class="step-actions">
+            <Button on:click={() => goToStep(1)} variant="outline">Back</Button>
+            <Button 
+              on:click={() => goToStep(3)} 
+              variant="primary"
+              disabled={!verifySteps[2].complete}
+            >
+              Next: Operational Test
+            </Button>
+          </div>
+        </div>
+      {:else if currentStep === 3}
+        <!-- Operational Test Step -->
+        <div class="test-step">
+          <h2>Operational Test</h2>
+          <p>Record a short video demonstrating that the gear works properly:</p>
+          
+          <div class="capture-view">
+            <GGVerifyCapture
+              sessionId={sessionId}
+              mediaType="video"
+              angle="operational-test"
+              instructionText="Record a 10-15 second video showing the gear works properly"
+              on:capture={handleCapture}
+            />
+          </div>
+          
+          {#if mediaUploads['operational-test']}
+            <div class="video-preview">
+              <h3>Recorded Test Video</h3>
+              <video controls src={mediaUploads['operational-test'].url}></video>
+            </div>
+          {/if}
+          
+          <div class="step-actions">
+            <Button on:click={() => goToStep(2)} variant="outline">Back</Button>
+            <Button 
+              on:click={() => goToStep(4)} 
+              variant="primary"
+              disabled={!verifySteps[3].complete}
+            >
+              Next: Condition Notes
+            </Button>
+          </div>
+        </div>
+      {:else if currentStep === 4}
+        <!-- Condition Notes Step -->
+        <div class="notes-step">
+          <h2>Condition Notes</h2>
+          <p>
+            Document the overall condition of the gear, including any existing damage, 
+            wear and tear, or other observations:
+          </p>
+          
+          <div class="notes-input">
+            <TextareaInput
+              label="Condition Notes"
+              placeholder="Describe the condition of the gear in detail..."
+              bind:value={conditionNotes}
+              rows={6}
+            />
+            
+            <Button 
+              on:click={saveConditionNotes} 
+              variant="outline"
+              size="small"
+              class="save-notes-btn"
+            >
+              Save Notes
+            </Button>
+          </div>
+          
+          <div class="step-actions">
+            <Button on:click={() => goToStep(3)} variant="outline">Back</Button>
+            <Button 
+              on:click={() => goToStep(5)} 
+              variant="primary"
+              disabled={!verifySteps[4].complete}
+            >
+              Next: Review & Submit
+            </Button>
+          </div>
+        </div>
+      {:else if currentStep === 5}
+        <!-- Review & Submit Step -->
+        <div class="review-step">
+          <h2>Review & Submit</h2>
+          <p>Review the verification details before submitting:</p>
+          
+          <div class="review-section">
+            <h3>Photos</h3>
+            <div class="review-photos">
+              {#each requiredPhotoAngles as angle}
+                <div class="review-photo">
+                  {#if angle.id in mediaUploads}
+                    <img src={mediaUploads[angle.id].url} alt={angle.label} />
+                    <span class="photo-label">{angle.label}</span>
+                  {:else if !angle.optional}
+                    <div class="missing-photo">
+                      <span>Missing: {angle.label}</span>
+                      <Button 
+                        on:click={() => {
+                          activeCapture = angle;
+                          goToStep(1);
+                        }} 
+                        size="small"
+                      >
+                        Take Photo
+                      </Button>
+                    </div>
+                  {/if}
+                </div>
+              {/each}
+            </div>
+          </div>
+          
+          <div class="review-section">
+            <h3>Accessories Checked</h3>
+            <ul class="review-accessories">
+              {#if accessoryInventory.length > 0}
+                {#each accessoryInventory as accessory}
+                  <li>{accessory}</li>
+                {/each}
+              {:else}
+                <li class="missing-item">
+                  No accessories checked
+                  <Button on:click={() => goToStep(2)} size="small">Add Accessories</Button>
+                </li>
+              {/if}
+            </ul>
+          </div>
+          
+          <div class="review-section">
+            <h3>Operational Test</h3>
+            {#if mediaUploads['operational-test']}
+              <video 
+                controls 
+                src={mediaUploads['operational-test'].url}
+                class="review-video"
+              ></video>
+            {:else}
+              <div class="missing-item">
+                Missing operational test video
+                <Button on:click={() => goToStep(3)} size="small">Record Video</Button>
+              </div>
+            {/if}
+          </div>
+          
+          <div class="review-section">
+            <h3>Condition Notes</h3>
+            {#if conditionNotes.trim().length > 0}
+              <div class="review-notes">
+                <p>{conditionNotes}</p>
+              </div>
+            {:else}
+              <div class="missing-item">
+                Missing condition notes
+                <Button on:click={() => goToStep(4)} size="small">Add Notes</Button>
+              </div>
+            {/if}
+          </div>
+          
+          <div class="verify-complete-notice">
+            <p>
+              By submitting this verification, you confirm that all information provided
+              is accurate and represents the current condition of the gear.
+            </p>
+          </div>
+          
+          <div class="step-actions">
+            <Button on:click={() => goToStep(4)} variant="outline">Back</Button>
+            <Button 
+              on:click={completeVerification} 
+              variant="primary"
+              disabled={!verifySteps[5].complete}
+            >
+              Complete Verification
+            </Button>
+          </div>
+        </div>
+      {/if}
+    </div>
+  {/if}
+</div>
+
+<style>
+  .gg-verify-container {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  
+  .verify-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .verify-progress {
+    margin-bottom: 2rem;
+  }
+  
+  .verify-content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+  }
+  
+  .loading-state,
+  .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+  }
+  
+  .step-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+  }
+  
+  /* Overview step styles */
+  .overview-card {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .overview-card h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--color-primary);
+  }
+  
+  /* Photos step styles */
+  .photo-progress {
+    display: flex;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+  }
+  
+  .photo-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    background-color: #f1f5f9;
+    margin-right: 0.5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    position: relative;
+    border: 2px solid transparent;
+  }
+  
+  .photo-item.active {
+    border-color: var(--color-primary);
+    background-color: #e0f2fe;
+  }
+  
+  .photo-item.complete {
+    background-color: #dcfce7;
+  }
+  
+  .photo-number {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+  }
+  
+  .photo-label {
+    font-size: 0.75rem;
+    text-align: center;
+  }
+  
+  .photo-check {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #10b981;
+    color: white;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .capture-view {
+    margin-bottom: 1.5rem;
+  }
+  
+  .captured-photos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .thumbnail {
+    width: calc(33.333% - 0.5rem);
+    position: relative;
+  }
+  
+  .thumbnail img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+  }
+  
+  .thumbnail span {
+    font-size: 0.75rem;
+    display: block;
+    margin-top: 0.25rem;
+    text-align: center;
+  }
+  
+  /* Accessories step styles */
+  .accessories-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  
+  /* Test step styles */
+  .video-preview {
+    margin-top: 1.5rem;
+  }
+  
+  .video-preview video {
+    width: 100%;
+    border-radius: 8px;
+    max-height: 300px;
+  }
+  
+  /* Notes step styles */
+  .notes-input {
+    margin: 1.5rem 0;
+    position: relative;
+  }
+  
+  .save-notes-btn {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+  }
+  
+  /* Review step styles */
+  .review-section {
+    margin-bottom: 2rem;
+  }
+  
+  .review-section h3 {
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .review-photos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+  }
+  
+  .review-photo img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+  }
+  
+  .missing-photo,
+  .missing-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #fee2e2;
+    border-radius: 4px;
+    padding: 0.75rem;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .review-accessories {
+    padding-left: 1.5rem;
+  }
+  
+  .review-video {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 4px;
+  }
+  
+  .review-notes {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 1rem;
+  }
+  
+  .verify-complete-notice {
+    background-color: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    padding: 1rem;
+    margin: 2rem 0;
+  }
+  
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    .review-photos {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .step-actions {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .step-actions button {
+      width: 100%;
+    }
+  }
+</style>
+```

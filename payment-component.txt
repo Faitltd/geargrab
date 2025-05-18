@@ -1,0 +1,919 @@
+<!-- src/routes/book/[listingId]/confirm/+page.svelte -->
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+  import { authStore } from '$stores/auth';
+  import { getListing } from '$firebase/db/listings';
+  import { createBookingWithPayment, calculateBookingFees } from '$services/payments';
+  import { Button, TextInput } from '$components/forms';
+  import { Elements, PaymentElement, CardElement } from '@stripe/stripe-svelte';
+  import { getStripe } from '$services/stripe';
+  import toast from 'svelte-french-toast';
+  
+  // Get listing ID from URL params
+  const listingId = $page.params.listingId;
+  
+  // Get query params
+  const searchParams = $page.url.searchParams;
+  const startDateParam = searchParams.get('startDate');
+  const endDateParam = searchParams.get('endDate');
+  const deliveryMethodParam = searchParams.get('deliveryMethod') || 'pickup';
+  
+  // Convert string dates to Date objects
+  const startDate = startDateParam ? new Date(startDateParam) : new Date();
+  const endDate = endDateParam ? new Date(endDateParam) : new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+  
+  // Component state
+  let loading = true;
+  let processingPayment = false;
+  let error = '';
+  let listing: any = null;
+  let insuranceTier: 'standard' | 'premium' = 'standard';
+  let fees = {
+    rentalFee: 0,
+    deliveryFee: 0,
+    insuranceFee: 0,
+    securityDeposit: 0,
+    totalAmount: 0,
+    days: 0
+  };
+  let deliveryMethod: 'pickup' | 'delivery' = deliveryMethodParam === 'delivery' 
+    ? 'delivery' 
+    : 'pickup';
+  let stripePromise: Promise<any>;
+  let paymentElement: any;
+  let cardComplete = false;
+  
+  onMount(async () => {
+    if (!$authStore.user) {
+      // Redirect to login if not authenticated
+      goto(`/auth?redirect=/book/${listingId}/confirm?startDate=${startDateParam}&endDate=${endDateParam}`);
+      return;
+    }
+    
+    try {
+      // Load listing data
+      listing = await getListing(listingId);
+      
+      if (!listing) {
+        error = 'Listing not found';
+        loading = false;
+        return;
+      }
+      
+      // Calculate fees
+      fees = calculateBookingFees(
+        listing.dailyRate,
+        startDate,
+        endDate,
+        deliveryMethod,
+        insuranceTier,
+        listing.securityDeposit
+      );
+      
+      // Initialize Stripe
+      stripePromise = getStripe();
+      
+      loading = false;
+    } catch (err) {
+      console.error('Error loading booking data:', err);
+      error = 'Failed to load booking information';
+      loading = false;
+    }
+  });
+  
+  // Update fees when insurance tier or delivery method changes
+  $: if (listing && !loading) {
+    fees = calculateBookingFees(
+      listing.dailyRate,
+      startDate,
+      endDate,
+      deliveryMethod,
+      insuranceTier,
+      listing.securityDeposit
+    );
+  }
+  
+  // Handle card element change
+  function handleCardChange(event) {
+    cardComplete = event.complete;
+    if (event.error) {
+      error = event.error.message;
+    } else {
+      error = '';
+    }
+  }
+  
+  // Handle form submission
+  async function handleSubmit() {
+    if (!cardComplete) {
+      error = 'Please complete your payment information';
+      return;
+    }
+    
+    processingPayment = true;
+    error = '';
+    
+    try {
+      // Process the booking with payment
+      const result = await createBookingWithPayment(
+        listing,
+        startDate,
+        endDate,
+        deliveryMethod,
+        insuranceTier
+      );
+      
+      // Success! Redirect to success page
+      toast.success('Booking created successfully!');
+      goto(`/booking/${result.bookingId}/success`);
+    } catch (err) {
+      console.error('Payment error:', err);
+      error = err.message || 'An error occurred while processing your payment';
+      processingPayment = false;
+    }
+  }
+  
+  // Format currency
+  function formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  }
+  
+  // Format date
+  function formatDate(date: Date): string {
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(date);
+  }
+</script>
+
+<svelte:head>
+  <title>Confirm Booking | GearGrab</title>
+</svelte:head>
+
+<div class="booking-confirmation-container">
+  {#if loading}
+    <div class="loading-state">
+      <p>Loading booking information...</p>
+    </div>
+  {:else if error && !listing}
+    <div class="error-state">
+      <p>{error}</p>
+      <Button on:click={() => window.history.back()}>Go Back</Button>
+    </div>
+  {:else}
+    <div class="booking-confirmation">
+      <h1>Confirm Your Booking</h1>
+      
+      <div class="booking-grid">
+        <div class="booking-details">
+          <div class="listing-summary">
+            <div class="listing-image">
+              {#if listing.photos && listing.photos.length > 0}
+                <img src={listing.photos[0].url} alt={listing.title} />
+              {:else}
+                <div class="no-image">No image available</div>
+              {/if}
+            </div>
+            
+            <div class="listing-info">
+              <h2>{listing.title}</h2>
+              <p class="listing-category">{listing.category} • {listing.subCategory}</p>
+              <div class="booking-dates">
+                <div class="date-group">
+                  <strong>Pickup</strong>
+                  <span>{formatDate(startDate)}</span>
+                </div>
+                <div class="date-divider"></div>
+                <div class="date-group">
+                  <strong>Return</strong>
+                  <span>{formatDate(endDate)}</span>
+                </div>
+              </div>
+              <p class="rental-duration">{fees.days} {fees.days === 1 ? 'day' : 'days'} rental</p>
+            </div>
+          </div>
+          
+          <div class="options-section">
+            <h3>Pickup / Delivery</h3>
+            <div class="option-buttons">
+              <button 
+                class="option-button" 
+                class:selected={deliveryMethod === 'pickup'}
+                on:click={() => deliveryMethod = 'pickup'}
+              >
+                <span class="option-icon">🚶</span>
+                <span class="option-label">Local Pickup</span>
+                <span class="option-price">Free</span>
+              </button>
+              
+              {#if listing.pickupOptions && listing.pickupOptions.delivery}
+                <button 
+                  class="option-button" 
+                  class:selected={deliveryMethod === 'delivery'}
+                  on:click={() => deliveryMethod = 'delivery'}
+                >
+                  <span class="option-icon">🚚</span>
+                  <span class="option-label">Delivery</span>
+                  <span class="option-price">+{formatCurrency(listing.pickupOptions.deliveryFee || 15)}</span>
+                </button>
+              {/if}
+            </div>
+          </div>
+          
+          <div class="options-section">
+            <h3>Insurance Options</h3>
+            <div class="option-buttons">
+              <button 
+                class="option-button" 
+                class:selected={insuranceTier === 'standard'}
+                on:click={() => insuranceTier = 'standard'}
+              >
+                <span class="option-icon">🛡️</span>
+                <span class="option-label">Standard Insurance</span>
+                <span class="option-price">+{formatCurrency(fees.rentalFee * 0.1)}</span>
+              </button>
+              
+              <button 
+                class="option-button" 
+                class:selected={insuranceTier === 'premium'}
+                on:click={() => insuranceTier = 'premium'}
+              >
+                <span class="option-icon">🛡️🛡️</span>
+                <span class="option-label">Premium Insurance</span>
+                <span class="option-price">+{formatCurrency(fees.rentalFee * 0.15)}</span>
+              </button>
+            </div>
+            <div class="insurance-info">
+              <p>
+                {#if insuranceTier === 'standard'}
+                  <strong>Standard Insurance</strong> covers basic damage and loss up to 
+                  {formatCurrency(listing.dailyRate * 10)} with a 
+                  {formatCurrency(listing.dailyRate)} deductible.
+                {:else}
+                  <strong>Premium Insurance</strong> offers enhanced coverage up to 
+                  {formatCurrency(listing.dailyRate * 20)} with no deductible and 
+                  includes personal liability protection.
+                {/if}
+              </p>
+              <a href="/insurance" target="_blank">View full insurance details</a>
+            </div>
+          </div>
+          
+          <div class="price-breakdown">
+            <h3>Price Breakdown</h3>
+            <div class="price-row">
+              <span>{formatCurrency(listing.dailyRate)} × {fees.days} {fees.days === 1 ? 'day' : 'days'}</span>
+              <span>{formatCurrency(fees.rentalFee)}</span>
+            </div>
+            
+            {#if fees.deliveryFee > 0}
+              <div class="price-row">
+                <span>Delivery Fee</span>
+                <span>{formatCurrency(fees.deliveryFee)}</span>
+              </div>
+            {/if}
+            
+            <div class="price-row">
+              <span>{insuranceTier === 'standard' ? 'Standard' : 'Premium'} Insurance</span>
+              <span>{formatCurrency(fees.insuranceFee)}</span>
+            </div>
+            
+            <div class="price-row security-deposit">
+              <span>Security Deposit <small>(refundable)</small></span>
+              <span>{formatCurrency(fees.securityDeposit)}</span>
+            </div>
+            
+            <div class="price-row total">
+              <span>Total</span>
+              <span>{formatCurrency(fees.totalAmount)}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="payment-section">
+          <h3>Payment Details</h3>
+          
+          {#if error}
+            <div class="payment-error">
+              {error}
+            </div>
+          {/if}
+          
+          <div class="card-element-container">
+            {#await stripePromise then stripe}
+              {#if stripe}
+                <CardElement 
+                  on:change={handleCardChange}
+                  options={{
+                    style: {
+                      base: {
+                        fontSize: '16px',
+                        color: '#424770',
+                        '::placeholder': {
+                          color: '#aab7c4',
+                        },
+                      },
+                      invalid: {
+                        color: '#9e2146',
+                      },
+                    },
+                  }}
+                />
+              {/if}
+            {/await}
+          </div>
+          
+          <div class="booking-policy">
+            <h4>Booking Policy</h4>
+            <p>By confirming this booking, you agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/cancellation-policy" target="_blank">Cancellation Policy</a>.</p>
+            <p>You won't be charged until the owner approves your booking. The security deposit is fully refundable if the gear is returned in the same condition.</p>
+          </div>
+          
+          <Button 
+            on:click={handleSubmit}
+            variant="primary"
+            disabled={processingPayment || !cardComplete}
+            loading={processingPayment}
+            fullWidth
+          >
+            Confirm & Pay {formatCurrency(fees.totalAmount)}
+          </Button>
+        </div>
+      </div>
+    </div>
+  {/if}
+</div>
+
+<style>
+  .booking-confirmation-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+  
+  .loading-state,
+  .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    text-align: center;
+  }
+  
+  h1 {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .booking-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  @media (min-width: 768px) {
+    .booking-grid {
+      grid-template-columns: 3fr 2fr;
+    }
+  }
+  
+  .booking-details,
+  .payment-section {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+  }
+  
+  .listing-summary {
+    display: flex;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .listing-image {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+    margin-right: 1rem;
+  }
+  
+  .listing-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  
+  .no-image {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f1f5f9;
+    border-radius: 4px;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+  
+  .listing-info {
+    flex-grow: 1;
+  }
+  
+  .listing-info h2 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+  }
+  
+  .listing-category {
+    color: #64748b;
+    margin-bottom: 1rem;
+  }
+  
+  .booking-dates {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .date-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .date-divider {
+    width: 20px;
+    height: 1px;
+    background-color: #cbd5e1;
+    margin: 0 0.5rem;
+  }
+  
+  .rental-duration {
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+  
+  .options-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .options-section h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .option-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  
+  .option-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .option-button.selected {
+    border-color: var(--color-primary);
+    background-color: #F0F9FF;
+  }
+  
+  .option-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .option-label {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+  
+  .option-price {
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+  
+  .insurance-info {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: #f8fafc;
+    border-radius: 4px;
+    font-size: 0.875rem;
+  }
+  
+  .insurance-info p {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .insurance-info a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-size: 0.75rem;
+  }
+  
+  .price-breakdown {
+    margin-bottom: 1.5rem;
+  }
+  
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  
+  .price-row.security-deposit {
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+    border-top: 1px dashed #e2e8f0;
+  }
+  
+  .price-row.total {
+    font-weight: bold;
+    font-size: 1.125rem;
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid #e2e8f0;
+  }
+  
+  .security-deposit small {
+    color: #64748b;
+    font-weight: normal;
+  }
+  
+  .payment-section h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+  }
+  
+  .payment-error {
+    background-color: #fde7e9;
+    color: #e53e3e;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  
+  .card-element-container {
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .booking-policy {
+    margin-bottom: 1.5rem;
+  }
+  
+  .booking-policy h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+  
+  .booking-policy p {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+  }
+  
+  .booking-policy a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+</style>
+```
+
+<!-- src/routes/booking/[bookingId]/success/+page.svelte -->
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+  import { getBooking } from '$firebase/db/bookings';
+  import { Button } from '$components/forms';
+  
+  // Get booking ID from URL params
+  const bookingId = $page.params.bookingId;
+  
+  // Component state
+  let loading = true;
+  let error = '';
+  let booking: any = null;
+  
+  onMount(async () => {
+    try {
+      // Load booking data
+      booking = await getBooking(bookingId);
+      
+      if (!booking) {
+        error = 'Booking not found';
+        loading = false;
+        return;
+      }
+      
+      loading = false;
+    } catch (err) {
+      console.error('Error loading booking data:', err);
+      error = 'Failed to load booking information';
+      loading = false;
+    }
+  });
+  
+  // Format date
+  function formatDate(timestamp: any): string {
+    if (!timestamp) return '';
+    
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(date);
+  }
+</script>
+
+<svelte:head>
+  <title>Booking Confirmed | GearGrab</title>
+</svelte:head>
+
+<div class="booking-success-container">
+  {#if loading}
+    <div class="loading-state">
+      <p>Loading booking information...</p>
+    </div>
+  {:else if error}
+    <div class="error-state">
+      <p>{error}</p>
+      <Button on:click={() => goto('/dashboard/renter')}>Go to Dashboard</Button>
+    </div>
+  {:else}
+    <div class="booking-success">
+      <div class="success-icon">✓</div>
+      
+      <h1>Booking Confirmed!</h1>
+      
+      <p class="success-message">
+        Your booking request for <strong>{booking.listingSnapshot.title}</strong> has been submitted.
+        {#if booking.status === 'pendingApproval'}
+          We'll notify you when the owner approves your request.
+        {:else if booking.status === 'approved'}
+          Your booking has been approved!
+        {/if}
+      </p>
+      
+      <div class="booking-details-card">
+        <div class="booking-info">
+          <div class="info-row">
+            <span class="info-label">Booking ID</span>
+            <span class="info-value">{booking.bookingId}</span>
+          </div>
+          
+          <div class="info-row">
+            <span class="info-label">Status</span>
+            <span class="info-value status-badge">
+              {#if booking.status === 'pendingApproval'}
+                Pending Approval
+              {:else if booking.status === 'approved'}
+                Approved
+              {:else}
+                {booking.status}
+              {/if}
+            </span>
+          </div>
+          
+          <div class="info-row">
+            <span class="info-label">Pickup Date</span>
+            <span class="info-value">{formatDate(booking.startDate)}</span>
+          </div>
+          
+          <div class="info-row">
+            <span class="info-label">Return Date</span>
+            <span class="info-value">{formatDate(booking.endDate)}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="next-steps">
+        <h2>Next Steps</h2>
+        
+        {#if booking.status === 'pendingApproval'}
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h3>Wait for Owner Approval</h3>
+              <p>The owner has 24 hours to approve your booking request. You'll receive a notification once they respond.</p>
+            </div>
+          </div>
+          
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h3>Prepare for Pickup/Delivery</h3>
+              <p>Once approved, coordinate with the owner for {booking.deliveryPreference === 'delivery' ? 'delivery' : 'pickup'} details.</p>
+            </div>
+          </div>
+        {:else if booking.status === 'approved'}
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h3>Coordinate with the Owner</h3>
+              <p>Contact the owner to confirm {booking.deliveryPreference === 'delivery' ? 'delivery' : 'pickup'} details.</p>
+            </div>
+          </div>
+        {/if}
+        
+        <div class="step-card">
+          <div class="step-number">{booking.status === 'pendingApproval' ? '3' : '2'}</div>
+          <div class="step-content">
+            <h3>Complete GG Verify at Handover</h3>
+            <p>When you receive the gear, complete the GG Verify process to document its condition.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="action-buttons">
+        <Button 
+          on:click={() => goto(`/booking/${bookingId}`)}
+          variant="primary"
+        >
+          View Booking Details
+        </Button>
+        
+        <Button 
+          on:click={() => goto('/dashboard/renter')}
+          variant="outline"
+        >
+          Go to Dashboard
+        </Button>
+      </div>
+    </div>
+  {/if}
+</div>
+
+<style>
+  .booking-success-container {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+  
+  .loading-state,
+  .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    text-align: center;
+  }
+  
+  .booking-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .success-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #10b981;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  h1 {
+    margin-bottom: 1rem;
+  }
+  
+  .success-message {
+    margin-bottom: 2rem;
+    font-size: 1.125rem;
+    max-width: 500px;
+  }
+  
+  .booking-details-card {
+    width: 100%;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .info-row:last-child {
+    border-bottom: none;
+  }
+  
+  .info-label {
+    color: #64748b;
+    font-weight: 500;
+  }
+  
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background-color: #dbeafe;
+    color: #2563eb;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .next-steps {
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+  
+  .next-steps h2 {
+    text-align: left;
+    margin-bottom: 1rem;
+  }
+  
+  .step-card {
+    display: flex;
+    align-items: flex-start;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 1rem;
+    flex-shrink: 0;
+  }
+  
+  .step-content {
+    text-align: left;
+  }
+  
+  .step-content h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+  }
+  
+  .step-content p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.875rem;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  @media (max-width: 640px) {
+    .action-buttons {
+      flex-direction: column;
+      width: 100%;
+    }
+  }
+</style>

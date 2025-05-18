@@ -1,0 +1,53 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Utility functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && firestore.get(/databases/(default)/documents/adminUsers/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // User profile images - public read, user-only write
+    match /users/{userId}/profile/{fileName} {
+      allow read: if true;
+      allow write: if isOwner(userId) || isAdmin();
+    }
+    
+    // Listing images - public read, owner-only write
+    match /listings/{listingId}/{fileName} {
+      allow read: if true;
+      allow write: if isAuthenticated() && (
+        // Check if user is the owner of the listing
+        firestore.get(/databases/(default)/documents/listings/$(listingId)).data.ownerUid == request.auth.uid
+      ) || isAdmin();
+    }
+    
+    // Verification documents - restricted access
+    match /verification/{userId}/{fileName} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+    
+    // Booking evidence (damage photos, etc.) - involved parties only
+    match /bookings/{bookingId}/{fileName} {
+      allow read: if isAuthenticated() && (
+        // Check if user is involved in the booking
+        let booking = firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data;
+        request.auth.uid == booking.renterUid || request.auth.uid == booking.ownerUid
+      ) || isAdmin();
+      
+      allow write: if isAuthenticated() && (
+        // Check if user is involved in the booking
+        let booking = firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data;
+        request.auth.uid == booking.renterUid || request.auth.uid == booking.ownerUid
+      ) || isAdmin();
+    }
+  }
+}
