@@ -90,7 +90,7 @@ This will start the Firebase emulators for Authentication, Firestore, and Storag
 
 2. Deploy to Firebase:
    ```
-   npm run deploy
+   firebase deploy
    ```
 
 ### Cloud Run Deployment
