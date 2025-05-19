@@ -9,6 +9,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "node build/index.js",
+    "emulate": "firebase emulators:start",
+    "deploy": "firebase deploy",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "cypress:open": "cypress open",
