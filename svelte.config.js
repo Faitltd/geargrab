@@ -2,22 +2,24 @@ import adapter from '@sveltejs/adapter-node';
 import { vitePreprocess } from '@sveltejs/kit/vite';
 import { resolve } from 'path';
 
+const alias = {
+  $lib: 'src/lib',
+  $components: 'src/lib/components',
+  $stores: 'src/lib/stores',
+  $utils: 'src/lib/utils',
+  $firebase: 'src/lib/firebase',
+  $types: 'src/lib/types',
+  $services: 'src/lib/services',
+  $constants: 'src/lib/constants'
+};
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   preprocess: vitePreprocess(),
 
   kit: {
     adapter: adapter(),
-    alias: {
-      $lib: resolve('./src/lib'),
-      $components: resolve('./src/lib/components'),
-      $stores: resolve('./src/lib/stores'),
-      $utils: resolve('./src/lib/utils'),
-      $firebase: resolve('./src/lib/firebase'),
-      $types: resolve('./src/lib/types'),
-      $services: resolve('./src/lib/services'),
-      $constants: resolve('./src/lib/constants')
-    }
+    alias
   }
 };
 
