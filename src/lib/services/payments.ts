@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 import { getDaysBetween } from '$utils/dates';
 import type { Listing, Booking } from '$types/firestore';
 import { createBooking } from '$firebase/db/bookings';
-import { userStore } from '$stores/auth';
+import { authStore } from '$stores/auth';
 import { get } from 'svelte/store';
 
 // Calculate booking fees
@@ -80,7 +80,7 @@ export async function createBookingWithPayment(
   if (!browser) throw new Error('Payment functions can only be called in the browser');
   
   // Get current user
-  const { authUser } = get(userStore);
+  const { authUser } = get(authStore);
   if (!authUser) throw new Error('User must be logged in to create a booking');
   
   // Calculate fees
