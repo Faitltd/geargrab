@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { userStore } from '$stores/auth';
+  import { authStore } from '$stores/auth';
   import { getUserBookings } from '$firebase/db/bookings';
   import { getListings } from '$firebase/db/listings';
   import { formatCurrency } from '$utils/formatting';
@@ -16,25 +16,25 @@
   
   // Load dashboard data
   onMount(async () => {
-    if (!$userStore.isLoggedIn) return;
+    if (!$authStore.user) return;
     
     try {
       // Get active bookings (as renter)
       const { bookings: renterBookings } = await getUserBookings(
-        $userStore.authUser!.uid,
+        $authStore.user!.uid,
         'renter',
         ['pending', 'confirmed', 'active']
       );
       
       // Get active listings
       const { listings } = await getListings({
-        ownerUid: $userStore.authUser!.uid,
+        ownerUid: $authStore.user!.uid,
         status: 'active'
       });
       
       // Get bookings for owner's listings
       const { bookings: ownerBookings } = await getUserBookings(
-        $userStore.authUser!.uid,
+        $authStore.user!.uid,
         'owner',
         ['pending', 'confirmed', 'active']
       );
@@ -132,7 +132,7 @@
           <h2 class="text-lg font-medium">Verification Status</h2>
         </div>
         <div class="card-body">
-          {#if $userStore.firestoreUser?.isVerified}
+          {#if $authStore.firestoreUser?.isVerified}
             <div class="flex items-center text-green-600">
               <svg class="h-6 w-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -151,7 +151,7 @@
           {/if}
         </div>
         <div class="card-footer">
-          {#if !$userStore.firestoreUser?.isVerified}
+          {#if !$authStore.firestoreUser?.isVerified}
             <a href="/verify" class="text-green-600 hover:text-green-700 font-medium">Complete verification</a>
           {:else}
             <span class="text-gray-500">All set!</span>
