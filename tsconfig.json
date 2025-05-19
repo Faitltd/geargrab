@@ -6,26 +6,8 @@
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true,
-		"skipLibCheck": true,
-		"sourceMap": true,
-		"strict": true,
-		"paths": {
-			"$lib": ["./src/lib"],
-			"$lib/*": ["./src/lib/*"],
-			"$components": ["./src/lib/components"],
-			"$components/*": ["./src/lib/components/*"],
-			"$stores": ["./src/lib/stores"],
-			"$stores/*": ["./src/lib/stores/*"],
-			"$utils": ["./src/lib/utils"],
-			"$utils/*": ["./src/lib/utils/*"],
-			"$firebase": ["./src/lib/firebase"],
-			"$firebase/*": ["./src/lib/firebase/*"],
-			"$types": ["./src/lib/types"],
-			"$types/*": ["./src/lib/types/*"],
-			"$services": ["./src/lib/services"],
-			"$services/*": ["./src/lib/services/*"],
-			"$constants": ["./src/lib/constants"],
-			"$constants/*": ["./src/lib/constants/*"]
-		}
-	}
+                "skipLibCheck": true,
+                "sourceMap": true,
+                "strict": true
+        }
 }
