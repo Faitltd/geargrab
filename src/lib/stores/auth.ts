@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import { auth } from '$lib/firebase/client';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 
@@ -13,6 +13,9 @@ const authStore = writable<{
   loading: true,
   error: null
 });
+
+// Store containing just the current user
+const userStore = derived(authStore, ($auth) => $auth.user);
 
 // Initialize auth state listener
 if (browser) {
@@ -36,4 +39,4 @@ if (browser) {
   );
 }
 
-export { authStore };
+export { authStore, userStore };
