@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import { auth } from '$lib/firebase/client';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 
@@ -37,3 +37,11 @@ if (browser) {
 }
 
 export { authStore };
+
+// Derived store used by older components
+export const userStore = derived(authStore, ($auth) => ({
+  authUser: $auth.user,
+  isLoggedIn: $auth.user !== null,
+  loading: $auth.loading,
+  firestoreUser: null
+}));
