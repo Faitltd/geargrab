@@ -1,6 +1,7 @@
 {
   "name": "geargrab",
   "version": "0.0.1",
+  "description": "GearGrab - Outdoor Gear Rental Marketplace",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,18 +10,16 @@
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "cypress:open": "cypress open",
-    "cypress:run": "cypress run",
-    "test": "cypress run"
+    "generate:component": "node scripts/generate-component.js"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^2.0.0",
-    "@sveltejs/kit": "^1.20.4",
+    "@sveltejs/adapter-node": "^1.3.1",
+    "@sveltejs/kit": "^1.30.4",
     "@tailwindcss/forms": "^0.5.3",
     "autoprefixer": "^10.4.14",
-    "cypress": "^14.3.3",
     "postcss": "^8.4.24",
-    "svelte": "^4.0.5",
+    "svelte": "3.59.2",
     "svelte-check": "^3.4.3",
     "tailwindcss": "^3.3.2",
     "tslib": "^2.4.1",
@@ -28,9 +27,6 @@
     "vite": "^4.4.2"
   },
   "dependencies": {
-    "date-fns": "^2.30.0",
-    "firebase": "^9.22.0",
-    "firebase-admin": "^11.8.0",
-    "svelte-dnd-action": "^0.9.61"
+    "firebase": "^9.22.0"
   }
 }

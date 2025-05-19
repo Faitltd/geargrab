@@ -1,0 +1,19 @@
+cat svelte.config.js
+npm install --save-dev @sveltejs/adapter-node
+# Clean up node_modules
+rm -rf node_modules
+
+# Reinstall dependencies with legacy peer deps
+npm install --legacy-peer-deps
+
+# Try building locally
+npm run build
+
+gcloud config set project geargrab-460213
+gcloud builds submit --tag gcr.io/geargrab-460213/geargrab-app
+gcloud run deploy geargrab \
+  --image gcr.io/geargrab-460213/geargrab-app \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated
+gcloud beta run domain-mappings create --service geargrab --domain yourdomain.com

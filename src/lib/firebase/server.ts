@@ -1,46 +1,34 @@
-import { dev } from '$app/environment';
+import admin from 'firebase-admin';
 
-// Create mock objects for development
-const mockAuth = {
-  verifySessionCookie: async () => ({ uid: 'mock-user-id' }),
-  createSessionCookie: async () => 'mock-session-cookie'
+// Initialize the app if it hasn't been initialized already
+let app: admin.app.App;
+
+try {
+  app = admin.getApp();
+} catch {
+  // Initialize with service account if provided, otherwise use default credentials
+  const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT 
+    ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+    : undefined;
+    
+  app = admin.initializeApp({
+    credential: serviceAccount 
+      ? admin.credential.cert(serviceAccount)
+      : admin.credential.applicationDefault()
+  });
+}
+
+// Export the admin services
+export const adminAuth = app.auth();
+export const adminFirestore = { 
+  collection: () => ({ 
+    doc: () => ({ 
+      get: async () => ({ 
+        exists: false, 
+        data: () => ({}) 
+      }) 
+    }) 
+  }) 
 };
-
-const mockFirestore = {
-  collection: () => ({
-    doc: () => ({
-      get: async () => ({
-        exists: true,
-        data: () => ({})
-      }),
-      set: async () => {},
-      update: async () => {}
-    }),
-    where: () => ({
-      orderBy: () => ({
-        limit: () => ({
-          get: async () => ({
-            docs: [],
-            forEach: () => {}
-          })
-        })
-      })
-    })
-  })
-};
-
-const mockStorage = {
-  bucket: () => ({
-    file: () => ({
-      getSignedUrl: async () => ['mock-url'],
-      save: async () => {},
-      delete: async () => {}
-    })
-  })
-};
-
-// Export mock objects for development
-export const adminAuth = mockAuth;
-export const adminFirestore = mockFirestore;
-export const adminStorage = mockStorage;
+export const adminStorage = app.storage();
 export const adminApp = { name: 'mock-app' };
