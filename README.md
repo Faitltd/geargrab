@@ -74,7 +74,7 @@ GearGrab is a peer-to-peer marketplace for outdoor gear rentals. Find camping, h
 For local development, you can use Firebase emulators:
 
 ```
-npm run emulate
+firebase emulators:start
 ```
 
 This will start the Firebase emulators for Authentication, Firestore, and Storage.
@@ -90,7 +90,7 @@ This will start the Firebase emulators for Authentication, Firestore, and Storag
 
 2. Deploy to Firebase:
    ```
-   npm run deploy
+   firebase deploy
    ```
 
 ### Cloud Run Deployment
