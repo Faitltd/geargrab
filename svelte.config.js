@@ -6,7 +6,17 @@ const config = {
   preprocess: vitePreprocess(),
 
   kit: {
-    adapter: adapter()
+    adapter: adapter(),
+    alias: {
+      $lib: 'src/lib',
+      $components: 'src/lib/components',
+      $stores: 'src/lib/stores',
+      $utils: 'src/lib/utils',
+      $firebase: 'src/lib/firebase',
+      $types: 'src/lib/types',
+      $services: 'src/lib/services',
+      $constants: 'src/lib/constants'
+    }
   }
 };
 

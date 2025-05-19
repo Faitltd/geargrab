@@ -13,7 +13,9 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "test": "cypress run"
+    "test": "cypress run",
+    "deploy": "npm run build && firebase deploy",
+    "emulate": "firebase emulators:start --import=./emulator-data --export-on-exit"
   },
   "devDependencies": {
     "@sveltejs/adapter-node": "^1.0.0",
