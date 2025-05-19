@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import { auth } from '$lib/firebase/client';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 
@@ -36,4 +36,15 @@ if (browser) {
   );
 }
 
-export { authStore };
+// Derived store for backwards compatibility with components
+// expecting `userStore`. It exposes common fields like
+// `authUser`, `isLoggedIn` and propagates loading/error states.
+const userStore = derived(authStore, ($auth) => ({
+  authUser: $auth.user,
+  firestoreUser: null,
+  isLoggedIn: !!$auth.user,
+  loading: $auth.loading,
+  error: $auth.error
+}));
+
+export { authStore, userStore };
