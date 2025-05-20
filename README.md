@@ -1,6 +1,6 @@
 # GearGrab
 
-GearGrab is a peer-to-peer marketplace for outdoor gear rentals. Find camping, hiking, skiing, and other outdoor equipment from local owners.
+GearGrab is a peer-to-peer marketplace for outdoor gear rentals. It allows users to browse, search, and rent outdoor equipment like camping, hiking, skiing, and other gear from local owners.
 
 ## Features
 
@@ -26,7 +26,7 @@ GearGrab is a peer-to-peer marketplace for outdoor gear rentals. Find camping, h
 - Node.js (v16 or later)
 - npm or yarn
 - Firebase account
-- Stripe account (for payment processing)
+- Google Cloud Platform account (for Cloud Run deployment)
 
 ### Installation
 

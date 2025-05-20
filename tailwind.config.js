@@ -16,7 +16,11 @@ export default {
           800: '#166534',
           900: '#14532d',
         },
+        primary: '#16a34a', // green-600
       },
+      boxShadow: {
+        t: '0 -2px 5px rgba(0,0,0,0.05)'
+      }
     },
   },
   plugins: [
