@@ -424,3 +424,24 @@ gcloud run services update geargrab-app \
 - [ ] Enable audit logging
 
 This guide provides a comprehensive approach to deploying the GearGrab SvelteKit application to Google Cloud Run with optimal performance and reliability.
+## Troubleshooting Cross-Project Container Images
+
+If you deploy a Cloud Run service using a container image from a different Google Cloud project, the Cloud Run service account must have permission to read that image. A common error is:
+
+```
+Revision 'SERVICE-NAME-00001-xxx' is not ready and cannot serve traffic.
+Google Cloud Run Service Agent SERVICE_ACCOUNT must have permission to read the image, gcr.io/OTHER-PROJECT/IMAGE.
+```
+
+To resolve this you can either:
+
+1. **Use the same project** for both the container image and the Cloud Run service (recommended). Build and push your image to `gcr.io/$(gcloud config get-value project)/IMAGE` and deploy from there.
+2. **Grant Artifact Registry access** to the Cloud Run service account if you must deploy across projects:
+
+```bash
+gcloud projects add-iam-policy-binding OTHER-PROJECT \
+  --member="serviceAccount:SERVICE_NUMBER@serverless-robot-prod.iam.gserviceaccount.com" \
+  --role="roles/artifactregistry.reader"
+```
+
+Replace `OTHER-PROJECT` with the project hosting the image and `SERVICE_NUMBER` with the Cloud Run project's number. After permissions propagate, redeploy.
