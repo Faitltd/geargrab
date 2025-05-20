@@ -1,18 +1,46 @@
 import { browser } from '$app/environment';
-import { writable } from 'svelte/store';
+import { derived } from 'svelte/store';
 import { auth } from '$lib/firebase/client';
-import { onAuthStateChanged, type User } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 
-// Create a writable store for the auth state
-const authStore = writable<{
-  user: User | null;
-  loading: boolean;
-  error: Error | null;
-}>({
-  user: null,
-  loading: true,
-  error: null
-});
+// Define the user type
+type User = {
+  uid: string;
+  email: string;
+  displayName?: string;
+  photoURL?: string;
+} | null;
+
+// Create the auth store
+function createAuthStore() {
+  const { subscribe, set, update } = writable<{
+    user: User;
+    loading: boolean;
+    error: string | null;
+  }>({
+    user: null,
+    loading: true,
+    error: null
+  });
+
+  return {
+    subscribe,
+    setUser: (user: User) => update(state => ({ ...state, user, loading: false })),
+    setLoading: (loading: boolean) => update(state => ({ ...state, loading })),
+    setError: (error: string | null) => update(state => ({ ...state, error, loading: false })),
+    signOut: () => update(state => ({ ...state, user: null, error: null }))
+  };
+}
+
+export const authStore = createAuthStore();
+
+// Create a derived store that just contains the user with additional properties
+const userStore = derived(authStore, ($authStore) => ({
+  authUser: $authStore.user,
+  isLoggedIn: !!$authStore.user,
+  loading: $authStore.loading,
+  error: $authStore.error
+}));
 
 // Initialize auth state listener
 if (browser) {
@@ -20,20 +48,12 @@ if (browser) {
   const unsubscribeAuth = onAuthStateChanged(
     auth,
     (user) => {
-      authStore.update((state) => ({
-        ...state,
-        user,
-        loading: false
-      }));
+      authStore.setUser(user);
     },
     (error) => {
-      authStore.update((state) => ({
-        ...state,
-        error,
-        loading: false
-      }));
+      authStore.setError(error.message);
     }
   );
 }
 
-export { authStore };
+export { authStore, userStore };

@@ -1,12 +1,7 @@
 <script lang="ts">
-  // Mock auth store for development
-  const authStore = {
-    subscribe: (callback: (value: { user: null | { displayName?: string; email?: string } }) => void) => {
-      callback({ user: null });
-      return () => {};
-    }
-  };
-
+  import { page } from '$app/stores';
+  import { authStore } from '$lib/stores/auth';
+  
   let isMenuOpen = false;
 
   function toggleMenu() {
