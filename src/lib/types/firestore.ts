@@ -23,6 +23,9 @@ export interface User {
     asRenter: number;
   };
   responseTime?: number; // Average response time in minutes
+  isGGVerified?: boolean;
+  ggVerificationLevel?: 'level1' | 'level2' | 'level3'; // Example verification tiers
+  ggVerifiedAt?: Timestamp;
 }
 
 export interface UserPrivate {
@@ -196,4 +199,46 @@ export interface VerificationSession {
   createdAt: Timestamp;
   updatedAt: Timestamp;
   completedAt?: Timestamp;
+}
+
+export interface Claim {
+  id: string; // Document ID
+  bookingId: string;
+  listingId: string; // Denormalized from booking for easier access
+  claimantUid: string; // UID of the user who filed the claim
+  ownerUid: string; // UID of the listing owner, denormalized from booking
+  renterUid: string; // UID of the renter, denormalized from booking
+  reason: string; // e.g., 'damage', 'theft', 'misrepresentation', 'not_as_described', 'late_return', 'other'
+  description: string; // Detailed explanation of the claim
+  status: 'pending' | 'under_review' | 'information_requested' | 'approved' | 'rejected' | 'resolved' | 'escalated_to_support';
+  resolutionDetails?: string; // Details on how the claim was resolved, if applicable
+  evidenceUrls?: string[]; // URLs to any uploaded evidence (photos, videos, documents)
+  adminNotes?: string; // Notes from an admin handling the claim
+  communicationHistory?: Array<{
+    userId: string;
+    message: string;
+    timestamp: Timestamp;
+  }>; // For communication within the claim
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  resolvedAt?: Timestamp; // Timestamp when the claim was finally resolved or closed
+}
+
+export interface GGVerification {
+  id: string; // Document ID
+  userId: string; // UID of the user being verified
+  documentType: 'drivers_license' | 'passport' | 'national_id' | 'residence_permit' | 'other';
+  documentFrontUrl: string; // URL to the Firebase Storage path for the front of the ID document
+  documentBackUrl?: string; // URL to the Firebase Storage path for the back of the ID document (if applicable)
+  faceImageUrl: string; // URL to the Firebase Storage path for the selfie/face image for comparison
+  status: 'pending_review' | 'approved' | 'rejected' | 'needs_resubmission' | 'expired' | 'in_progress';
+  rejectionReason?: string; // If status is 'rejected' or 'needs_resubmission'
+  rejectionCode?: 'POOR_QUALITY' | 'MISMATCH' | 'EXPIRED_DOCUMENT' | 'SUSPICIOUS_ACTIVITY' | 'INCOMPLETE' | 'OTHER'; // Standardized rejection codes
+  verificationDetails?: string; // Any additional details from the admin or system
+  attempts: number; // Number of submission attempts for this verification
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  reviewedAt?: Timestamp; // When an admin/system last reviewed it
+  reviewedBy?: string; // UID of the admin or system identifier that reviewed it
+  expiresAt?: Timestamp; // If verification can expire (e.g., for certain document types)
 }

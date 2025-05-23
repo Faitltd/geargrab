@@ -79,5 +79,117 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow write: if isAdmin();
     }
+
+    // --- New Collections ---
+
+    // Payments Collection
+    // - Users can create their own payments.
+    // - Users can read their own payments, Admins can read any.
+    // - Payments are not updatable.
+    // - Admins can delete payments.
+    function hasRequiredPaymentFields(data) {
+      return data.userId is string &&
+             data.amount is number && data.amount > 0 &&
+             data.currency is string && data.currency.size() == 3 &&
+             data.paymentMethodId is string &&
+             data.status is string && (data.status == 'succeeded' || data.status == 'pending' || data.status == 'failed') &&
+             data.createdAt is timestamp &&
+             data.keys().hasOnly(['userId', 'amount', 'currency', 'paymentMethodId', 'status', 'clientSecret', 'createdAt', 'updatedAt', 'listingId', 'bookingId', 'description', 'metadata']); // Ensure only expected fields
+    }
+
+    match /payments/{paymentId} {
+      allow create: if isAuthenticated() &&
+                       request.resource.data.userId == request.auth.uid &&
+                       hasRequiredPaymentFields(request.resource.data) &&
+                       request.resource.data.createdAt == request.time; // Ensure server timestamp for creation
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // Claims Collection
+    // - Users can create claims if they are a participant (owner/renter) in the associated booking.
+    // - Involved users (claimant, owner, renter) and Admins can read claims.
+    // - Only Admins can update claims.
+    // - Only Admins can delete claims.
+    function isActualBookingParticipant(bookingId, expectedOwnerUid, expectedRenterUid) {
+      let booking = get(/databases/$(database)/documents/bookings/$(bookingId)).data;
+      return booking.ownerUid == expectedOwnerUid && // Verify owner from request matches booking
+             booking.renterUid == expectedRenterUid && // Verify renter from request matches booking
+             (request.auth.uid == booking.renterUid || request.auth.uid == booking.ownerUid);
+    }
+
+    function hasRequiredClaimFields(data) {
+      return data.claimantUid is string &&
+             data.bookingId is string &&
+             data.listingId is string &&
+             data.ownerUid is string &&
+             data.renterUid is string &&
+             data.reason is string && data.reason.size() > 0 &&
+             data.description is string && data.description.size() > 0 &&
+             data.status == 'pending' && // Initial status must be pending
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp &&
+             data.keys().hasOnly(['claimantUid', 'bookingId', 'listingId', 'ownerUid', 'renterUid', 'reason', 'description', 'status', 'evidenceUrls', 'resolutionDetails', 'adminNotes', 'communicationHistory', 'createdAt', 'updatedAt', 'resolvedAt']);
+    }
+    
+    function claimCannotChangeImmutableFields(requestData, existingData) {
+      return requestData.claimantUid == existingData.claimantUid &&
+             requestData.bookingId == existingData.bookingId &&
+             requestData.listingId == existingData.listingId &&
+             requestData.ownerUid == existingData.ownerUid &&
+             requestData.renterUid == existingData.renterUid &&
+             requestData.createdAt == existingData.createdAt;
+    }
+
+    match /claims/{claimId} {
+      allow create: if isAuthenticated() &&
+                       request.resource.data.claimantUid == request.auth.uid &&
+                       isActualBookingParticipant(request.resource.data.bookingId, request.resource.data.ownerUid, request.resource.data.renterUid) &&
+                       hasRequiredClaimFields(request.resource.data) &&
+                       request.resource.data.createdAt == request.time &&
+                       request.resource.data.updatedAt == request.time;
+      allow read: if isAuthenticated() &&
+                     (resource.data.claimantUid == request.auth.uid ||
+                      resource.data.ownerUid == request.auth.uid ||
+                      resource.data.renterUid == request.auth.uid ||
+                      isAdmin());
+      allow update: if isAdmin() && 
+                       claimCannotChangeImmutableFields(request.resource.data, resource.data) &&
+                       request.resource.data.updatedAt == request.time; // Ensure server timestamp for updates
+      allow delete: if isAdmin();
+    }
+
+    // GG Verifications Collection
+    // - Users can create their own verification requests, or Admins can create for them.
+    // - Users can read their own requests, Admins can read any.
+    // - Only Admins can update requests (approve/reject).
+    // - Only Admins can delete requests.
+    function hasRequiredGGVerificationFields(data) {
+      return data.userId is string &&
+             data.documentType is string && (data.documentType == 'drivers_license' || data.documentType == 'passport' || data.documentType == 'national_id' || data.documentType == 'residence_permit' || data.documentType == 'other') &&
+             data.documentFrontUrl is string && data.documentFrontUrl.size() > 0 &&
+             data.faceImageUrl is string && data.faceImageUrl.size() > 0 &&
+             data.status == 'pending_review' && // Initial status
+             data.attempts is number && data.attempts > 0 &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp &&
+             // documentBackUrl is optional
+             data.keys().hasOnly(['userId', 'documentType', 'documentFrontUrl', 'documentBackUrl', 'faceImageUrl', 'status', 'rejectionReason', 'rejectionCode', 'verificationDetails', 'attempts', 'createdAt', 'updatedAt', 'reviewedAt', 'reviewedBy', 'expiresAt']);
+    }
+
+    match /gg_verifications/{verificationId} {
+      allow create: if isAuthenticated() &&
+                       (request.resource.data.userId == request.auth.uid || isAdmin()) &&
+                       hasRequiredGGVerificationFields(request.resource.data) &&
+                       request.resource.data.createdAt == request.time &&
+                       request.resource.data.updatedAt == request.time;
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if isAdmin() &&
+                       request.resource.data.userId == resource.data.userId && // userId cannot be changed
+                       request.resource.data.createdAt == resource.data.createdAt && // createdAt cannot be changed
+                       request.resource.data.updatedAt == request.time; // Ensure server timestamp for updates
+      allow delete: if isAdmin();
+    }
   }
 }
