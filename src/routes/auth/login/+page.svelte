@@ -44,7 +44,11 @@
 
     try {
       await signInWithEmail(email, password);
-      notificationsStore.success('Successfully logged in!');
+      notifications.add({
+        type: 'success',
+        message: 'Successfully logged in!',
+        timeout: 5000
+      });
       goto(redirectTo);
     } catch (error: any) {
       console.error('Login error:', error);
@@ -69,7 +73,11 @@
 
     try {
       await signInWithGoogle();
-      notificationsStore.success('Successfully logged in with Google!');
+      notifications.add({
+        type: 'success',
+        message: 'Successfully logged in with Google!',
+        timeout: 5000
+      });
       goto(redirectTo);
     } catch (error: any) {
       console.error('Google sign-in error:', error);
