@@ -3,6 +3,7 @@ import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from 'firebase/storage';
+import { logFirebaseConfigStatus } from '$lib/utils/firebaseValidator';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -22,9 +23,12 @@ let firestore: Firestore;
 let storage: FirebaseStorage;
 
 if (browser) {
+  // Log configuration status for debugging
+  logFirebaseConfigStatus();
+
   // Initialize Firebase
   firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-  
+
   // Initialize Firebase services
   auth = getAuth(firebaseApp);
   firestore = getFirestore(firebaseApp);

@@ -4,6 +4,19 @@ import type { Listing, Booking } from '$types/firestore';
 import { createBooking } from '$firebase/db/bookings';
 import { userStore } from '$stores/auth';
 import { get } from 'svelte/store';
+import { db } from '$lib/firebase/client';
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  serverTimestamp
+} from 'firebase/firestore';
 
 // Calculate booking fees
 export function calculateBookingFees(
@@ -117,6 +130,155 @@ export async function createBookingWithPayment(
   return { bookingId };
 }
 
+// Advanced payment interfaces
+export interface PaymentMethod {
+  id: string;
+  type: 'card' | 'bank_account' | 'digital_wallet';
+  isDefault: boolean;
+  card?: {
+    brand: string;
+    last4: string;
+    expMonth: number;
+    expYear: number;
+    funding: 'credit' | 'debit' | 'prepaid';
+  };
+  bankAccount?: {
+    bankName: string;
+    accountType: 'checking' | 'savings';
+    last4: string;
+    routingNumber: string;
+  };
+  digitalWallet?: {
+    provider: 'apple_pay' | 'google_pay' | 'paypal';
+    email?: string;
+  };
+  billingAddress: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  createdAt: Date;
+  isVerified: boolean;
+}
+
+export interface PaymentIntent {
+  id: string;
+  amount: number;
+  currency: string;
+  status: 'requires_payment_method' | 'requires_confirmation' | 'requires_action' | 'processing' | 'succeeded' | 'canceled';
+  bookingId: string;
+  paymentMethodId?: string;
+  clientSecret: string;
+  metadata: {
+    bookingId: string;
+    listingId: string;
+    renterId: string;
+    ownerId: string;
+  };
+  createdAt: Date;
+  confirmedAt?: Date;
+}
+
+export interface Transaction {
+  id: string;
+  type: 'payment' | 'refund' | 'payout' | 'fee' | 'deposit_hold' | 'deposit_release';
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'canceled';
+  amount: number;
+  currency: string;
+  description: string;
+
+  // Related entities
+  bookingId?: string;
+  paymentIntentId?: string;
+  paymentMethodId?: string;
+
+  // Parties involved
+  fromUserId?: string;
+  toUserId?: string;
+
+  // Fees breakdown
+  fees: {
+    platform: number;
+    payment: number;
+    insurance?: number;
+  };
+
+  // Timing
+  createdAt: Date;
+  processedAt?: Date;
+  settledAt?: Date;
+
+  // Additional data
+  metadata?: Record<string, any>;
+  failureReason?: string;
+  refundedAmount?: number;
+}
+
+export interface Payout {
+  id: string;
+  userId: string;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'in_transit' | 'paid' | 'failed' | 'canceled';
+  payoutMethodId: string;
+
+  // Breakdown
+  earnings: {
+    bookings: Transaction[];
+    totalBookingRevenue: number;
+    platformFees: number;
+    netEarnings: number;
+  };
+
+  // Timing
+  createdAt: Date;
+  expectedArrival?: Date;
+  arrivedAt?: Date;
+
+  // Failure handling
+  failureCode?: string;
+  failureMessage?: string;
+}
+
+export interface EarningsReport {
+  userId: string;
+  period: {
+    start: Date;
+    end: Date;
+  };
+
+  summary: {
+    totalRevenue: number;
+    platformFees: number;
+    netEarnings: number;
+    bookingCount: number;
+    averageBookingValue: number;
+  };
+
+  breakdown: {
+    byMonth: Array<{
+      month: string;
+      revenue: number;
+      fees: number;
+      net: number;
+      bookings: number;
+    }>;
+    byListing: Array<{
+      listingId: string;
+      listingTitle: string;
+      revenue: number;
+      bookings: number;
+    }>;
+  };
+
+  pendingPayouts: number;
+  availableForPayout: number;
+  nextPayoutDate?: Date;
+}
+
 // Process a refund
 export async function processRefund(
   bookingId: string,
@@ -124,14 +286,103 @@ export async function processRefund(
   reason: string
 ): Promise<{ success: boolean; refundId?: string }> {
   if (!browser) throw new Error('Payment functions can only be called in the browser');
-  
-  // In a real implementation, we would call a server endpoint to process the refund
-  // For now, we'll simulate a successful refund
-  const refundId = `re_${Math.random().toString(36).substring(2, 15)}`;
-  
-  // Update the booking status in Firestore would happen here
-  
-  return { success: true, refundId };
+
+  try {
+    // Create refund transaction record
+    const transactionsRef = collection(db, 'transactions');
+    const refundTransaction: Omit<Transaction, 'id'> = {
+      type: 'refund',
+      status: 'pending',
+      amount,
+      currency: 'USD',
+      description: `Refund for booking ${bookingId}: ${reason}`,
+      bookingId,
+      fees: {
+        platform: 0,
+        payment: Math.round(amount * 0.029) // Stripe refund fee
+      },
+      createdAt: new Date(),
+      metadata: { reason }
+    };
+
+    const refundDoc = await addDoc(transactionsRef, {
+      ...refundTransaction,
+      createdAt: serverTimestamp()
+    });
+
+    // In a real implementation, we would call Stripe API here
+    const refundId = `re_${Math.random().toString(36).substring(2, 15)}`;
+
+    // Update transaction with success
+    await updateDoc(refundDoc, {
+      status: 'completed',
+      processedAt: serverTimestamp(),
+      metadata: { ...refundTransaction.metadata, stripeRefundId: refundId }
+    });
+
+    return { success: true, refundId };
+  } catch (error) {
+    console.error('Error processing refund:', error);
+    return { success: false };
+  }
+}
+
+// Add payment method
+export async function addPaymentMethod(
+  userId: string,
+  paymentMethodData: Omit<PaymentMethod, 'id' | 'createdAt' | 'isVerified'>
+): Promise<string> {
+  try {
+    const paymentMethodsRef = collection(db, 'paymentMethods');
+
+    const paymentMethod = {
+      ...paymentMethodData,
+      userId,
+      createdAt: serverTimestamp(),
+      isVerified: false
+    };
+
+    const docRef = await addDoc(paymentMethodsRef, paymentMethod);
+
+    // In a real implementation, verify with Stripe
+    setTimeout(async () => {
+      await updateDoc(docRef, { isVerified: true });
+    }, 2000);
+
+    return docRef.id;
+  } catch (error) {
+    console.error('Error adding payment method:', error);
+    throw error;
+  }
+}
+
+// Get user's payment methods
+export async function getUserPaymentMethods(userId: string): Promise<PaymentMethod[]> {
+  try {
+    const paymentMethodsRef = collection(db, 'paymentMethods');
+    const q = query(
+      paymentMethodsRef,
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc')
+    );
+
+    const querySnapshot = await getDocs(q);
+    const paymentMethods: PaymentMethod[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      paymentMethods.push({
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate()
+      } as PaymentMethod);
+    });
+
+    return paymentMethods;
+  } catch (error) {
+    console.error('Error getting payment methods:', error);
+    throw error;
+  }
 }
 
 // Calculate owner payout amount

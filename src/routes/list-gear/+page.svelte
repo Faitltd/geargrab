@@ -829,31 +829,43 @@
 
       <!-- Step 5: Preview -->
       {#if currentStep === 5}
-        <div>
-          <h2 class="text-xl font-semibold mb-4">Preview Your Listing</h2>
-          <p class="text-gray-500 mb-6">Review your listing details before submitting.</p>
+        <div class="space-y-8">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-white drop-shadow-lg">Preview Your Listing</h2>
+            <p class="text-gray-300 drop-shadow-lg mt-2">Review your listing details before submitting.</p>
+          </div>
 
           <div class="space-y-8">
             <!-- Basic Info Preview -->
-            <div>
-              <h3 class="text-lg font-medium border-b border-gray-200 pb-2 mb-3">Basic Information</h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-                <div>
-                  <p class="text-sm text-gray-500">Title</p>
-                  <p class="font-medium">{formData.title}</p>
+            <div class="max-w-2xl mx-auto">
+              <h3 class="text-xl font-medium text-white drop-shadow-lg mb-6 text-center">Basic Information</h3>
+
+              <!-- Title -->
+              <div class="mb-6">
+                <div class="bg-gray-800/70 backdrop-blur-sm rounded-lg border border-gray-600/50 p-4 shadow-lg">
+                  <p class="text-sm text-gray-300 mb-1">Title</p>
+                  <p class="text-white font-medium">{formData.title}</p>
                 </div>
-                <div>
-                  <p class="text-sm text-gray-500">Category</p>
-                  <p class="font-medium">
+              </div>
+
+              <!-- Category -->
+              <div class="mb-6">
+                <div class="bg-gray-800/70 backdrop-blur-sm rounded-lg border border-gray-600/50 p-4 shadow-lg">
+                  <p class="text-sm text-gray-300 mb-1">Category</p>
+                  <p class="text-white font-medium">
                     {categories.find(c => c.id === formData.category)?.name || ''}
                     {#if formData.subcategory}
                       &nbsp;› {formData.subcategory}
                     {/if}
                   </p>
                 </div>
-                <div class="col-span-1 md:col-span-2">
-                  <p class="text-sm text-gray-500">Description</p>
-                  <p>{formData.description}</p>
+              </div>
+
+              <!-- Description -->
+              <div class="mb-6">
+                <div class="bg-gray-800/70 backdrop-blur-sm rounded-lg border border-gray-600/50 p-4 shadow-lg">
+                  <p class="text-sm text-gray-300 mb-1">Description</p>
+                  <p class="text-white">{formData.description}</p>
                 </div>
               </div>
             </div>

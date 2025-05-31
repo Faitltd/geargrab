@@ -6,9 +6,7 @@
   - onChange: Function to call when images change
 -->
 <script lang="ts">
-  import { createEventDispatcher, onMount } from 'svelte';
-  import { flip } from 'svelte/animate';
-  import { dndzone } from 'svelte-dnd-action';
+  import { createEventDispatcher } from 'svelte';
   
   // Props
   export let images: string[] = [];
@@ -103,21 +101,36 @@
     dispatch('change', { images: updatedImages });
   }
   
-  // Handle image reordering
-  function handleDndConsider(event: CustomEvent) {
-    const newItems = event.detail.items;
-    dispatch('change', { images: newItems });
+  // Move image up in order
+  function moveImageUp(index: number) {
+    if (index > 0) {
+      const newImages = [...images];
+      [newImages[index - 1], newImages[index]] = [newImages[index], newImages[index - 1]];
+      dispatch('change', { images: newImages });
+    }
   }
-  
-  function handleDndFinalize(event: CustomEvent) {
-    const newItems = event.detail.items;
-    dispatch('change', { images: newItems });
+
+  // Move image down in order
+  function moveImageDown(index: number) {
+    if (index < images.length - 1) {
+      const newImages = [...images];
+      [newImages[index], newImages[index + 1]] = [newImages[index + 1], newImages[index]];
+      dispatch('change', { images: newImages });
+    }
   }
   
   // Trigger file input click
   function openFileDialog() {
     if (fileInput) {
       fileInput.click();
+    }
+  }
+
+  // Handle keyboard events for accessibility
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openFileDialog();
     }
   }
 </script>
@@ -133,14 +146,18 @@
   {/if}
   
   <!-- Drag and drop area -->
-  <div 
+  <div
     class="upload-area {dragActive ? 'active' : ''} {images.length >= maxImages ? 'disabled' : ''}"
     on:dragenter={handleDragEnter}
     on:dragover={handleDragOver}
     on:dragleave={handleDragLeave}
     on:drop={handleDrop}
     on:click={openFileDialog}
+    on:keydown={handleKeydown}
+    tabindex="0"
+    role="button"
     aria-disabled={images.length >= maxImages}
+    aria-label="Upload images by clicking or dragging files here"
   >
     <input 
       type="file" 
@@ -178,37 +195,60 @@
   {#if images.length > 0}
     <div class="image-preview-container">
       <p class="text-sm font-medium text-gray-700 mb-2">
-        Drag images to reorder. The first image will be the main image.
+        Use the arrow buttons to reorder images. The first image will be the main image.
       </p>
-      
-      <div class="image-grid" use:dndzone={{items: images, flipDurationMs: 200}} on:consider={handleDndConsider} on:finalize={handleDndFinalize}>
+
+      <div class="image-grid">
         {#each images as image, i (image)}
-          <div class="image-item" animate:flip={{duration: 200}}>
+          <div class="image-item">
             <div class="image-wrapper">
               <img src={image} alt={`Preview ${i+1}`} class="preview-image" />
-              
-              <button 
-                type="button" 
+
+              <!-- Remove button -->
+              <button
+                type="button"
                 class="remove-button"
-                on:click|stopPropagation={() => removeImage(i)}
+                on:click={() => removeImage(i)}
                 aria-label={`Remove image ${i+1}`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
                   <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                 </svg>
               </button>
-              
+
+              <!-- Move buttons -->
+              <div class="move-buttons">
+                {#if i > 0}
+                  <button
+                    type="button"
+                    class="move-button"
+                    on:click={() => moveImageUp(i)}
+                    aria-label={`Move image ${i+1} left`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                      <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                {/if}
+                {#if i < images.length - 1}
+                  <button
+                    type="button"
+                    class="move-button"
+                    on:click={() => moveImageDown(i)}
+                    aria-label={`Move image ${i+1} right`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                {/if}
+              </div>
+
               {#if i === 0}
                 <div class="main-image-badge">
                   Main Image
                 </div>
               {/if}
-              
-              <div class="drag-handle" aria-label="Drag to reorder">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
-                  <path d="M7 2a1 1 0 011 1v1h3a1 1 0 110 2H9.578a18.87 18.87 0 01-1.724 4.78c.29.354.596.696.914 1.026a1 1 0 11-1.44 1.389 21.29 21.29 0 01-.554-.6 19.29 19.29 0 01-3.107 3.567 1 1 0 01-1.334-1.49 17.33 17.33 0 003.13-3.234c-.865-1.333-1.858-2.798-2.327-4.438H2.31a1 1 0 110-2H4a1 1 0 011-1h2zm4.5 6a1 1 0 00-1 1v1h-2a1 1 0 000 2h2v1a1 1 0 002 0v-1h2a1 1 0 000-2h-2V9a1 1 0 00-1-1z" />
-                </svg>
-              </div>
             </div>
           </div>
         {/each}
@@ -328,11 +368,16 @@
     border-radius: 0.25rem;
   }
   
-  .drag-handle {
+  .move-buttons {
     position: absolute;
-    top: 0.5rem;
-    left: 0.5rem;
-    background-color: rgba(0, 0, 0, 0.5);
+    bottom: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .move-button {
+    background-color: rgba(0, 0, 0, 0.7);
     color: white;
     border-radius: 0.25rem;
     width: 1.5rem;
@@ -340,10 +385,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: grab;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border: none;
   }
-  
-  .drag-handle:active {
-    cursor: grabbing;
+
+  .move-button:hover {
+    background-color: rgba(0, 0, 0, 0.9);
   }
 </style>

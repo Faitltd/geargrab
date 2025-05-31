@@ -1,9 +1,9 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { signUpWithEmail, signInWithGoogle } from '$firebase/auth';
-  import { notificationsStore } from '$stores/notifications';
-  import { isValidEmail, isValidPassword } from '$utils/validation';
+  import { signUpWithEmail, signInWithGoogle } from '$lib/firebase/auth';
+  import { notifications } from '$lib/stores/notifications';
+  import { isValidEmail, isValidPassword } from '$lib/utils/validation';
   
   let displayName = '';
   let email = '';
@@ -64,7 +64,7 @@
     
     try {
       await signUpWithEmail(email, password, displayName);
-      notificationsStore.success('Account created successfully!');
+      notifications.success('Account created successfully!');
       goto(redirectTo);
     } catch (error: any) {
       console.error('Signup error:', error);
@@ -96,7 +96,7 @@
     
     try {
       await signInWithGoogle();
-      notificationsStore.success('Account created successfully with Google!');
+      notifications.success('Account created successfully with Google!');
       goto(redirectTo);
     } catch (error: any) {
       console.error('Google sign-in error:', error);
@@ -111,22 +111,36 @@
   <title>Sign Up - GearGrab</title>
 </svelte:head>
 
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+<!-- Full Page Background -->
+<div class="fixed inset-0 z-0">
+  <div class="absolute inset-0">
+    <img
+      src="/pexels-bianca-gasparoto-834990-1752951.jpg"
+      alt="Mountain landscape"
+      class="w-full h-full object-cover"
+    >
+  </div>
+  <div class="absolute inset-0 bg-black opacity-40"></div>
+</div>
+
+<!-- Page Content -->
+<div class="relative z-30 min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-32">
   <div class="max-w-md w-full space-y-8">
-    <div>
-      <h1 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    <!-- Header -->
+    <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6 text-center">
+      <h1 class="text-3xl font-extrabold text-white">
         Create your account
       </h1>
-      <p class="mt-2 text-center text-sm text-gray-600">
+      <p class="mt-2 text-sm text-gray-300">
         Or
-        <a href="/auth/login" class="font-medium text-green-600 hover:text-green-500">
+        <a href="/auth/login" class="font-medium text-green-400 hover:text-green-300">
           sign in to your existing account
         </a>
       </p>
     </div>
     
     {#if errors.auth}
-      <div class="rounded-md bg-red-50 p-4">
+      <div class="bg-red-500/20 border border-red-500/50 rounded-lg p-4">
         <div class="flex">
           <div class="flex-shrink-0">
             <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -134,7 +148,7 @@
             </svg>
           </div>
           <div class="ml-3">
-            <h3 class="text-sm font-medium text-red-800">
+            <h3 class="text-sm font-medium text-red-200">
               {errors.auth}
             </h3>
           </div>
@@ -142,8 +156,10 @@
       </div>
     {/if}
     
-    <form class="mt-8 space-y-6" on:submit|preventDefault={handleSubmit}>
-      <div class="rounded-md shadow-sm -space-y-px">
+    <!-- Signup Form -->
+    <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6">
+      <form class="space-y-6" on:submit|preventDefault={handleSubmit}>
+        <div class="space-y-4">
         <div>
           <label for="display-name" class="sr-only">Full name</label>
           <input 
@@ -152,12 +168,12 @@
             type="text" 
             autocomplete="name" 
             required 
-            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" 
+            class="appearance-none relative block w-full px-3 py-2 border border-white/20 placeholder-gray-300 text-white bg-white/10 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
             placeholder="Full name"
             bind:value={displayName}
           />
           {#if errors.displayName}
-            <p class="mt-1 text-sm text-red-600">{errors.displayName}</p>
+            <p class="mt-1 text-sm text-red-300">{errors.displayName}</p>
           {/if}
         </div>
         <div>
@@ -168,66 +184,66 @@
             type="email" 
             autocomplete="email" 
             required 
-            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" 
+            class="appearance-none relative block w-full px-3 py-2 border border-white/20 placeholder-gray-300 text-white bg-white/10 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
             placeholder="Email address"
             bind:value={email}
           />
           {#if errors.email}
-            <p class="mt-1 text-sm text-red-600">{errors.email}</p>
+            <p class="mt-1 text-sm text-red-300">{errors.email}</p>
           {/if}
         </div>
         <div>
           <label for="password" class="sr-only">Password</label>
-          <input 
-            id="password" 
-            name="password" 
-            type="password" 
-            autocomplete="new-password" 
-            required 
-            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" 
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="new-password"
+            required
+            class="appearance-none relative block w-full px-3 py-2 border border-white/20 placeholder-gray-300 text-white bg-white/10 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
             placeholder="Password"
             bind:value={password}
           />
           {#if errors.password}
-            <p class="mt-1 text-sm text-red-600">{errors.password}</p>
+            <p class="mt-1 text-sm text-red-300">{errors.password}</p>
           {/if}
         </div>
         <div>
           <label for="confirm-password" class="sr-only">Confirm password</label>
-          <input 
-            id="confirm-password" 
-            name="confirm-password" 
-            type="password" 
-            autocomplete="new-password" 
-            required 
-            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" 
+          <input
+            id="confirm-password"
+            name="confirm-password"
+            type="password"
+            autocomplete="new-password"
+            required
+            class="appearance-none relative block w-full px-3 py-2 border border-white/20 placeholder-gray-300 text-white bg-white/10 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
             placeholder="Confirm password"
             bind:value={confirmPassword}
           />
           {#if errors.confirmPassword}
-            <p class="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+            <p class="mt-1 text-sm text-red-300">{errors.confirmPassword}</p>
           {/if}
         </div>
       </div>
 
-      <div class="flex items-center">
-        <input 
-          id="agree-terms" 
-          name="agree-terms" 
-          type="checkbox" 
-          class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-          bind:checked={agreeTerms}
-        />
-        <label for="agree-terms" class="ml-2 block text-sm text-gray-900">
-          I agree to the 
-          <a href="/terms" class="text-green-600 hover:text-green-500">Terms of Service</a>
-          and
-          <a href="/privacy" class="text-green-600 hover:text-green-500">Privacy Policy</a>
-        </label>
-      </div>
-      {#if errors.agreeTerms}
-        <p class="mt-1 text-sm text-red-600">{errors.agreeTerms}</p>
-      {/if}
+        <div class="flex items-center">
+          <input
+            id="agree-terms"
+            name="agree-terms"
+            type="checkbox"
+            class="h-4 w-4 text-green-600 focus:ring-green-500 border-white/20 bg-white/10 rounded"
+            bind:checked={agreeTerms}
+          />
+          <label for="agree-terms" class="ml-2 block text-sm text-gray-300">
+            I agree to the
+            <a href="/terms" class="text-green-400 hover:text-green-300">Terms of Service</a>
+            and
+            <a href="/privacy" class="text-green-400 hover:text-green-300">Privacy Policy</a>
+          </label>
+        </div>
+        {#if errors.agreeTerms}
+          <p class="mt-1 text-sm text-red-300">{errors.agreeTerms}</p>
+        {/if}
 
       <div>
         <button 
@@ -247,25 +263,27 @@
             Sign up
           {/if}
         </button>
-      </div>
-    </form>
-    
-    <div class="mt-6">
+        </div>
+      </form>
+    </div>
+
+    <!-- Google Sign In -->
+    <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6">
       <div class="relative">
         <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-300"></div>
+          <div class="w-full border-t border-white/20"></div>
         </div>
         <div class="relative flex justify-center text-sm">
-          <span class="px-2 bg-gray-50 text-gray-500">
+          <span class="px-2 bg-black/20 text-gray-300">
             Or continue with
           </span>
         </div>
       </div>
 
       <div class="mt-6">
-        <button 
-          type="button" 
-          class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        <button
+          type="button"
+          class="w-full flex justify-center py-2 px-4 border border-white/20 rounded-md shadow-sm bg-white/10 text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
           on:click={handleGoogleSignIn}
           disabled={loading}
         >
