@@ -23,7 +23,8 @@
     "test:all": "node cypress/scripts/run-tests.js all",
     "test:parallel": "node cypress/scripts/run-tests.js parallel core auth dashboard",
     "test:ci": "node cypress/scripts/run-tests.js ci",
-    "test:setup": "node cypress/scripts/setup-tests.js"
+    "test:setup": "node cypress/scripts/setup-tests.js",
+    "setup:firebase": "node scripts/setup-firebase-env.js"
   },
   "devDependencies": {
     "@sveltejs/adapter-node": "^1.0.0",

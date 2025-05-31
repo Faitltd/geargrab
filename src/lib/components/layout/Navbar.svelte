@@ -1,10 +1,29 @@
 <script lang="ts">
   import { authStore } from '$lib/stores/auth';
+  import { smoothScrollWithNavOffset } from '$lib/utils/smoothScroll';
 
   let isMenuOpen = false;
 
   function toggleMenu() {
     isMenuOpen = !isMenuOpen;
+  }
+
+  function handleSmoothScroll(elementId: string) {
+    smoothScrollWithNavOffset(elementId);
+    // Close mobile menu if open
+    if (isMenuOpen) {
+      isMenuOpen = false;
+    }
+  }
+
+  // Add smooth scroll for same-page navigation
+  function handleNavClick(event: Event, href: string) {
+    // Check if it's a same-page anchor link
+    if (href.startsWith('#')) {
+      event.preventDefault();
+      const elementId = href.substring(1);
+      handleSmoothScroll(elementId);
+    }
   }
 </script>
 

@@ -33,20 +33,20 @@
   const dummyListings = [
     {
       id: '1',
-      title: 'Premium Camping Tent (4-Person)',
-      description: 'Spacious 4-person tent, perfect for family camping trips.',
+      title: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
+      description: 'Experience the great outdoors with this spacious and reliable 4-person tent from REI Co-op. Perfect for family camping adventures.',
       category: 'camping',
-      dailyPrice: 35,
+      dailyPrice: 45,
       images: [
         'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
       ],
       location: {
-        city: 'Denver',
-        state: 'CO'
+        city: 'Salt Lake City',
+        state: 'UT'
       },
       condition: 'Like New',
       averageRating: 4.8,
-      reviewCount: 12
+      reviewCount: 5
     },
     {
       id: '2',

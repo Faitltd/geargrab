@@ -1,53 +1,72 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
 
   // Dummy listings data (enhanced version)
   const dummyListings = [
     {
       id: '1',
-      title: 'Premium Camping Tent (4-Person)',
-      description: 'Spacious 4-person tent, perfect for family camping trips. This North Face Wawona 4 tent features a durable waterproof construction, easy setup with color-coded poles, and plenty of interior space for four people. The large vestibule provides additional covered storage space for gear, and the mesh windows offer excellent ventilation while keeping insects out.',
+      title: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
+      description: 'Experience the great outdoors with this spacious and reliable 4-person tent from REI Co-op. The Half Dome 4 Plus is perfect for family camping adventures, featuring a generous interior space, easy setup, and excellent weather protection. This tent has been meticulously maintained and is in like-new condition.\n\nKey Features:\n• Spacious interior with 60 sq ft of floor space\n• Two large doors for easy entry/exit\n• Large vestibule for gear storage (35 sq ft)\n• Color-coded poles for quick setup\n• Excellent ventilation with mesh panels\n• Waterproof rainfly with 1,500mm coating\n• Durable 70D nylon floor\n• Freestanding design - no guylines required\n\nThis tent has been used on only 3 camping trips and has been professionally cleaned and waterproofed. Perfect for families, groups of friends, or anyone who values comfort and reliability in the outdoors.',
       category: 'camping',
       subcategory: 'tents',
-      brand: 'North Face',
-      model: 'Wawona 4',
+      brand: 'REI Co-op',
+      model: 'Half Dome 4 Plus',
       condition: 'Like New',
       ageInYears: 1,
-      dailyPrice: 35,
-      weeklyPrice: 210,
-      monthlyPrice: 700,
-      securityDeposit: 100,
+      dailyPrice: 45,
+      weeklyPrice: 270,
+      monthlyPrice: 900,
+      securityDeposit: 150,
       location: {
-        city: 'Denver',
-        state: 'CO',
-        zipCode: '80202'
+        city: 'Salt Lake City',
+        state: 'UT',
+        zipCode: '84101'
       },
       deliveryOptions: {
         pickup: true,
         dropoff: true,
         shipping: false,
-        pickupLocation: 'Downtown Denver',
-        dropoffDistance: 15
+        pickupLocation: '2100 S State St, Salt Lake City, UT (REI Store)',
+        dropoffDistance: 30
       },
       images: [
         'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-        'https://images.unsplash.com/photo-1563299796-17596ed6b017?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-        'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
+        'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+        'https://images.unsplash.com/photo-1487730116645-74489c95b41b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+        'https://images.unsplash.com/photo-1571863533956-01c88e79957e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+        'https://images.unsplash.com/photo-1445308394109-4ec2920981b1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
       ],
       features: [
-        'Waterproof',
-        'Easy setup',
-        'Spacious interior',
-        'Mesh windows',
-        'Includes rainfly',
-        'Includes carrying bag'
+        'Waterproof (1,500mm coating)',
+        'Easy Setup (10 minutes)',
+        'Spacious Interior (60 sq ft)',
+        'Two Large Doors',
+        'Large Vestibule (35 sq ft)',
+        'Color-coded Poles',
+        'Mesh Windows & Roof',
+        'Freestanding Design',
+        'Gear Loft Included',
+        'Footprint Included',
+        'Recently Waterproofed',
+        'Professional Cleaning'
       ],
       specifications: {
-        'Capacity': '4 person',
-        'Weight': '10 lbs',
-        'Dimensions': '8\' x 8\' x 6\'',
-        'Material': 'Polyester',
-        'Season': '3-season'
+        'Capacity': '4 people',
+        'Floor Area': '60 sq ft',
+        'Vestibule Area': '35 sq ft',
+        'Peak Height': '6 ft 2 in',
+        'Packed Weight': '9.2 lbs',
+        'Packed Size': '25 x 9 inches',
+        'Seasons': '3-season',
+        'Setup Time': '10 minutes',
+        'Doors': '2 large doors',
+        'Vestibules': '1 large vestibule',
+        'Floor Material': '70D nylon',
+        'Rainfly Material': '75D polyester',
+        'Pole Material': 'DAC Featherlite NSL aluminum',
+        'Waterproof Rating': '1,500mm',
+        'Wind Rating': '35+ mph'
       },
       includesInsurance: true,
       insuranceDetails: 'Basic damage coverage included',
@@ -64,7 +83,7 @@
       updatedAt: { seconds: 1625097600, nanoseconds: 0 },
       status: 'active',
       averageRating: 4.8,
-      reviewCount: 12,
+      reviewCount: 5,
       reviews: [
         {
           id: '101',
@@ -72,8 +91,8 @@
           userName: 'Sarah Johnson',
           userImage: 'https://randomuser.me/api/portraits/women/32.jpg',
           rating: 5,
-          date: '2023-06-15',
-          comment: 'Amazing tent! Very spacious and super easy to set up. Stayed completely dry during a rainstorm. Would definitely rent again.'
+          date: '2024-01-15',
+          comment: 'Outstanding tent for our family camping trip to Zion! The setup was incredibly easy with the color-coded poles - took us less than 10 minutes even in windy conditions. The two doors were perfect for our family of four, and the vestibule gave us plenty of space for our gear. We had a surprise thunderstorm and stayed completely dry. The mesh roof panels provided great ventilation during the day. David was super responsive and even included a footprint and gear loft. Highly recommend!'
         },
         {
           id: '102',
@@ -81,17 +100,35 @@
           userName: 'Michael Chen',
           userImage: 'https://randomuser.me/api/portraits/men/44.jpg',
           rating: 5,
-          date: '2023-06-02',
-          comment: 'Great quality tent. The owner was very helpful and provided clear instructions. Perfect for our weekend camping trip.'
+          date: '2024-01-08',
+          comment: 'Rented this tent for a weekend at Moab and it exceeded expectations. The quality is top-notch - you can tell it\'s been well-maintained. The interior space is generous, easily fit our sleeping bags and gear. The large vestibule was perfect for cooking and storing our bikes. David met us at the REI store for pickup which was super convenient. The tent was clean and came with everything we needed. Will definitely rent from David again!'
         },
         {
           id: '103',
           userId: 'user789',
           userName: 'Emily Rodriguez',
           userImage: 'https://randomuser.me/api/portraits/women/68.jpg',
+          rating: 5,
+          date: '2024-01-02',
+          comment: 'Perfect tent for our New Year\'s camping trip! We were worried about the cold but this tent handled everything beautifully. The freestanding design made it easy to set up on rocky ground. The two large doors meant no one had to crawl over anyone to get out at night. The gear loft kept our small items organized. David provided excellent instructions and was available for questions. The tent was spotless and smelled fresh. Great value for the price!'
+        },
+        {
+          id: '104',
+          userId: 'user890',
+          userName: 'Jake Thompson',
+          userImage: 'https://randomuser.me/api/portraits/men/25.jpg',
           rating: 4,
-          date: '2023-05-20',
-          comment: 'Nice tent, very roomy. Only giving 4 stars because one of the zippers was a bit sticky, but otherwise excellent.'
+          date: '2023-12-20',
+          comment: 'Really solid tent! Used it for a 3-day camping trip in the Uintas. Setup was straightforward and the tent felt very stable in moderate winds. The interior space is exactly as advertised - plenty of room for 4 people. Only minor issue was one of the zipper pulls was a bit stiff, but it didn\'t affect functionality. The waterproofing is excellent - we had some light rain and stayed completely dry. David was great to work with and very accommodating with pickup times.'
+        },
+        {
+          id: '105',
+          userId: 'user567',
+          userName: 'Lisa Park',
+          userImage: 'https://randomuser.me/api/portraits/women/41.jpg',
+          rating: 5,
+          date: '2023-12-10',
+          comment: 'This tent is amazing! We\'re new to camping and David was incredibly helpful with setup tips and camping advice. The tent is so much roomier than we expected - we had space for our air mattresses plus room to move around. The mesh windows provided great airflow during the day and the rainfly kept us cozy at night. The included footprint protected the tent floor perfectly. Pickup and return were seamless. We\'re already planning our next trip and will definitely rent this tent again!'
         }
       ],
       owner: {
@@ -101,9 +138,13 @@
         joinedDate: '2022-03-15',
         responseRate: 98,
         responseTime: 'within an hour',
-        listings: 5,
-        reviews: 42,
-        averageRating: 4.9
+        listings: 8,
+        reviews: 67,
+        averageRating: 4.9,
+        bio: 'Outdoor enthusiast and gear expert with 15+ years of camping experience. I love sharing quality gear with fellow adventurers! All my equipment is professionally maintained and comes with detailed setup instructions. Happy to provide camping tips and local recommendations for the Salt Lake City area.',
+        verified: true,
+        languages: ['English'],
+        location: 'Salt Lake City, UT'
       }
     },
     {
@@ -388,7 +429,17 @@
       return;
     }
 
-    alert(`Booking functionality would be implemented here. Total: ${formatCurrency(totalPrice)}`);
+    // Navigate to booking confirmation page with booking details
+    const bookingParams = new URLSearchParams({
+      listingId: listing.id,
+      startDate: startDate,
+      endDate: endDate,
+      deliveryMethod: deliveryMethod,
+      insuranceTier: insuranceTier,
+      totalPrice: totalPrice.toString()
+    });
+
+    goto(`/book/confirm?${bookingParams.toString()}`);
   }
 
   // Handle message owner

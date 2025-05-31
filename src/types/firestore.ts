@@ -7,13 +7,18 @@ export interface User {
   photoURL?: string;
   phoneNumber?: string;
   createdAt: Timestamp;
-  lastLoginAt: Timestamp;
-  isOwner: boolean;
-  isRenter: boolean;
+  lastLoginAt?: Timestamp;
+  isOwner?: boolean;
+  isRenter?: boolean;
+  isVerified?: boolean;
   completedBookings?: number;
   listingsCount?: number;
   bio?: string;
   location?: string;
+  ratings?: {
+    asOwner: number;
+    asRenter: number;
+  };
 }
 
 export interface Listing {

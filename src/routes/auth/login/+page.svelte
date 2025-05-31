@@ -1,9 +1,10 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { signInWithEmail, signInWithGoogle } from '$firebase/auth';
-  import { notifications } from '$stores/notifications';
-  import { isValidEmail } from '$utils/validation';
+  import { signInWithEmail, signInWithGoogle } from '$lib/firebase/auth';
+  import { notifications } from '$lib/stores/notifications';
+  import { isValidEmail } from '$lib/utils/validation';
+
 
   let email = '';
   let password = '';
@@ -44,12 +45,17 @@
 
     try {
       await signInWithEmail(email, password);
+
       notifications.add({
         type: 'success',
         message: 'Successfully logged in!',
         timeout: 5000
       });
-      goto(redirectTo);
+
+      // Small delay to allow auth state to update
+      setTimeout(() => {
+        goto(redirectTo);
+      }, 100);
     } catch (error: any) {
       console.error('Login error:', error);
 
@@ -73,12 +79,17 @@
 
     try {
       await signInWithGoogle();
+
       notifications.add({
         type: 'success',
         message: 'Successfully logged in with Google!',
         timeout: 5000
       });
-      goto(redirectTo);
+
+      // Small delay to allow auth state to update
+      setTimeout(() => {
+        goto(redirectTo);
+      }, 100);
     } catch (error: any) {
       console.error('Google sign-in error:', error);
       errors.auth = error.message || 'An error occurred during Google sign-in';
@@ -103,7 +114,7 @@
   <div class="absolute inset-0 bg-black opacity-60"></div>
 
   <!-- Content -->
-  <div class="relative min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="relative z-30 min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-32">
     <div class="max-w-md w-full space-y-8">
       <!-- Login Card with outdoor styling -->
       <div class="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-xl p-8">

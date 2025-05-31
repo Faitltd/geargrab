@@ -1,6 +1,7 @@
 <script lang="ts">
   export const prerender = true;
   import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
+  import ContactSection from '$lib/components/forms/ContactSection.svelte';
   import { onMount } from 'svelte';
 
   let videoElement: HTMLVideoElement;
