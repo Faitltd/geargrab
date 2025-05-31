@@ -262,13 +262,13 @@
           </p>
 
           <div class="max-w-md mx-auto">
-            <div class="flex gap-4">
+            <div class="flex flex-col sm:flex-row gap-4">
               <input
                 type="email"
                 placeholder="Enter your email"
                 class="flex-1 px-4 py-3 rounded-lg bg-gray-800/70 backdrop-blur-sm border border-gray-600/50 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 shadow-lg"
               >
-              <button class="bg-green-600/80 backdrop-blur-sm hover:bg-green-700/80 text-white font-bold px-6 py-3 rounded-lg transition-colors border border-green-500/30 shadow-lg">
+              <button class="bg-green-600/80 backdrop-blur-sm hover:bg-green-700/80 text-white font-bold px-6 py-3 rounded-lg transition-colors border border-green-500/30 shadow-lg whitespace-nowrap">
                 Subscribe
               </button>
             </div>

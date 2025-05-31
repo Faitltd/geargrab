@@ -187,7 +187,7 @@
   <div class="absolute inset-0 bg-black bg-opacity-20" style="z-index: 2;"></div>
 
   <!-- Top Section Content -->
-  <div class="relative z-10 flex flex-col justify-center min-h-screen" style="z-index: 10;">
+  <div class="relative z-10 flex flex-col justify-center min-h-screen pt-16" style="z-index: 10;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
       <!-- Hero Content -->
