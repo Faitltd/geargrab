@@ -28,3 +28,6 @@ if (typeof window !== 'undefined') {
     error: null
   });
 }
+
+// Export alias for backward compatibility
+export const userStore = authStore;
