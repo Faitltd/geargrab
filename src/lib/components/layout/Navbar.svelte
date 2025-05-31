@@ -16,6 +16,11 @@
     }
   }
 
+  function handleMobileNavClick() {
+    // Close mobile menu when any link is clicked
+    isMenuOpen = false;
+  }
+
   // Add smooth scroll for same-page navigation
   function handleNavClick(event: Event, href: string) {
     // Check if it's a same-page anchor link
@@ -101,31 +106,31 @@
   {#if isMenuOpen}
     <div id="mobile-menu" class="sm:hidden bg-black/20 backdrop-blur-sm">
       <div class="pt-2 pb-3 space-y-1">
-        <a href="/" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Home
         </a>
-        <a href="/browse" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/browse" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Browse
         </a>
-        <a href="/list-gear" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/list-gear" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           List Gear
         </a>
-        <a href="/how-it-works" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/how-it-works" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           How It Works
         </a>
-        <a href="/blog" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/blog" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Blog
         </a>
-        <a href="/about" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/about" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           About
         </a>
-        <a href="/contact" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/contact" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Contact
         </a>
-        <a href="/help" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/help" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Help
         </a>
-        <a href="/faq" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/faq" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           FAQ
         </a>
       </div>
@@ -144,19 +149,19 @@
             </div>
           </div>
           <div class="mt-3 space-y-1">
-            <a href="/dashboard" class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
+            <a href="/dashboard" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Dashboard
             </a>
-            <button class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
+            <button on:click={handleMobileNavClick} class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Sign out
             </button>
           </div>
         {:else}
           <div class="mt-3 space-y-1">
-            <a href="/auth/login" class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
+            <a href="/auth/login" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Log In
             </a>
-            <a href="/auth/signup" class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
+            <a href="/auth/signup" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Sign Up
             </a>
           </div>

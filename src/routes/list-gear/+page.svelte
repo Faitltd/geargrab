@@ -402,8 +402,8 @@
             <div class="w-8 h-8 rounded-full flex items-center justify-center {i + 1 <= currentStep ? 'bg-green-500 text-white' : 'bg-gray-600/70 text-gray-300 border border-gray-500'}">
               {i + 1}
             </div>
-            <div class="text-xs mt-1 text-gray-300 drop-shadow-lg">
-              {i === 0 ? 'Basic Info' : i === 1 ? 'Details' : i === 2 ? 'Images' : i === 3 ? 'Pricing & Location' : 'Preview'}
+            <div class="text-xs mt-1 text-gray-300 drop-shadow-lg text-center whitespace-pre-line">
+              {i === 0 ? 'Basic Info' : i === 1 ? 'Details' : i === 2 ? 'Images' : i === 3 ? 'Pricing &\nLocation' : 'Preview'}
             </div>
           </div>
 
