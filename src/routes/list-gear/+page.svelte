@@ -1,6 +1,21 @@
 <script lang="ts">
-  import Calendar from '$lib/components/Calendar.svelte';
   import ImageUploader from '$lib/components/ImageUploader.svelte';
+  import ContentBlock from '$lib/components/layout/ContentBlock.svelte';
+
+  let videoElement: HTMLVideoElement;
+
+  // Video event handlers
+  function handleVideoLoaded() {
+    if (videoElement) {
+      videoElement.style.opacity = '1';
+    }
+  }
+
+  function handleVideoError() {
+    if (videoElement) {
+      videoElement.style.display = 'none';
+    }
+  }
 
   // Define types for form data
   type Specification = {
@@ -333,546 +348,478 @@
   <title>List Your Gear - GearGrab</title>
 </svelte:head>
 
-<div class="bg-white min-h-screen">
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-6">List Your Gear</h1>
+<!-- Full Page Video Background -->
+<div class="fixed inset-0 z-0">
+  <!-- Background Image (always visible as fallback) -->
+  <div class="absolute inset-0">
+    <img
+      src="/pexels-bianca-gasparoto-834990-1752951.jpg"
+      alt="Mountain landscape with stars"
+      class="w-full h-full object-cover"
+    >
+  </div>
+
+  <!-- Video Background (overlays image when loaded) -->
+  <video
+    bind:this={videoElement}
+    class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+    style="opacity: 1;"
+    autoplay
+    muted
+    loop
+    playsinline
+    on:loadeddata={handleVideoLoaded}
+    on:error={handleVideoError}
+    on:loadstart={() => console.log('List-gear video load started')}
+  >
+    <!-- Outdoor gear/equipment video for list gear page -->
+    <source src="/857134-hd_1280_720_24fps.mp4" type="video/mp4" />
+    <!-- Fallback videos -->
+    <source src="https://player.vimeo.com/external/291648067.hd.mp4?s=94998971682c6a3267e4cbd19d16a7b6c720f345&profile_id=175" type="video/mp4" />
+  </video>
+
+  <!-- Light Overlay for Text Readability -->
+  <div class="absolute inset-0 bg-black opacity-30"></div>
+</div>
+
+<!-- Page Content with Video Background -->
+<div class="relative z-10 min-h-screen">
+  <!-- Hero Content -->
+  <div class="relative h-60 flex flex-col items-center justify-center text-center text-white px-4 pt-20">
+    <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">List Your Gear</h1>
+    <p class="text-lg md:text-xl max-w-2xl mx-auto">Turn your unused outdoor equipment into income. It only takes a few minutes to get started.</p>
+  </div>
+
+  <!-- Form Section -->
+  <div class="relative">
+  <ContentBlock padding="pt-8 pb-16" maxWidth="max-w-3xl" background="bg-transparent" shadow={false} blur={false} rounded={false} border={false}>
 
     <!-- Progress bar -->
     <div class="mb-8">
       <div class="flex justify-between mb-2">
         {#each Array(totalSteps) as _, i}
           <div class="flex flex-col items-center">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center {i + 1 <= currentStep ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'}">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center {i + 1 <= currentStep ? 'bg-green-500 text-white' : 'bg-gray-600/70 text-gray-300 border border-gray-500'}">
               {i + 1}
             </div>
-            <div class="text-xs mt-1 text-gray-500">
+            <div class="text-xs mt-1 text-gray-300 drop-shadow-lg">
               {i === 0 ? 'Basic Info' : i === 1 ? 'Details' : i === 2 ? 'Images' : i === 3 ? 'Pricing & Location' : 'Preview'}
             </div>
           </div>
 
           {#if i < totalSteps - 1}
             <div class="flex-1 flex items-center">
-              <div class="h-1 w-full {i + 1 < currentStep ? 'bg-green-500' : 'bg-gray-200'}"></div>
+              <div class="h-1 w-full {i + 1 < currentStep ? 'bg-green-500' : 'bg-gray-600/50'}"></div>
             </div>
           {/if}
         {/each}
       </div>
     </div>
 
-    <!-- Form steps -->
-    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-      <!-- Step 1: Basic Info -->
-      {#if currentStep === 1}
-        <div>
-          <h2 class="text-xl font-semibold mb-4">Basic Information</h2>
+    <!-- Form steps with floating fields -->
+    {#if currentStep === 1}
+      <!-- Step 1: Basic Info - Individual floating fields -->
+      <div class="space-y-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-white drop-shadow-lg">Basic Information</h2>
+        </div>
 
-          <div class="space-y-4">
-            <div>
-              <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-              <input
-                type="text"
-                id="title"
-                class="form-input block w-full rounded-md"
-                placeholder="e.g. Premium Camping Tent (4-Person)"
-                bind:value={formData.title}
-              />
-              {#if errors.title}
-                <p class="text-red-500 text-sm mt-1">{errors.title}</p>
-              {/if}
-            </div>
+        <!-- Title Field -->
+        <div class="max-w-md mx-auto">
+          <label for="title" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Title *</label>
+          <input
+            type="text"
+            id="title"
+            class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+            placeholder="e.g. Premium Camping Tent (4-Person)"
+            bind:value={formData.title}
+          />
+          {#if errors.title}
+            <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.title}</p>
+          {/if}
+        </div>
 
+        <!-- Category Field -->
+        <div class="max-w-md mx-auto">
+          <label for="category" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Category *</label>
+          <select
+            id="category"
+            class="form-select block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white focus:ring-green-500 focus:border-green-500 shadow-lg"
+            bind:value={formData.category}
+          >
+            <option value="" class="bg-gray-800 text-white">Select a category</option>
+            {#each categories as category}
+              <option value={category.id} class="bg-gray-800 text-white">{category.name}</option>
+            {/each}
+          </select>
+          {#if errors.category}
+            <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.category}</p>
+          {/if}
+        </div>
+
+        <!-- Subcategory Field (conditional) -->
+        {#if subcategories.length > 0}
+          <div class="max-w-md mx-auto">
+            <label for="subcategory" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Subcategory</label>
+            <select
+              id="subcategory"
+              class="form-select block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white focus:ring-green-500 focus:border-green-500 shadow-lg"
+              bind:value={formData.subcategory}
+            >
+              <option value="" class="bg-gray-800 text-white">Select a subcategory</option>
+              {#each subcategories as subcategory}
+                <option value={subcategory} class="bg-gray-800 text-white">{subcategory}</option>
+              {/each}
+            </select>
+          </div>
+        {/if}
+
+        <!-- Description Field -->
+        <div class="max-w-lg mx-auto">
+          <label for="description" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Description *</label>
+          <textarea
+            id="description"
+            class="form-textarea block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+            rows="4"
+            placeholder="Describe your gear in detail. Include features, benefits, and condition."
+            bind:value={formData.description}
+          ></textarea>
+          {#if errors.description}
+            <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.description}</p>
+          {/if}
+        </div>
+      </div>
+    {/if}
+
+    {#if currentStep === 2}
+      <!-- Step 2: Gear Details - Individual floating fields -->
+      <div class="space-y-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-white drop-shadow-lg">Gear Details</h2>
+        </div>
+
+        <!-- Brand Field -->
+        <div class="max-w-md mx-auto">
+          <label for="brand" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Brand *</label>
+          <input
+            type="text"
+            id="brand"
+            class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+            placeholder="e.g. North Face"
+            bind:value={formData.brand}
+          />
+          {#if errors.brand}
+            <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.brand}</p>
+          {/if}
+        </div>
+
+        <!-- Model Field -->
+        <div class="max-w-md mx-auto">
+          <label for="model" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Model</label>
+          <input
+            type="text"
+            id="model"
+            class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+            placeholder="e.g. Wawona 4"
+            bind:value={formData.model}
+          />
+        </div>
+
+        <!-- Condition & Age Fields -->
+        <div class="max-w-lg mx-auto">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+              <label for="condition" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Condition *</label>
               <select
-                id="category"
-                class="form-select block w-full rounded-md"
-                bind:value={formData.category}
+                id="condition"
+                class="form-select block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white focus:ring-green-500 focus:border-green-500 shadow-lg"
+                bind:value={formData.condition}
               >
-                <option value="">Select a category</option>
-                {#each categories as category}
-                  <option value={category.id}>{category.name}</option>
+                {#each conditions as condition}
+                  <option value={condition} class="bg-gray-800 text-white">{condition}</option>
                 {/each}
               </select>
-              {#if errors.category}
-                <p class="text-red-500 text-sm mt-1">{errors.category}</p>
+              {#if errors.condition}
+                <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.condition}</p>
               {/if}
             </div>
-
-            {#if subcategories.length > 0}
-              <div>
-                <label for="subcategory" class="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
-                <select
-                  id="subcategory"
-                  class="form-select block w-full rounded-md"
-                  bind:value={formData.subcategory}
-                >
-                  <option value="">Select a subcategory</option>
-                  {#each subcategories as subcategory}
-                    <option value={subcategory}>{subcategory}</option>
-                  {/each}
-                </select>
-              </div>
-            {/if}
-
             <div>
-              <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
-              <textarea
-                id="description"
-                class="form-textarea block w-full rounded-md"
-                rows="4"
-                placeholder="Describe your gear in detail. Include features, benefits, and condition."
-                bind:value={formData.description}
-              ></textarea>
-              {#if errors.description}
-                <p class="text-red-500 text-sm mt-1">{errors.description}</p>
-              {/if}
-            </div>
-          </div>
-        </div>
-      {/if}
-
-      <!-- Step 2: Details, Features, and Specifications -->
-      {#if currentStep === 2}
-        <div>
-          <h2 class="text-xl font-semibold mb-4">Gear Details</h2>
-
-          <div class="space-y-6">
-            <!-- Basic Details -->
-            <div class="space-y-4">
-              <h3 class="text-lg font-medium">Basic Details</h3>
-
-              <div>
-                <label for="brand" class="block text-sm font-medium text-gray-700 mb-1">Brand *</label>
-                <input
-                  type="text"
-                  id="brand"
-                  class="form-input block w-full rounded-md"
-                  placeholder="e.g. North Face"
-                  bind:value={formData.brand}
-                />
-                {#if errors.brand}
-                  <p class="text-red-500 text-sm mt-1">{errors.brand}</p>
-                {/if}
-              </div>
-
-              <div>
-                <label for="model" class="block text-sm font-medium text-gray-700 mb-1">Model</label>
-                <input
-                  type="text"
-                  id="model"
-                  class="form-input block w-full rounded-md"
-                  placeholder="e.g. Wawona 4"
-                  bind:value={formData.model}
-                />
-              </div>
-
-              <div>
-                <label for="condition" class="block text-sm font-medium text-gray-700 mb-1">Condition *</label>
-                <select
-                  id="condition"
-                  class="form-select block w-full rounded-md"
-                  bind:value={formData.condition}
-                >
-                  {#each conditions as condition}
-                    <option value={condition}>{condition}</option>
-                  {/each}
-                </select>
-                {#if errors.condition}
-                  <p class="text-red-500 text-sm mt-1">{errors.condition}</p>
-                {/if}
-              </div>
-
-              <div>
-                <label for="age" class="block text-sm font-medium text-gray-700 mb-1">Age (years)</label>
-                <input
-                  type="number"
-                  id="age"
-                  class="form-input block w-full rounded-md"
-                  min="0"
-                  bind:value={formData.ageInYears}
-                />
-              </div>
-            </div>
-
-            <!-- Features -->
-            <div class="space-y-4">
-              <div class="flex justify-between items-center">
-                <h3 class="text-lg font-medium">Features *</h3>
-                <button
-                  type="button"
-                  class="text-sm text-green-600 hover:text-green-700 font-medium"
-                  on:click={addFeatureField}
-                >
-                  + Add Feature
-                </button>
-              </div>
-
-              <p class="text-sm text-gray-500">List the key features of your gear. Add at least one feature.</p>
-
-              {#if errors.features}
-                <p class="text-red-500 text-sm">{errors.features}</p>
-              {/if}
-
-              {#each formData.features as _, i}
-                <div class="flex items-center space-x-2">
-                  <input
-                    type="text"
-                    id={`feature-${i}`}
-                    class="form-input block w-full rounded-md"
-                    placeholder={`Feature ${i+1} (e.g. Waterproof, Easy setup)`}
-                    bind:value={formData.features[i]}
-                  />
-                  {#if formData.features.length > 1}
-                    <button
-                      type="button"
-                      class="text-red-500 hover:text-red-700"
-                      on:click={() => removeFeatureField(i)}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  {/if}
-                </div>
-              {/each}
-            </div>
-
-            <!-- Specifications -->
-            <div class="space-y-4">
-              <div class="flex justify-between items-center">
-                <h3 class="text-lg font-medium">Specifications</h3>
-                <button
-                  type="button"
-                  class="text-sm text-green-600 hover:text-green-700 font-medium"
-                  on:click={addSpecificationField}
-                >
-                  + Add Specification
-                </button>
-              </div>
-
-              <p class="text-sm text-gray-500">Add specifications like dimensions, weight, material, etc.</p>
-
-              {#each formData.specifications as _, i}
-                <div class="flex items-start space-x-2">
-                  <div class="flex-1">
-                    <input
-                      type="text"
-                      id={`spec-key-${i}`}
-                      class="form-input block w-full rounded-md"
-                      placeholder="Key (e.g. Weight, Dimensions)"
-                      bind:value={formData.specifications[i].key}
-                    />
-                    {#if errors[`specification_${i}`]}
-                      <p class="text-red-500 text-sm mt-1">{errors[`specification_${i}`]}</p>
-                    {/if}
-                  </div>
-                  <div class="flex-1">
-                    <input
-                      type="text"
-                      id={`spec-value-${i}`}
-                      class="form-input block w-full rounded-md"
-                      placeholder="Value (e.g. 5 lbs, 10' x 8')"
-                      bind:value={formData.specifications[i].value}
-                    />
-                  </div>
-                  {#if formData.specifications.length > 1}
-                    <button
-                      type="button"
-                      class="text-red-500 hover:text-red-700 mt-2"
-                      on:click={() => removeSpecificationField(i)}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  {/if}
-                </div>
-              {/each}
-            </div>
-
-            <!-- Insurance -->
-            <div class="space-y-2">
-              <h3 class="text-lg font-medium">Insurance</h3>
-
-              <div class="flex items-start">
-                <div class="flex items-center h-5">
-                  <input
-                    type="checkbox"
-                    id="includesInsurance"
-                    class="form-checkbox h-4 w-4 text-green-600"
-                    bind:checked={formData.includesInsurance}
-                  />
-                </div>
-                <div class="ml-3 text-sm">
-                  <label for="includesInsurance" class="font-medium text-gray-700">Includes Insurance</label>
-                  <p class="text-gray-500">Check this if you provide insurance coverage with your gear.</p>
-                </div>
-              </div>
-
-              {#if formData.includesInsurance}
-                <div class="ml-7 mt-2">
-                  <label for="insuranceDetails" class="block text-sm font-medium text-gray-700 mb-1">Insurance Details</label>
-                  <textarea
-                    id="insuranceDetails"
-                    class="form-textarea block w-full rounded-md"
-                    rows="2"
-                    placeholder="Describe the insurance coverage you provide."
-                    bind:value={formData.insuranceDetails}
-                  ></textarea>
-                </div>
-              {/if}
-            </div>
-          </div>
-        </div>
-      {/if}
-
-      <!-- Step 3: Images -->
-      {#if currentStep === 3}
-        <div>
-          <h2 class="text-xl font-semibold mb-4">Images</h2>
-
-          <div class="space-y-4">
-            <div>
-              <p class="block text-sm font-medium text-gray-700 mb-1">Upload Images *</p>
-              <p class="text-sm text-gray-500 mb-2">Add up to 5 high-quality images of your gear. The first image will be the main image.</p>
-
-              {#if errors.images}
-                <p class="text-red-500 text-sm mb-2">{errors.images}</p>
-              {/if}
-
-              <ImageUploader
-                images={formData.images}
-                maxImages={5}
-                on:change={handleImagesChange}
+              <label for="age" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Age (years)</label>
+              <input
+                type="number"
+                id="age"
+                class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                min="0"
+                bind:value={formData.ageInYears}
               />
             </div>
           </div>
         </div>
-      {/if}
 
-      <!-- Step 4: Pricing & Location -->
-      {#if currentStep === 4}
-        <div>
-          <h2 class="text-xl font-semibold mb-4">Pricing & Location</h2>
+        <!-- Features Field -->
+        <div class="max-w-lg mx-auto">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-white drop-shadow-lg">Features *</h3>
+            <button
+              type="button"
+              class="text-sm text-green-400 hover:text-green-300 font-medium bg-gray-800/70 backdrop-blur-sm px-3 py-1 rounded-lg shadow-lg"
+              on:click={addFeatureField}
+            >
+              + Add Feature
+            </button>
+          </div>
 
-          <div class="space-y-6">
-            <div>
-              <h3 class="text-lg font-medium mb-2">Pricing</h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label for="dailyPrice" class="block text-sm font-medium text-gray-700 mb-1">Daily Price ($) *</label>
-                  <input
-                    type="number"
-                    id="dailyPrice"
-                    class="form-input block w-full rounded-md"
-                    min="0"
-                    bind:value={formData.dailyPrice}
-                  />
-                  {#if errors.dailyPrice}
-                    <p class="text-red-500 text-sm mt-1">{errors.dailyPrice}</p>
-                  {/if}
-                </div>
+          <p class="text-sm text-gray-300 drop-shadow-lg mb-4">List the key features of your gear. Add at least one feature.</p>
 
-                <div>
-                  <label for="weeklyPrice" class="block text-sm font-medium text-gray-700 mb-1">Weekly Price ($)</label>
-                  <input
-                    type="number"
-                    id="weeklyPrice"
-                    class="form-input block w-full rounded-md"
-                    min="0"
-                    bind:value={formData.weeklyPrice}
-                  />
-                  <p class="text-xs text-gray-500 mt-1">Suggested: ${formData.dailyPrice * 6} (1 day free)</p>
-                </div>
+          {#if errors.features}
+            <p class="text-red-400 text-sm drop-shadow-lg mb-4">{errors.features}</p>
+          {/if}
 
-                <div>
-                  <label for="monthlyPrice" class="block text-sm font-medium text-gray-700 mb-1">Monthly Price ($)</label>
-                  <input
-                    type="number"
-                    id="monthlyPrice"
-                    class="form-input block w-full rounded-md"
-                    min="0"
-                    bind:value={formData.monthlyPrice}
-                  />
-                  <p class="text-xs text-gray-500 mt-1">Suggested: ${formData.dailyPrice * 24} (6 days free)</p>
-                </div>
-
-                <div>
-                  <label for="securityDeposit" class="block text-sm font-medium text-gray-700 mb-1">Security Deposit ($)</label>
-                  <input
-                    type="number"
-                    id="securityDeposit"
-                    class="form-input block w-full rounded-md"
-                    min="0"
-                    bind:value={formData.securityDeposit}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 class="text-lg font-medium mb-2">Location</h3>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City *</label>
-                  <input
-                    type="text"
-                    id="city"
-                    class="form-input block w-full rounded-md"
-                    bind:value={formData.city}
-                  />
-                  {#if errors.city}
-                    <p class="text-red-500 text-sm mt-1">{errors.city}</p>
-                  {/if}
-                </div>
-
-                <div>
-                  <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State *</label>
-                  <input
-                    type="text"
-                    id="state"
-                    class="form-input block w-full rounded-md"
-                    bind:value={formData.state}
-                  />
-                  {#if errors.state}
-                    <p class="text-red-500 text-sm mt-1">{errors.state}</p>
-                  {/if}
-                </div>
-
-                <div>
-                  <label for="zipCode" class="block text-sm font-medium text-gray-700 mb-1">Zip Code *</label>
-                  <input
-                    type="text"
-                    id="zipCode"
-                    class="form-input block w-full rounded-md"
-                    bind:value={formData.zipCode}
-                  />
-                  {#if errors.zipCode}
-                    <p class="text-red-500 text-sm mt-1">{errors.zipCode}</p>
-                  {/if}
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 class="text-lg font-medium mb-2">Delivery Options</h3>
-              <p class="text-sm text-gray-500 mb-2">Select at least one delivery option.</p>
-
-              <div class="space-y-2">
-                <div class="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="pickup"
-                    class="form-checkbox h-4 w-4 text-green-600"
-                    bind:checked={formData.pickup}
-                  />
-                  <label for="pickup" class="ml-2 block text-sm text-gray-700">Pickup</label>
-                </div>
-
-                {#if formData.pickup}
-                  <div class="ml-6">
-                    <label for="pickupLocation" class="block text-sm font-medium text-gray-700 mb-1">Pickup Location</label>
-                    <input
-                      type="text"
-                      id="pickupLocation"
-                      class="form-input block w-full rounded-md"
-                      placeholder="e.g. Downtown Denver"
-                      bind:value={formData.pickupLocation}
-                    />
-                    {#if errors.pickupLocation}
-                      <p class="text-red-500 text-sm mt-1">{errors.pickupLocation}</p>
-                    {/if}
-                  </div>
-                {/if}
-
-                <div class="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="dropoff"
-                    class="form-checkbox h-4 w-4 text-green-600"
-                    bind:checked={formData.dropoff}
-                  />
-                  <label for="dropoff" class="ml-2 block text-sm text-gray-700">Dropoff</label>
-                </div>
-
-                {#if formData.dropoff}
-                  <div class="ml-6">
-                    <label for="dropoffDistance" class="block text-sm font-medium text-gray-700 mb-1">Maximum Dropoff Distance (miles)</label>
-                    <input
-                      type="number"
-                      id="dropoffDistance"
-                      class="form-input block w-full rounded-md"
-                      min="0"
-                      bind:value={formData.dropoffDistance}
-                    />
-                    {#if errors.dropoffDistance}
-                      <p class="text-red-500 text-sm mt-1">{errors.dropoffDistance}</p>
-                    {/if}
-                  </div>
-                {/if}
-
-                <div class="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="shipping"
-                    class="form-checkbox h-4 w-4 text-green-600"
-                    bind:checked={formData.shipping}
-                  />
-                  <label for="shipping" class="ml-2 block text-sm text-gray-700">Shipping</label>
-                </div>
-
-                {#if formData.shipping}
-                  <div class="ml-6">
-                    <label for="shippingFee" class="block text-sm font-medium text-gray-700 mb-1">Shipping Fee ($)</label>
-                    <input
-                      type="number"
-                      id="shippingFee"
-                      class="form-input block w-full rounded-md"
-                      min="0"
-                      bind:value={formData.shippingFee}
-                    />
-                    {#if errors.shippingFee}
-                      <p class="text-red-500 text-sm mt-1">{errors.shippingFee}</p>
-                    {/if}
-                  </div>
-                {/if}
-              </div>
-            </div>
-
-            <div>
-              <h3 class="text-lg font-medium mb-2">Availability</h3>
-              <p class="text-sm text-gray-500 mb-2">Mark any dates when your gear will not be available for rent.</p>
-
-              <div class="bg-white border border-gray-200 rounded-md p-4">
-                <Calendar
-                  selectedDates={formData.unavailableDates}
-                  on:dateSelect={toggleDateAvailability}
-                  monthsToShow={2}
+          <div class="space-y-3">
+            {#each formData.features as _, i}
+              <div class="flex items-center space-x-2">
+                <input
+                  type="text"
+                  id={`feature-${i}`}
+                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                  placeholder={`Feature ${i+1} (e.g. Waterproof, Easy setup)`}
+                  bind:value={formData.features[i]}
                 />
+                {#if formData.features.length > 1}
+                  <button
+                    type="button"
+                    class="text-red-400 hover:text-red-300 bg-gray-800/70 backdrop-blur-sm p-2 rounded-lg shadow-lg"
+                    on:click={() => removeFeatureField(i)}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </div>
 
-                {#if formData.unavailableDates.length > 0}
-                  <div class="mt-4">
-                    <h4 class="text-sm font-medium text-gray-700 mb-2">Unavailable Dates:</h4>
-                    <div class="flex flex-wrap gap-2">
-                      {#each formData.unavailableDates.sort() as date}
-                        <div class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full flex items-center">
-                          {new Date(date).toLocaleDateString()}
-                          <button
-                            type="button"
-                            class="ml-1 text-red-600 hover:text-red-800"
-                            on:click={() => {
-                              formData.unavailableDates = formData.unavailableDates.filter(d => d !== date);
-                            }}
-                            aria-label={`Remove ${new Date(date).toLocaleDateString()}`}
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                          </button>
-                        </div>
-                      {/each}
-                    </div>
-                  </div>
+        <!-- Specifications Field -->
+        <div class="max-w-lg mx-auto">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-white drop-shadow-lg">Specifications</h3>
+            <button
+              type="button"
+              class="text-sm text-green-400 hover:text-green-300 font-medium bg-gray-800/70 backdrop-blur-sm px-3 py-1 rounded-lg shadow-lg"
+              on:click={addSpecificationField}
+            >
+              + Add Specification
+            </button>
+          </div>
+
+          <p class="text-sm text-gray-300 drop-shadow-lg mb-4">Add specifications like dimensions, weight, material, etc.</p>
+
+          <div class="space-y-3">
+            {#each formData.specifications as _, i}
+              <div class="flex items-start space-x-2">
+                <div class="flex-1">
+                  <input
+                    type="text"
+                    id={`spec-key-${i}`}
+                    class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                    placeholder="Key (e.g. Weight, Dimensions)"
+                    bind:value={formData.specifications[i].key}
+                  />
+                  {#if errors[`specification_${i}`]}
+                    <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors[`specification_${i}`]}</p>
+                  {/if}
+                </div>
+                <div class="flex-1">
+                  <input
+                    type="text"
+                    id={`spec-value-${i}`}
+                    class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                    placeholder="Value (e.g. 5 lbs, 10' x 8')"
+                    bind:value={formData.specifications[i].value}
+                  />
+                </div>
+                {#if formData.specifications.length > 1}
+                  <button
+                    type="button"
+                    class="text-red-400 hover:text-red-300 bg-gray-800/70 backdrop-blur-sm p-2 rounded-lg shadow-lg mt-2"
+                    on:click={() => removeSpecificationField(i)}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </div>
+
+        <!-- Insurance Field -->
+        <div class="max-w-md mx-auto">
+          <h3 class="text-lg font-medium text-white drop-shadow-lg mb-4">Insurance</h3>
+
+          <div class="flex items-start bg-transparent rounded-lg p-4">
+            <div class="flex items-center h-5">
+              <input
+                type="checkbox"
+                id="includesInsurance"
+                class="form-checkbox h-4 w-4 text-green-600 bg-gray-700 border-gray-600 focus:ring-green-500"
+                bind:checked={formData.includesInsurance}
+              />
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="includesInsurance" class="font-medium text-white drop-shadow-lg">Includes Insurance</label>
+              <p class="text-gray-300 drop-shadow-lg">Check this if you provide insurance coverage with your gear.</p>
+            </div>
+          </div>
+
+          {#if formData.includesInsurance}
+            <div class="mt-4">
+              <label for="insuranceDetails" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Insurance Details</label>
+              <textarea
+                id="insuranceDetails"
+                class="form-textarea block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                rows="2"
+                placeholder="Describe the insurance coverage you provide."
+                bind:value={formData.insuranceDetails}
+              ></textarea>
+            </div>
+          {/if}
+        </div>
+      </div>
+    {/if}
+
+    {#if currentStep === 3}
+      <!-- Step 3: Images - Floating upload area -->
+      <div class="space-y-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-white drop-shadow-lg">Images</h2>
+        </div>
+
+        <!-- Images Upload Field -->
+        <div class="max-w-2xl mx-auto">
+          <p class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Upload Images *</p>
+          <p class="text-sm text-gray-300 mb-4 drop-shadow-lg">Add up to 5 high-quality images of your gear. The first image will be the main image.</p>
+
+          {#if errors.images}
+            <p class="text-red-400 text-sm mb-4 drop-shadow-lg">{errors.images}</p>
+          {/if}
+
+          <div class="bg-transparent rounded-lg p-6">
+            <ImageUploader
+              images={formData.images}
+              maxImages={5}
+              on:change={handleImagesChange}
+            />
+          </div>
+        </div>
+      </div>
+    {/if}
+
+      <!-- Step 4: Pricing & Location - Individual floating fields -->
+      {#if currentStep === 4}
+        <div class="space-y-8">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-white drop-shadow-lg">Pricing & Location</h2>
+          </div>
+
+          <!-- Pricing Fields -->
+          <div class="max-w-lg mx-auto">
+            <h3 class="text-lg font-medium text-white drop-shadow-lg mb-6 text-center">Pricing</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="dailyPrice" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Daily Price ($) *</label>
+                <input
+                  type="number"
+                  id="dailyPrice"
+                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                  min="0"
+                  bind:value={formData.dailyPrice}
+                />
+                {#if errors.dailyPrice}
+                  <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.dailyPrice}</p>
+                {/if}
+              </div>
+
+              <div>
+                <label for="weeklyPrice" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Weekly Price ($)</label>
+                <input
+                  type="number"
+                  id="weeklyPrice"
+                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                  min="0"
+                  bind:value={formData.weeklyPrice}
+                />
+                <p class="text-xs text-gray-300 mt-1 drop-shadow-lg">Suggested: ${formData.dailyPrice * 6} (1 day free)</p>
+              </div>
+
+              <div>
+                <label for="monthlyPrice" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Monthly Price ($)</label>
+                <input
+                  type="number"
+                  id="monthlyPrice"
+                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                  min="0"
+                  bind:value={formData.monthlyPrice}
+                />
+                <p class="text-xs text-gray-300 mt-1 drop-shadow-lg">Suggested: ${formData.dailyPrice * 24} (6 days free)</p>
+              </div>
+
+              <div>
+                <label for="securityDeposit" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Security Deposit ($)</label>
+                <input
+                  type="number"
+                  id="securityDeposit"
+                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                  min="0"
+                  bind:value={formData.securityDeposit}
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Location Fields -->
+          <div class="max-w-lg mx-auto">
+            <h3 class="text-lg font-medium text-white drop-shadow-lg mb-6 text-center">Location</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label for="city" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">City *</label>
+                <input
+                  type="text"
+                  id="city"
+                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                  bind:value={formData.city}
+                />
+                {#if errors.city}
+                  <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.city}</p>
+                {/if}
+              </div>
+
+              <div>
+                <label for="state" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">State *</label>
+                <input
+                  type="text"
+                  id="state"
+                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                  bind:value={formData.state}
+                />
+                {#if errors.state}
+                  <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.state}</p>
+                {/if}
+              </div>
+
+              <div>
+                <label for="zipCode" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Zip Code *</label>
+                <input
+                  type="text"
+                  id="zipCode"
+                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                  bind:value={formData.zipCode}
+                />
+                {#if errors.zipCode}
+                  <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.zipCode}</p>
                 {/if}
               </div>
             </div>
@@ -1114,40 +1061,38 @@
         </div>
       {/if}
 
-      <!-- Navigation buttons -->
-      <div class="mt-8 flex justify-between">
-        {#if currentStep > 1}
-          <button
-            type="button"
-            class="btn btn-secondary"
-            on:click={prevStep}
-          >
-            Previous
-          </button>
-        {:else}
-          <div></div>
-        {/if}
+    <!-- Navigation buttons - centered and transparent -->
+    <div class="flex justify-center items-center gap-4 mt-8">
+      {#if currentStep > 1}
+        <button
+          type="button"
+          class="bg-gray-600/70 hover:bg-gray-600/90 text-white font-medium py-3 px-6 rounded-md border border-gray-500 backdrop-blur-sm transition-all duration-200"
+          on:click={prevStep}
+        >
+          Previous
+        </button>
+      {/if}
 
-        {#if currentStep < totalSteps}
-          <button
-            type="button"
-            class="btn btn-primary"
-            on:click={nextStep}
-            disabled={!isStepValid()}
-          >
-            Next
-          </button>
-        {:else}
-          <button
-            type="button"
-            class="btn btn-primary"
-            on:click={submitForm}
-            disabled={!isStepValid()}
-          >
-            List My Gear
-          </button>
-        {/if}
-      </div>
+      {#if currentStep < totalSteps}
+        <button
+          type="button"
+          class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-8 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          on:click={nextStep}
+          disabled={!isStepValid()}
+        >
+          Next
+        </button>
+      {:else}
+        <button
+          type="button"
+          class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-8 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          on:click={submitForm}
+          disabled={!isStepValid()}
+        >
+          List My Gear
+        </button>
+      {/if}
     </div>
+  </ContentBlock>
   </div>
 </div>

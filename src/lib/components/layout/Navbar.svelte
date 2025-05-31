@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import { authStore } from '$lib/stores/auth';
-  
+
   let isMenuOpen = false;
 
   function toggleMenu() {
@@ -9,35 +8,53 @@
   }
 </script>
 
-<nav class="bg-white shadow" role="navigation" aria-label="Main">
+<nav class="bg-black/20 backdrop-blur-sm fixed w-full z-50" aria-label="Main">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between h-16">
       <div class="flex">
         <div class="flex-shrink-0 flex items-center">
-          <a href="/" class="text-green-600 font-bold text-xl">GearGrab</a>
+          <a href="/" class="text-white font-bold text-xl">GearGrab</a>
         </div>
         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-          <a href="/" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+          <a href="/" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
             Home
           </a>
-          <a href="/browse" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+          <a href="/browse" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
             Browse
           </a>
-          <a href="/list-gear" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+          <a href="/list-gear" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
             List Gear
+          </a>
+          <a href="/how-it-works" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+            How It Works
+          </a>
+          <a href="/blog" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+            Blog
+          </a>
+          <a href="/about" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+            About
+          </a>
+          <a href="/contact" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+            Contact
+          </a>
+          <a href="/help" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+            Help
+          </a>
+          <a href="/faq" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+            FAQ
           </a>
         </div>
       </div>
       <div class="hidden sm:ml-6 sm:flex sm:items-center">
         {#if $authStore.user}
-          <a href="/dashboard" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+          <a href="/dashboard" class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
             Dashboard
           </a>
-          <button class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+          <button class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
             Sign Out
           </button>
         {:else}
-          <a href="/auth/login" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+          <a href="/auth/login" class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
             Log In
           </a>
           <a href="/auth/signup" class="bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-md text-sm font-medium ml-2">
@@ -48,7 +65,7 @@
       <div class="-mr-2 flex items-center sm:hidden">
         <button
           type="button"
-          class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
+          class="inline-flex items-center justify-center p-2 rounded-md text-white/90 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
           aria-expanded={isMenuOpen}
           aria-controls="mobile-menu"
           on:click={toggleMenu}
@@ -63,46 +80,64 @@
   </div>
 
   {#if isMenuOpen}
-    <div id="mobile-menu" class="sm:hidden">
+    <div id="mobile-menu" class="sm:hidden bg-black/20 backdrop-blur-sm">
       <div class="pt-2 pb-3 space-y-1">
-        <a href="/" class="bg-white block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700">
+        <a href="/" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Home
         </a>
-        <a href="/browse" class="bg-white block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700">
+        <a href="/browse" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Browse
         </a>
-        <a href="/list-gear" class="bg-white block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700">
+        <a href="/list-gear" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           List Gear
         </a>
+        <a href="/how-it-works" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+          How It Works
+        </a>
+        <a href="/blog" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+          Blog
+        </a>
+        <a href="/about" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+          About
+        </a>
+        <a href="/contact" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+          Contact
+        </a>
+        <a href="/help" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+          Help
+        </a>
+        <a href="/faq" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+          FAQ
+        </a>
       </div>
-      <div class="pt-4 pb-3 border-t border-gray-200">
+      <div class="pt-4 pb-3 border-t border-white/20">
         {#if $authStore.user}
           <div class="flex items-center px-4">
             <div class="flex-shrink-0">
-              <span class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-gray-500">
+              <span class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-green-600">
                 <span class="text-xl font-medium leading-none text-white">
                   {$authStore.user.displayName?.[0] || $authStore.user.email?.[0] || 'U'}
                 </span>
               </span>
             </div>
             <div class="ml-3">
-              <div class="text-base font-medium text-gray-800">{$authStore.user.displayName || $authStore.user.email}</div>
+              <div class="text-base font-medium text-white">{$authStore.user.displayName || $authStore.user.email}</div>
             </div>
           </div>
           <div class="mt-3 space-y-1">
-            <a href="/dashboard" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+            <a href="/dashboard" class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Dashboard
             </a>
-            <button class="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+            <button class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Sign out
             </button>
           </div>
         {:else}
           <div class="mt-3 space-y-1">
-            <a href="/auth/login" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+            <a href="/auth/login" class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Log In
             </a>
-            <a href="/auth/signup" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+            <a href="/auth/signup" class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Sign Up
             </a>
           </div>

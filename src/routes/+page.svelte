@@ -1,228 +1,335 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import HeroSearch from '$lib/components/forms/HeroSearch.svelte';
 
-  // Featured categories
+  let videoElement: HTMLVideoElement;
+
+  // Video event handlers
+  function handleVideoLoaded() {
+    console.log('Video loaded successfully');
+    if (videoElement) {
+      videoElement.style.opacity = '1';
+    }
+  }
+
+  function handleVideoError(event: Event) {
+    console.error('Video failed to load:', event);
+    if (videoElement) {
+      videoElement.style.display = 'none';
+    }
+  }
+
+  function handleVideoCanPlay() {
+    console.log('Video can play');
+  }
+
+  // Stats data
+  const stats = [
+    { number: '500+', label: 'Gear Items' },
+    { number: '150+', label: 'Happy Renters' },
+    { number: '25+', label: 'Cities' },
+    { number: '4.8★', label: 'Average Rating' }
+  ];
+
+  // Featured gear items
+  const featuredGear = [
+    {
+      id: 1,
+      title: 'Premium 4-Person Tent',
+      image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+      price: '$25/day',
+      location: 'Denver, CO'
+    },
+    {
+      id: 2,
+      title: 'Professional Hiking Backpack',
+      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+      price: '$15/day',
+      location: 'Boulder, CO'
+    }
+  ];
+
+  // Categories
   const categories = [
     {
       id: 'camping',
       name: 'Camping',
-      image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-      description: 'Tents, sleeping bags, cooking equipment, and more'
+      image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
     },
     {
       id: 'hiking',
       name: 'Hiking',
-      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-      description: 'Backpacks, footwear, navigation tools, and clothing'
+      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
+    },
+    {
+      id: 'skiing',
+      name: 'Skiing',
+      image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
+    },
+    {
+      id: 'climbing',
+      name: 'Climbing',
+      image: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
     },
     {
       id: 'water-sports',
       name: 'Water Sports',
-      image: 'https://images.unsplash.com/photo-1604537466158-719b1972feb8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80',
-      description: 'Kayaks, paddleboards, surfboards, and life vests'
+      image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
     },
     {
-      id: 'biking',
-      name: 'Biking',
-      image: 'https://images.unsplash.com/photo-1511994298241-608e28f14fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-      description: 'Mountain bikes, road bikes, helmets, and accessories'
+      id: 'winter-sports',
+      name: 'Winter Sports',
+      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
     }
   ];
 
-  // Testimonials
-  const testimonials = [
+  // Why choose us features
+  const features = [
     {
-      id: 1,
-      name: 'Sarah Johnson',
-      location: 'Denver, CO',
-      image: 'https://randomuser.me/api/portraits/women/32.jpg',
-      quote: 'GearGrab saved me hundreds of dollars on camping equipment for our family trip. The gear was in perfect condition and the owner was super helpful!'
+      title: 'Quality Guarantee',
+      description: 'Every piece of gear is verified and quality-checked before rental.',
+      icon: '✓'
     },
     {
-      id: 2,
-      name: 'Michael Chen',
-      location: 'Boulder, CO',
-      image: 'https://randomuser.me/api/portraits/men/44.jpg',
-      quote: 'As someone who only goes skiing once a year, renting through GearGrab is perfect. I got high-quality equipment for a fraction of the retail price.'
+      title: '$5 to Try',
+      description: 'Start your adventure with our affordable trial pricing.',
+      icon: '$'
     },
     {
-      id: 3,
-      name: 'Emily Rodriguez',
-      location: 'Fort Collins, CO',
-      image: 'https://randomuser.me/api/portraits/women/68.jpg',
-      quote: 'I love being able to try different kayaks before committing to buying one. GearGrab makes it easy and affordable to test out gear.'
+      title: 'Local Community',
+      description: 'Connect with fellow outdoor enthusiasts in your area.',
+      icon: '👥'
     }
   ];
 
-  // How it works steps
-  const steps = [
-    {
-      id: 1,
-      title: 'Find Gear',
-      icon: 'search',
-      description: 'Browse thousands of outdoor gear listings from local owners in your area.'
-    },
-    {
-      id: 2,
-      title: 'Book & Pay',
-      icon: 'calendar',
-      description: 'Reserve the gear for your dates and pay securely through our platform.'
-    },
-    {
-      id: 3,
-      title: 'Enjoy Outdoors',
-      icon: 'mountain',
-      description: 'Pick up the gear and enjoy your adventure without the cost of buying.'
-    },
-    {
-      id: 4,
-      title: 'Return & Review',
-      icon: 'star',
-      description: 'Return the gear and share your experience with the community.'
-    }
-  ];
+  // Stats animation
+  let statsVisible = false;
+  let heroVisible = false;
 
-  // Parallax effect
-  let scrollY: number = 0;
-
-  // Initialize parallax effect
   onMount(() => {
-    const updateParallax = () => {
-      scrollY = window.scrollY;
-      requestAnimationFrame(updateParallax);
+    // Trigger hero animation after a short delay
+    setTimeout(() => {
+      heroVisible = true;
+    }, 300);
+
+    setTimeout(() => {
+      statsVisible = true;
+    }, 800);
+
+    // Parallax effect
+    const handleScroll = () => {
+      const scrolled = window.pageYOffset;
+      const parallaxImage = document.querySelector('.parallax-image') as HTMLElement;
+      const parallaxVideo = document.querySelector('.parallax-video') as HTMLElement;
+
+      if (parallaxImage) {
+        const speed = 0.5;
+        parallaxImage.style.transform = `translateY(${scrolled * speed}px)`;
+      }
+
+      if (parallaxVideo) {
+        const speed = 0.5;
+        parallaxVideo.style.transform = `translateY(${scrolled * speed}px)`;
+      }
     };
-    updateParallax();
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   });
 </script>
 
-<svelte:head>
-  <title>GearGrab - Rent Outdoor Gear from Local Owners</title>
-  <meta name="description" content="GearGrab is a peer-to-peer marketplace for outdoor gear rentals. Rent camping, hiking, biking, and water sports equipment from local owners." />
-</svelte:head>
-
-<svelte:window bind:scrollY={scrollY} />
-
-<!-- Hero Section with Parallax -->
-<div class="relative h-screen overflow-hidden">
-  <div
-    class="absolute inset-0 bg-cover bg-center"
-    style="background-image: url('https://images.unsplash.com/photo-1465310477141-6fb93167a273?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'); transform: translateY({scrollY * 0.5}px);"
-  ></div>
-  <div class="absolute inset-0 bg-black opacity-50"></div>
-
-  <div class="relative h-full flex flex-col items-center justify-center text-center text-white px-4">
-    <h1 class="text-4xl md:text-6xl font-bold mb-4 animate-fade-in" style="animation-delay: 0.2s; opacity: 0;">Adventure Awaits</h1>
-    <p class="text-xl md:text-2xl mb-8 max-w-3xl animate-fade-in" style="animation-delay: 0.4s; opacity: 0;">Rent outdoor gear from local owners and save money while exploring the great outdoors.</p>
-    <div class="flex flex-col sm:flex-row gap-4 animate-fade-in" style="animation-delay: 0.6s; opacity: 0;">
-      <a href="/browse" class="btn btn-primary text-lg px-8 py-3">Browse Gear</a>
-      <a href="/list-gear" class="btn btn-secondary text-lg px-8 py-3">List Your Gear</a>
-    </div>
+<!-- Top Section with Video Background -->
+<section class="min-h-screen relative overflow-hidden">
+  <!-- Background Image for Top Section with Parallax -->
+  <div class="absolute inset-0 parallax-bg">
+    <img
+      src="/pexels-bianca-gasparoto-834990-1752951.jpg"
+      alt="Mountain landscape with stars"
+      class="w-full h-full object-cover parallax-image"
+      style="transform: translateY(0px);"
+    >
   </div>
 
-  <div
-    class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"
-  ></div>
-</div>
+  <!-- Video Background (overlays image when loaded) with Parallax -->
+  <video
+    bind:this={videoElement}
+    autoplay
+    muted
+    loop
+    playsinline
+    class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 parallax-video"
+    style="z-index: 1; opacity: 1; transform: translateY(0px);"
+    on:loadeddata={handleVideoLoaded}
+    on:error={handleVideoError}
+    on:canplay={handleVideoCanPlay}
+    on:loadstart={() => console.log('Homepage video load started')}
+    on:loadedmetadata={() => console.log('Homepage video metadata loaded')}
+  >
+    <!-- Same video as blog page for consistency -->
+    <source src="/1877846-hd_1920_1080_30fps.mp4" type="video/mp4">
+    <!-- Fallback videos -->
+    <source src="/857134-hd_1280_720_24fps.mp4" type="video/mp4">
+    <source src="/My Movie 4.mp4" type="video/mp4">
+    <source src="/Standing_around_the_202505280600.mp4" type="video/mp4">
+    <source src="/Drone.mp4" type="video/mp4">
+    <source src="/tent.mp4" type="video/mp4">
+    <source src="/Stars.mp4" type="video/mp4">
+    <source src="/Milky Way.mp4" type="video/mp4">
+    <source src="/campfire.mp4" type="video/mp4">
+    <source src="/857251-hd_1620_1080_25fps.mp4" type="video/mp4">
+    <source src="https://player.vimeo.com/external/291648067.hd.mp4?s=94998971682c6a3267e4cbd19d16a7b6c720f345&profile_id=175" type="video/mp4">
+  </video>
 
-<!-- Featured Categories -->
-<section class="py-16 bg-white">
-  <div class="container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-12 animate-fade-in" style="animation-delay: 0.2s; opacity: 0;">Explore Gear Categories</h2>
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black bg-opacity-20" style="z-index: 2;"></div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      {#each categories as category}
-        <a href="/browse?category={category.id}" class="group">
-          <div class="relative h-64 rounded-lg overflow-hidden shadow-md transition-transform transform group-hover:scale-105">
-            <img src={category.image} alt={category.name} class="w-full h-full object-cover" />
-            <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-70"></div>
-            <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
-              <h3 class="text-xl font-bold mb-1">{category.name}</h3>
-              <p class="text-sm opacity-90">{category.description}</p>
+  <!-- Top Section Content -->
+  <div class="relative z-10 flex flex-col justify-center min-h-screen" style="z-index: 10;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <!-- Hero Content -->
+      <div class="text-center text-white mb-12">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 {heroVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'} transition-all duration-800">
+          Grab Some Gear And Get<br>Out There!
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto {heroVisible ? 'animate-fade-in-up animate-delay-200' : 'opacity-0 translate-y-8'} transition-all duration-800">
+          Premier gear rental from local owners. Adventure awaits, gear doesn't have to wait.
+        </p>
+
+        <!-- Search Form -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 max-w-2xl mx-auto {heroVisible ? 'animate-fade-in-up animate-delay-400' : 'opacity-0 translate-y-8'} transition-all duration-800">
+          <HeroSearch />
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="text-center">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {#each stats as stat, i}
+            <div class="transform transition-all duration-700 {statsVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}" style="transition-delay: {i * 100}ms">
+              <div class="text-3xl md:text-4xl font-bold text-green-400 mb-2">{stat.number}</div>
+              <div class="text-gray-200">{stat.label}</div>
             </div>
-          </div>
+          {/each}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Bottom Section with Black Background -->
+<section class="bg-black">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+
+    <!-- Featured Gear -->
+    <div class="text-center mb-20">
+        <h2 class="text-4xl font-bold text-white mb-4">Featured Gear</h2>
+        <p class="text-xl text-gray-200 mb-12 max-w-2xl mx-auto">
+          Discover top-rated outdoor equipment from the best local owners.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
+          {#each featuredGear as gear}
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20">
+              <img src={gear.image} alt={gear.title} class="w-full h-48 object-cover">
+              <div class="p-6 text-white">
+                <h3 class="text-xl font-bold mb-2">{gear.title}</h3>
+                <div class="flex justify-between items-center">
+                  <span class="text-green-400 font-bold">{gear.price}</span>
+                  <span class="text-gray-300">{gear.location}</span>
+                </div>
+              </div>
+            </div>
+          {/each}
+        </div>
+
+        <a href="/browse" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
+          Browse All Gear
         </a>
-      {/each}
-    </div>
-  </div>
-</section>
+      </div>
 
-<!-- How It Works -->
-<section class="py-16 bg-gray-50">
-  <div class="container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-12 animate-fade-in" style="animation-delay: 0.2s; opacity: 0;">How GearGrab Works</h2>
+      <!-- Explore Categories -->
+      <div class="text-center mb-20">
+        <h2 class="text-4xl font-bold text-white mb-4">Explore Categories</h2>
+        <p class="text-xl text-gray-200 mb-12 max-w-2xl mx-auto">
+          Find the perfect gear for your outdoor adventure.
+        </p>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      {#each steps as step}
-        <div class="bg-white rounded-lg p-6 shadow-md text-center">
-          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            {#if step.icon === 'search'}
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            {:else if step.icon === 'calendar'}
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            {:else if step.icon === 'mountain'}
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
-            {:else if step.icon === 'star'}
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-              </svg>
-            {/if}
-          </div>
-          <h3 class="text-xl font-bold mb-2">{step.title}</h3>
-          <p class="text-gray-600">{step.description}</p>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-6xl mx-auto">
+          {#each categories as category}
+            <a href="/browse?category={category.id}" class="group">
+              <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 hover:bg-white/20 transition-all">
+                <img src={category.image} alt={category.name} class="w-full h-24 object-cover">
+                <div class="p-4">
+                  <h3 class="text-white font-semibold text-sm">{category.name}</h3>
+                </div>
+              </div>
+            </a>
+          {/each}
         </div>
-      {/each}
-    </div>
-  </div>
-</section>
+      </div>
 
-<!-- Parallax Banner -->
-<div
-  class="relative h-80 bg-cover bg-center bg-fixed flex items-center justify-center"
-  style="background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80');"
->
-  <div class="absolute inset-0 bg-black opacity-60"></div>
-  <div class="relative text-center text-white px-4">
-    <h2 class="text-3xl md:text-4xl font-bold mb-4">Save Money. Reduce Waste. Explore More.</h2>
-    <p class="text-xl max-w-3xl mx-auto">Renting gear is better for your wallet and the planet.</p>
-  </div>
-</div>
+      <!-- Why Choose GearGrab -->
+      <div class="text-center mb-20">
+        <h2 class="text-4xl font-bold text-white mb-4">Why Choose GearGrab?</h2>
+        <p class="text-xl text-gray-200 mb-12 max-w-2xl mx-auto">
+          Experience the future of outdoor gear access with our trusted platform.
+        </p>
 
-<!-- Testimonials -->
-<section class="py-16 bg-white">
-  <div class="container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-12 animate-fade-in" style="animation-delay: 0.2s; opacity: 0;">What Our Users Say</h2>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {#each testimonials as testimonial}
-        <div class="bg-gray-50 rounded-lg p-6 shadow-sm">
-          <div class="flex items-center mb-4">
-            <img src={testimonial.image} alt={testimonial.name} class="w-12 h-12 rounded-full mr-4" />
-            <div>
-              <h3 class="font-bold">{testimonial.name}</h3>
-              <p class="text-sm text-gray-600">{testimonial.location}</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          {#each features as feature}
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20">
+              <div class="text-4xl mb-4">{feature.icon}</div>
+              <h3 class="text-xl font-bold text-white mb-4">{feature.title}</h3>
+              <p class="text-gray-200">{feature.description}</p>
             </div>
-          </div>
-          <p class="text-gray-700 italic">"{testimonial.quote}"</p>
+          {/each}
         </div>
-      {/each}
+      </div>
+
+    <!-- Call to Action -->
+    <div class="text-center">
+      <h2 class="text-4xl font-bold text-white mb-6">Ready to Start Your Adventure?</h2>
+      <p class="text-xl text-gray-200 mb-8 max-w-3xl mx-auto">
+        Join thousands of outdoor enthusiasts who are saving money and exploring more with GearGrab.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/browse" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
+          Start Browsing
+        </a>
+        <a href="/list-gear" class="border-2 border-white text-white hover:bg-white hover:text-gray-900 font-bold py-3 px-8 rounded-lg transition-colors">
+          List Your Gear
+        </a>
+      </div>
     </div>
+
   </div>
 </section>
 
-<!-- CTA Section -->
-<section class="py-16 bg-green-600 text-white">
-  <div class="container mx-auto px-4 text-center">
-    <h2 class="text-3xl font-bold mb-6">Ready to Start Your Adventure?</h2>
-    <p class="text-xl mb-8 max-w-3xl mx-auto">Join thousands of outdoor enthusiasts who are saving money and exploring more with GearGrab.</p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="/browse" class="btn bg-white text-green-600 hover:bg-gray-100 text-lg px-8 py-3">Browse Gear</a>
-      <a href="/list-gear" class="btn border-2 border-white text-white hover:bg-green-700 text-lg px-8 py-3">List Your Gear</a>
-    </div>
-  </div>
-</section>
+<style>
+  .parallax-bg {
+    will-change: transform;
+  }
+
+  .parallax-image, .parallax-video {
+    will-change: transform;
+    transform-origin: center center;
+    min-height: 120vh;
+    min-width: 100%;
+  }
+
+  /* Smooth scrolling for better parallax effect */
+  :global(html) {
+    scroll-behavior: smooth;
+  }
+
+  /* Ensure no overflow issues */
+  section {
+    overflow-x: hidden;
+  }
+</style>

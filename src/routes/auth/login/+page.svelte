@@ -2,23 +2,23 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { signInWithEmail, signInWithGoogle } from '$firebase/auth';
-  import { notificationsStore } from '$stores/notifications';
+  import { notifications } from '$stores/notifications';
   import { isValidEmail } from '$utils/validation';
-  
+
   let email = '';
   let password = '';
   let rememberMe = false;
   let loading = false;
   let errors: Record<string, string> = {};
-  
+
   // Get redirect URL from query parameters
   $: redirectTo = $page.url.searchParams.get('redirectTo') || '/dashboard';
-  
+
   // Validate form
   function validateForm() {
     errors = {};
     let isValid = true;
-    
+
     if (!email) {
       errors.email = 'Email is required';
       isValid = false;
@@ -26,29 +26,29 @@
       errors.email = 'Please enter a valid email address';
       isValid = false;
     }
-    
+
     if (!password) {
       errors.password = 'Password is required';
       isValid = false;
     }
-    
+
     return isValid;
   }
-  
+
   // Handle form submission
   async function handleSubmit() {
     if (!validateForm()) return;
-    
+
     loading = true;
     errors = {};
-    
+
     try {
       await signInWithEmail(email, password);
       notificationsStore.success('Successfully logged in!');
       goto(redirectTo);
     } catch (error: any) {
       console.error('Login error:', error);
-      
+
       // Handle specific Firebase auth errors
       if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
         errors.auth = 'Invalid email or password';
@@ -61,12 +61,12 @@
       loading = false;
     }
   }
-  
+
   // Handle Google sign-in
   async function handleGoogleSignIn() {
     loading = true;
     errors = {};
-    
+
     try {
       await signInWithGoogle();
       notificationsStore.success('Successfully logged in with Google!');
@@ -82,22 +82,45 @@
 
 <svelte:head>
   <title>Log In - GearGrab</title>
+  <meta name="description" content="Log in to your GearGrab account to rent outdoor gear or list your equipment for others to enjoy." />
 </svelte:head>
 
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-md w-full space-y-8">
-    <div>
-      <h1 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-        Log in to your account
-      </h1>
-      <p class="mt-2 text-center text-sm text-gray-600">
-        Or
-        <a href="/auth/signup" class="font-medium text-green-600 hover:text-green-500">
-          create a new account
-        </a>
-      </p>
-    </div>
-    
+<!-- Full screen background with outdoor theme -->
+<div class="min-h-screen relative">
+  <!-- Background Image -->
+  <div
+    class="absolute inset-0 bg-cover bg-center"
+    style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80');"
+  ></div>
+  <div class="absolute inset-0 bg-black opacity-60"></div>
+
+  <!-- Content -->
+  <div class="relative min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <!-- Login Card with outdoor styling -->
+      <div class="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-xl p-8">
+        <div>
+          <div class="flex justify-center mb-6">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+            </div>
+          </div>
+          <h1 class="text-center text-3xl font-extrabold text-gray-900">
+            Welcome back
+          </h1>
+          <p class="mt-2 text-center text-sm text-gray-600">
+            Log in to your GearGrab account
+          </p>
+          <p class="mt-1 text-center text-sm text-gray-600">
+            Or
+            <a href="/auth/signup" class="font-medium text-green-600 hover:text-green-500">
+              create a new account
+            </a>
+          </p>
+        </div>
+
     {#if errors.auth}
       <div class="rounded-md bg-red-50 p-4">
         <div class="flex">
@@ -114,18 +137,18 @@
         </div>
       </div>
     {/if}
-    
+
     <form class="mt-8 space-y-6" on:submit|preventDefault={handleSubmit}>
       <div class="rounded-md shadow-sm -space-y-px">
         <div>
           <label for="email-address" class="sr-only">Email address</label>
-          <input 
-            id="email-address" 
-            name="email" 
-            type="email" 
-            autocomplete="email" 
-            required 
-            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" 
+          <input
+            id="email-address"
+            name="email"
+            type="email"
+            autocomplete="email"
+            required
+            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
             placeholder="Email address"
             bind:value={email}
           />
@@ -135,13 +158,13 @@
         </div>
         <div>
           <label for="password" class="sr-only">Password</label>
-          <input 
-            id="password" 
-            name="password" 
-            type="password" 
-            autocomplete="current-password" 
-            required 
-            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" 
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
             placeholder="Password"
             bind:value={password}
           />
@@ -153,10 +176,10 @@
 
       <div class="flex items-center justify-between">
         <div class="flex items-center">
-          <input 
-            id="remember-me" 
-            name="remember-me" 
-            type="checkbox" 
+          <input
+            id="remember-me"
+            name="remember-me"
+            type="checkbox"
             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
             bind:checked={rememberMe}
           />
@@ -173,8 +196,8 @@
       </div>
 
       <div>
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           disabled={loading}
         >
@@ -192,7 +215,7 @@
         </button>
       </div>
     </form>
-    
+
     <div class="mt-6">
       <div class="relative">
         <div class="absolute inset-0 flex items-center">
@@ -206,8 +229,8 @@
       </div>
 
       <div class="mt-6">
-        <button 
-          type="button" 
+        <button
+          type="button"
           class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           on:click={handleGoogleSignIn}
           disabled={loading}
@@ -222,6 +245,8 @@
           </svg>
           Google
         </button>
+      </div>
+    </div>
       </div>
     </div>
   </div>

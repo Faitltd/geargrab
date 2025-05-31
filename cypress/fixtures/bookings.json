@@ -1,0 +1,151 @@
+[
+  {
+    "id": "booking1",
+    "listingId": "1",
+    "renterId": "user2",
+    "ownerId": "user1",
+    "status": "confirmed",
+    "startDate": "2024-06-15",
+    "endDate": "2024-06-18",
+    "totalDays": 3,
+    "pricing": {
+      "dailyRate": 35,
+      "subtotal": 105,
+      "serviceFee": 15.75,
+      "insurance": 10.50,
+      "securityDeposit": 150,
+      "total": 131.25
+    },
+    "deliveryMethod": "pickup",
+    "pickupLocation": "Downtown Denver",
+    "insuranceTier": "standard",
+    "specialRequests": "Please include setup instructions",
+    "createdAt": "2024-05-20T10:30:00Z",
+    "updatedAt": "2024-05-21T14:15:00Z",
+    "messages": [
+      {
+        "id": "msg1",
+        "senderId": "user2",
+        "text": "Hi! I'm excited about renting your tent. Can you confirm the pickup location?",
+        "timestamp": "2024-05-20T11:00:00Z"
+      },
+      {
+        "id": "msg2",
+        "senderId": "user1",
+        "text": "Hello! Yes, pickup is at 123 Main St, Denver. I'll have setup instructions ready for you.",
+        "timestamp": "2024-05-20T15:30:00Z"
+      }
+    ]
+  },
+  {
+    "id": "booking2",
+    "listingId": "2",
+    "renterId": "user3",
+    "ownerId": "user2",
+    "status": "pending",
+    "startDate": "2024-07-01",
+    "endDate": "2024-07-05",
+    "totalDays": 4,
+    "pricing": {
+      "dailyRate": 25,
+      "subtotal": 100,
+      "serviceFee": 15.00,
+      "insurance": 8.00,
+      "securityDeposit": 100,
+      "total": 123.00
+    },
+    "deliveryMethod": "delivery",
+    "deliveryAddress": "456 Mountain View Dr, Vail, CO 81657",
+    "insuranceTier": "premium",
+    "specialRequests": "Need delivery by 9 AM on July 1st",
+    "createdAt": "2024-05-25T09:15:00Z",
+    "updatedAt": "2024-05-25T09:15:00Z",
+    "messages": []
+  },
+  {
+    "id": "booking3",
+    "listingId": "3",
+    "renterId": "user1",
+    "ownerId": "user3",
+    "status": "completed",
+    "startDate": "2024-03-10",
+    "endDate": "2024-03-12",
+    "totalDays": 2,
+    "pricing": {
+      "dailyRate": 45,
+      "subtotal": 90,
+      "serviceFee": 13.50,
+      "insurance": 9.00,
+      "securityDeposit": 200,
+      "total": 112.50
+    },
+    "deliveryMethod": "pickup",
+    "pickupLocation": "Vail Village",
+    "insuranceTier": "standard",
+    "specialRequests": "",
+    "createdAt": "2024-03-05T16:20:00Z",
+    "updatedAt": "2024-03-15T10:00:00Z",
+    "completedAt": "2024-03-15T10:00:00Z",
+    "review": {
+      "id": "review5",
+      "rating": 5,
+      "text": "Excellent ski equipment! Perfect condition and great performance on the slopes.",
+      "createdAt": "2024-03-15T18:30:00Z"
+    },
+    "messages": [
+      {
+        "id": "msg3",
+        "senderId": "user1",
+        "text": "Thanks for the great ski equipment! Had an amazing time on the slopes.",
+        "timestamp": "2024-03-12T20:00:00Z"
+      },
+      {
+        "id": "msg4",
+        "senderId": "user3",
+        "text": "Glad you enjoyed it! Hope to rent to you again soon.",
+        "timestamp": "2024-03-13T08:30:00Z"
+      }
+    ]
+  },
+  {
+    "id": "booking4",
+    "listingId": "1",
+    "renterId": "user3",
+    "ownerId": "user1",
+    "status": "cancelled",
+    "startDate": "2024-05-20",
+    "endDate": "2024-05-23",
+    "totalDays": 3,
+    "pricing": {
+      "dailyRate": 35,
+      "subtotal": 105,
+      "serviceFee": 15.75,
+      "insurance": 10.50,
+      "securityDeposit": 150,
+      "total": 131.25
+    },
+    "deliveryMethod": "pickup",
+    "pickupLocation": "Downtown Denver",
+    "insuranceTier": "standard",
+    "specialRequests": "",
+    "createdAt": "2024-05-15T12:00:00Z",
+    "updatedAt": "2024-05-18T14:30:00Z",
+    "cancelledAt": "2024-05-18T14:30:00Z",
+    "cancellationReason": "Weather conditions",
+    "refundAmount": 131.25,
+    "messages": [
+      {
+        "id": "msg5",
+        "senderId": "user3",
+        "text": "Unfortunately, I need to cancel due to bad weather forecast. Sorry for the inconvenience.",
+        "timestamp": "2024-05-18T14:00:00Z"
+      },
+      {
+        "id": "msg6",
+        "senderId": "user1",
+        "text": "No problem at all! Safety first. Hope you can book again when the weather improves.",
+        "timestamp": "2024-05-18T14:45:00Z"
+      }
+    ]
+  }
+]

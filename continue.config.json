@@ -1,0 +1,12 @@
+{
+  "defaultProvider": "lmstudio",
+  "providers": [
+    {
+      "title": "LM Studio Local",
+      "id": "lmstudio",
+      "model": "codellama:13b-instruct",
+      "apiBase": "http://localhost:1234/v1",
+      "apiKey": "sk-no-key-needed"
+    }
+  ]
+}

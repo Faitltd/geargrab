@@ -13,7 +13,17 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "test": "cypress run"
+    "test": "cypress run",
+    "test:smoke": "node cypress/scripts/run-tests.js smoke",
+    "test:core": "node cypress/scripts/run-tests.js core",
+    "test:auth": "node cypress/scripts/run-tests.js auth",
+    "test:dashboard": "node cypress/scripts/run-tests.js dashboard",
+    "test:responsive": "node cypress/scripts/run-tests.js responsive",
+    "test:integration": "node cypress/scripts/run-tests.js integration",
+    "test:all": "node cypress/scripts/run-tests.js all",
+    "test:parallel": "node cypress/scripts/run-tests.js parallel core auth dashboard",
+    "test:ci": "node cypress/scripts/run-tests.js ci",
+    "test:setup": "node cypress/scripts/setup-tests.js"
   },
   "devDependencies": {
     "@sveltejs/adapter-node": "^1.0.0",
