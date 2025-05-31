@@ -416,15 +416,25 @@
 </svelte:head>
 
 {#if !listing}
-  <div class="bg-white min-h-screen flex items-center justify-center">
-    <div class="text-center">
-      <h1 class="text-3xl font-bold text-gray-900 mb-4">Listing Not Found</h1>
-      <p class="text-gray-600 mb-6">The listing you're looking for doesn't exist or has been removed.</p>
-      <a href="/browse" class="btn btn-primary">Browse Other Listings</a>
+  <!-- Not Found with Outdoor Theme -->
+  <div class="relative min-h-screen">
+    <div
+      class="absolute inset-0 bg-cover bg-center"
+      style="background-image: url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80');"
+    ></div>
+    <div class="absolute inset-0 bg-black opacity-50"></div>
+
+    <div class="relative min-h-screen flex items-center justify-center px-4">
+      <div class="text-center text-white">
+        <h1 class="text-3xl font-bold mb-4">Listing Not Found</h1>
+        <p class="text-lg mb-6">The listing you're looking for doesn't exist or has been removed.</p>
+        <a href="/browse" class="btn bg-white text-green-600 hover:bg-gray-100 px-8 py-3">Browse Other Listings</a>
+      </div>
     </div>
   </div>
 {:else}
-  <div class="bg-white">
+  <!-- Listing Page with Outdoor Styling -->
+  <div class="bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left Column: Images and Details -->
