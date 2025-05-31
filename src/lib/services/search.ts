@@ -1,5 +1,5 @@
 // Advanced search and filtering service for GearGrab
-import { db } from '$lib/firebase/client';
+import { firestore } from '$lib/firebase/client';
 import { 
   collection, 
   query, 

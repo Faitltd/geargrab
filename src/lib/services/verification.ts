@@ -1,5 +1,5 @@
 // User verification service for GearGrab
-import { db } from '$lib/firebase/client';
+import { firestore } from '$lib/firebase/client';
 import { 
   collection, 
   doc, 
@@ -168,7 +168,7 @@ class VerificationService {
     data: any
   ): Promise<string> {
     try {
-      const verificationsRef = collection(db, 'verificationRequests');
+      const verificationsRef = collection(firestore, 'verificationRequests');
       
       const request: Omit<VerificationRequest, 'id'> = {
         userId,
@@ -226,7 +226,7 @@ class VerificationService {
   // Confirm phone verification
   async confirmPhoneVerification(requestId: string, code: string): Promise<boolean> {
     try {
-      const requestRef = doc(db, 'verificationRequests', requestId);
+      const requestRef = doc(firestore, 'verificationRequests', requestId);
       const requestDoc = await getDoc(requestRef);
       
       if (!requestDoc.exists()) {
@@ -272,7 +272,7 @@ class VerificationService {
   // Get user verification status
   async getUserVerificationStatus(userId: string): Promise<UserVerificationStatus> {
     try {
-      const userRef = doc(db, 'userVerifications', userId);
+      const userRef = doc(firestore, 'userVerifications', userId);
       const userDoc = await getDoc(userRef);
       
       if (userDoc.exists()) {
@@ -309,7 +309,7 @@ class VerificationService {
   async updateUserVerificationStatus(userId: string): Promise<void> {
     try {
       // Get all approved verification requests for user
-      const verificationsRef = collection(db, 'verificationRequests');
+      const verificationsRef = collection(firestore, 'verificationRequests');
       const q = query(
         verificationsRef,
         where('userId', '==', userId),
@@ -346,7 +346,7 @@ class VerificationService {
         lastUpdated: new Date()
       };
 
-      const userRef = doc(db, 'userVerifications', userId);
+      const userRef = doc(firestore, 'userVerifications', userId);
       await updateDoc(userRef, {
         ...status,
         lastUpdated: serverTimestamp()
