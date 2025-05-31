@@ -232,15 +232,18 @@
                     </div>
 
                     <div class="mt-4">
-                      <a
-                        href="/blog/{post.id}"
+                      <button
                         class="inline-flex items-center text-green-400 hover:text-green-300 font-medium drop-shadow-lg"
+                        on:click={() => {
+                          // For now, just show an alert - in the future this would navigate to the actual blog post
+                          alert(`Blog post "${post.title}" - Coming soon!`);
+                        }}
                       >
                         Read More
                         <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                         </svg>
-                      </a>
+                      </button>
                     </div>
                   </div>
                 </article>
