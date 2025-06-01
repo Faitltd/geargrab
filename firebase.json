@@ -36,6 +36,18 @@
         "destination": "/favicon.ico"
       },
       {
+        "source": "/*.mp4",
+        "destination": "/*.mp4"
+      },
+      {
+        "source": "/*.jpg",
+        "destination": "/*.jpg"
+      },
+      {
+        "source": "/*.png",
+        "destination": "/*.png"
+      },
+      {
         "source": "**",
         "run": {
           "serviceId": "geargrab-app",
