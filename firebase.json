@@ -24,30 +24,6 @@
     ],
     "rewrites": [
       {
-        "source": "/_app/**",
-        "destination": "/_app/**"
-      },
-      {
-        "source": "/images/**",
-        "destination": "/images/**"
-      },
-      {
-        "source": "/favicon.ico",
-        "destination": "/favicon.ico"
-      },
-      {
-        "source": "/*.mp4",
-        "destination": "/*.mp4"
-      },
-      {
-        "source": "/*.jpg",
-        "destination": "/*.jpg"
-      },
-      {
-        "source": "/*.png",
-        "destination": "/*.png"
-      },
-      {
         "source": "**",
         "run": {
           "serviceId": "geargrab-app",
