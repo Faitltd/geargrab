@@ -13,6 +13,16 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:123456789:web:abcdef'
 };
 
+// Debug logging
+console.log('Firebase Config:', {
+  apiKey: firebaseConfig.apiKey?.substring(0, 10) + '...',
+  authDomain: firebaseConfig.authDomain,
+  projectId: firebaseConfig.projectId,
+  storageBucket: firebaseConfig.storageBucket,
+  messagingSenderId: firebaseConfig.messagingSenderId,
+  appId: firebaseConfig.appId?.substring(0, 20) + '...'
+});
+
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);

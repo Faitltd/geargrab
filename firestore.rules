@@ -1,83 +1,49 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Utility functions
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
-    }
-
-    function isInvolvedInBooking(bookingData) {
-      return isAuthenticated() && (request.auth.uid == bookingData.renterUid || request.auth.uid == bookingData.ownerUid);
-    }
-
-    function isAdmin() {
-      return isAuthenticated() && get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.isAdmin == true;
-    }
-
-    // User profiles - public read, user-only write
+    // Users can read and write their own user document
     match /users/{userId} {
-      allow read: if true;
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isAdmin();
-
-      // User's private data
-      match /private/{document=**} {
-        allow read: if isOwner(userId) || isAdmin();
-        allow write: if isOwner(userId) || isAdmin();
-      }
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Gear listings - public read, owner-only write
+    // Users can read and write their own private data
+    match /users/{userId}/private/{document} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Listings - authenticated users can read all, but only owners can write
     match /listings/{listingId} {
-      allow read: if true;
-      allow create: if isAuthenticated() && request.resource.data.ownerUid == request.auth.uid;
-      allow update: if isOwner(resource.data.ownerUid) || isAdmin();
-      allow delete: if isOwner(resource.data.ownerUid) || isAdmin();
+      allow read: if true; // Anyone can browse listings
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.ownerUid;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.ownerUid;
     }
 
-    // Bookings - involved parties can read, specific rules for create/update
+    // Bookings - only involved parties can access
     match /bookings/{bookingId} {
-      allow read: if isInvolvedInBooking(resource.data) || isAdmin();
-      allow create: if isAuthenticated() && request.resource.data.renterUid == request.auth.uid;
-      allow update: if isInvolvedInBooking(resource.data) || isAdmin();
-      allow delete: if isAdmin();
+      allow read, write: if request.auth != null &&
+        (request.auth.uid == resource.data.renterUid ||
+         request.auth.uid == resource.data.ownerUid);
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.renterUid;
     }
 
-    // Reviews - public read, involved parties can write
+    // Messages - only participants can access
+    match /messages/{messageId} {
+      allow read, write: if request.auth != null &&
+        (request.auth.uid in resource.data.participants);
+      allow create: if request.auth != null && request.auth.uid in request.resource.data.participants;
+    }
+
+    // Reviews - authenticated users can read all, only reviewers can write their own
     match /reviews/{reviewId} {
       allow read: if true;
-      allow create: if isAuthenticated() && (
-        request.resource.data.reviewerUid == request.auth.uid
-      );
-      allow update: if isOwner(resource.data.reviewerUid) || isAdmin();
-      allow delete: if isOwner(resource.data.reviewerUid) || isAdmin();
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.reviewerUid;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.reviewerUid;
     }
 
-    // Messages - only involved parties can read/write
-    match /messages/{messageId} {
-      allow read: if isAuthenticated() && (
-        request.auth.uid == resource.data.senderUid ||
-        request.auth.uid == resource.data.recipientUid
-      );
-      allow create: if isAuthenticated() && request.resource.data.senderUid == request.auth.uid;
-      allow update: if false; // Messages should not be updated
-      allow delete: if isAdmin();
-    }
-
-    // Admin-only collections
-    match /adminUsers/{userId} {
-      allow read: if isAdmin();
-      allow write: if isAdmin();
-    }
-
-    match /system/{document=**} {
-      allow read: if isAdmin();
-      allow write: if isAdmin();
-    }
+    // For development - temporary open access (remove in production)
+    // match /{document=**} {
+    //   allow read, write: if true;
+    // }
   }
 }

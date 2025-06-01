@@ -1,6 +1,10 @@
 <script lang="ts">
   import ImageUploader from '$lib/components/ImageUploader.svelte';
   import ContentBlock from '$lib/components/layout/ContentBlock.svelte';
+  import { authStore } from '$lib/stores/auth';
+  import { createListing } from '$lib/firebase/db/listings';
+  import { goto } from '$app/navigation';
+  import type { Listing } from '$lib/types/firestore';
 
   let videoElement: HTMLVideoElement;
 
@@ -202,69 +206,88 @@
     }
   }
 
+  // Loading state for form submission
+  let isSubmitting = false;
+
   // Submit form
-  function submitForm(): void {
-    // In a real app, we would send this to the server
-    alert('Your gear has been listed successfully! In a real app, this would be saved to the database.');
-    console.log('Form data:', formData);
+  async function submitForm(): Promise<void> {
+    // Check if user is authenticated
+    if (!$authStore.user) {
+      alert('Please sign in to list your gear.');
+      goto('/auth/signin');
+      return;
+    }
 
-    // Reset form
-    formData = {
-      // Basic info
-      title: '',
-      category: '',
-      subcategory: '',
-      description: '',
+    // Validate the form one more time
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4)) {
+      alert('Please fix all validation errors before submitting.');
+      return;
+    }
 
-      // Details
-      brand: '',
-      model: '',
-      condition: 'Like New',
-      ageInYears: 0,
+    isSubmitting = true;
 
-      // Features and specifications
-      features: ['', '', ''],
-      specifications: [
-        { key: '', value: '' },
-        { key: '', value: '' },
-        { key: '', value: '' }
-      ],
+    try {
+      // Transform form data to match Listing interface
+      const listingData: Omit<Listing, 'id' | 'createdAt' | 'updatedAt'> = {
+        ownerUid: $authStore.user.uid,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        subcategory: formData.subcategory || undefined,
+        brand: formData.brand || undefined,
+        model: formData.model || undefined,
+        condition: formData.condition as 'New' | 'Like New' | 'Good' | 'Fair' | 'Poor',
+        ageInYears: formData.ageInYears || undefined,
+        dailyPrice: formData.dailyPrice,
+        weeklyPrice: formData.weeklyPrice || undefined,
+        monthlyPrice: formData.monthlyPrice || undefined,
+        securityDeposit: formData.securityDeposit,
+        location: {
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode
+        },
+        deliveryOptions: {
+          pickup: formData.pickup,
+          dropoff: formData.dropoff,
+          shipping: formData.shipping,
+          pickupLocation: formData.pickup ? formData.pickupLocation : undefined,
+          dropoffDistance: formData.dropoff ? formData.dropoffDistance : undefined,
+          shippingFee: formData.shipping ? formData.shippingFee : undefined
+        },
+        images: formData.images,
+        features: formData.features.filter(f => f.trim() !== ''),
+        specifications: formData.specifications
+          .filter(spec => spec.key.trim() !== '' && spec.value.trim() !== '')
+          .reduce((acc, spec) => {
+            acc[spec.key] = spec.value;
+            return acc;
+          }, {} as Record<string, string>),
+        includesInsurance: formData.includesInsurance,
+        insuranceDetails: formData.includesInsurance ? formData.insuranceDetails : undefined,
+        availabilityCalendar: {}, // Initialize empty - can be updated later
+        status: 'active' as const,
+        averageRating: undefined,
+        reviewCount: undefined
+      };
 
-      // Images
-      images: [],
+      // Create the listing in Firestore
+      const listingId = await createListing(listingData);
 
-      // Pricing
-      dailyPrice: 0,
-      weeklyPrice: 0,
-      monthlyPrice: 0,
-      securityDeposit: 0,
+      console.log('Listing created successfully with ID:', listingId);
 
-      // Location
-      city: '',
-      state: '',
-      zipCode: '',
+      // Show success message
+      alert('Your gear has been listed successfully! You can view and manage your listings in your dashboard.');
 
-      // Delivery options
-      pickup: true,
-      dropoff: false,
-      shipping: false,
-      pickupLocation: '',
-      dropoffDistance: 0,
-      shippingFee: 0,
+      // Redirect to the new listing or dashboard
+      goto(`/listing/${listingId}`);
 
-      // Availability
-      unavailableDates: [],
-
-      // Insurance
-      includesInsurance: false,
-      insuranceDetails: ''
-    };
-
-    // Reset errors
-    errors = {};
-
-    // Reset step
-    currentStep = 1;
+    } catch (error) {
+      console.error('Error creating listing:', error);
+      alert('There was an error creating your listing. Please try again.');
+    } finally {
+      isSubmitting = false;
+    }
   }
 
   // Validate form data and update errors
@@ -1099,9 +1122,19 @@
           type="button"
           class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-8 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
           on:click={submitForm}
-          disabled={!isStepValid()}
+          disabled={isSubmitting || !isStepValid()}
         >
-          List My Gear
+          {#if isSubmitting}
+            <span class="flex items-center">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Creating Listing...
+            </span>
+          {:else}
+            List My Gear
+          {/if}
         </button>
       {/if}
     </div>

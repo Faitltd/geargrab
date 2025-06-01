@@ -16,9 +16,9 @@
 
 <!-- Simple Search Form for Hero Section -->
 <form on:submit|preventDefault={handleSearch} class="w-full">
-  <div class="flex flex-col md:flex-row gap-3 items-end">
+  <div class="flex flex-col md:flex-row gap-3 items-center md:items-end">
     <!-- Search Input -->
-    <div class="flex-1">
+    <div class="w-full md:flex-1">
       <input
         type="text"
         bind:value={selectedQuery}
@@ -28,7 +28,7 @@
     </div>
 
     <!-- Location Input -->
-    <div class="flex-1">
+    <div class="w-full md:flex-1">
       <input
         type="text"
         bind:value={selectedLocation}
@@ -38,10 +38,10 @@
     </div>
 
     <!-- Search Button -->
-    <div>
+    <div class="w-full md:w-auto">
       <button
         type="submit"
-        class="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-lg transition-colors whitespace-nowrap"
+        class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-lg transition-colors whitespace-nowrap"
       >
         Search Gear
       </button>

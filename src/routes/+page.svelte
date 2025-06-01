@@ -19,9 +19,7 @@
     }
   }
 
-  function handleVideoCanPlay() {
-    console.log('Video can play');
-  }
+
 
   // Stats data
   const stats = [
@@ -120,16 +118,10 @@
     const handleScroll = () => {
       const scrolled = window.pageYOffset;
       const parallaxImage = document.querySelector('.parallax-image') as HTMLElement;
-      const parallaxVideo = document.querySelector('.parallax-video') as HTMLElement;
 
       if (parallaxImage) {
         const speed = 0.5;
         parallaxImage.style.transform = `translateY(${scrolled * speed}px)`;
-      }
-
-      if (parallaxVideo) {
-        const speed = 0.5;
-        parallaxVideo.style.transform = `translateY(${scrolled * speed}px)`;
       }
     };
 
@@ -142,49 +134,28 @@
 </script>
 
 <!-- Top Section with Video Background -->
-<section class="min-h-screen relative overflow-hidden">
-  <!-- Background Image for Top Section with Parallax -->
-  <div class="absolute inset-0 parallax-bg">
-    <img
-      src="/pexels-bianca-gasparoto-834990-1752951.jpg"
-      alt="Mountain landscape with stars"
-      class="w-full h-full object-cover parallax-image"
-      style="transform: translateY(0px);"
-    >
-  </div>
-
-  <!-- Video Background (overlays image when loaded) with Parallax -->
+<section class="min-h-screen relative overflow-hidden" style="background: #000;">
+  <!-- Video Background - Matching Working Pattern -->
   <video
     bind:this={videoElement}
+    class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+    style="opacity: 1;"
     autoplay
     muted
     loop
     playsinline
-    class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 parallax-video"
-    style="z-index: 1; opacity: 1; transform: translateY(0px);"
     on:loadeddata={handleVideoLoaded}
     on:error={handleVideoError}
-    on:canplay={handleVideoCanPlay}
-    on:loadstart={() => console.log('Homepage video load started')}
-    on:loadedmetadata={() => console.log('Homepage video metadata loaded')}
+    on:loadstart={() => console.log('🎬 Homepage video load started')}
+    on:loadedmetadata={() => console.log('📹 Homepage video metadata loaded')}
+    on:play={() => console.log('▶️ Homepage video started playing')}
   >
-    <!-- Same video as blog page for consistency -->
     <source src="/1877846-hd_1920_1080_30fps.mp4" type="video/mp4">
-    <!-- Fallback videos -->
     <source src="/857134-hd_1280_720_24fps.mp4" type="video/mp4">
-    <source src="/My Movie 4.mp4" type="video/mp4">
-    <source src="/Standing_around_the_202505280600.mp4" type="video/mp4">
-    <source src="/Drone.mp4" type="video/mp4">
-    <source src="/tent.mp4" type="video/mp4">
-    <source src="/Stars.mp4" type="video/mp4">
-    <source src="/Milky Way.mp4" type="video/mp4">
-    <source src="/campfire.mp4" type="video/mp4">
-    <source src="/857251-hd_1620_1080_25fps.mp4" type="video/mp4">
-    <source src="https://player.vimeo.com/external/291648067.hd.mp4?s=94998971682c6a3267e4cbd19d16a7b6c720f345&profile_id=175" type="video/mp4">
   </video>
 
-  <!-- Overlay -->
-  <div class="absolute inset-0 bg-black bg-opacity-20" style="z-index: 2;"></div>
+  <!-- Dark overlay for text readability -->
+  <div class="absolute inset-0 bg-black bg-opacity-40" style="z-index: 2;"></div>
 
   <!-- Top Section Content -->
   <div class="relative z-10 flex flex-col justify-center min-h-screen pt-16" style="z-index: 10;">
@@ -200,8 +171,12 @@
         </p>
 
         <!-- Search Form -->
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 max-w-2xl mx-auto {heroVisible ? 'animate-fade-in-up animate-delay-400' : 'opacity-0 translate-y-8'} transition-all duration-800">
-          <HeroSearch />
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto w-full {heroVisible ? 'animate-fade-in-up animate-delay-400' : 'opacity-0 translate-y-8'} transition-all duration-800">
+          <div class="w-full flex justify-center">
+            <div class="w-full max-w-xl">
+              <HeroSearch />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -312,16 +287,6 @@
 </section>
 
 <style>
-  .parallax-bg {
-    will-change: transform;
-  }
-
-  .parallax-image, .parallax-video {
-    will-change: transform;
-    transform-origin: center center;
-    min-height: 120vh;
-    min-width: 100%;
-  }
 
   /* Smooth scrolling for better parallax effect */
   :global(html) {

@@ -1,6 +1,8 @@
 <script lang="ts">
   import { authStore } from '$lib/stores/auth';
   import { smoothScrollWithNavOffset } from '$lib/utils/smoothScroll';
+  import { signOut } from '$lib/firebase/auth';
+  import { goto } from '$app/navigation';
 
   let isMenuOpen = false;
 
@@ -28,6 +30,31 @@
       event.preventDefault();
       const elementId = href.substring(1);
       handleSmoothScroll(elementId);
+    }
+  }
+
+  // Handle sign out
+  let signOutButtonText = 'Sign Out [JS LOADED]';
+  let debugInfo = 'Script loaded at: ' + new Date().toLocaleTimeString();
+
+  async function handleSignOut() {
+    console.log('handleSignOut called');
+    signOutButtonText = 'CLICKED!'; // Visual feedback
+    try {
+      console.log('Calling signOut...');
+      await signOut();
+      console.log('signOut completed successfully');
+      signOutButtonText = 'SUCCESS!';
+      // Close mobile menu if open
+      if (isMenuOpen) {
+        isMenuOpen = false;
+      }
+      // Redirect to home page
+      setTimeout(() => goto('/'), 1000);
+    } catch (error) {
+      console.error('Error signing out:', error);
+      signOutButtonText = 'ERROR!';
+      setTimeout(() => signOutButtonText = 'Sign Out', 2000);
     }
   }
 </script>
@@ -74,8 +101,8 @@
           <a href="/dashboard" class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
             Dashboard
           </a>
-          <button class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-            Sign Out
+          <button on:click={handleSignOut} class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+            {signOutButtonText}
           </button>
         {:else}
           <a href="/auth/login" class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
@@ -152,8 +179,8 @@
             <a href="/dashboard" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Dashboard
             </a>
-            <button on:click={handleMobileNavClick} class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
-              Sign out
+            <button on:click={handleSignOut} class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
+              {signOutButtonText}
             </button>
           </div>
         {:else}
