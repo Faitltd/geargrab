@@ -37,13 +37,18 @@ jobs:
 
       - name: Build and push container
         run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/geargrab:${{ github.sha }} .
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/geargrab:${{ github.sha }}
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/geargrab-app:${{ github.sha }} .
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/geargrab-app:${{ github.sha }}
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy geargrab \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/geargrab:${{ github.sha }} \
+          gcloud run deploy geargrab-app \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/geargrab-app:${{ github.sha }} \
             --platform managed \
             --region us-central1 \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --memory 512Mi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 10 \
+            --set-env-vars NODE_ENV=production
