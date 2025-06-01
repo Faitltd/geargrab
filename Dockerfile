@@ -6,6 +6,16 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
+
+# Set Firebase environment variables for build
+ENV VITE_FIREBASE_API_KEY=AIzaSyANV1v2FhD2ktXxBUsfGrDm9442dGGCuYs
+ENV VITE_FIREBASE_AUTH_DOMAIN=geargrabco.firebaseapp.com
+ENV VITE_FIREBASE_PROJECT_ID=geargrabco
+ENV VITE_FIREBASE_STORAGE_BUCKET=geargrabco.firebasestorage.app
+ENV VITE_FIREBASE_MESSAGING_SENDER_ID=227444442028
+ENV VITE_FIREBASE_APP_ID=1:227444442028:web:6eeaed1e136d07f5b73009
+ENV VITE_USE_EMULATORS=false
+
 RUN npm run build
 
 # Production stage
@@ -22,4 +32,4 @@ ENV NODE_ENV=production
 
 EXPOSE 8080
 
-CMD ["node", "build"]
+CMD ["node", "build/index.js"]

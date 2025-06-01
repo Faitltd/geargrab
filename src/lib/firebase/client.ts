@@ -1,8 +1,8 @@
 import { browser } from '$app/environment';
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
-import { getAuth, type Auth } from 'firebase/auth';
-import { getFirestore, type Firestore } from 'firebase/firestore';
-import { getStorage, type FirebaseStorage } from 'firebase/storage';
+import { getAuth, connectAuthEmulator, type Auth } from 'firebase/auth';
+import { getFirestore, connectFirestoreEmulator, type Firestore } from 'firebase/firestore';
+import { getStorage, connectStorageEmulator, type FirebaseStorage } from 'firebase/storage';
 import { logFirebaseConfigStatus } from '$lib/utils/firebaseValidator';
 
 // Your web app's Firebase configuration
@@ -33,6 +33,35 @@ if (browser) {
   auth = getAuth(firebaseApp);
   firestore = getFirestore(firebaseApp);
   storage = getStorage(firebaseApp);
+
+  // Connect to emulators if enabled
+  if (import.meta.env.VITE_USE_EMULATORS === 'true') {
+    console.log('🔧 Connecting to Firebase emulators...');
+
+    // Connect to Auth emulator
+    try {
+      connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+      console.log('✅ Connected to Auth emulator');
+    } catch (error) {
+      console.log('⚠️ Auth emulator already connected or failed to connect');
+    }
+
+    // Connect to Firestore emulator
+    try {
+      connectFirestoreEmulator(firestore, 'localhost', 8080);
+      console.log('✅ Connected to Firestore emulator');
+    } catch (error) {
+      console.log('⚠️ Firestore emulator already connected or failed to connect');
+    }
+
+    // Connect to Storage emulator
+    try {
+      connectStorageEmulator(storage, 'localhost', 9199);
+      console.log('✅ Connected to Storage emulator');
+    } catch (error) {
+      console.log('⚠️ Storage emulator already connected or failed to connect');
+    }
+  }
 }
 
 export { firebaseApp, auth, firestore, storage };

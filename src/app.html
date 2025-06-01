@@ -6,6 +6,10 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>GearGrab - Rent Outdoor Gear from Local Owners</title>
 		<meta name="description" content="GearGrab is a peer-to-peer marketplace for renting outdoor gear. Find camping, hiking, skiing, and other outdoor equipment from local owners." />
+		<!-- Cache busting -->
+		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Expires" content="0" />
 		<!-- Font Awesome for icons -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
@@ -16,6 +20,8 @@
 				.form-container, .max-w-md, .max-w-lg, .max-w-xl, .max-w-2xl {
 					margin-left: auto !important;
 					margin-right: auto !important;
+					padding-left: 1rem !important;
+					padding-right: 1rem !important;
 				}
 
 				/* Ensure text inputs and buttons are properly sized */
@@ -26,6 +32,23 @@
 				/* Fix flex layouts on mobile */
 				.flex {
 					flex-wrap: wrap;
+				}
+
+				/* Specific fix for hero search form centering */
+				.bg-white\/10 {
+					margin-left: 1rem !important;
+					margin-right: 1rem !important;
+				}
+
+				/* Ensure full width on mobile for form elements */
+				form {
+					width: 100% !important;
+				}
+
+				/* Center content within containers */
+				.text-center > div {
+					margin-left: auto !important;
+					margin-right: auto !important;
 				}
 			}
 		</style>
