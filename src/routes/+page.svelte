@@ -34,6 +34,8 @@
 
   function handleVideoError(event: Event) {
     console.error('❌ Video failed to load:', event);
+    console.error('❌ Video element:', videoElement);
+    console.error('❌ Video sources:', videoElement?.innerHTML);
     videoError = true;
     videoLoaded = false;
     showVideo = false;
@@ -43,6 +45,17 @@
     console.log('▶️ Video is playing');
     showVideo = true;
     videoLoaded = true;
+    videoError = false; // Clear any previous errors
+  }
+
+  function handleVideoLoadedData() {
+    console.log('📹 Video data loaded');
+    videoLoaded = true;
+    showVideo = true;
+    // Try to play if not already playing
+    if (videoElement && videoElement.paused) {
+      videoElement.play().catch(e => console.log('Play after load failed:', e));
+    }
   }
 
 
@@ -206,14 +219,15 @@
     preload="auto"
     on:canplay={handleVideoCanPlay}
     on:error={handleVideoError}
+    on:loadeddata={handleVideoLoadedData}
     on:loadedmetadata={() => console.log('📹 Homepage video metadata loaded')}
     on:play={handleVideoPlay}
     on:pause={() => console.log('⏸️ Video paused')}
     on:ended={() => console.log('🔚 Video ended')}
   >
-    <source src="/Stars.mp4" type="video/mp4">
     <source src="/1877846-hd_1920_1080_30fps.mp4" type="video/mp4">
     <source src="/857134-hd_1280_720_24fps.mp4" type="video/mp4">
+    <source src="/Stars.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 
@@ -226,6 +240,8 @@
     <div>Loaded: {videoLoaded ? '✅' : '❌'}</div>
     <div>Error: {videoError ? '❌' : '✅'}</div>
     <div>Visible: {showVideo ? '✅' : '❌'}</div>
+    <div>ReadyState: {videoElement?.readyState || 'N/A'}</div>
+    <div>CurrentSrc: {videoElement?.currentSrc ? 'Set' : 'None'}</div>
   </div>
 
   <!-- Top Section Content -->
