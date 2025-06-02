@@ -37,8 +37,7 @@
     console.error('❌ Video element:', videoElement);
     console.error('❌ Video sources:', videoElement?.innerHTML);
     videoError = true;
-    // Don't set videoLoaded to false - let other events handle it
-    // showVideo = false;
+    // Keep fallback background visible
   }
 
   function handleVideoPlay() {
@@ -112,16 +111,18 @@
 
   // Loading sequence with staggered delays
   onMount(() => {
-    // Show hero content immediately
-    heroVisible = true;
+    // Show hero content immediately - no delay
+    setTimeout(() => {
+      heroVisible = true;
+    }, 50); // Very small delay to ensure DOM is ready
 
     // Progressive loading sequence - top to bottom with proper delays
     const loadingSequence = [
-      { element: 'stats', delay: 800, setter: () => statsVisible = true },
-      { element: 'featured', delay: 1400, setter: () => featuredGearVisible = true },
-      { element: 'categories', delay: 1800, setter: () => categoriesVisible = true },
-      { element: 'features', delay: 2200, setter: () => featuresVisible = true },
-      { element: 'cta', delay: 2600, setter: () => ctaVisible = true }
+      { element: 'stats', delay: 600, setter: () => statsVisible = true },
+      { element: 'featured', delay: 1000, setter: () => featuredGearVisible = true },
+      { element: 'categories', delay: 1300, setter: () => categoriesVisible = true },
+      { element: 'features', delay: 1600, setter: () => featuresVisible = true },
+      { element: 'cta', delay: 1900, setter: () => ctaVisible = true }
     ];
 
     // Execute loading sequence
@@ -151,43 +152,41 @@
       sections.forEach(section => observer.observe(section));
     }, 100);
 
-    // Initialize video after a short delay to ensure DOM is ready
-    setTimeout(() => {
-      if (videoElement) {
-        console.log('🎬 Initializing video element');
+    // Initialize video immediately to start loading
+    if (videoElement) {
+      console.log('🎬 Initializing video element');
 
-        // Reset video state
-        videoLoaded = false;
-        videoError = false;
-        showVideo = false;
+      // Reset video state
+      videoLoaded = false;
+      videoError = false;
+      showVideo = false;
 
-        // Load the video
-        videoElement.load();
+      // Load the video immediately
+      videoElement.load();
 
-        // Try to play after a short delay
-        setTimeout(() => {
-          if (videoElement && !videoError) {
-            videoElement.play().catch(error => {
-              console.log('⚠️ Initial video autoplay failed:', error);
-              // Show video anyway if it's loaded
-              if (videoElement.readyState >= 3) {
-                showVideo = true;
-                videoLoaded = true;
+      // Try to play after a short delay
+      setTimeout(() => {
+        if (videoElement && !videoError) {
+          videoElement.play().catch(error => {
+            console.log('⚠️ Initial video autoplay failed:', error);
+            // Show video anyway if it's loaded
+            if (videoElement.readyState >= 2) {
+              showVideo = true;
+              videoLoaded = true;
+            }
+            // Try again with user interaction
+            document.addEventListener('click', () => {
+              if (videoElement) {
+                videoElement.play().catch(e => console.log('Click play failed:', e));
               }
-              // Try again with user interaction
-              document.addEventListener('click', () => {
-                if (videoElement) {
-                  videoElement.play().catch(e => console.log('Click play failed:', e));
-                }
-              }, { once: true });
-            });
-          }
-        }, 500);
+            }, { once: true });
+          });
+        }
+      }, 200);
 
-        // Force check after 2 seconds
-        setTimeout(forceVideoShow, 2000);
-      }
-    }, 100);
+      // Force check after 1 second (faster)
+      setTimeout(forceVideoShow, 1000);
+    }
 
     // Fallback: if video doesn't load within 5 seconds, show fallback
     setTimeout(() => {
@@ -221,7 +220,7 @@
 
   <!-- Fallback Background Image (shows while video loads or if video fails) -->
   <div class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat z-0"
-       style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'); opacity: {videoLoaded && !videoError ? 0 : 1}; transition: opacity 1s ease-in-out;"></div>
+       style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'); opacity: {videoLoaded && !videoError ? 0.3 : 1}; transition: opacity 1s ease-in-out;"></div>
 
   <!-- Video Background -->
   <video
