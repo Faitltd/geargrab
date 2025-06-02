@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import HeroSearch from '$lib/components/forms/HeroSearch.svelte';
+  import { featuredGear, categories } from '$lib/data/products';
 
   let videoElement: HTMLVideoElement;
   let videoLoaded = false;
@@ -51,57 +52,9 @@
     { number: '4.8★', label: 'Average Rating' }
   ];
 
-  // Featured gear items
-  const featuredGear = [
-    {
-      id: 1,
-      title: 'Premium 4-Person Tent',
-      image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-      price: '$25/day',
-      location: 'Denver, CO'
-    },
-    {
-      id: 2,
-      title: 'Professional Hiking Backpack',
-      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-      price: '$15/day',
-      location: 'Boulder, CO'
-    }
-  ];
+  // Featured gear items are now imported from products.ts
 
-  // Categories
-  const categories = [
-    {
-      id: 'camping',
-      name: 'Camping',
-      image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      id: 'hiking',
-      name: 'Hiking',
-      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      id: 'skiing',
-      name: 'Skiing',
-      image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      id: 'climbing',
-      name: 'Climbing',
-      image: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      id: 'water-sports',
-      name: 'Water Sports',
-      image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      id: 'winter-sports',
-      name: 'Winter Sports',
-      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
-    }
-  ];
+  // Categories are now imported from products.ts
 
   // Why choose us features
   const features = [
@@ -314,7 +267,7 @@
           Discover top-rated outdoor equipment from the best local owners.
         </p>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-12">
           {#each featuredGear as gear, i}
             <a href="/listing/{gear.id}" class="block group cursor-pointer transform transition-all duration-800 ease-out {featuredGearVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'}" style="transition-delay: {i * 200 + 400}ms;">
               <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 transition-all duration-300 group-hover:bg-white/20 group-hover:border-white/30 group-hover:transform group-hover:scale-105 group-hover:shadow-xl">
