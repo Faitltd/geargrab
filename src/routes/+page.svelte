@@ -19,6 +19,9 @@
     if (videoElement) {
       videoElement.play().catch(error => {
         console.log('⚠️ Video autoplay failed:', error);
+        // Still show the video even if autoplay fails
+        showVideo = true;
+        videoLoaded = true;
         // Add click listener to play on user interaction
         document.addEventListener('click', () => {
           if (videoElement) {
@@ -122,32 +125,40 @@
       sections.forEach(section => observer.observe(section));
     }, 100);
 
-    // Force video to load and play
-    if (videoElement) {
-      console.log('🎬 Initializing video element');
+    // Initialize video after a short delay to ensure DOM is ready
+    setTimeout(() => {
+      if (videoElement) {
+        console.log('🎬 Initializing video element');
 
-      // Reset video state
-      videoLoaded = false;
-      videoError = false;
+        // Reset video state
+        videoLoaded = false;
+        videoError = false;
+        showVideo = false;
 
-      // Load the video
-      videoElement.load();
+        // Load the video
+        videoElement.load();
 
-      // Try to play after a short delay
-      setTimeout(() => {
-        if (videoElement && !videoError) {
-          videoElement.play().catch(error => {
-            console.log('⚠️ Initial video autoplay failed:', error);
-            // Try again with user interaction
-            document.addEventListener('click', () => {
-              if (videoElement && !videoLoaded) {
-                videoElement.play().catch(e => console.log('Click play failed:', e));
+        // Try to play after a short delay
+        setTimeout(() => {
+          if (videoElement && !videoError) {
+            videoElement.play().catch(error => {
+              console.log('⚠️ Initial video autoplay failed:', error);
+              // Show video anyway if it's loaded
+              if (videoElement.readyState >= 3) {
+                showVideo = true;
+                videoLoaded = true;
               }
-            }, { once: true });
-          });
-        }
-      }, 500);
-    }
+              // Try again with user interaction
+              document.addEventListener('click', () => {
+                if (videoElement) {
+                  videoElement.play().catch(e => console.log('Click play failed:', e));
+                }
+              }, { once: true });
+            });
+          }
+        }, 500);
+      }
+    }, 100);
 
     // Fallback: if video doesn't load within 5 seconds, show fallback
     setTimeout(() => {
@@ -187,7 +198,7 @@
   <video
     bind:this={videoElement}
     class="absolute inset-0 w-full h-full object-cover z-10"
-    style="opacity: 1; transition: opacity 1s ease-in-out;"
+    style="opacity: {showVideo && videoLoaded && !videoError ? 1 : 0}; transition: opacity 1s ease-in-out;"
     autoplay
     muted
     loop
