@@ -52,10 +52,11 @@
         timeout: 5000
       });
 
-      // Small delay to allow auth state to update
-      setTimeout(() => {
-        goto(redirectTo);
-      }, 100);
+      // Wait for auth state to propagate
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Navigate to redirect URL
+      await goto(redirectTo);
     } catch (error: any) {
       console.error('Login error:', error);
 
@@ -86,10 +87,11 @@
         timeout: 5000
       });
 
-      // Small delay to allow auth state to update
-      setTimeout(() => {
-        goto(redirectTo);
-      }, 100);
+      // Wait for auth state to propagate
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Navigate to redirect URL
+      await goto(redirectTo);
     } catch (error: any) {
       console.error('Google sign-in error:', error);
       errors.auth = error.message || 'An error occurred during Google sign-in';

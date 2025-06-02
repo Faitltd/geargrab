@@ -311,6 +311,196 @@ class ChatService {
     }
   }
 
+  // Admin Functions - Monitor all communications
+
+  // Get all conversations for admin monitoring
+  async getAllConversations(limitCount: number = 50): Promise<ChatConversation[]> {
+    try {
+      const conversationsRef = collection(firestore, 'conversations');
+      const q = query(
+        conversationsRef,
+        orderBy('updatedAt', 'desc'),
+        limit(limitCount)
+      );
+
+      const querySnapshot = await getDocs(q);
+      const conversations: ChatConversation[] = [];
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        conversations.push({
+          id: doc.id,
+          participants: data.participants.map((id: string) => ({
+            id,
+            name: 'User',
+            avatar: undefined
+          })),
+          lastMessage: data.lastMessage ? {
+            content: data.lastMessage.content,
+            senderId: data.lastMessage.senderId,
+            timestamp: data.lastMessage.timestamp?.toDate() || new Date()
+          } : undefined,
+          unreadCount: data.unreadCount || {},
+          bookingId: data.bookingId,
+          listingId: data.listingId,
+          listingTitle: data.listingTitle,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date()
+        });
+      });
+
+      return conversations;
+    } catch (error) {
+      console.error('Error getting all conversations:', error);
+      throw error;
+    }
+  }
+
+  // Get all messages for admin monitoring
+  async getAllMessages(conversationId: string): Promise<ChatMessage[]> {
+    try {
+      const messagesRef = collection(firestore, 'conversations', conversationId, 'messages');
+      const q = query(messagesRef, orderBy('timestamp', 'asc'));
+
+      const querySnapshot = await getDocs(q);
+      const messages: ChatMessage[] = [];
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        messages.push({
+          id: doc.id,
+          conversationId,
+          senderId: data.senderId,
+          senderName: data.senderName || 'Unknown',
+          senderAvatar: data.senderAvatar,
+          content: data.content,
+          timestamp: data.timestamp?.toDate() || new Date(),
+          read: data.read,
+          type: data.type || 'text',
+          attachments: data.attachments || []
+        });
+      });
+
+      return messages;
+    } catch (error) {
+      console.error('Error getting all messages:', error);
+      throw error;
+    }
+  }
+
+  // Flag inappropriate content
+  async flagMessage(messageId: string, conversationId: string, reason: string, flaggedBy: string): Promise<void> {
+    try {
+      const flagsRef = collection(firestore, 'moderationFlags');
+
+      const flagData = {
+        messageId,
+        conversationId,
+        reason,
+        flaggedBy,
+        flaggedAt: serverTimestamp(),
+        status: 'pending',
+        reviewed: false
+      };
+
+      await addDoc(flagsRef, flagData);
+
+      // Also update the message with a flag
+      const messageRef = doc(firestore, 'conversations', conversationId, 'messages', messageId);
+      await updateDoc(messageRef, {
+        flagged: true,
+        flaggedAt: serverTimestamp()
+      });
+
+    } catch (error) {
+      console.error('Error flagging message:', error);
+      throw error;
+    }
+  }
+
+  // Get flagged content for admin review
+  async getFlaggedContent(): Promise<any[]> {
+    try {
+      const flagsRef = collection(firestore, 'moderationFlags');
+      const q = query(
+        flagsRef,
+        where('status', '==', 'pending'),
+        orderBy('flaggedAt', 'desc')
+      );
+
+      const querySnapshot = await getDocs(q);
+      const flags: any[] = [];
+
+      querySnapshot.forEach((doc) => {
+        flags.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
+
+      return flags;
+    } catch (error) {
+      console.error('Error getting flagged content:', error);
+      throw error;
+    }
+  }
+
+  // Search conversations and messages
+  async searchConversations(searchTerm: string, userId?: string): Promise<ChatConversation[]> {
+    try {
+      const conversationsRef = collection(firestore, 'conversations');
+      let q = query(conversationsRef, orderBy('updatedAt', 'desc'));
+
+      if (userId) {
+        q = query(conversationsRef, where('participants', 'array-contains', userId), orderBy('updatedAt', 'desc'));
+      }
+
+      const querySnapshot = await getDocs(q);
+      const conversations: ChatConversation[] = [];
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const conversation = {
+          id: doc.id,
+          participants: data.participants.map((id: string) => ({
+            id,
+            name: 'User',
+            avatar: undefined
+          })),
+          lastMessage: data.lastMessage ? {
+            content: data.lastMessage.content,
+            senderId: data.lastMessage.senderId,
+            timestamp: data.lastMessage.timestamp?.toDate() || new Date()
+          } : undefined,
+          unreadCount: data.unreadCount || {},
+          bookingId: data.bookingId,
+          listingId: data.listingId,
+          listingTitle: data.listingTitle,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date()
+        };
+
+        // Filter by search term
+        if (searchTerm) {
+          const searchLower = searchTerm.toLowerCase();
+          if (
+            conversation.listingTitle?.toLowerCase().includes(searchLower) ||
+            conversation.lastMessage?.content.toLowerCase().includes(searchLower)
+          ) {
+            conversations.push(conversation);
+          }
+        } else {
+          conversations.push(conversation);
+        }
+      });
+
+      return conversations;
+    } catch (error) {
+      console.error('Error searching conversations:', error);
+      throw error;
+    }
+  }
+
   // Cleanup all listeners
   cleanup(): void {
     this.messageListeners.forEach((unsubscribe) => unsubscribe());

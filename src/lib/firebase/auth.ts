@@ -93,7 +93,15 @@ export async function createUserDocument(user: User): Promise<void> {
 // Sign out
 export async function signOut(): Promise<void> {
   if (!browser) throw new Error('Auth functions can only be called in the browser');
-  return firebaseSignOut(auth);
+  
+  try {
+    await firebaseSignOut(auth);
+    // The auth state change will be handled by the onAuthStateChanged listener
+    // in the root layout, which will update the authStore
+  } catch (error) {
+    console.error('Error during sign out:', error);
+    throw error;
+  }
 }
 
 // Reset password

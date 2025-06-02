@@ -1,7 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { verificationService, VERIFICATION_REQUIREMENTS, type UserVerificationStatus } from '$lib/services/verification';
+  import { backgroundCheckService } from '$lib/services/backgroundCheck';
   import { authStore } from '$lib/stores/auth';
+  import BackgroundCheckFlow from '$lib/components/verification/BackgroundCheckFlow.svelte';
+  import BackgroundCheckStatus from '$lib/components/verification/BackgroundCheckStatus.svelte';
 
   let verificationStatus: UserVerificationStatus | null = null;
   let loading = true;
@@ -9,6 +12,7 @@
   let phoneNumber = '';
   let verificationCode = '';
   let email = '';
+  let showBackgroundCheckDetails = false;
 
   onMount(async () => {
     if ($authStore.user) {
@@ -62,6 +66,45 @@
       case 'premium': return 'bg-purple-500';
       default: return 'bg-gray-500';
     }
+  }
+
+  async function confirmPhoneVerification() {
+    if (!$authStore.user || !verificationCode) return;
+
+    try {
+      const success = await verificationService.confirmPhoneVerification($authStore.user.uid, verificationCode);
+      if (success) {
+        alert('Phone verified successfully!');
+        activeStep = 'overview';
+        // Reload verification status
+        verificationStatus = await verificationService.getUserVerificationStatus($authStore.user.uid);
+      } else {
+        alert('Invalid verification code. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error confirming phone verification:', error);
+    }
+  }
+
+  // Handle background check submission
+  function handleBackgroundCheckSubmitted(event: CustomEvent) {
+    const { requestId, provider, checkType } = event.detail;
+    console.log('Background check submitted:', { requestId, provider, checkType });
+
+    // Reload verification status
+    if ($authStore.user) {
+      verificationService.getUserVerificationStatus($authStore.user.uid).then(status => {
+        verificationStatus = status;
+      });
+    }
+
+    // Switch back to overview
+    activeStep = 'overview';
+  }
+
+  // Check if background check is required for current verification level
+  function isBackgroundCheckRequired(level: 'basic' | 'standard' | 'premium'): boolean {
+    return backgroundCheckService.isRequiredForLevel(level);
   }
 </script>
 
@@ -133,7 +176,7 @@
           </div>
 
           <!-- Verification Methods -->
-          <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
             {#each Object.entries(verificationStatus.verifiedMethods) as [method, verified]}
               <div class="text-center">
                 <div class="w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center {verified ? 'bg-green-500' : 'bg-gray-600'}">
@@ -147,9 +190,11 @@
                     💳
                   {:else if method === 'address'}
                     🏠
+                  {:else if method === 'background_check'}
+                    🛡️
                   {/if}
                 </div>
-                <div class="text-xs text-gray-300 capitalize">{method}</div>
+                <div class="text-xs text-gray-300 capitalize">{method.replace('_', ' ')}</div>
                 <div class="text-xs {verified ? 'text-green-400' : 'text-gray-500'}">
                   {verified ? 'Verified' : 'Pending'}
                 </div>
@@ -271,6 +316,66 @@
               </div>
             </div>
 
+            <!-- Premium Verification -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-white">Premium Verification</h3>
+                <span class="text-sm text-purple-400">Premium</span>
+              </div>
+              <div class="space-y-4">
+                {#each VERIFICATION_REQUIREMENTS.premium as requirement}
+                  <div class="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+                    <div>
+                      <h4 class="font-medium text-white">{requirement.name}</h4>
+                      <p class="text-sm text-gray-300">{requirement.description}</p>
+                      <div class="flex items-center space-x-4 mt-2 text-xs text-gray-400">
+                        <span>⏱️ {requirement.estimatedTime}</span>
+                        <span>✨ {requirement.benefits.join(', ')}</span>
+                      </div>
+                    </div>
+                    <div>
+                      {#if requirement.type === 'address'}
+                        {#if verificationStatus.verifiedMethods.address}
+                          <span class="text-green-400">✅ Verified</span>
+                        {:else}
+                          <button
+                            class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm"
+                            on:click={() => activeStep = 'address'}
+                          >
+                            Verify Address
+                          </button>
+                        {/if}
+                      {:else if requirement.type === 'background_check'}
+                        {#if verificationStatus.verifiedMethods.background_check}
+                          <div class="text-center">
+                            <span class="text-green-400 block">✅ Verified</span>
+                            <button
+                              class="text-xs text-purple-400 hover:text-purple-300 mt-1"
+                              on:click={() => showBackgroundCheckDetails = !showBackgroundCheckDetails}
+                            >
+                              View Details
+                            </button>
+                          </div>
+                        {:else}
+                          <button
+                            class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm"
+                            on:click={() => activeStep = 'background_check'}
+                          >
+                            Start Background Check
+                          </button>
+                        {/if}
+                      {/if}
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            </div>
+
+            <!-- Background Check Status (if verified) -->
+            {#if verificationStatus.verifiedMethods.background_check && showBackgroundCheckDetails}
+              <BackgroundCheckStatus showDetails={showBackgroundCheckDetails} />
+            {/if}
+
           </div>
 
         <!-- Email Verification Step -->
@@ -354,19 +459,20 @@
                 />
               </div>
               <div class="flex space-x-4">
-                <button 
+                <button
                   class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
                   disabled={verificationCode.length !== 6}
+                  on:click={confirmPhoneVerification}
                 >
                   Verify Code
                 </button>
-                <button 
+                <button
                   class="text-blue-400 hover:text-blue-300 px-6 py-2"
                   on:click={startPhoneVerification}
                 >
                   Resend Code
                 </button>
-                <button 
+                <button
                   class="text-gray-300 hover:text-white px-6 py-2"
                   on:click={() => activeStep = 'overview'}
                 >
@@ -375,6 +481,10 @@
               </div>
             </div>
           </div>
+
+        <!-- Background Check Step -->
+        {:else if activeStep === 'background_check'}
+          <BackgroundCheckFlow on:submitted={handleBackgroundCheckSubmitted} />
         {/if}
 
       {/if}

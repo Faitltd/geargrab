@@ -1,12 +1,127 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import ImageUploader from '$lib/components/ImageUploader.svelte';
-  import ContentBlock from '$lib/components/layout/ContentBlock.svelte';
+  import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
   import { authStore } from '$lib/stores/auth';
-  import { createListing } from '$lib/firebase/db/listings';
+  import { createListing, getListing, updateListing } from '$lib/firebase/db/listings';
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
   import type { Listing } from '$lib/types/firestore';
 
   let videoElement: HTMLVideoElement;
+  let heroVisible = false;
+
+  // Edit mode variables
+  let isEditMode = false;
+  let editingListingId: string | null = null;
+  let originalListing: Listing | null = null;
+  let isLoadingListing = false;
+
+  // Initialize animations and check for edit mode
+  onMount(async () => {
+    setTimeout(() => {
+      heroVisible = true;
+    }, 100);
+
+    // Check if we're in edit mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('edit');
+
+    if (editId) {
+      await loadListingForEdit(editId);
+    }
+  });
+
+  // Load listing for editing
+  async function loadListingForEdit(listingId: string) {
+    try {
+      isLoadingListing = true;
+      const listing = await getListing(listingId);
+
+      if (!listing) {
+        alert('Listing not found');
+        goto('/list-gear');
+        return;
+      }
+
+      // Check if user owns this listing
+      if (listing.ownerUid !== $authStore.user?.uid) {
+        alert('You can only edit your own listings');
+        goto('/list-gear');
+        return;
+      }
+
+      // Set edit mode
+      isEditMode = true;
+      editingListingId = listingId;
+      originalListing = listing;
+
+      // Populate form with existing data
+      populateFormFromListing(listing);
+
+    } catch (error) {
+      console.error('Error loading listing for edit:', error);
+      alert('Error loading listing. Please try again.');
+      goto('/list-gear');
+    } finally {
+      isLoadingListing = false;
+    }
+  }
+
+  // Populate form with listing data
+  function populateFormFromListing(listing: Listing) {
+    formData = {
+      // Basic info
+      title: listing.title || '',
+      category: listing.category || '',
+      subcategory: listing.subcategory || '',
+      description: listing.description || '',
+
+      // Details
+      brand: listing.brand || '',
+      model: listing.model || '',
+      condition: listing.condition || 'Like New',
+      ageInYears: listing.ageInYears || 0,
+
+      // Features and specifications
+      features: listing.features && listing.features.length > 0 ? listing.features : ['', '', ''],
+      specifications: listing.specifications ?
+        Object.entries(listing.specifications).map(([key, value]) => ({ key, value })) :
+        [{ key: '', value: '' }, { key: '', value: '' }, { key: '', value: '' }],
+
+      // Images
+      images: listing.images || [],
+
+      // Pricing
+      dailyPrice: listing.dailyPrice || 0,
+      weeklyPrice: listing.weeklyPrice || 0,
+      monthlyPrice: listing.monthlyPrice || 0,
+      securityDeposit: listing.securityDeposit || 0,
+
+      // Location
+      city: listing.location?.city || '',
+      state: listing.location?.state || '',
+      zipCode: listing.location?.zipCode || '',
+
+      // Delivery options
+      pickup: listing.deliveryOptions?.pickup || false,
+      dropoff: listing.deliveryOptions?.dropoff || false,
+      shipping: listing.deliveryOptions?.shipping || false,
+      pickupLocation: listing.deliveryOptions?.pickupLocation || '',
+      dropoffDistance: listing.deliveryOptions?.dropoffDistance || 0,
+      shippingFee: listing.deliveryOptions?.shippingFee || 0,
+
+      // Availability - convert from availabilityCalendar to unavailableDates
+      unavailableDates: listing.availabilityCalendar ?
+        Object.entries(listing.availabilityCalendar)
+          .filter(([_, isAvailable]) => !isAvailable)
+          .map(([date, _]) => date) : [],
+
+      // Insurance
+      includesInsurance: listing.includesInsurance || false,
+      insuranceDetails: listing.insuranceDetails || ''
+    };
+  }
 
   // Video event handlers
   function handleVideoLoaded() {
@@ -76,7 +191,7 @@
 
   // Form state
   let currentStep = 1;
-  const totalSteps = 5; // Added a preview step
+  const totalSteps = 5;
 
   // Initialize form data
   let formData: FormData = {
@@ -93,7 +208,7 @@
     ageInYears: 0,
 
     // Features and specifications
-    features: ['', '', ''], // Start with 3 empty feature fields
+    features: ['', '', ''],
     specifications: [
       { key: '', value: '' },
       { key: '', value: '' },
@@ -136,6 +251,15 @@
   };
 
   let errors: FormErrors = {};
+  let stepValidationStatus: { [key: number]: boolean } = {};
+  let validationSummary = {
+    hasErrors: false,
+    errorSteps: [],
+    totalErrors: 0
+  };
+
+  // Track which steps have been attempted (to show errors only after user tries to proceed)
+  let attemptedSteps: { [key: number]: boolean } = {};
 
   // Available categories
   const categories = [
@@ -147,7 +271,6 @@
     { id: 'biking', name: 'Biking', subcategories: ['Mountain Bikes', 'Road Bikes', 'Helmets', 'Accessories'] }
   ];
 
-  // Available conditions
   const conditions = ['Like New', 'Excellent', 'Good', 'Fair', 'Worn'];
 
   // Get subcategories for selected category
@@ -157,40 +280,141 @@
   // Calculate suggested weekly and monthly prices
   $: {
     if (formData.dailyPrice > 0) {
-      formData.weeklyPrice = Math.round(formData.dailyPrice * 6); // 1 day free for weekly
-      formData.monthlyPrice = Math.round(formData.dailyPrice * 24); // 6 days free for monthly
+      formData.weeklyPrice = Math.round(formData.dailyPrice * 6);
+      formData.monthlyPrice = Math.round(formData.dailyPrice * 24);
     }
   }
 
-  // Handle image change from ImageUploader component
-  function handleImagesChange(event: CustomEvent): void {
-    formData.images = event.detail.images;
+  // Validation function
+  function validateStep(step: number): boolean {
+    errors = {};
+
+    if (step === 1) {
+      // Basic Information
+      if (!formData.title.trim()) {
+        errors.title = 'Title is required';
+      } else if (formData.title.trim().length < 5) {
+        errors.title = 'Title must be at least 5 characters long';
+      }
+
+      if (!formData.category) {
+        errors.category = 'Category is required';
+      }
+
+      if (!formData.description.trim()) {
+        errors.description = 'Description is required';
+      } else if (formData.description.trim().length < 20) {
+        errors.description = 'Description must be at least 20 characters long';
+      }
+
+    } else if (step === 2) {
+      // Details
+      if (!formData.brand.trim()) {
+        errors.brand = 'Brand is required';
+      }
+
+      if (!formData.condition) {
+        errors.condition = 'Condition is required';
+      }
+
+      const validFeatures = formData.features.filter(f => f.trim() !== '');
+      if (validFeatures.length === 0) {
+        errors.features = 'At least one feature is required';
+      }
+
+      formData.specifications.forEach((spec, index) => {
+        if (spec.key.trim() && !spec.value.trim()) {
+          errors[`spec_${index}_value`] = `Value required for specification "${spec.key}"`;
+        }
+        if (spec.value.trim() && !spec.key.trim()) {
+          errors[`spec_${index}_key`] = `Key required for specification value "${spec.value}"`;
+        }
+      });
+
+    } else if (step === 3) {
+      // Images
+      if (formData.images.length === 0) {
+        errors.images = 'At least one image is required';
+      }
+
+    } else if (step === 4) {
+      // Pricing & Location
+      if (formData.dailyPrice <= 0) {
+        errors.dailyPrice = 'Daily price must be greater than $0';
+      }
+
+      if (formData.securityDeposit < 0) {
+        errors.securityDeposit = 'Security deposit cannot be negative';
+      }
+
+      if (!formData.city.trim()) {
+        errors.city = 'City is required';
+      }
+
+      if (!formData.state.trim()) {
+        errors.state = 'State is required';
+      }
+
+      if (!formData.zipCode.trim()) {
+        errors.zipCode = 'ZIP code is required';
+      } else if (!/^\d{5}(-\d{4})?$/.test(formData.zipCode.trim())) {
+        errors.zipCode = 'Please enter a valid ZIP code (e.g., 12345 or 12345-6789)';
+      }
+
+      if (formData.pickup && !formData.pickupLocation.trim()) {
+        errors.pickupLocation = 'Pickup location is required when pickup is enabled';
+      }
+
+      if (formData.dropoff && formData.dropoffDistance <= 0) {
+        errors.dropoffDistance = 'Dropoff distance must be greater than 0 when dropoff is enabled';
+      }
+
+      if (formData.shipping && formData.shippingFee < 0) {
+        errors.shippingFee = 'Shipping fee cannot be negative when shipping is enabled';
+      }
+
+      if (!formData.pickup && !formData.dropoff && !formData.shipping) {
+        errors.deliveryOptions = 'At least one delivery option must be selected';
+      }
+    }
+
+    const isValid = Object.keys(errors).length === 0;
+    stepValidationStatus[step] = isValid;
+    return isValid;
   }
 
-  // Add feature field
+  // Helper functions
+  function handleImagesChange(event: CustomEvent): void {
+    formData.images = event.detail.images;
+    if (currentStep === 3) {
+      validateStep(3);
+    }
+  }
+
   function addFeatureField(): void {
     formData.features = [...formData.features, ''];
   }
 
-  // Remove feature field
   function removeFeatureField(index: number): void {
     formData.features = formData.features.filter((_, i) => i !== index);
+    if (currentStep === 2) {
+      validateStep(2);
+    }
   }
 
-  // Add specification field
   function addSpecificationField(): void {
     formData.specifications = [...formData.specifications, { key: '', value: '' }];
   }
 
-  // Remove specification field
   function removeSpecificationField(index: number): void {
     formData.specifications = formData.specifications.filter((_, i) => i !== index);
+    if (currentStep === 2) {
+      validateStep(2);
+    }
   }
 
-  // Handle date selection for availability
   function toggleDateAvailability(event: CustomEvent): void {
     const dateString = event.detail.date;
-
     if (formData.unavailableDates.includes(dateString)) {
       formData.unavailableDates = formData.unavailableDates.filter(d => d !== dateString);
     } else {
@@ -198,7 +422,6 @@
     }
   }
 
-  // Navigate to previous step
   function prevStep(): void {
     if (currentStep > 1) {
       currentStep--;
@@ -206,28 +429,86 @@
     }
   }
 
-  // Loading state for form submission
   let isSubmitting = false;
 
-  // Submit form
+  // Navigation and submission functions
+  function getValidationSummary() {
+    const stepNames = ['Basic Information', 'Details', 'Images', 'Pricing & Location', 'Preview'];
+    const errorSteps = [];
+    let totalErrors = 0;
+
+    for (let step = 1; step <= 4; step++) {
+      const isValid = validateStep(step);
+      if (!isValid) {
+        errorSteps.push({
+          step: step,
+          name: stepNames[step - 1],
+          errorCount: Object.keys(errors).length
+        });
+        totalErrors += Object.keys(errors).length;
+      }
+    }
+
+    return {
+      hasErrors: errorSteps.length > 0,
+      errorSteps,
+      totalErrors
+    };
+  }
+
+  function nextStep(): void {
+    if (currentStep < totalSteps) {
+      // Mark this step as attempted
+      attemptedSteps[currentStep] = true;
+
+      const isValid = validateStep(currentStep);
+
+      if (!isValid) {
+        const stepNames = ['Basic Information', 'Details', 'Images', 'Pricing & Location', 'Preview'];
+        const errorCount = Object.keys(errors).length;
+        const errorList = Object.values(errors).join('\n• ');
+        alert(`Please fix the following ${errorCount} error${errorCount > 1 ? 's' : ''} in ${stepNames[currentStep - 1]} before continuing:\n\n• ${errorList}`);
+        return;
+      }
+
+      currentStep++;
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function goToStep(step: number): void {
+    validateStep(currentStep);
+    currentStep = step;
+    window.scrollTo(0, 0);
+  }
+
   async function submitForm(): Promise<void> {
-    // Check if user is authenticated
     if (!$authStore.user) {
       alert('Please sign in to list your gear.');
       goto('/auth/signin');
       return;
     }
 
-    // Validate the form one more time
-    if (!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4)) {
-      alert('Please fix all validation errors before submitting.');
+    validationSummary = getValidationSummary();
+
+    if (validationSummary.hasErrors) {
+      const firstErrorStep = validationSummary.errorSteps[0].step;
+      currentStep = firstErrorStep;
+      window.scrollTo(0, 0);
+
+      const errorDetails = validationSummary.errorSteps.map(stepError =>
+        `${stepError.name} (${stepError.errorCount} error${stepError.errorCount > 1 ? 's' : ''})`
+      ).join(', ');
+
+      const errorMessage = `Please fix ${validationSummary.totalErrors} validation error${validationSummary.totalErrors > 1 ? 's' : ''} in the following sections:\n\n${errorDetails}\n\nYou've been taken to the first section with errors.`;
+
+      alert(errorMessage);
       return;
     }
 
     isSubmitting = true;
 
     try {
-      // Transform form data to match Listing interface
       const listingData: Omit<Listing, 'id' | 'createdAt' | 'updatedAt'> = {
         ownerUid: $authStore.user.uid,
         title: formData.title,
@@ -265,22 +546,25 @@
           }, {} as Record<string, string>),
         includesInsurance: formData.includesInsurance,
         insuranceDetails: formData.includesInsurance ? formData.insuranceDetails : undefined,
-        availabilityCalendar: {}, // Initialize empty - can be updated later
+        availabilityCalendar: {},
         status: 'active' as const,
         averageRating: undefined,
         reviewCount: undefined
       };
 
-      // Create the listing in Firestore
-      const listingId = await createListing(listingData);
-
-      console.log('Listing created successfully with ID:', listingId);
-
-      // Show success message
-      alert('Your gear has been listed successfully! You can view and manage your listings in your dashboard.');
-
-      // Redirect to the new listing or dashboard
-      goto(`/listing/${listingId}`);
+      if (isEditMode && editingListingId) {
+        // Update existing listing
+        await updateListing(editingListingId, listingData);
+        console.log('Listing updated successfully with ID:', editingListingId);
+        alert('Your listing has been updated successfully!');
+        goto(`/listing/${editingListingId}`);
+      } else {
+        // Create new listing
+        const listingId = await createListing(listingData);
+        console.log('Listing created successfully with ID:', listingId);
+        alert('Your gear has been listed successfully! You can view and manage your listings in your dashboard.');
+        goto(`/listing/${listingId}`);
+      }
 
     } catch (error) {
       console.error('Error creating listing:', error);
@@ -290,86 +574,15 @@
     }
   }
 
-  // Validate form data and update errors
-  function validateStep(step: number): boolean {
-    errors = {};
-
-    if (step === 1) {
-      // Validate basic info
-      if (!formData.title) errors.title = 'Title is required';
-      if (!formData.category) errors.category = 'Category is required';
-      if (!formData.description) errors.description = 'Description is required';
-      else if (formData.description.length < 20) errors.description = 'Description should be at least 20 characters';
-
-      return Object.keys(errors).length === 0;
-    }
-    else if (step === 2) {
-      // Validate details, features, and specifications
-      if (!formData.brand) errors.brand = 'Brand is required';
-      if (!formData.condition) errors.condition = 'Condition is required';
-
-      // Validate features (at least one non-empty feature)
-      const validFeatures = formData.features.filter(f => f.trim() !== '');
-      if (validFeatures.length === 0) errors.features = 'At least one feature is required';
-
-      // Validate specifications (key and value must both be filled if either is filled)
-      formData.specifications.forEach((spec, index) => {
-        if ((spec.key && !spec.value) || (!spec.key && spec.value)) {
-          errors[`specification_${index}`] = 'Both key and value must be provided';
-        }
-      });
-
-      return Object.keys(errors).length === 0;
-    }
-    else if (step === 3) {
-      // Validate images
-      if (formData.images.length === 0) errors.images = 'At least one image is required';
-
-      return Object.keys(errors).length === 0;
-    }
-    else if (step === 4) {
-      // Validate pricing and location
-      if (formData.dailyPrice <= 0) errors.dailyPrice = 'Daily price must be greater than 0';
-      if (!formData.city) errors.city = 'City is required';
-      if (!formData.state) errors.state = 'State is required';
-      if (!formData.zipCode) errors.zipCode = 'Zip code is required';
-
-      // Validate delivery options
-      if (formData.pickup && !formData.pickupLocation) errors.pickupLocation = 'Pickup location is required';
-      if (formData.dropoff && formData.dropoffDistance <= 0) errors.dropoffDistance = 'Dropoff distance must be greater than 0';
-      if (formData.shipping && formData.shippingFee <= 0) errors.shippingFee = 'Shipping fee must be greater than 0';
-
-      return Object.keys(errors).length === 0;
-    }
-    else if (step === 5) {
-      // Preview step - no validation needed
-      return true;
-    }
-
-    return false;
-  }
-
-  // Check if current step is valid (for disabling/enabling buttons)
-  function isStepValid(): boolean {
-    // Make the Next button always enabled to allow users to navigate through the form
-    // They'll see validation errors when they try to proceed
-    return true;
-  }
-
-  // Navigate to next step with validation
-  function nextStep(): void {
-    if (currentStep < totalSteps) {
-      // Still validate to show errors, but proceed anyway
+  // Reactive validation - only run if step has been attempted
+  $: {
+    if (currentStep <= 4 && attemptedSteps[currentStep]) {
       validateStep(currentStep);
-      currentStep++;
-      window.scrollTo(0, 0);
     }
   }
-</script>
 
-<svelte:head>
-  <title>List Your Gear - GearGrab</title>
-</svelte:head>
+
+</script>
 
 <!-- Full Page Video Background -->
 <div class="fixed inset-0 z-0">
@@ -386,19 +599,15 @@
   <video
     bind:this={videoElement}
     class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-    style="opacity: 1;"
+    style="opacity: 0;"
     autoplay
     muted
     loop
     playsinline
     on:loadeddata={handleVideoLoaded}
     on:error={handleVideoError}
-    on:loadstart={() => console.log('List-gear video load started')}
   >
-    <!-- Outdoor gear/equipment video for list gear page -->
-    <source src="/857134-hd_1280_720_24fps.mp4" type="video/mp4" />
-    <!-- Fallback videos -->
-    <source src="https://player.vimeo.com/external/291648067.hd.mp4?s=94998971682c6a3267e4cbd19d16a7b6c720f345&profile_id=175" type="video/mp4" />
+    <source src="/Stars.mp4" type="video/mp4" />
   </video>
 
   <!-- Light Overlay for Text Readability -->
@@ -407,737 +616,900 @@
 
 <!-- Page Content with Video Background -->
 <div class="relative z-10 min-h-screen">
-  <!-- Hero Content -->
-  <div class="relative h-60 flex flex-col items-center justify-center text-center text-white px-4 pt-20">
-    <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">List Your Gear</h1>
-    <p class="text-lg md:text-xl max-w-2xl mx-auto">Turn your unused outdoor equipment into income. It only takes a few minutes to get started.</p>
-  </div>
-
-  <!-- Form Section -->
-  <div class="relative">
-  <ContentBlock padding="pt-8 pb-16" maxWidth="max-w-3xl" background="bg-transparent" shadow={false} blur={false} rounded={false} border={false}>
-
-    <!-- Progress bar -->
-    <div class="mb-8">
-      <div class="flex justify-between mb-2">
-        {#each Array(totalSteps) as _, i}
-          <div class="flex flex-col items-center">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center {i + 1 <= currentStep ? 'bg-green-500 text-white' : 'bg-gray-600/70 text-gray-300 border border-gray-500'}">
-              {i + 1}
-            </div>
-            <div class="text-xs mt-1 text-gray-300 drop-shadow-lg text-center whitespace-pre-line">
-              {i === 0 ? 'Basic Info' : i === 1 ? 'Details' : i === 2 ? 'Images' : i === 3 ? 'Pricing &\nLocation' : 'Preview'}
-            </div>
-          </div>
-
-          {#if i < totalSteps - 1}
-            <div class="flex-1 flex items-center">
-              <div class="h-1 w-full {i + 1 < currentStep ? 'bg-green-500' : 'bg-gray-600/50'}"></div>
-            </div>
-          {/if}
-        {/each}
+  <!-- Loading State for Edit Mode -->
+  {#if isLoadingListing}
+    <div class="flex items-center justify-center min-h-screen">
+      <div class="text-center">
+        <svg class="animate-spin h-12 w-12 text-white mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="text-white text-lg">Loading listing for editing...</p>
       </div>
     </div>
+  {:else}
+    <!-- Hero Content -->
+    <div class="relative pt-20 pb-16">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-    <!-- Form steps with floating fields -->
-    {#if currentStep === 1}
-      <!-- Step 1: Basic Info - Individual floating fields -->
-      <div class="space-y-8">
+      <!-- Hero Section -->
+      <ScrollAnimated animation="fade-up" delay={200}>
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-white drop-shadow-lg">Basic Information</h2>
+          <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 {heroVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'} transition-all duration-800 drop-shadow-lg">
+            {isEditMode ? 'Edit Your Listing' : 'List Your Gear'}
+          </h1>
+          <p class="text-xl text-gray-200 drop-shadow-lg max-w-2xl mx-auto {heroVisible ? 'animate-fade-in-up animate-delay-200' : 'opacity-0 translate-y-8'} transition-all duration-800">
+            {isEditMode ? 'Update your gear listing information' : 'Share your outdoor equipment with fellow adventurers and earn money'}
+          </p>
         </div>
+      </ScrollAnimated>
 
-        <!-- Title Field -->
-        <div class="max-w-md mx-auto">
-          <label for="title" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Title *</label>
-          <input
-            type="text"
-            id="title"
-            class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-            placeholder="e.g. Premium Camping Tent (4-Person)"
-            bind:value={formData.title}
-          />
-          {#if errors.title}
-            <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.title}</p>
-          {/if}
-        </div>
+      <!-- Progress bar -->
+      <ScrollAnimated animation="fade-up" delay={400}>
+        <div class="mb-8">
+          <div class="flex justify-between mb-2">
+            {#each Array(totalSteps) as _, i}
+              <div class="flex flex-col items-center relative">
+                <button
+                  type="button"
+                  class="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 {i + 1 <= currentStep ? (attemptedSteps[i + 1] && stepValidationStatus[i + 1] === false ? 'bg-red-500 text-white ring-2 ring-red-300' : 'bg-green-500 text-white') : 'bg-gray-600/70 text-gray-300 border border-gray-500 hover:bg-gray-600/90'}"
+                  on:click={() => goToStep(i + 1)}
+                  title={stepValidationStatus[i + 1] === false ? 'This step has validation errors - click to review' : `Go to step ${i + 1}`}
+                >
+                  {#if attemptedSteps[i + 1] && stepValidationStatus[i + 1] === false && i + 1 <= currentStep}
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  {:else if attemptedSteps[i + 1] && stepValidationStatus[i + 1] === true && i + 1 < currentStep}
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  {:else}
+                    {i + 1}
+                  {/if}
+                </button>
+                <div class="text-xs mt-1 text-gray-300 drop-shadow-lg text-center whitespace-pre-line">
+                  {i === 0 ? 'Basic Info' : i === 1 ? 'Details' : i === 2 ? 'Images' : i === 3 ? 'Pricing &\nLocation' : 'Preview'}
+                  {#if attemptedSteps[i + 1] && stepValidationStatus[i + 1] === false && i + 1 <= currentStep}
+                    <div class="text-red-400 text-xs">Has errors</div>
+                  {/if}
+                </div>
+              </div>
 
-        <!-- Category Field -->
-        <div class="max-w-md mx-auto">
-          <label for="category" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Category *</label>
-          <select
-            id="category"
-            class="form-select block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white focus:ring-green-500 focus:border-green-500 shadow-lg"
-            bind:value={formData.category}
-          >
-            <option value="" class="bg-gray-800 text-white">Select a category</option>
-            {#each categories as category}
-              <option value={category.id} class="bg-gray-800 text-white">{category.name}</option>
+              {#if i < totalSteps - 1}
+                <div class="flex-1 flex items-center">
+                  <div class="h-1 w-full {i + 1 < currentStep ? (attemptedSteps[i + 1] && stepValidationStatus[i + 1] === false ? 'bg-red-400' : 'bg-green-500') : 'bg-gray-600/50'}"></div>
+                </div>
+              {/if}
             {/each}
-          </select>
-          {#if errors.category}
-            <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.category}</p>
-          {/if}
+          </div>
         </div>
+      </ScrollAnimated>
 
-        <!-- Subcategory Field (conditional) -->
-        {#if subcategories.length > 0}
+      <!-- Form steps -->
+      {#if currentStep === 1}
+        <!-- Step 1: Basic Information -->
+        <ScrollAnimated animation="fade-up" delay={600}>
+          <div class="space-y-8">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold text-white drop-shadow-lg">Basic Information</h2>
+            </div>
+
+          <!-- Error Summary - Only show if step has been attempted -->
+          {#if attemptedSteps[1] && stepValidationStatus[1] === false && Object.keys(errors).length > 0}
+            <div class="max-w-md mx-auto mb-6">
+              <div class="bg-red-500/20 backdrop-blur-sm border border-red-500/50 rounded-lg p-4">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-300">
+                      Please fix {Object.keys(errors).length} error{Object.keys(errors).length > 1 ? 's' : ''} in Basic Information:
+                    </h3>
+                    <ul class="mt-2 text-sm text-red-200 list-disc list-inside">
+                      {#each Object.entries(errors) as [field, error]}
+                        <li>{error}</li>
+                      {/each}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {/if}
+
+          <!-- Title Field -->
           <div class="max-w-md mx-auto">
-            <label for="subcategory" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Subcategory</label>
+            <label for="title" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Title *</label>
+            <input
+              type="text"
+              id="title"
+              bind:value={formData.title}
+              class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg {attemptedSteps[1] && errors.title ? 'border-red-500 ring-red-500' : ''}"
+              placeholder="e.g., REI Co-op Half Dome 4 Plus Tent"
+            />
+            {#if attemptedSteps[1] && errors.title}
+              <p class="mt-1 text-sm text-red-400">{errors.title}</p>
+            {/if}
+          </div>
+
+          <!-- Category Field -->
+          <div class="max-w-md mx-auto">
+            <label for="category" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Category *</label>
             <select
-              id="subcategory"
-              class="form-select block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white focus:ring-green-500 focus:border-green-500 shadow-lg"
-              bind:value={formData.subcategory}
+              id="category"
+              bind:value={formData.category}
+              class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white focus:ring-green-500 focus:border-green-500 shadow-lg {attemptedSteps[1] && errors.category ? 'border-red-500 ring-red-500' : ''}"
             >
-              <option value="" class="bg-gray-800 text-white">Select a subcategory</option>
-              {#each subcategories as subcategory}
-                <option value={subcategory} class="bg-gray-800 text-white">{subcategory}</option>
+              <option value="" class="bg-gray-800 text-white">Select a category</option>
+              {#each categories as category}
+                <option value={category.id} class="bg-gray-800 text-white">{category.name}</option>
               {/each}
             </select>
+            {#if attemptedSteps[1] && errors.category}
+              <p class="mt-1 text-sm text-red-400">{errors.category}</p>
+            {/if}
           </div>
-        {/if}
 
-        <!-- Description Field -->
-        <div class="max-w-lg mx-auto">
-          <label for="description" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Description *</label>
-          <textarea
-            id="description"
-            class="form-textarea block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-            rows="4"
-            placeholder="Describe your gear in detail. Include features, benefits, and condition."
-            bind:value={formData.description}
-          ></textarea>
-          {#if errors.description}
-            <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.description}</p>
-          {/if}
-        </div>
-      </div>
-    {/if}
-
-    {#if currentStep === 2}
-      <!-- Step 2: Gear Details - Individual floating fields -->
-      <div class="space-y-8">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-white drop-shadow-lg">Gear Details</h2>
-        </div>
-
-        <!-- Brand Field -->
-        <div class="max-w-md mx-auto">
-          <label for="brand" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Brand *</label>
-          <input
-            type="text"
-            id="brand"
-            class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-            placeholder="e.g. North Face"
-            bind:value={formData.brand}
-          />
-          {#if errors.brand}
-            <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.brand}</p>
-          {/if}
-        </div>
-
-        <!-- Model Field -->
-        <div class="max-w-md mx-auto">
-          <label for="model" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Model</label>
-          <input
-            type="text"
-            id="model"
-            class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-            placeholder="e.g. Wawona 4"
-            bind:value={formData.model}
-          />
-        </div>
-
-        <!-- Condition & Age Fields -->
-        <div class="max-w-lg mx-auto">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label for="condition" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Condition *</label>
+          <!-- Subcategory Field -->
+          {#if subcategories.length > 0}
+            <div class="max-w-md mx-auto">
+              <label for="subcategory" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Subcategory</label>
               <select
-                id="condition"
-                class="form-select block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white focus:ring-green-500 focus:border-green-500 shadow-lg"
-                bind:value={formData.condition}
+                id="subcategory"
+                bind:value={formData.subcategory}
+                class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white focus:ring-green-500 focus:border-green-500 shadow-lg"
               >
-                {#each conditions as condition}
-                  <option value={condition} class="bg-gray-800 text-white">{condition}</option>
+                <option value="" class="bg-gray-800 text-white">Select a subcategory</option>
+                {#each subcategories as subcategory}
+                  <option value={subcategory} class="bg-gray-800 text-white">{subcategory}</option>
                 {/each}
               </select>
-              {#if errors.condition}
-                <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.condition}</p>
-              {/if}
             </div>
-            <div>
-              <label for="age" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Age (years)</label>
-              <input
-                type="number"
-                id="age"
-                class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-                min="0"
-                bind:value={formData.ageInYears}
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Features Field -->
-        <div class="max-w-lg mx-auto">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-medium text-white drop-shadow-lg">Features *</h3>
-            <button
-              type="button"
-              class="text-sm text-green-400 hover:text-green-300 font-medium bg-gray-800/70 backdrop-blur-sm px-3 py-1 rounded-lg shadow-lg"
-              on:click={addFeatureField}
-            >
-              + Add Feature
-            </button>
-          </div>
-
-          <p class="text-sm text-gray-300 drop-shadow-lg mb-4">List the key features of your gear. Add at least one feature.</p>
-
-          {#if errors.features}
-            <p class="text-red-400 text-sm drop-shadow-lg mb-4">{errors.features}</p>
           {/if}
 
-          <div class="space-y-3">
-            {#each formData.features as _, i}
-              <div class="flex items-center space-x-2">
+          <!-- Description Field -->
+          <div class="max-w-lg mx-auto">
+            <label for="description" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Description *</label>
+            <textarea
+              id="description"
+              bind:value={formData.description}
+              class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg {attemptedSteps[1] && errors.description ? 'border-red-500 ring-red-500' : ''}"
+              rows="4"
+              placeholder="Describe your gear in detail. Include features, benefits, and condition."
+            ></textarea>
+            {#if attemptedSteps[1] && errors.description}
+              <p class="mt-1 text-sm text-red-400">{errors.description}</p>
+            {/if}
+            <p class="mt-1 text-xs text-gray-400">
+              {formData.description.length}/20 characters minimum
+            </p>
+          </div>
+        </div>
+        </ScrollAnimated>
+      {/if}
+      {#if currentStep === 2}
+        <!-- Step 2: Gear Details -->
+        <ScrollAnimated animation="fade-up" delay={600}>
+          <div class="space-y-8">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold text-white drop-shadow-lg">Gear Details</h2>
+            </div>
+
+          <!-- Error Summary - Only show if step has been attempted -->
+          {#if attemptedSteps[2] && stepValidationStatus[2] === false && Object.keys(errors).length > 0}
+            <div class="max-w-md mx-auto mb-6">
+              <div class="bg-red-500/20 backdrop-blur-sm border border-red-500/50 rounded-lg p-4">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-300">
+                      Please fix {Object.keys(errors).length} error{Object.keys(errors).length > 1 ? 's' : ''} in Gear Details:
+                    </h3>
+                    <ul class="mt-2 text-sm text-red-200 list-disc list-inside">
+                      {#each Object.entries(errors) as [field, error]}
+                        <li>{error}</li>
+                      {/each}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {/if}
+
+          <!-- Brand Field -->
+          <div class="max-w-md mx-auto">
+            <label for="brand" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Brand *</label>
+            <input
+              type="text"
+              id="brand"
+              bind:value={formData.brand}
+              class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg {attemptedSteps[2] && errors.brand ? 'border-red-500 ring-red-500' : ''}"
+              placeholder="e.g., REI Co-op, Patagonia, North Face"
+            />
+            {#if attemptedSteps[2] && errors.brand}
+              <p class="mt-1 text-sm text-red-400">{errors.brand}</p>
+            {/if}
+          </div>
+
+          <!-- Model Field -->
+          <div class="max-w-md mx-auto">
+            <label for="model" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Model</label>
+            <input
+              type="text"
+              id="model"
+              bind:value={formData.model}
+              class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+              placeholder="e.g., Half Dome 4 Plus"
+            />
+          </div>
+
+          <!-- Condition Field -->
+          <div class="max-w-md mx-auto">
+            <label for="condition" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Condition *</label>
+            <select
+              id="condition"
+              bind:value={formData.condition}
+              class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white focus:ring-green-500 focus:border-green-500 shadow-lg {attemptedSteps[2] && errors.condition ? 'border-red-500 ring-red-500' : ''}"
+            >
+              {#each conditions as condition}
+                <option value={condition} class="bg-gray-800 text-white">{condition}</option>
+              {/each}
+            </select>
+            {#if attemptedSteps[2] && errors.condition}
+              <p class="mt-1 text-sm text-red-400">{errors.condition}</p>
+            {/if}
+          </div>
+
+          <!-- Age Field -->
+          <div class="max-w-md mx-auto">
+            <label for="age" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Age (years)</label>
+            <input
+              type="number"
+              id="age"
+              bind:value={formData.ageInYears}
+              min="0"
+              max="50"
+              class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+              placeholder="0"
+            />
+          </div>
+
+          <!-- Features -->
+          <div class="max-w-lg mx-auto">
+            <label class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Key Features *</label>
+            {#each formData.features as feature, index}
+              <div class="flex gap-2 mb-2">
                 <input
                   type="text"
-                  id={`feature-${i}`}
-                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-                  placeholder={`Feature ${i+1} (e.g. Waterproof, Easy setup)`}
-                  bind:value={formData.features[i]}
+                  bind:value={formData.features[index]}
+                  class="flex-1 rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                  placeholder="e.g., Waterproof, Lightweight, Easy setup"
                 />
                 {#if formData.features.length > 1}
                   <button
                     type="button"
-                    class="text-red-400 hover:text-red-300 bg-gray-800/70 backdrop-blur-sm p-2 rounded-lg shadow-lg"
-                    on:click={() => removeFeatureField(i)}
+                    on:click={() => removeFeatureField(index)}
+                    class="px-3 py-2 bg-red-600/70 hover:bg-red-600/90 text-white rounded-lg transition-all duration-200"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    ×
                   </button>
                 {/if}
               </div>
             {/each}
-          </div>
-        </div>
-
-        <!-- Specifications Field -->
-        <div class="max-w-lg mx-auto">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-medium text-white drop-shadow-lg">Specifications</h3>
             <button
               type="button"
-              class="text-sm text-green-400 hover:text-green-300 font-medium bg-gray-800/70 backdrop-blur-sm px-3 py-1 rounded-lg shadow-lg"
-              on:click={addSpecificationField}
+              on:click={addFeatureField}
+              class="mt-2 px-4 py-2 bg-green-600/70 hover:bg-green-600/90 text-white rounded-lg transition-all duration-200"
             >
-              + Add Specification
+              + Add Feature
             </button>
+            {#if attemptedSteps[2] && errors.features}
+              <p class="mt-1 text-sm text-red-400">{errors.features}</p>
+            {/if}
           </div>
+        </div>
+        </ScrollAnimated>
+      {/if}
 
-          <p class="text-sm text-gray-300 drop-shadow-lg mb-4">Add specifications like dimensions, weight, material, etc.</p>
+      {#if currentStep === 3}
+        <!-- Step 3: Images -->
+        <ScrollAnimated animation="fade-up" delay={600}>
+          <div class="space-y-8">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold text-white drop-shadow-lg">Images</h2>
+              <p class="text-gray-200 drop-shadow-lg">Add photos to showcase your gear</p>
+            </div>
 
-          <div class="space-y-3">
-            {#each formData.specifications as _, i}
-              <div class="flex items-start space-x-2">
-                <div class="flex-1">
-                  <input
-                    type="text"
-                    id={`spec-key-${i}`}
-                    class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-                    placeholder="Key (e.g. Weight, Dimensions)"
-                    bind:value={formData.specifications[i].key}
-                  />
-                  {#if errors[`specification_${i}`]}
-                    <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors[`specification_${i}`]}</p>
-                  {/if}
-                </div>
-                <div class="flex-1">
-                  <input
-                    type="text"
-                    id={`spec-value-${i}`}
-                    class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-                    placeholder="Value (e.g. 5 lbs, 10' x 8')"
-                    bind:value={formData.specifications[i].value}
-                  />
-                </div>
-                {#if formData.specifications.length > 1}
-                  <button
-                    type="button"
-                    class="text-red-400 hover:text-red-300 bg-gray-800/70 backdrop-blur-sm p-2 rounded-lg shadow-lg mt-2"
-                    on:click={() => removeSpecificationField(i)}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <!-- Error Summary - Only show if step has been attempted -->
+          {#if attemptedSteps[3] && stepValidationStatus[3] === false && Object.keys(errors).length > 0}
+            <div class="max-w-md mx-auto mb-6">
+              <div class="bg-red-500/20 backdrop-blur-sm border border-red-500/50 rounded-lg p-4">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                  </button>
-                {/if}
+                  </div>
+                  <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-300">
+                      Please fix {Object.keys(errors).length} error{Object.keys(errors).length > 1 ? 's' : ''} in Images:
+                    </h3>
+                    <ul class="mt-2 text-sm text-red-200 list-disc list-inside">
+                      {#each Object.entries(errors) as [field, error]}
+                        <li>{error}</li>
+                      {/each}
+                    </ul>
+                  </div>
+                </div>
               </div>
-            {/each}
-          </div>
-        </div>
-
-        <!-- Insurance Field -->
-        <div class="max-w-md mx-auto">
-          <h3 class="text-lg font-medium text-white drop-shadow-lg mb-4">Insurance</h3>
-
-          <div class="flex items-start bg-transparent rounded-lg p-4">
-            <div class="flex items-center h-5">
-              <input
-                type="checkbox"
-                id="includesInsurance"
-                class="form-checkbox h-4 w-4 text-green-600 bg-gray-700 border-gray-600 focus:ring-green-500"
-                bind:checked={formData.includesInsurance}
-              />
-            </div>
-            <div class="ml-3 text-sm">
-              <label for="includesInsurance" class="font-medium text-white drop-shadow-lg">Includes Insurance</label>
-              <p class="text-gray-300 drop-shadow-lg">Check this if you provide insurance coverage with your gear.</p>
-            </div>
-          </div>
-
-          {#if formData.includesInsurance}
-            <div class="mt-4">
-              <label for="insuranceDetails" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Insurance Details</label>
-              <textarea
-                id="insuranceDetails"
-                class="form-textarea block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-                rows="2"
-                placeholder="Describe the insurance coverage you provide."
-                bind:value={formData.insuranceDetails}
-              ></textarea>
             </div>
           {/if}
-        </div>
-      </div>
-    {/if}
 
-    {#if currentStep === 3}
-      <!-- Step 3: Images - Floating upload area -->
-      <div class="space-y-8">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-white drop-shadow-lg">Images</h2>
-        </div>
-
-        <!-- Images Upload Field -->
-        <div class="max-w-2xl mx-auto">
-          <p class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Upload Images *</p>
-          <p class="text-sm text-gray-300 mb-4 drop-shadow-lg">Add up to 5 high-quality images of your gear. The first image will be the main image.</p>
-
-          {#if errors.images}
-            <p class="text-red-400 text-sm mb-4 drop-shadow-lg">{errors.images}</p>
-          {/if}
-
-          <div class="bg-transparent rounded-lg p-6">
-            <ImageUploader
-              images={formData.images}
-              maxImages={5}
-              on:change={handleImagesChange}
-            />
-          </div>
-        </div>
-      </div>
-    {/if}
-
-      <!-- Step 4: Pricing & Location - Individual floating fields -->
-      {#if currentStep === 4}
-        <div class="space-y-8">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-white drop-shadow-lg">Pricing & Location</h2>
-          </div>
-
-          <!-- Pricing Fields -->
+          <!-- Image Upload -->
           <div class="max-w-lg mx-auto">
-            <h3 class="text-lg font-medium text-white drop-shadow-lg mb-6 text-center">Pricing</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label for="dailyPrice" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Daily Price ($) *</label>
+            <ImageUploader
+              bind:images={formData.images}
+              on:change={handleImagesChange}
+              maxImages={10}
+            />
+            {#if attemptedSteps[3] && errors.images}
+              <p class="mt-2 text-sm text-red-400">{errors.images}</p>
+            {/if}
+            <p class="mt-2 text-xs text-gray-400">
+              Upload up to 10 high-quality photos. The first image will be your main photo.
+            </p>
+          </div>
+
+          <!-- Image Preview -->
+          {#if formData.images.length > 0}
+            <div class="max-w-4xl mx-auto">
+              <h3 class="text-lg font-medium text-white mb-4 text-center">Your Photos ({formData.images.length})</h3>
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {#each formData.images as image, index}
+                  <div class="relative group">
+                    <img
+                      src={image}
+                      alt="Gear photo {index + 1}"
+                      class="w-full h-32 object-cover rounded-lg shadow-lg"
+                    />
+                    {#if index === 0}
+                      <div class="absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
+                        Main Photo
+                      </div>
+                    {/if}
+                    <button
+                      type="button"
+                      on:click={() => {
+                        formData.images = formData.images.filter((_, i) => i !== index);
+                        if (currentStep === 3) validateStep(3);
+                      }}
+                      class="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      ×
+                    </button>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          {/if}
+        </div>
+        </ScrollAnimated>
+      {/if}
+
+      {#if currentStep === 4}
+        <!-- Step 4: Pricing & Location -->
+        <ScrollAnimated animation="fade-up" delay={600}>
+          <div class="space-y-8">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold text-white drop-shadow-lg">Pricing & Location</h2>
+              <p class="text-gray-200 drop-shadow-lg">Set your rental rates and location</p>
+            </div>
+
+          <!-- Error Summary - Only show if step has been attempted -->
+          {#if attemptedSteps[4] && stepValidationStatus[4] === false && Object.keys(errors).length > 0}
+            <div class="max-w-md mx-auto mb-6">
+              <div class="bg-red-500/20 backdrop-blur-sm border border-red-500/50 rounded-lg p-4">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-300">
+                      Please fix {Object.keys(errors).length} error{Object.keys(errors).length > 1 ? 's' : ''} in Pricing & Location:
+                    </h3>
+                    <ul class="mt-2 text-sm text-red-200 list-disc list-inside">
+                      {#each Object.entries(errors) as [field, error]}
+                        <li>{error}</li>
+                      {/each}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {/if}
+
+          <!-- Pricing Section -->
+          <div class="max-w-lg mx-auto">
+            <h3 class="text-xl font-semibold text-white mb-6 text-center">Rental Pricing</h3>
+
+            <!-- Daily Price -->
+            <div class="mb-4">
+              <label for="dailyPrice" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Daily Rate *</label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">$</span>
                 <input
                   type="number"
                   id="dailyPrice"
-                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-                  min="0"
                   bind:value={formData.dailyPrice}
+                  min="1"
+                  step="0.01"
+                  class="block w-full pl-8 rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg {attemptedSteps[4] && errors.dailyPrice ? 'border-red-500 ring-red-500' : ''}"
+                  placeholder="25.00"
                 />
-                {#if errors.dailyPrice}
-                  <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.dailyPrice}</p>
-                {/if}
               </div>
+              {#if attemptedSteps[4] && errors.dailyPrice}
+                <p class="mt-1 text-sm text-red-400">{errors.dailyPrice}</p>
+              {/if}
+            </div>
 
-              <div>
-                <label for="weeklyPrice" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Weekly Price ($)</label>
+            <!-- Weekly Price (auto-calculated) -->
+            <div class="mb-4">
+              <label for="weeklyPrice" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Weekly Rate (suggested)</label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">$</span>
                 <input
                   type="number"
                   id="weeklyPrice"
-                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-                  min="0"
                   bind:value={formData.weeklyPrice}
+                  min="0"
+                  step="0.01"
+                  class="block w-full pl-8 rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                  placeholder="150.00"
                 />
-                <p class="text-xs text-gray-300 mt-1 drop-shadow-lg">Suggested: ${formData.dailyPrice * 6} (1 day free)</p>
               </div>
+              <p class="mt-1 text-xs text-gray-400">Suggested: 6x daily rate (1 day free)</p>
+            </div>
 
-              <div>
-                <label for="monthlyPrice" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Monthly Price ($)</label>
+            <!-- Monthly Price (auto-calculated) -->
+            <div class="mb-6">
+              <label for="monthlyPrice" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Monthly Rate (suggested)</label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">$</span>
                 <input
                   type="number"
                   id="monthlyPrice"
-                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-                  min="0"
                   bind:value={formData.monthlyPrice}
+                  min="0"
+                  step="0.01"
+                  class="block w-full pl-8 rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
+                  placeholder="600.00"
                 />
-                <p class="text-xs text-gray-300 mt-1 drop-shadow-lg">Suggested: ${formData.dailyPrice * 24} (6 days free)</p>
               </div>
+              <p class="mt-1 text-xs text-gray-400">Suggested: 24x daily rate (6 days free)</p>
+            </div>
 
-              <div>
-                <label for="securityDeposit" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Security Deposit ($)</label>
+            <!-- Security Deposit -->
+            <div class="mb-6">
+              <label for="securityDeposit" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Security Deposit *</label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">$</span>
                 <input
                   type="number"
                   id="securityDeposit"
-                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-                  min="0"
                   bind:value={formData.securityDeposit}
+                  min="0"
+                  step="0.01"
+                  class="block w-full pl-8 rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg {attemptedSteps[4] && errors.securityDeposit ? 'border-red-500 ring-red-500' : ''}"
+                  placeholder="100.00"
                 />
               </div>
+              {#if attemptedSteps[4] && errors.securityDeposit}
+                <p class="mt-1 text-sm text-red-400">{errors.securityDeposit}</p>
+              {/if}
+              <p class="mt-1 text-xs text-gray-400">Refundable deposit to cover potential damages</p>
             </div>
           </div>
 
-          <!-- Location Fields -->
+          <!-- Location Section -->
           <div class="max-w-lg mx-auto">
-            <h3 class="text-lg font-medium text-white drop-shadow-lg mb-6 text-center">Location</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label for="city" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">City *</label>
-                <input
-                  type="text"
-                  id="city"
-                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-                  bind:value={formData.city}
-                />
-                {#if errors.city}
-                  <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.city}</p>
-                {/if}
-              </div>
+            <h3 class="text-xl font-semibold text-white mb-6 text-center">Location</h3>
 
-              <div>
-                <label for="state" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">State *</label>
-                <input
-                  type="text"
-                  id="state"
-                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-                  bind:value={formData.state}
-                />
-                {#if errors.state}
-                  <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.state}</p>
-                {/if}
-              </div>
-
-              <div>
-                <label for="zipCode" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Zip Code *</label>
-                <input
-                  type="text"
-                  id="zipCode"
-                  class="form-input block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
-                  bind:value={formData.zipCode}
-                />
-                {#if errors.zipCode}
-                  <p class="text-red-400 text-sm mt-1 drop-shadow-lg">{errors.zipCode}</p>
-                {/if}
-              </div>
-            </div>
-          </div>
-        </div>
-      {/if}
-
-      <!-- Step 5: Preview -->
-      {#if currentStep === 5}
-        <div class="space-y-8">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-white drop-shadow-lg">Preview Your Listing</h2>
-            <p class="text-gray-300 drop-shadow-lg mt-2">Review your listing details before submitting.</p>
-          </div>
-
-          <div class="space-y-8">
-            <!-- Basic Info Preview -->
-            <div class="max-w-2xl mx-auto">
-              <h3 class="text-xl font-medium text-white drop-shadow-lg mb-6 text-center">Basic Information</h3>
-
-              <!-- Title -->
-              <div class="mb-6">
-                <div class="bg-gray-800/70 backdrop-blur-sm rounded-lg border border-gray-600/50 p-4 shadow-lg">
-                  <p class="text-sm text-gray-300 mb-1">Title</p>
-                  <p class="text-white font-medium">{formData.title}</p>
-                </div>
-              </div>
-
-              <!-- Category -->
-              <div class="mb-6">
-                <div class="bg-gray-800/70 backdrop-blur-sm rounded-lg border border-gray-600/50 p-4 shadow-lg">
-                  <p class="text-sm text-gray-300 mb-1">Category</p>
-                  <p class="text-white font-medium">
-                    {categories.find(c => c.id === formData.category)?.name || ''}
-                    {#if formData.subcategory}
-                      &nbsp;› {formData.subcategory}
-                    {/if}
-                  </p>
-                </div>
-              </div>
-
-              <!-- Description -->
-              <div class="mb-6">
-                <div class="bg-gray-800/70 backdrop-blur-sm rounded-lg border border-gray-600/50 p-4 shadow-lg">
-                  <p class="text-sm text-gray-300 mb-1">Description</p>
-                  <p class="text-white">{formData.description}</p>
-                </div>
-              </div>
+            <!-- City -->
+            <div class="mb-4">
+              <label for="city" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">City *</label>
+              <input
+                type="text"
+                id="city"
+                bind:value={formData.city}
+                class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg {attemptedSteps[4] && errors.city ? 'border-red-500 ring-red-500' : ''}"
+                placeholder="e.g., Denver"
+              />
+              {#if attemptedSteps[4] && errors.city}
+                <p class="mt-1 text-sm text-red-400">{errors.city}</p>
+              {/if}
             </div>
 
-            <!-- Details Preview -->
-            <div>
-              <h3 class="text-lg font-medium border-b border-gray-200 pb-2 mb-3">Gear Details</h3>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-3">
-                <div>
-                  <p class="text-sm text-gray-500">Brand</p>
-                  <p class="font-medium">{formData.brand}</p>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500">Model</p>
-                  <p class="font-medium">{formData.model || 'Not specified'}</p>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500">Condition</p>
-                  <p class="font-medium">{formData.condition}</p>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500">Age</p>
-                  <p class="font-medium">{formData.ageInYears} {formData.ageInYears === 1 ? 'year' : 'years'}</p>
-                </div>
-                {#if formData.includesInsurance}
-                  <div class="col-span-1 md:col-span-2">
-                    <p class="text-sm text-gray-500">Insurance</p>
-                    <p class="font-medium">Included - {formData.insuranceDetails || 'No details provided'}</p>
-                  </div>
-                {/if}
-              </div>
+            <!-- State -->
+            <div class="mb-4">
+              <label for="state" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">State *</label>
+              <input
+                type="text"
+                id="state"
+                bind:value={formData.state}
+                class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg {attemptedSteps[4] && errors.state ? 'border-red-500 ring-red-500' : ''}"
+                placeholder="e.g., Colorado"
+              />
+              {#if attemptedSteps[4] && errors.state}
+                <p class="mt-1 text-sm text-red-400">{errors.state}</p>
+              {/if}
+            </div>
 
-              <!-- Features Preview -->
-              <div class="mt-4">
-                <p class="text-sm text-gray-500 mb-2">Features</p>
-                <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
-                  {#each formData.features.filter(f => f.trim() !== '') as feature}
-                    <li class="flex items-center">
-                      <svg class="h-4 w-4 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                      </svg>
-                      {feature}
-                    </li>
-                  {/each}
-                </ul>
-              </div>
+            <!-- ZIP Code -->
+            <div class="mb-6">
+              <label for="zipCode" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">ZIP Code *</label>
+              <input
+                type="text"
+                id="zipCode"
+                bind:value={formData.zipCode}
+                class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg {attemptedSteps[4] && errors.zipCode ? 'border-red-500 ring-red-500' : ''}"
+                placeholder="e.g., 80202"
+              />
+              {#if attemptedSteps[4] && errors.zipCode}
+                <p class="mt-1 text-sm text-red-400">{errors.zipCode}</p>
+              {/if}
+            </div>
+          </div>
 
-              <!-- Specifications Preview -->
-              {#if formData.specifications.some(s => s.key && s.value)}
-                <div class="mt-4">
-                  <p class="text-sm text-gray-500 mb-2">Specifications</p>
-                  <div class="bg-gray-50 rounded-lg p-4">
-                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
-                      {#each formData.specifications.filter(s => s.key && s.value) as spec}
-                        <div class="sm:col-span-1">
-                          <dt class="text-sm font-medium text-gray-500">{spec.key}</dt>
-                          <dd class="mt-1 text-sm text-gray-900">{spec.value}</dd>
-                        </div>
-                      {/each}
-                    </dl>
-                  </div>
+          <!-- Delivery Options -->
+          <div class="max-w-lg mx-auto">
+            <h3 class="text-xl font-semibold text-white mb-6 text-center">Delivery Options</h3>
+
+            <!-- Pickup Option -->
+            <div class="mb-4">
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  bind:checked={formData.pickup}
+                  class="rounded bg-gray-800/70 border-gray-600/50 text-green-600 focus:ring-green-500 focus:ring-offset-0"
+                />
+                <span class="ml-2 text-white">Pickup available</span>
+              </label>
+              {#if formData.pickup}
+                <div class="mt-2">
+                  <input
+                    type="text"
+                    bind:value={formData.pickupLocation}
+                    class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg {attemptedSteps[4] && errors.pickupLocation ? 'border-red-500 ring-red-500' : ''}"
+                    placeholder="Pickup location (e.g., Downtown Denver)"
+                  />
+                  {#if attemptedSteps[4] && errors.pickupLocation}
+                    <p class="mt-1 text-sm text-red-400">{errors.pickupLocation}</p>
+                  {/if}
                 </div>
               {/if}
             </div>
 
-            <!-- Images Preview -->
-            {#if formData.images.length > 0}
-              <div>
-                <h3 class="text-lg font-medium border-b border-gray-200 pb-2 mb-3">Images</h3>
-
-                <!-- Main image -->
-                <div class="mb-4">
-                  <p class="text-sm text-gray-500 mb-2">Main Image</p>
-                  <div class="relative rounded-lg overflow-hidden" style="max-width: 400px;">
-                    <img src={formData.images[0]} alt="Product main view" class="w-full h-auto object-cover" />
-                    <div class="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
-                      Main Image
-                    </div>
-                  </div>
+            <!-- Dropoff Option -->
+            <div class="mb-4">
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  bind:checked={formData.dropoff}
+                  class="rounded bg-gray-800/70 border-gray-600/50 text-green-600 focus:ring-green-500 focus:ring-offset-0"
+                />
+                <span class="ml-2 text-white">Dropoff/delivery available</span>
+              </label>
+              {#if formData.dropoff}
+                <div class="mt-2">
+                  <input
+                    type="number"
+                    bind:value={formData.dropoffDistance}
+                    min="1"
+                    class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg {attemptedSteps[4] && errors.dropoffDistance ? 'border-red-500 ring-red-500' : ''}"
+                    placeholder="Maximum delivery distance (miles)"
+                  />
+                  {#if attemptedSteps[4] && errors.dropoffDistance}
+                    <p class="mt-1 text-sm text-red-400">{errors.dropoffDistance}</p>
+                  {/if}
                 </div>
-
-                <!-- Additional images -->
-                {#if formData.images.length > 1}
-                  <div>
-                    <p class="text-sm text-gray-500 mb-2">Additional Images</p>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                      {#each formData.images.slice(1) as image, i}
-                        <div class="relative">
-                          <img src={image} alt={`Additional image ${i+1}`} class="h-24 w-full object-cover rounded-md" />
-                        </div>
-                      {/each}
-                    </div>
-                  </div>
-                {/if}
-              </div>
-            {/if}
-
-            <!-- Pricing Preview -->
-            <div>
-              <h3 class="text-lg font-medium border-b border-gray-200 pb-2 mb-3">Pricing</h3>
-              <div class="grid grid-cols-1 md:grid-cols-4 gap-x-6 gap-y-3">
-                <div>
-                  <p class="text-sm text-gray-500">Daily Price</p>
-                  <p class="font-medium text-green-600">${formData.dailyPrice}</p>
-                </div>
-                {#if formData.weeklyPrice > 0}
-                  <div>
-                    <p class="text-sm text-gray-500">Weekly Price</p>
-                    <p class="font-medium">${formData.weeklyPrice}</p>
-                  </div>
-                {/if}
-                {#if formData.monthlyPrice > 0}
-                  <div>
-                    <p class="text-sm text-gray-500">Monthly Price</p>
-                    <p class="font-medium">${formData.monthlyPrice}</p>
-                  </div>
-                {/if}
-                {#if formData.securityDeposit > 0}
-                  <div>
-                    <p class="text-sm text-gray-500">Security Deposit</p>
-                    <p class="font-medium">${formData.securityDeposit}</p>
-                  </div>
-                {/if}
-              </div>
+              {/if}
             </div>
 
-            <!-- Location & Delivery Preview -->
-            <div>
-              <h3 class="text-lg font-medium border-b border-gray-200 pb-2 mb-3">Location & Delivery</h3>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-3 mb-4">
-                <div>
-                  <p class="text-sm text-gray-500">City</p>
-                  <p class="font-medium">{formData.city}</p>
+            <!-- Shipping Option -->
+            <div class="mb-6">
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  bind:checked={formData.shipping}
+                  class="rounded bg-gray-800/70 border-gray-600/50 text-green-600 focus:ring-green-500 focus:ring-offset-0"
+                />
+                <span class="ml-2 text-white">Shipping available</span>
+              </label>
+              {#if formData.shipping}
+                <div class="mt-2">
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">$</span>
+                    <input
+                      type="number"
+                      bind:value={formData.shippingFee}
+                      min="0"
+                      step="0.01"
+                      class="block w-full pl-8 rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg {attemptedSteps[4] && errors.shippingFee ? 'border-red-500 ring-red-500' : ''}"
+                      placeholder="Shipping fee"
+                    />
+                  </div>
+                  {#if attemptedSteps[4] && errors.shippingFee}
+                    <p class="mt-1 text-sm text-red-400">{errors.shippingFee}</p>
+                  {/if}
                 </div>
-                <div>
-                  <p class="text-sm text-gray-500">State</p>
-                  <p class="font-medium">{formData.state}</p>
+              {/if}
+            </div>
+
+            {#if attemptedSteps[4] && errors.deliveryOptions}
+              <p class="text-sm text-red-400 text-center">{errors.deliveryOptions}</p>
+            {/if}
+          </div>
+        </div>
+        </ScrollAnimated>
+      {/if}
+
+      {#if currentStep === 5}
+        <!-- Step 5: Preview -->
+        <ScrollAnimated animation="fade-up" delay={600}>
+          <div class="space-y-8">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold text-white drop-shadow-lg">Preview Your Listing</h2>
+              <p class="text-gray-200 drop-shadow-lg">Review your listing before publishing</p>
+            </div>
+
+          <!-- Validation Summary -->
+          {#if validationSummary.hasErrors}
+            <div class="max-w-2xl mx-auto mb-8">
+              <div class="bg-red-500/20 backdrop-blur-sm border border-red-500/50 rounded-lg p-6">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <h3 class="text-lg font-medium text-red-300 mb-2">
+                      Please fix {validationSummary.totalErrors} error{validationSummary.totalErrors > 1 ? 's' : ''} before publishing:
+                    </h3>
+                    <ul class="space-y-1">
+                      {#each validationSummary.errorSteps as errorStep}
+                        <li class="flex items-center justify-between">
+                          <span class="text-red-200">{errorStep.name}: {errorStep.errorCount} error{errorStep.errorCount > 1 ? 's' : ''}</span>
+                          <button
+                            type="button"
+                            on:click={() => goToStep(errorStep.step)}
+                            class="text-red-300 hover:text-red-100 underline text-sm"
+                          >
+                            Fix →
+                          </button>
+                        </li>
+                      {/each}
+                    </ul>
+                  </div>
                 </div>
-                <div>
-                  <p class="text-sm text-gray-500">Zip Code</p>
-                  <p class="font-medium">{formData.zipCode}</p>
+              </div>
+            </div>
+          {:else}
+            <div class="max-w-2xl mx-auto mb-8">
+              <div class="bg-green-500/20 backdrop-blur-sm border border-green-500/50 rounded-lg p-4">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-green-300">Your listing is ready to publish!</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {/if}
+
+          <!-- Listing Preview -->
+          <div class="max-w-4xl mx-auto">
+            <div class="bg-gray-800/70 backdrop-blur-sm rounded-lg p-6 shadow-lg border border-gray-600/50">
+
+              <!-- Header -->
+              <div class="mb-6">
+                <h3 class="text-2xl font-bold text-white mb-2">{formData.title || 'Your Gear Title'}</h3>
+                <div class="flex items-center gap-4 text-gray-300">
+                  <span class="bg-green-600/80 text-white px-2 py-1 rounded text-sm">{formData.category || 'Category'}</span>
+                  {#if formData.subcategory}
+                    <span class="text-sm">{formData.subcategory}</span>
+                  {/if}
+                  <span class="text-sm">{formData.condition || 'Condition'}</span>
                 </div>
               </div>
 
-              <p class="text-sm text-gray-500 mb-2">Delivery Options</p>
-              <ul class="space-y-1">
-                {#if formData.pickup}
-                  <li class="flex items-start">
-                    <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    <div>
-                      <span class="font-medium">Pickup</span>
-                      {#if formData.pickupLocation}
-                        <p class="text-gray-600 text-sm">Location: {formData.pickupLocation}</p>
-                      {/if}
-                    </div>
-                  </li>
-                {/if}
-
-                {#if formData.dropoff}
-                  <li class="flex items-start">
-                    <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    <div>
-                      <span class="font-medium">Dropoff</span>
-                      {#if formData.dropoffDistance}
-                        <p class="text-gray-600 text-sm">Within {formData.dropoffDistance} miles</p>
-                      {/if}
-                    </div>
-                  </li>
-                {/if}
-
-                {#if formData.shipping}
-                  <li class="flex items-start">
-                    <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    <div>
-                      <span class="font-medium">Shipping</span>
-                      {#if formData.shippingFee}
-                        <p class="text-gray-600 text-sm">Fee: ${formData.shippingFee}</p>
-                      {/if}
-                    </div>
-                  </li>
-                {/if}
-              </ul>
-
-              <!-- Availability Preview -->
-              {#if formData.unavailableDates.length > 0}
-                <div class="mt-4">
-                  <p class="text-sm text-gray-500 mb-2">Unavailable Dates</p>
-                  <div class="flex flex-wrap gap-2">
-                    {#each formData.unavailableDates.sort() as date}
-                      <div class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
-                        {new Date(date).toLocaleDateString()}
+              <!-- Images Preview -->
+              {#if formData.images.length > 0}
+                <div class="mb-6">
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {#each formData.images.slice(0, 6) as image, index}
+                      <img
+                        src={image}
+                        alt="Gear photo {index + 1}"
+                        class="w-full h-48 object-cover rounded-lg"
+                      />
+                    {/each}
+                    {#if formData.images.length > 6}
+                      <div class="w-full h-48 bg-gray-700/50 rounded-lg flex items-center justify-center">
+                        <span class="text-gray-300">+{formData.images.length - 6} more</span>
                       </div>
+                    {/if}
+                  </div>
+                </div>
+              {/if}
+
+              <!-- Description -->
+              <div class="mb-6">
+                <h4 class="text-lg font-semibold text-white mb-2">Description</h4>
+                <p class="text-gray-300">{formData.description || 'No description provided'}</p>
+              </div>
+
+              <!-- Details -->
+              <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <h4 class="text-lg font-semibold text-white mb-3">Details</h4>
+                  <div class="space-y-2 text-gray-300">
+                    {#if formData.brand}
+                      <div><span class="font-medium">Brand:</span> {formData.brand}</div>
+                    {/if}
+                    {#if formData.model}
+                      <div><span class="font-medium">Model:</span> {formData.model}</div>
+                    {/if}
+                    <div><span class="font-medium">Condition:</span> {formData.condition}</div>
+                    {#if formData.ageInYears > 0}
+                      <div><span class="font-medium">Age:</span> {formData.ageInYears} year{formData.ageInYears > 1 ? 's' : ''}</div>
+                    {/if}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 class="text-lg font-semibold text-white mb-3">Pricing</h4>
+                  <div class="space-y-2 text-gray-300">
+                    <div><span class="font-medium">Daily:</span> ${formData.dailyPrice || 0}/day</div>
+                    {#if formData.weeklyPrice > 0}
+                      <div><span class="font-medium">Weekly:</span> ${formData.weeklyPrice}/week</div>
+                    {/if}
+                    {#if formData.monthlyPrice > 0}
+                      <div><span class="font-medium">Monthly:</span> ${formData.monthlyPrice}/month</div>
+                    {/if}
+                    <div><span class="font-medium">Security Deposit:</span> ${formData.securityDeposit || 0}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Features -->
+              {#if formData.features.some(f => f.trim() !== '')}
+                <div class="mb-6">
+                  <h4 class="text-lg font-semibold text-white mb-3">Features</h4>
+                  <div class="flex flex-wrap gap-2">
+                    {#each formData.features.filter(f => f.trim() !== '') as feature}
+                      <span class="bg-green-600/20 text-green-300 px-3 py-1 rounded-full text-sm border border-green-500/30">
+                        {feature}
+                      </span>
                     {/each}
                   </div>
                 </div>
               {/if}
+
+              <!-- Location & Delivery -->
+              <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h4 class="text-lg font-semibold text-white mb-3">Location</h4>
+                  <p class="text-gray-300">
+                    {formData.city || 'City'}, {formData.state || 'State'} {formData.zipCode || 'ZIP'}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 class="text-lg font-semibold text-white mb-3">Delivery Options</h4>
+                  <div class="space-y-1 text-gray-300">
+                    {#if formData.pickup}
+                      <div>✓ Pickup available{formData.pickupLocation ? ` at ${formData.pickupLocation}` : ''}</div>
+                    {/if}
+                    {#if formData.dropoff}
+                      <div>✓ Delivery available{formData.dropoffDistance ? ` within ${formData.dropoffDistance} miles` : ''}</div>
+                    {/if}
+                    {#if formData.shipping}
+                      <div>✓ Shipping available{formData.shippingFee ? ` ($${formData.shippingFee})` : ''}</div>
+                    {/if}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+        </ScrollAnimated>
       {/if}
 
-    <!-- Navigation buttons - centered and transparent -->
-    <div class="flex justify-center items-center gap-4 mt-8">
-      {#if currentStep > 1}
-        <button
-          type="button"
-          class="bg-gray-600/70 hover:bg-gray-600/90 text-white font-medium py-3 px-6 rounded-md border border-gray-500 backdrop-blur-sm transition-all duration-200"
-          on:click={prevStep}
-        >
-          Previous
-        </button>
-      {/if}
+      <!-- Navigation Buttons -->
+      <ScrollAnimated animation="fade-up" delay={800}>
+        <div class="flex justify-between mt-12">
+        {#if currentStep > 1}
+          <button
+            type="button"
+            on:click={prevStep}
+            class="bg-gray-600/70 hover:bg-gray-600/90 text-white px-6 py-3 rounded-lg backdrop-blur-sm border border-gray-500/50 transition-all duration-200 shadow-lg"
+          >
+            ← Previous
+          </button>
+        {:else}
+          <div></div>
+        {/if}
 
-      {#if currentStep < totalSteps}
-        <button
-          type="button"
-          class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-8 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-          on:click={nextStep}
-          disabled={!isStepValid()}
-        >
-          Next
-        </button>
-      {:else}
-        <button
-          type="button"
-          class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-8 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-          on:click={submitForm}
-          disabled={isSubmitting || !isStepValid()}
-        >
-          {#if isSubmitting}
-            <span class="flex items-center">
-              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        {#if currentStep < totalSteps}
+          <button
+            type="button"
+            on:click={nextStep}
+            class="bg-green-600/80 hover:bg-green-600/90 text-white px-6 py-3 rounded-lg backdrop-blur-sm border border-green-500/50 transition-all duration-200 shadow-lg"
+          >
+            Next →
+          </button>
+        {:else}
+          <button
+            type="button"
+            on:click={submitForm}
+            disabled={isSubmitting}
+            class="bg-green-600/80 hover:bg-green-600/90 text-white px-8 py-3 rounded-lg backdrop-blur-sm border border-green-500/50 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {#if isSubmitting}
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Creating Listing...
-            </span>
-          {:else}
-            List My Gear
-          {/if}
-        </button>
-      {/if}
+              {isEditMode ? 'Updating Listing...' : 'Creating Listing...'}
+            {:else}
+              {isEditMode ? 'Update Listing' : 'List My Gear'}
+            {/if}
+          </button>
+        {/if}
+        </div>
+      </ScrollAnimated>
     </div>
-  </ContentBlock>
   </div>
+  {/if}
 </div>
+
+<style>
+  /* Smooth scrolling for better parallax effect */
+  :global(html) {
+    scroll-behavior: smooth;
+  }
+
+  /* Animation classes */
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+
+  .animate-delay-200 {
+    animation-delay: 0.2s;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(2rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

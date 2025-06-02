@@ -16,8 +16,8 @@ import {
 export interface VerificationRequest {
   id: string;
   userId: string;
-  type: 'identity' | 'phone' | 'email' | 'address' | 'payment';
-  status: 'pending' | 'approved' | 'rejected' | 'expired';
+  type: 'identity' | 'phone' | 'email' | 'address' | 'payment' | 'background_check';
+  status: 'pending' | 'approved' | 'rejected' | 'expired' | 'in_progress';
   submittedAt: Date;
   reviewedAt?: Date;
   reviewedBy?: string;
@@ -72,7 +72,54 @@ export interface VerificationRequest {
     last4Digits: string;
     verified: boolean;
   };
-  
+
+  // Background check verification
+  backgroundCheckData?: {
+    checkType: 'basic' | 'standard' | 'comprehensive';
+    provider: 'checkr' | 'sterling' | 'accurate' | 'internal';
+    externalId?: string; // ID from background check provider
+    consentGiven: boolean;
+    consentTimestamp: Date;
+    results?: {
+      criminalHistory: {
+        status: 'clear' | 'records_found' | 'pending';
+        details?: string;
+        recordsFound?: Array<{
+          type: 'felony' | 'misdemeanor' | 'infraction';
+          description: string;
+          date: Date;
+          jurisdiction: string;
+          disposition: string;
+        }>;
+      };
+      sexOffenderRegistry: {
+        status: 'clear' | 'found' | 'pending';
+        details?: string;
+      };
+      globalWatchlist: {
+        status: 'clear' | 'found' | 'pending';
+        details?: string;
+      };
+      identityVerification: {
+        status: 'verified' | 'failed' | 'pending';
+        ssnTrace?: boolean;
+        addressHistory?: boolean;
+      };
+      motorVehicleRecords?: {
+        status: 'clear' | 'violations_found' | 'pending';
+        violations?: Array<{
+          type: string;
+          date: Date;
+          description: string;
+        }>;
+      };
+    };
+    completedAt?: Date;
+    expiresAt?: Date; // Background checks expire after certain period
+    riskLevel?: 'low' | 'medium' | 'high';
+    overallStatus: 'pass' | 'fail' | 'review_required' | 'pending';
+  };
+
   rejectionReason?: string;
   notes?: string;
 }
@@ -87,6 +134,16 @@ export interface UserVerificationStatus {
     email: boolean;
     address: boolean;
     payment: boolean;
+    background_check: boolean;
+  };
+  backgroundCheckStatus?: {
+    status: 'not_started' | 'pending' | 'in_progress' | 'completed' | 'expired' | 'failed';
+    checkType?: 'basic' | 'standard' | 'comprehensive';
+    completedAt?: Date;
+    expiresAt?: Date;
+    riskLevel?: 'low' | 'medium' | 'high';
+    overallResult?: 'pass' | 'fail' | 'review_required';
+    requiresRenewal?: boolean;
   };
   verificationScore: number; // 0-100
   badges: VerificationBadge[];
@@ -94,7 +151,7 @@ export interface UserVerificationStatus {
 }
 
 export interface VerificationBadge {
-  type: 'identity_verified' | 'phone_verified' | 'email_verified' | 'address_verified' | 'payment_verified' | 'superhost' | 'trusted_renter';
+  type: 'identity_verified' | 'phone_verified' | 'email_verified' | 'address_verified' | 'payment_verified' | 'background_check_verified' | 'background_check_premium' | 'superhost' | 'trusted_renter';
   name: string;
   description: string;
   earnedAt: Date;
@@ -156,6 +213,14 @@ export const VERIFICATION_REQUIREMENTS: Record<string, VerificationRequirement[]
       required: false,
       estimatedTime: '10 minutes',
       benefits: ['Maximum trust level', 'Priority support', 'Special offers']
+    },
+    {
+      type: 'background_check',
+      name: 'Background Check',
+      description: 'Complete a comprehensive background check',
+      required: true,
+      estimatedTime: '2-5 business days',
+      benefits: ['Highest trust level', 'Access to premium gear', 'Reduced security deposits', 'Priority booking']
     }
   ]
 };
@@ -269,6 +334,110 @@ class VerificationService {
     return this.submitVerificationRequest(userId, 'identity', identityData);
   }
 
+  // Submit background check request
+  async submitBackgroundCheck(
+    userId: string,
+    checkType: 'basic' | 'standard' | 'comprehensive' = 'standard',
+    provider: 'checkr' | 'sterling' | 'accurate' | 'internal' = 'checkr'
+  ): Promise<string> {
+    const backgroundCheckData = {
+      checkType,
+      provider,
+      consentGiven: true,
+      consentTimestamp: new Date(),
+      overallStatus: 'pending' as const
+    };
+
+    const requestId = await this.submitVerificationRequest(userId, 'background_check', backgroundCheckData);
+
+    // In a real implementation, this would trigger the actual background check
+    // with the chosen provider (Checkr, Sterling, etc.)
+    await this.initiateExternalBackgroundCheck(requestId, userId, backgroundCheckData);
+
+    return requestId;
+  }
+
+  // Initiate external background check with third-party provider
+  private async initiateExternalBackgroundCheck(
+    requestId: string,
+    userId: string,
+    checkData: any
+  ): Promise<void> {
+    try {
+      // Update status to in_progress
+      const requestRef = doc(firestore, 'verificationRequests', requestId);
+      await updateDoc(requestRef, {
+        status: 'in_progress',
+        'backgroundCheckData.externalId': `ext_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      });
+
+      // In a real implementation, this would make API calls to:
+      // - Checkr API: https://docs.checkr.com/
+      // - Sterling API: https://www.sterlingcheck.com/api/
+      // - Accurate Background API: https://www.accuratebackground.com/
+
+      console.log(`Background check initiated for user ${userId} with provider ${checkData.provider}`);
+
+      // Simulate background check processing (remove in production)
+      setTimeout(async () => {
+        await this.simulateBackgroundCheckCompletion(requestId);
+      }, 5000); // 5 seconds for demo, real checks take 1-5 business days
+
+    } catch (error) {
+      console.error('Error initiating background check:', error);
+      throw error;
+    }
+  }
+
+  // Simulate background check completion (for demo purposes)
+  private async simulateBackgroundCheckCompletion(requestId: string): Promise<void> {
+    try {
+      const requestRef = doc(firestore, 'verificationRequests', requestId);
+      const requestDoc = await getDoc(requestRef);
+
+      if (!requestDoc.exists()) return;
+
+      const request = requestDoc.data() as VerificationRequest;
+
+      // Simulate results (in production, this would come from the provider's webhook)
+      const simulatedResults = {
+        criminalHistory: {
+          status: 'clear' as const,
+          details: 'No criminal records found'
+        },
+        sexOffenderRegistry: {
+          status: 'clear' as const,
+          details: 'No matches found in sex offender registry'
+        },
+        globalWatchlist: {
+          status: 'clear' as const,
+          details: 'No matches found in global watchlists'
+        },
+        identityVerification: {
+          status: 'verified' as const,
+          ssnTrace: true,
+          addressHistory: true
+        }
+      };
+
+      await updateDoc(requestRef, {
+        status: 'approved',
+        reviewedAt: serverTimestamp(),
+        'backgroundCheckData.results': simulatedResults,
+        'backgroundCheckData.completedAt': serverTimestamp(),
+        'backgroundCheckData.expiresAt': new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
+        'backgroundCheckData.riskLevel': 'low',
+        'backgroundCheckData.overallStatus': 'pass'
+      });
+
+      // Update user verification status
+      await this.updateUserVerificationStatus(request.userId);
+
+    } catch (error) {
+      console.error('Error completing background check:', error);
+    }
+  }
+
   // Get user verification status
   async getUserVerificationStatus(userId: string): Promise<UserVerificationStatus> {
     try {
@@ -293,7 +462,8 @@ class VerificationService {
           phone: false,
           email: false,
           address: false,
-          payment: false
+          payment: false,
+          background_check: false
         },
         verificationScore: 0,
         badges: [],
@@ -322,7 +492,8 @@ class VerificationService {
         phone: false,
         email: false,
         address: false,
-        payment: false
+        payment: false,
+        background_check: false
       };
 
       querySnapshot.forEach((doc) => {
@@ -363,24 +534,25 @@ class VerificationService {
     score: number;
   } {
     let score = 0;
-    
+
     if (verifiedMethods.email) score += 10;
     if (verifiedMethods.phone) score += 20;
-    if (verifiedMethods.identity) score += 40;
+    if (verifiedMethods.identity) score += 30;
     if (verifiedMethods.payment) score += 20;
     if (verifiedMethods.address) score += 10;
+    if (verifiedMethods.background_check) score += 30; // High value for background check
 
     let level: UserVerificationStatus['verificationLevel'] = 'none';
-    
+
     if (verifiedMethods.email && verifiedMethods.phone) {
       level = 'basic';
     }
-    
+
     if (level === 'basic' && verifiedMethods.identity && verifiedMethods.payment) {
       level = 'standard';
     }
-    
-    if (level === 'standard' && verifiedMethods.address) {
+
+    if (level === 'standard' && verifiedMethods.background_check) {
       level = 'premium';
     }
 
@@ -442,12 +614,114 @@ class VerificationService {
       });
     }
 
+    if (verifiedMethods.background_check) {
+      badges.push({
+        type: 'background_check_verified',
+        name: 'Background Check Verified',
+        description: 'Comprehensive background check completed',
+        earnedAt: now,
+        icon: '🛡️'
+      });
+    }
+
+    // Premium background check badge for comprehensive checks
+    // This would be determined by checking the actual background check data
+    if (verifiedMethods.background_check) {
+      badges.push({
+        type: 'background_check_premium',
+        name: 'Premium Verified',
+        description: 'Highest level of verification completed',
+        earnedAt: now,
+        icon: '⭐'
+      });
+    }
+
     return badges;
   }
 
   // Get verification requirements for a level
   getVerificationRequirements(level: 'basic' | 'standard' | 'premium'): VerificationRequirement[] {
     return VERIFICATION_REQUIREMENTS[level] || [];
+  }
+
+  // Admin methods for managing verification requests
+  async getAllVerificationRequests(): Promise<VerificationRequest[]> {
+    try {
+      const verificationsRef = collection(firestore, 'verificationRequests');
+      const querySnapshot = await getDocs(verificationsRef);
+
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as VerificationRequest));
+    } catch (error) {
+      console.error('Error getting all verification requests:', error);
+      throw error;
+    }
+  }
+
+  async approveVerificationRequest(requestId: string, notes?: string): Promise<void> {
+    try {
+      const requestRef = doc(firestore, 'verificationRequests', requestId);
+      await updateDoc(requestRef, {
+        status: 'approved',
+        reviewedAt: serverTimestamp(),
+        reviewedBy: 'admin', // In real app, use actual admin user ID
+        notes: notes || 'Approved by administrator'
+      });
+
+      // Get the request to update user verification status
+      const requestDoc = await getDoc(requestRef);
+      if (requestDoc.exists()) {
+        const request = requestDoc.data() as VerificationRequest;
+        await this.updateUserVerificationStatus(request.userId);
+      }
+    } catch (error) {
+      console.error('Error approving verification request:', error);
+      throw error;
+    }
+  }
+
+  async rejectVerificationRequest(requestId: string, reason: string): Promise<void> {
+    try {
+      const requestRef = doc(firestore, 'verificationRequests', requestId);
+      await updateDoc(requestRef, {
+        status: 'rejected',
+        reviewedAt: serverTimestamp(),
+        reviewedBy: 'admin', // In real app, use actual admin user ID
+        rejectionReason: reason
+      });
+
+      // Get the request to update user verification status
+      const requestDoc = await getDoc(requestRef);
+      if (requestDoc.exists()) {
+        const request = requestDoc.data() as VerificationRequest;
+        await this.updateUserVerificationStatus(request.userId);
+      }
+    } catch (error) {
+      console.error('Error rejecting verification request:', error);
+      throw error;
+    }
+  }
+
+  // Get user verification requests (for user's own requests)
+  async getUserVerificationRequests(userId: string): Promise<VerificationRequest[]> {
+    try {
+      const verificationsRef = collection(firestore, 'verificationRequests');
+      const q = query(
+        verificationsRef,
+        where('userId', '==', userId)
+      );
+
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as VerificationRequest));
+    } catch (error) {
+      console.error('Error getting user verification requests:', error);
+      throw error;
+    }
   }
 }
 

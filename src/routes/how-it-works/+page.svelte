@@ -32,12 +32,14 @@
       const parallaxVideo = document.querySelector('.parallax-video') as HTMLElement;
 
       if (parallaxVideo) {
-        const speed = 0.5;
-        parallaxVideo.style.transform = `translateY(${scrolled * speed}px)`;
+        const speed = 0.3; // Reduced speed for smoother effect
+        const maxTransform = window.innerHeight * 0.5; // Limit transform to prevent excessive movement
+        const transform = Math.min(scrolled * speed, maxTransform);
+        parallaxVideo.style.transform = `translateY(${transform}px)`;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
