@@ -4,7 +4,7 @@ import type { Listing, Booking } from '$types/firestore';
 import { createBooking } from '$firebase/db/bookings';
 import { userStore } from '$stores/auth';
 import { get } from 'svelte/store';
-import { db } from '$lib/firebase/client';
+import { firestore } from '$lib/firebase/client';
 import {
   collection,
   doc,
@@ -17,6 +17,78 @@ import {
   orderBy,
   serverTimestamp
 } from 'firebase/firestore';
+
+// Stripe integration
+let stripe: any = null;
+
+// Initialize Stripe
+export async function initializeStripe() {
+  if (!browser) return null;
+
+  if (!stripe) {
+    const { loadStripe } = await import('@stripe/stripe-js');
+    stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51234567890');
+  }
+
+  return stripe;
+}
+
+// Create payment intent
+export async function createPaymentIntent(
+  amount: number,
+  currency: string = 'usd',
+  metadata: Record<string, string> = {}
+): Promise<{ clientSecret: string; paymentIntentId: string }> {
+  try {
+    const response = await fetch('/api/payments/create-intent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency,
+        metadata
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create payment intent');
+    }
+
+    const { clientSecret, paymentIntentId } = await response.json();
+    return { clientSecret, paymentIntentId };
+  } catch (error) {
+    console.error('Error creating payment intent:', error);
+    throw error;
+  }
+}
+
+// Confirm payment
+export async function confirmPayment(
+  clientSecret: string,
+  paymentMethod: any
+): Promise<{ success: boolean; paymentIntent?: any; error?: string }> {
+  try {
+    const stripeInstance = await initializeStripe();
+    if (!stripeInstance) {
+      throw new Error('Stripe not initialized');
+    }
+
+    const { error, paymentIntent } = await stripeInstance.confirmCardPayment(clientSecret, {
+      payment_method: paymentMethod
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, paymentIntent };
+  } catch (error) {
+    console.error('Error confirming payment:', error);
+    return { success: false, error: error.message };
+  }
+}
 
 // Calculate booking fees
 export function calculateBookingFees(
@@ -289,7 +361,7 @@ export async function processRefund(
 
   try {
     // Create refund transaction record
-    const transactionsRef = collection(db, 'transactions');
+    const transactionsRef = collection(firestore, 'transactions');
     const refundTransaction: Omit<Transaction, 'id'> = {
       type: 'refund',
       status: 'pending',
@@ -333,7 +405,7 @@ export async function addPaymentMethod(
   paymentMethodData: Omit<PaymentMethod, 'id' | 'createdAt' | 'isVerified'>
 ): Promise<string> {
   try {
-    const paymentMethodsRef = collection(db, 'paymentMethods');
+    const paymentMethodsRef = collection(firestore, 'paymentMethods');
 
     const paymentMethod = {
       ...paymentMethodData,
@@ -359,7 +431,7 @@ export async function addPaymentMethod(
 // Get user's payment methods
 export async function getUserPaymentMethods(userId: string): Promise<PaymentMethod[]> {
   try {
-    const paymentMethodsRef = collection(db, 'paymentMethods');
+    const paymentMethodsRef = collection(firestore, 'paymentMethods');
     const q = query(
       paymentMethodsRef,
       where('userId', '==', userId),

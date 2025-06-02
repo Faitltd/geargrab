@@ -3,6 +3,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { authStore } from '$lib/stores/auth';
+  import StripePaymentForm from '$lib/components/payments/StripePaymentForm.svelte';
 
   // Get booking details from URL parameters
   let listingId = '';
@@ -100,6 +101,10 @@
     });
   }
 
+  // Payment state
+  let showPayment = false;
+  let paymentProcessing = false;
+
   async function handleBookingSubmit() {
     console.log('handleBookingSubmit called');
 
@@ -113,11 +118,17 @@
       return;
     }
 
-    processing = true;
+    // Show payment form
+    showPayment = true;
     error = '';
+  }
+
+  async function handlePaymentSuccess(event) {
+    console.log('Payment successful:', event.detail);
+    paymentProcessing = true;
 
     try {
-      // Create booking via API
+      // Create booking via API with payment confirmation
       const bookingData = {
         listingId,
         startDate,
@@ -126,10 +137,11 @@
         insuranceTier,
         totalPrice: calculatedTotal,
         contactInfo,
-        specialRequests
+        specialRequests,
+        paymentIntentId: event.detail.paymentIntentId
       };
 
-      console.log('Sending booking data:', bookingData);
+      console.log('Sending booking data with payment:', bookingData);
 
       const response = await fetch('/api/book', {
         method: 'POST',
@@ -152,8 +164,14 @@
     } catch (err) {
       console.error('Booking error:', err);
       error = err.message || 'Failed to create booking. Please try again.';
-      processing = false;
+      paymentProcessing = false;
     }
+  }
+
+  function handlePaymentError(event) {
+    console.error('Payment error:', event.detail);
+    error = event.detail.error || 'Payment failed. Please try again.';
+    paymentProcessing = false;
   }
 </script>
 
@@ -301,7 +319,7 @@
               <button
                 type="submit"
                 class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors"
-                disabled={processing || !agreeToTerms}
+                disabled={processing || !agreeToTerms || showPayment}
               >
                 {#if processing}
                   <div class="flex items-center justify-center">
@@ -309,11 +327,32 @@
                     Processing...
                   </div>
                 {:else}
-                  Confirm Booking
+                  {showPayment ? 'Complete Payment Below' : 'Continue to Payment'}
                 {/if}
               </button>
             </div>
           </form>
+
+          <!-- Payment Form -->
+          {#if showPayment}
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6 mt-6">
+              <h2 class="text-lg font-semibold text-white mb-4">💳 Secure Payment</h2>
+              <StripePaymentForm
+                amount={calculatedTotal}
+                currency="usd"
+                metadata={{
+                  listingId,
+                  startDate,
+                  endDate,
+                  deliveryMethod,
+                  insuranceTier
+                }}
+                disabled={paymentProcessing}
+                on:success={handlePaymentSuccess}
+                on:error={handlePaymentError}
+              />
+            </div>
+          {/if}
 
         </div>
 
