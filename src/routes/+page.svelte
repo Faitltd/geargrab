@@ -5,27 +5,53 @@
   let videoElement: HTMLVideoElement;
   let videoLoaded = false;
   let videoError = false;
+  let videoAttempted = false;
 
   // Video event handlers
   function handleVideoLoaded() {
-    console.log('Video loaded successfully');
+    console.log('✅ Video loaded successfully');
     videoLoaded = true;
+    videoError = false;
     if (videoElement) {
       videoElement.style.opacity = '1';
+      // Ensure video plays
+      videoElement.play().catch(error => {
+        console.log('⚠️ Video autoplay failed after load:', error);
+      });
     }
   }
 
   function handleVideoError(event: Event) {
-    console.error('Video failed to load:', event);
+    console.error('❌ Video failed to load:', event);
     videoError = true;
+    videoLoaded = false;
     if (videoElement) {
       videoElement.style.display = 'none';
     }
   }
 
   function handleVideoCanPlay() {
-    console.log('Video can start playing');
+    console.log('🎬 Video can start playing');
     videoLoaded = true;
+    videoError = false;
+    if (videoElement && !videoAttempted) {
+      videoAttempted = true;
+      videoElement.play().catch(error => {
+        console.log('⚠️ Video autoplay failed on canplay:', error);
+      });
+    }
+  }
+
+  function handleVideoLoadStart() {
+    console.log('🔄 Video load started');
+    videoLoaded = false;
+    videoError = false;
+  }
+
+  function handleVideoPlay() {
+    console.log('▶️ Video started playing');
+    videoLoaded = true;
+    videoError = false;
   }
 
 
@@ -125,19 +151,39 @@
 
     // Force video to load and play
     if (videoElement) {
+      console.log('🎬 Initializing video element');
+
+      // Reset video state
+      videoLoaded = false;
+      videoError = false;
+      videoAttempted = false;
+
+      // Load the video
       videoElement.load();
-      videoElement.play().catch(error => {
-        console.log('Video autoplay failed:', error);
-      });
+
+      // Try to play after a short delay
+      setTimeout(() => {
+        if (videoElement && !videoError) {
+          videoElement.play().catch(error => {
+            console.log('⚠️ Initial video autoplay failed:', error);
+            // Try again with user interaction
+            document.addEventListener('click', () => {
+              if (videoElement && !videoLoaded) {
+                videoElement.play().catch(e => console.log('Click play failed:', e));
+              }
+            }, { once: true });
+          });
+        }
+      }, 500);
     }
 
-    // Fallback: if video doesn't load within 3 seconds, show fallback
+    // Fallback: if video doesn't load within 5 seconds, show fallback
     setTimeout(() => {
       if (!videoLoaded && !videoError) {
-        console.log('Video loading timeout, showing fallback');
+        console.log('⏰ Video loading timeout, showing fallback background');
         videoError = true;
       }
-    }, 3000);
+    }, 5000);
 
     // Parallax effect
     const handleScroll = () => {
@@ -169,26 +215,37 @@
   <video
     bind:this={videoElement}
     class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-    style="opacity: {videoLoaded ? 1 : 0};"
+    style="opacity: {videoLoaded && !videoError ? 1 : 0}; z-index: 1;"
     autoplay
     muted
     loop
     playsinline
-    preload="auto"
+    preload="metadata"
     on:loadeddata={handleVideoLoaded}
     on:canplay={handleVideoCanPlay}
     on:error={handleVideoError}
-    on:loadstart={() => console.log('🎬 Homepage video load started')}
+    on:loadstart={handleVideoLoadStart}
     on:loadedmetadata={() => console.log('📹 Homepage video metadata loaded')}
-    on:play={() => console.log('▶️ Homepage video started playing')}
+    on:play={handleVideoPlay}
+    on:pause={() => console.log('⏸️ Video paused')}
+    on:ended={() => console.log('🔚 Video ended')}
   >
+    <source src="/Stars.mp4" type="video/mp4">
     <source src="/1877846-hd_1920_1080_30fps.mp4" type="video/mp4">
     <source src="/857134-hd_1280_720_24fps.mp4" type="video/mp4">
-    <source src="/Stars.mp4" type="video/mp4">
+    Your browser does not support the video tag.
   </video>
 
   <!-- Dark overlay for text readability -->
   <div class="absolute inset-0 bg-black bg-opacity-40" style="z-index: 2;"></div>
+
+  <!-- Debug overlay (remove in production) -->
+  <div class="absolute top-4 right-4 bg-black bg-opacity-70 text-white p-2 rounded text-xs" style="z-index: 10;">
+    <div>Video Status:</div>
+    <div>Loaded: {videoLoaded ? '✅' : '❌'}</div>
+    <div>Error: {videoError ? '❌' : '✅'}</div>
+    <div>Attempted: {videoAttempted ? '✅' : '❌'}</div>
+  </div>
 
   <!-- Top Section Content -->
   <div class="relative z-10 flex flex-col justify-center min-h-screen pt-16" style="z-index: 10;">
