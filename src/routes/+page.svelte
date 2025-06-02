@@ -5,18 +5,25 @@
   let videoElement: HTMLVideoElement;
   let videoLoaded = false;
   let videoError = false;
-  let videoAttempted = false;
+  let showVideo = false;
 
-  // Video event handlers
-  function handleVideoLoaded() {
-    console.log('✅ Video loaded successfully');
+  // Simplified video handlers
+  function handleVideoCanPlay() {
+    console.log('🎬 Video can play - showing video');
     videoLoaded = true;
     videoError = false;
+    showVideo = true;
+
+    // Try to play the video
     if (videoElement) {
-      videoElement.style.opacity = '1';
-      // Ensure video plays
       videoElement.play().catch(error => {
-        console.log('⚠️ Video autoplay failed after load:', error);
+        console.log('⚠️ Video autoplay failed:', error);
+        // Add click listener to play on user interaction
+        document.addEventListener('click', () => {
+          if (videoElement) {
+            videoElement.play().catch(e => console.log('Click play failed:', e));
+          }
+        }, { once: true });
       });
     }
   }
@@ -25,33 +32,13 @@
     console.error('❌ Video failed to load:', event);
     videoError = true;
     videoLoaded = false;
-    if (videoElement) {
-      videoElement.style.display = 'none';
-    }
-  }
-
-  function handleVideoCanPlay() {
-    console.log('🎬 Video can start playing');
-    videoLoaded = true;
-    videoError = false;
-    if (videoElement && !videoAttempted) {
-      videoAttempted = true;
-      videoElement.play().catch(error => {
-        console.log('⚠️ Video autoplay failed on canplay:', error);
-      });
-    }
-  }
-
-  function handleVideoLoadStart() {
-    console.log('🔄 Video load started');
-    videoLoaded = false;
-    videoError = false;
+    showVideo = false;
   }
 
   function handleVideoPlay() {
-    console.log('▶️ Video started playing');
+    console.log('▶️ Video is playing');
+    showVideo = true;
     videoLoaded = true;
-    videoError = false;
   }
 
 
@@ -208,23 +195,21 @@
 <section class="min-h-screen relative overflow-hidden" style="background: linear-gradient(135deg, #1a365d 0%, #2d3748 50%, #1a202c 100%);">
 
   <!-- Fallback Background Image (shows while video loads or if video fails) -->
-  <div class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-       style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'); opacity: {videoLoaded ? 0 : 1}; transition: opacity 1s ease-in-out;"></div>
+  <div class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat z-0"
+       style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'); opacity: {videoLoaded && !videoError ? 0 : 1}; transition: opacity 1s ease-in-out;"></div>
 
   <!-- Video Background -->
   <video
     bind:this={videoElement}
-    class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-    style="opacity: {videoLoaded && !videoError ? 1 : 0}; z-index: 1;"
+    class="absolute inset-0 w-full h-full object-cover z-10"
+    style="opacity: 1; transition: opacity 1s ease-in-out;"
     autoplay
     muted
     loop
     playsinline
-    preload="metadata"
-    on:loadeddata={handleVideoLoaded}
+    preload="auto"
     on:canplay={handleVideoCanPlay}
     on:error={handleVideoError}
-    on:loadstart={handleVideoLoadStart}
     on:loadedmetadata={() => console.log('📹 Homepage video metadata loaded')}
     on:play={handleVideoPlay}
     on:pause={() => console.log('⏸️ Video paused')}
@@ -237,18 +222,18 @@
   </video>
 
   <!-- Dark overlay for text readability -->
-  <div class="absolute inset-0 bg-black bg-opacity-40" style="z-index: 2;"></div>
+  <div class="absolute inset-0 bg-black bg-opacity-40 z-20"></div>
 
   <!-- Debug overlay (remove in production) -->
-  <div class="absolute top-4 right-4 bg-black bg-opacity-70 text-white p-2 rounded text-xs" style="z-index: 10;">
+  <div class="absolute top-4 right-4 bg-black bg-opacity-70 text-white p-2 rounded text-xs z-50">
     <div>Video Status:</div>
     <div>Loaded: {videoLoaded ? '✅' : '❌'}</div>
     <div>Error: {videoError ? '❌' : '✅'}</div>
-    <div>Attempted: {videoAttempted ? '✅' : '❌'}</div>
+    <div>Visible: {showVideo ? '✅' : '❌'}</div>
   </div>
 
   <!-- Top Section Content -->
-  <div class="relative z-10 flex flex-col justify-center min-h-screen pt-16" style="z-index: 10;">
+  <div class="relative flex flex-col justify-center min-h-screen pt-16 z-30">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
       <!-- Hero Content -->
