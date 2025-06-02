@@ -3,10 +3,13 @@
   import HeroSearch from '$lib/components/forms/HeroSearch.svelte';
 
   let videoElement: HTMLVideoElement;
+  let videoLoaded = false;
+  let videoError = false;
 
   // Video event handlers
   function handleVideoLoaded() {
     console.log('Video loaded successfully');
+    videoLoaded = true;
     if (videoElement) {
       videoElement.style.opacity = '1';
     }
@@ -14,9 +17,15 @@
 
   function handleVideoError(event: Event) {
     console.error('Video failed to load:', event);
+    videoError = true;
     if (videoElement) {
       videoElement.style.display = 'none';
     }
+  }
+
+  function handleVideoCanPlay() {
+    console.log('Video can start playing');
+    videoLoaded = true;
   }
 
 
@@ -114,6 +123,22 @@
       statsVisible = true;
     }, 800);
 
+    // Force video to load and play
+    if (videoElement) {
+      videoElement.load();
+      videoElement.play().catch(error => {
+        console.log('Video autoplay failed:', error);
+      });
+    }
+
+    // Fallback: if video doesn't load within 3 seconds, show fallback
+    setTimeout(() => {
+      if (!videoLoaded && !videoError) {
+        console.log('Video loading timeout, showing fallback');
+        videoError = true;
+      }
+    }, 3000);
+
     // Parallax effect
     const handleScroll = () => {
       const scrolled = window.pageYOffset;
@@ -134,17 +159,24 @@
 </script>
 
 <!-- Top Section with Video Background -->
-<section class="min-h-screen relative overflow-hidden" style="background: #000;">
-  <!-- Video Background - Matching Working Pattern -->
+<section class="min-h-screen relative overflow-hidden" style="background: linear-gradient(135deg, #1a365d 0%, #2d3748 50%, #1a202c 100%);">
+
+  <!-- Fallback Background Image (shows while video loads or if video fails) -->
+  <div class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+       style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'); opacity: {videoLoaded ? 0 : 1}; transition: opacity 1s ease-in-out;"></div>
+
+  <!-- Video Background -->
   <video
     bind:this={videoElement}
     class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-    style="opacity: 1;"
+    style="opacity: {videoLoaded ? 1 : 0};"
     autoplay
     muted
     loop
     playsinline
+    preload="auto"
     on:loadeddata={handleVideoLoaded}
+    on:canplay={handleVideoCanPlay}
     on:error={handleVideoError}
     on:loadstart={() => console.log('🎬 Homepage video load started')}
     on:loadedmetadata={() => console.log('📹 Homepage video metadata loaded')}
@@ -152,6 +184,7 @@
   >
     <source src="/1877846-hd_1920_1080_30fps.mp4" type="video/mp4">
     <source src="/857134-hd_1280_720_24fps.mp4" type="video/mp4">
+    <source src="/Stars.mp4" type="video/mp4">
   </video>
 
   <!-- Dark overlay for text readability -->
