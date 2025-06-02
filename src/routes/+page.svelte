@@ -37,8 +37,8 @@
     console.error('❌ Video element:', videoElement);
     console.error('❌ Video sources:', videoElement?.innerHTML);
     videoError = true;
-    videoLoaded = false;
-    showVideo = false;
+    // Don't set videoLoaded to false - let other events handle it
+    // showVideo = false;
   }
 
   function handleVideoPlay() {
@@ -52,9 +52,20 @@
     console.log('📹 Video data loaded');
     videoLoaded = true;
     showVideo = true;
+    videoError = false; // Clear any errors
     // Try to play if not already playing
     if (videoElement && videoElement.paused) {
       videoElement.play().catch(e => console.log('Play after load failed:', e));
+    }
+  }
+
+  // Force video to show after a timeout
+  function forceVideoShow() {
+    if (videoElement && videoElement.readyState >= 2) {
+      console.log('🔧 Force showing video - readyState:', videoElement.readyState);
+      videoLoaded = true;
+      showVideo = true;
+      videoError = false;
     }
   }
 
@@ -170,6 +181,9 @@
             });
           }
         }, 500);
+
+        // Force check after 2 seconds
+        setTimeout(forceVideoShow, 2000);
       }
     }, 100);
 
@@ -211,7 +225,7 @@
   <video
     bind:this={videoElement}
     class="absolute inset-0 w-full h-full object-cover z-10"
-    style="opacity: {showVideo && videoLoaded && !videoError ? 1 : 0}; transition: opacity 1s ease-in-out;"
+    style="opacity: {videoLoaded ? 1 : 0}; transition: opacity 1s ease-in-out;"
     autoplay
     muted
     loop
