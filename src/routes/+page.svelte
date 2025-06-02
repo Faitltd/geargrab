@@ -112,14 +112,16 @@
 
   // Loading sequence with staggered delays
   onMount(() => {
-    // Progressive loading sequence - top to bottom
+    // Show hero content immediately
+    heroVisible = true;
+
+    // Progressive loading sequence - top to bottom with proper delays
     const loadingSequence = [
-      { element: 'hero', delay: 200, setter: () => heroVisible = true },
-      { element: 'stats', delay: 600, setter: () => statsVisible = true },
-      { element: 'featured', delay: 1000, setter: () => featuredGearVisible = true },
-      { element: 'categories', delay: 1200, setter: () => categoriesVisible = true },
-      { element: 'features', delay: 1400, setter: () => featuresVisible = true },
-      { element: 'cta', delay: 1600, setter: () => ctaVisible = true }
+      { element: 'stats', delay: 800, setter: () => statsVisible = true },
+      { element: 'featured', delay: 1400, setter: () => featuredGearVisible = true },
+      { element: 'categories', delay: 1800, setter: () => categoriesVisible = true },
+      { element: 'features', delay: 2200, setter: () => featuresVisible = true },
+      { element: 'cta', delay: 2600, setter: () => ctaVisible = true }
     ];
 
     // Execute loading sequence
@@ -264,15 +266,15 @@
 
       <!-- Hero Content -->
       <div class="text-center text-white mb-12">
-        <h1 class="text-5xl md:text-6xl font-bold mb-6 transform transition-all duration-1000 ease-out {heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 transform transition-all duration-800 ease-out {heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}">
           Grab Some Gear And Get<br>Out There!
         </h1>
-        <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto transform transition-all duration-1000 ease-out {heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}" style="transition-delay: 200ms;">
+        <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto transform transition-all duration-800 ease-out {heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}" style="transition-delay: 100ms;">
           Premier gear rental from local owners. Adventure awaits, gear doesn't have to wait.
         </p>
 
         <!-- Search Form -->
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto w-full transform transition-all duration-1000 ease-out {heroVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-6 scale-95'}" style="transition-delay: 400ms;">
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto w-full transform transition-all duration-800 ease-out {heroVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-6 scale-95'}" style="transition-delay: 200ms;">
           <div class="w-full flex justify-center">
             <div class="w-full max-w-xl">
               <HeroSearch />
@@ -285,7 +287,7 @@
       <div class="text-center">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
           {#each stats as stat, i}
-            <div class="transform transition-all duration-800 ease-out {statsVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-8 opacity-0 scale-90'}" style="transition-delay: {i * 150 + 200}ms">
+            <div class="transform transition-all duration-800 ease-out {statsVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-8 opacity-0 scale-90'}" style="transition-delay: {i * 100}ms">
               <div class="text-3xl md:text-4xl font-bold text-green-400 mb-2 transition-all duration-500" style="transition-delay: {i * 150 + 400}ms">{stat.number}</div>
               <div class="text-gray-200 transition-all duration-500" style="transition-delay: {i * 150 + 500}ms">{stat.label}</div>
             </div>
