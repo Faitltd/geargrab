@@ -3,6 +3,7 @@
   import ChatWindow from '$lib/components/chat/ChatWindow.svelte';
   import { chatService, type ChatConversation } from '$lib/services/chat';
   import { authStore } from '$lib/stores/auth';
+  import { goto } from '$app/navigation';
 
   let selectedConversation: ChatConversation | null = null;
   let otherUser: { id: string; name: string; avatar?: string } | null = null;
@@ -27,6 +28,19 @@
       'user3': { name: 'Mike Chen', avatar: 'https://randomuser.me/api/portraits/men/25.jpg' }
     };
     return sampleUsers[userId] || { name: 'Unknown User' };
+  }
+
+  // Navigation functions for quick actions
+  function handleFindGear() {
+    goto('/browse');
+  }
+
+  function handleListGear() {
+    goto('/list-gear');
+  }
+
+  function handleViewBookings() {
+    goto('/dashboard');
   }
 </script>
 
@@ -94,19 +108,28 @@
     <div class="mt-8 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6">
       <h2 class="text-lg font-semibold text-white mb-4">Quick Actions</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center">
+        <button
+          on:click={handleFindGear}
+          class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center"
+        >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
           Find Gear to Rent
         </button>
-        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center">
+        <button
+          on:click={handleListGear}
+          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center"
+        >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
           </svg>
           List Your Gear
         </button>
-        <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center">
+        <button
+          on:click={handleViewBookings}
+          class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center"
+        >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
           </svg>

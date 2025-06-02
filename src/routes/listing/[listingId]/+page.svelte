@@ -447,6 +447,21 @@
     alert(`Messaging functionality would be implemented here. You would be able to message ${listing?.owner?.name}.`);
   }
 
+  // Handle date picker clicks to show calendar
+  function handleStartDateClick(e: Event) {
+    const input = e.target as HTMLInputElement;
+    if (input && 'showPicker' in input && typeof input.showPicker === 'function') {
+      input.showPicker();
+    }
+  }
+
+  function handleEndDateClick(e: Event) {
+    const input = e.target as HTMLInputElement;
+    if (input && 'showPicker' in input && typeof input.showPicker === 'function') {
+      input.showPicker();
+    }
+  }
+
   // Generate star rating display
   function renderStars(rating: number) {
     const fullStars = Math.floor(rating);
@@ -873,9 +888,10 @@
                     <input
                       type="date"
                       id="start-date"
-                      class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                      class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent cursor-pointer"
                       bind:value={startDate}
                       min={new Date().toISOString().split('T')[0]}
+                      on:click={handleStartDateClick}
                     />
                   </div>
                   <div>
@@ -883,9 +899,10 @@
                     <input
                       type="date"
                       id="end-date"
-                      class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                      class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent cursor-pointer"
                       bind:value={endDate}
                       min={startDate || new Date().toISOString().split('T')[0]}
+                      on:click={handleEndDateClick}
                     />
                   </div>
                 </div>

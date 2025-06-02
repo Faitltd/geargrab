@@ -17,6 +17,9 @@
   let messagesContainer: HTMLElement;
   let unsubscribe: Unsubscribe | null = null;
   let sending = false;
+  let showFlagModal = false;
+  let flaggingMessage: ChatMessage | null = null;
+  let flagReason = '';
 
   onMount(() => {
     if (conversationId) {

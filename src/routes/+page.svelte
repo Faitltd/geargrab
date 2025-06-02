@@ -209,16 +209,18 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
           {#each featuredGear as gear}
-            <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20">
-              <img src={gear.image} alt={gear.title} class="w-full h-48 object-cover">
-              <div class="p-6 text-white">
-                <h3 class="text-xl font-bold mb-2">{gear.title}</h3>
-                <div class="flex justify-between items-center">
-                  <span class="text-green-400 font-bold">{gear.price}</span>
-                  <span class="text-gray-300">{gear.location}</span>
+            <a href="/listing/{gear.id}" class="block group cursor-pointer">
+              <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 transition-all duration-300 group-hover:bg-white/20 group-hover:border-white/30 group-hover:transform group-hover:scale-105 group-hover:shadow-xl">
+                <img src={gear.image} alt={gear.title} class="w-full h-48 object-cover">
+                <div class="p-6 text-white">
+                  <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors">{gear.title}</h3>
+                  <div class="flex justify-between items-center">
+                    <span class="text-green-400 font-bold">{gear.price}</span>
+                    <span class="text-gray-300">{gear.location}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </a>
           {/each}
         </div>
 
