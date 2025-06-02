@@ -122,19 +122,52 @@
     }
   ];
 
-  // Stats animation
-  let statsVisible = false;
+  // Progressive loading states for smooth top-to-bottom animation
   let heroVisible = false;
+  let statsVisible = false;
+  let featuredGearVisible = false;
+  let categoriesVisible = false;
+  let featuresVisible = false;
+  let ctaVisible = false;
 
+  // Loading sequence with staggered delays
   onMount(() => {
-    // Trigger hero animation after a short delay
-    setTimeout(() => {
-      heroVisible = true;
-    }, 300);
+    // Progressive loading sequence - top to bottom
+    const loadingSequence = [
+      { element: 'hero', delay: 200, setter: () => heroVisible = true },
+      { element: 'stats', delay: 600, setter: () => statsVisible = true },
+      { element: 'featured', delay: 1000, setter: () => featuredGearVisible = true },
+      { element: 'categories', delay: 1200, setter: () => categoriesVisible = true },
+      { element: 'features', delay: 1400, setter: () => featuresVisible = true },
+      { element: 'cta', delay: 1600, setter: () => ctaVisible = true }
+    ];
 
+    // Execute loading sequence
+    loadingSequence.forEach(({ delay, setter }) => {
+      setTimeout(setter, delay);
+    });
+
+    // Intersection Observer for scroll-triggered animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const target = entry.target as HTMLElement;
+          target.classList.add('animate-in');
+          observer.unobserve(target);
+        }
+      });
+    }, observerOptions);
+
+    // Observe sections for scroll animations
     setTimeout(() => {
-      statsVisible = true;
-    }, 800);
+      const sections = document.querySelectorAll('.scroll-animate');
+      sections.forEach(section => observer.observe(section));
+    }, 100);
 
     // Force video to load and play
     if (videoElement) {
@@ -143,7 +176,6 @@
       // Reset video state
       videoLoaded = false;
       videoError = false;
-      videoAttempted = false;
 
       // Load the video
       videoElement.load();
@@ -238,15 +270,15 @@
 
       <!-- Hero Content -->
       <div class="text-center text-white mb-12">
-        <h1 class="text-5xl md:text-6xl font-bold mb-6 {heroVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'} transition-all duration-800">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 transform transition-all duration-1000 ease-out {heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}">
           Grab Some Gear And Get<br>Out There!
         </h1>
-        <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto {heroVisible ? 'animate-fade-in-up animate-delay-200' : 'opacity-0 translate-y-8'} transition-all duration-800">
+        <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto transform transition-all duration-1000 ease-out {heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}" style="transition-delay: 200ms;">
           Premier gear rental from local owners. Adventure awaits, gear doesn't have to wait.
         </p>
 
         <!-- Search Form -->
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto w-full {heroVisible ? 'animate-fade-in-up animate-delay-400' : 'opacity-0 translate-y-8'} transition-all duration-800">
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto w-full transform transition-all duration-1000 ease-out {heroVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-6 scale-95'}" style="transition-delay: 400ms;">
           <div class="w-full flex justify-center">
             <div class="w-full max-w-xl">
               <HeroSearch />
@@ -259,9 +291,9 @@
       <div class="text-center">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
           {#each stats as stat, i}
-            <div class="transform transition-all duration-700 {statsVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}" style="transition-delay: {i * 100}ms">
-              <div class="text-3xl md:text-4xl font-bold text-green-400 mb-2">{stat.number}</div>
-              <div class="text-gray-200">{stat.label}</div>
+            <div class="transform transition-all duration-800 ease-out {statsVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-8 opacity-0 scale-90'}" style="transition-delay: {i * 150 + 200}ms">
+              <div class="text-3xl md:text-4xl font-bold text-green-400 mb-2 transition-all duration-500" style="transition-delay: {i * 150 + 400}ms">{stat.number}</div>
+              <div class="text-gray-200 transition-all duration-500" style="transition-delay: {i * 150 + 500}ms">{stat.label}</div>
             </div>
           {/each}
         </div>
@@ -276,19 +308,19 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
 
     <!-- Featured Gear -->
-    <div class="text-center mb-20">
-        <h2 class="text-4xl font-bold text-white mb-4">Featured Gear</h2>
-        <p class="text-xl text-gray-200 mb-12 max-w-2xl mx-auto">
+    <div class="text-center mb-20 scroll-animate">
+        <h2 class="text-4xl font-bold text-white mb-4 transform transition-all duration-800 ease-out {featuredGearVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}">Featured Gear</h2>
+        <p class="text-xl text-gray-200 mb-12 max-w-2xl mx-auto transform transition-all duration-800 ease-out {featuredGearVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}" style="transition-delay: 200ms;">
           Discover top-rated outdoor equipment from the best local owners.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
-          {#each featuredGear as gear}
-            <a href="/listing/{gear.id}" class="block group cursor-pointer">
+          {#each featuredGear as gear, i}
+            <a href="/listing/{gear.id}" class="block group cursor-pointer transform transition-all duration-800 ease-out {featuredGearVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'}" style="transition-delay: {i * 200 + 400}ms;">
               <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 transition-all duration-300 group-hover:bg-white/20 group-hover:border-white/30 group-hover:transform group-hover:scale-105 group-hover:shadow-xl">
-                <img src={gear.image} alt={gear.title} class="w-full h-48 object-cover">
+                <img src={gear.image} alt={gear.title} class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110">
                 <div class="p-6 text-white">
-                  <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors">{gear.title}</h3>
+                  <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors duration-300">{gear.title}</h3>
                   <div class="flex justify-between items-center">
                     <span class="text-green-400 font-bold">{gear.price}</span>
                     <span class="text-gray-300">{gear.location}</span>
@@ -299,25 +331,25 @@
           {/each}
         </div>
 
-        <a href="/browse" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
+        <a href="/browse" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform {featuredGearVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}" style="transition-delay: 800ms;">
           Browse All Gear
         </a>
       </div>
 
       <!-- Explore Categories -->
-      <div class="text-center mb-20">
-        <h2 class="text-4xl font-bold text-white mb-4">Explore Categories</h2>
-        <p class="text-xl text-gray-200 mb-12 max-w-2xl mx-auto">
+      <div class="text-center mb-20 scroll-animate">
+        <h2 class="text-4xl font-bold text-white mb-4 transform transition-all duration-800 ease-out {categoriesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}">Explore Categories</h2>
+        <p class="text-xl text-gray-200 mb-12 max-w-2xl mx-auto transform transition-all duration-800 ease-out {categoriesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}" style="transition-delay: 200ms;">
           Find the perfect gear for your outdoor adventure.
         </p>
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-6xl mx-auto">
-          {#each categories as category}
-            <a href="/browse?category={category.id}" class="group">
-              <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 hover:bg-white/20 transition-all">
-                <img src={category.image} alt={category.name} class="w-full h-24 object-cover">
+          {#each categories as category, i}
+            <a href="/browse?category={category.id}" class="group transform transition-all duration-800 ease-out {categoriesVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-90'}" style="transition-delay: {i * 100 + 400}ms;">
+              <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <img src={category.image} alt={category.name} class="w-full h-24 object-cover transition-transform duration-300 group-hover:scale-110">
                 <div class="p-4">
-                  <h3 class="text-white font-semibold text-sm">{category.name}</h3>
+                  <h3 class="text-white font-semibold text-sm group-hover:text-green-400 transition-colors duration-300">{category.name}</h3>
                 </div>
               </div>
             </a>
@@ -326,35 +358,35 @@
       </div>
 
       <!-- Why Choose GearGrab -->
-      <div class="text-center mb-20">
-        <h2 class="text-4xl font-bold text-white mb-4">Why Choose GearGrab?</h2>
-        <p class="text-xl text-gray-200 mb-12 max-w-2xl mx-auto">
+      <div class="text-center mb-20 scroll-animate">
+        <h2 class="text-4xl font-bold text-white mb-4 transform transition-all duration-800 ease-out {featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}">Why Choose GearGrab?</h2>
+        <p class="text-xl text-gray-200 mb-12 max-w-2xl mx-auto transform transition-all duration-800 ease-out {featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}" style="transition-delay: 200ms;">
           Experience the future of outdoor gear access with our trusted platform.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          {#each features as feature}
-            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20">
-              <div class="text-4xl mb-4">{feature.icon}</div>
-              <h3 class="text-xl font-bold text-white mb-4">{feature.title}</h3>
-              <p class="text-gray-200">{feature.description}</p>
+          {#each features as feature, i}
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 transform transition-all duration-800 ease-out hover:bg-white/20 hover:scale-105 {featuresVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-90'}" style="transition-delay: {i * 200 + 400}ms;">
+              <div class="text-4xl mb-4 transition-transform duration-300 hover:scale-110">{feature.icon}</div>
+              <h3 class="text-xl font-bold text-white mb-4 transition-colors duration-300 hover:text-green-400">{feature.title}</h3>
+              <p class="text-gray-200 transition-colors duration-300">{feature.description}</p>
             </div>
           {/each}
         </div>
       </div>
 
     <!-- Call to Action -->
-    <div class="text-center">
-      <h2 class="text-4xl font-bold text-white mb-6">Ready to Start Your Adventure?</h2>
-      <p class="text-xl text-gray-200 mb-8 max-w-3xl mx-auto">
+    <div class="text-center scroll-animate">
+      <h2 class="text-4xl font-bold text-white mb-6 transform transition-all duration-800 ease-out {ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}">Ready to Start Your Adventure?</h2>
+      <p class="text-xl text-gray-200 mb-8 max-w-3xl mx-auto transform transition-all duration-800 ease-out {ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}" style="transition-delay: 200ms;">
         Join thousands of outdoor enthusiasts who are saving money and exploring more with GearGrab.
       </p>
 
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="/browse" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
+        <a href="/browse" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform {ctaVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}" style="transition-delay: 400ms;">
           Start Browsing
         </a>
-        <a href="/list-gear" class="border-2 border-white text-white hover:bg-white hover:text-gray-900 font-bold py-3 px-8 rounded-lg transition-colors">
+        <a href="/list-gear" class="border-2 border-white text-white hover:bg-white hover:text-gray-900 font-bold py-3 px-8 rounded-lg transition-all duration-300 transform {ctaVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}" style="transition-delay: 600ms;">
           List Your Gear
         </a>
       </div>
@@ -364,7 +396,6 @@
 </section>
 
 <style>
-
   /* Smooth scrolling for better parallax effect */
   :global(html) {
     scroll-behavior: smooth;
@@ -373,5 +404,32 @@
   /* Ensure no overflow issues */
   section {
     overflow-x: hidden;
+  }
+
+  /* Progressive loading animations */
+  .scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease-out;
+  }
+
+  .scroll-animate.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Smooth transitions for all elements */
+  :global(*) {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Prevent layout shift during loading */
+  :global(img) {
+    transition: transform 0.3s ease;
+  }
+
+  /* Ensure smooth video transitions */
+  video {
+    will-change: opacity;
   }
 </style>
