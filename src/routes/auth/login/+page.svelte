@@ -1,16 +1,26 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { signInWithEmail, signInWithGoogle } from '$lib/firebase/auth';
   import { notifications } from '$lib/stores/notifications';
   import { isValidEmail } from '$lib/utils/validation';
-
+  import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
+  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
 
   let email = '';
   let password = '';
   let rememberMe = false;
   let loading = false;
   let errors: Record<string, string> = {};
+  let heroVisible = false;
+
+  // Initialize animations
+  onMount(() => {
+    setTimeout(() => {
+      heroVisible = true;
+    }, 100);
+  });
 
   // Get redirect URL from query parameters
   $: redirectTo = $page.url.searchParams.get('redirectTo') || '/dashboard';
@@ -107,19 +117,15 @@
 </svelte:head>
 
 <!-- Full screen background with outdoor theme -->
+<VideoBackground />
 <div class="min-h-screen relative">
-  <!-- Background Image -->
-  <div
-    class="absolute inset-0 bg-cover bg-center"
-    style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80');"
-  ></div>
-  <div class="absolute inset-0 bg-black opacity-60"></div>
 
   <!-- Content -->
   <div class="relative z-30 min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-32">
     <div class="max-w-md w-full space-y-8">
       <!-- Login Card with outdoor styling -->
-      <div class="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-xl p-8">
+      <ScrollAnimated animation="fade-up" delay={200}>
+        <div class="bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-xl p-8">
         <div>
           <div class="flex justify-center mb-6">
             <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
@@ -128,10 +134,10 @@
               </svg>
             </div>
           </div>
-          <h1 class="text-center text-3xl font-extrabold text-gray-900">
+          <h1 class="text-center text-3xl font-extrabold text-gray-900 {heroVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'} transition-all duration-800">
             Welcome back
           </h1>
-          <p class="mt-2 text-center text-sm text-gray-600">
+          <p class="mt-2 text-center text-sm text-gray-600 {heroVisible ? 'animate-fade-in-up animate-delay-200' : 'opacity-0 translate-y-8'} transition-all duration-800">
             Log in to your GearGrab account
           </p>
           <p class="mt-1 text-center text-sm text-gray-600">
@@ -268,7 +274,8 @@
         </button>
       </div>
     </div>
-      </div>
+        </div>
+      </ScrollAnimated>
     </div>
   </div>
 </div>

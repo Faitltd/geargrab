@@ -1,49 +1,17 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
+  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
 
   export const prerender = true;
 
-  let videoElement: HTMLVideoElement;
   let heroVisible = false;
-
-  // Video event handlers
-  function handleVideoLoaded() {
-    if (videoElement) {
-      videoElement.style.opacity = '1';
-    }
-  }
-
-  function handleVideoError() {
-    if (videoElement) {
-      videoElement.style.display = 'none';
-    }
-  }
 
   onMount(() => {
     // Trigger hero animation after a short delay
     setTimeout(() => {
       heroVisible = true;
     }, 300);
-
-    // Parallax effect
-    const handleScroll = () => {
-      const scrolled = window.pageYOffset;
-      const parallaxVideo = document.querySelector('.parallax-video') as HTMLElement;
-
-      if (parallaxVideo) {
-        const speed = 0.3; // Reduced speed for smoother effect
-        const maxTransform = window.innerHeight * 0.5; // Limit transform to prevent excessive movement
-        const transform = Math.min(scrolled * speed, maxTransform);
-        parallaxVideo.style.transform = `translateY(${transform}px)`;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
   });
 
   // Steps for renters
@@ -59,7 +27,7 @@
       id: 2,
       title: 'Book & Pay',
       icon: 'calendar',
-      description: 'Select your dates, choose delivery options, and pay securely through our platform.',
+      description: 'Select your dates, choose transfer options, and pay securely through our platform.',
       details: 'All payments are processed securely with insurance coverage and damage protection included.'
     },
     {
@@ -67,7 +35,7 @@
       title: 'Get Your Gear',
       icon: 'truck',
       description: 'Pick up your gear or have it delivered, then start your adventure.',
-      details: 'Meet the owner for pickup, or choose convenient delivery options including doorstep drop-off.'
+      details: 'Meet the owner for pickup, or choose convenient transfer options including doorstep delivery.'
     },
     {
       id: 4,
@@ -98,7 +66,7 @@
       id: 3,
       title: 'Meet & Handoff',
       icon: 'handshake',
-      description: 'Meet the renter and hand over your gear, or arrange convenient delivery.',
+      description: 'Meet the renter and hand over your gear, or arrange convenient transfer.',
       details: 'Inspect the gear together, provide usage tips, and ensure the renter is comfortable with the equipment.'
     },
     {
@@ -119,38 +87,10 @@
 </svelte:head>
 
 <!-- Full Page Video Background -->
-<div class="fixed inset-0 z-0">
-  <!-- Background Image (always visible as fallback) -->
-  <div class="absolute inset-0">
-    <img
-      src="/pexels-bianca-gasparoto-834990-1752951.jpg"
-      alt="Mountain landscape with stars"
-      class="w-full h-full object-cover"
-    >
-  </div>
-
-  <!-- Video Background (overlays image when loaded) -->
-  <video
-    bind:this={videoElement}
-    class="parallax-video absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-    style="opacity: 1;"
-    autoplay
-    muted
-    loop
-    playsinline
-    on:loadeddata={handleVideoLoaded}
-    on:error={handleVideoError}
-    on:loadstart={() => console.log('How-it-works video load started')}
-  >
-    <!-- Outdoor gear/equipment video for how-it-works page -->
-    <source src="/857134-hd_1280_720_24fps.mp4" type="video/mp4" />
-    <!-- Fallback videos -->
-    <source src="https://player.vimeo.com/external/291648067.hd.mp4?s=94998971682c6a3267e4cbd19d16a7b6c720f345&profile_id=175" type="video/mp4" />
-  </video>
-
-  <!-- Light Overlay for Text Readability -->
-  <div class="absolute inset-0 bg-black opacity-30"></div>
-</div>
+<VideoBackground
+  videoSrc="/857134-hd_1280_720_24fps.mp4"
+  overlayOpacity={0.3}
+/>
 
 <!-- Page Content with Video Background -->
 <div class="relative z-10 min-h-screen">
@@ -309,7 +249,7 @@
                 <p class="text-gray-200 mb-4 drop-shadow-lg">Every rental includes damage protection. Minor wear is expected, but significant damage is covered by our insurance policy.</p>
 
                 <h3 class="text-lg font-bold mb-2 text-white drop-shadow-lg">How do I get my gear to the adventure location?</h3>
-                <p class="text-gray-200 drop-shadow-lg">Choose from pickup, delivery, or shipping options. Many owners offer convenient delivery to trailheads or adventure locations.</p>
+                <p class="text-gray-200 drop-shadow-lg">Choose from pickup, delivery, or shipping options. Many owners offer convenient transfer to trailheads or adventure locations.</p>
               </div>
             </ScrollAnimated>
 

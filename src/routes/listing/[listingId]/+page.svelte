@@ -619,7 +619,7 @@
                   <p class="text-white/90 leading-relaxed">{listing.description}</p>
 
                   <div class="mt-6">
-                    <h3 class="text-lg font-medium mb-4 text-white">Delivery Options</h3>
+                    <h3 class="text-lg font-medium mb-4 text-white">Transfer Options</h3>
                     <ul class="space-y-3">
                       {#if listing.deliveryOptions.pickup}
                         <li class="flex items-start">
@@ -907,9 +907,9 @@
                   </div>
                 </div>
 
-                <!-- Delivery Method -->
+                <!-- Transfer Method -->
                 <fieldset>
-                  <legend class="block text-sm font-medium text-white mb-2">Delivery Method</legend>
+                  <legend class="block text-sm font-medium text-white mb-2">Transfer Method</legend>
                   <div class="space-y-3">
                     {#if listing.deliveryOptions.pickup}
                       <div class="flex items-center">
@@ -935,7 +935,7 @@
                           class="h-4 w-4 text-green-400 bg-white/10 border-white/20 focus:ring-green-400"
                           bind:group={deliveryMethod}
                         />
-                        <label for="dropoff" class="ml-3 block text-sm text-white">Dropoff (within {listing.deliveryOptions.dropoffDistance} miles)</label>
+                        <label for="dropoff" class="ml-3 block text-sm text-white">Delivery (within {listing.deliveryOptions.dropoffDistance} miles)</label>
                       </div>
                     {/if}
 
@@ -1036,7 +1036,7 @@
 
                       {#if deliveryFee > 0}
                         <div class="flex justify-between">
-                          <span>{deliveryMethod === 'dropoff' ? 'Dropoff fee' : 'Shipping fee'}</span>
+                          <span>{deliveryMethod === 'dropoff' ? 'Delivery fee' : 'Shipping fee'}</span>
                           <span>{formatCurrency(deliveryFee)}</span>
                         </div>
                       {/if}

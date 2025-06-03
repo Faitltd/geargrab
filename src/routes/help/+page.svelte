@@ -48,7 +48,7 @@
         { title: 'How to search for gear', link: '#' },
         { title: 'Understanding gear conditions', link: '#' },
         { title: 'Booking and payment process', link: '#' },
-        { title: 'Pickup and delivery options', link: '#' },
+        { title: 'Pickup and transfer options', link: '#' },
         { title: 'What to do if gear is damaged', link: '#' }
       ]
     },
@@ -110,7 +110,7 @@
       description: 'Get help from our support team',
       icon: 'mail',
       link: '/contact',
-      color: 'green'
+      color: 'blue'
     },
     {
       title: 'Report an Issue',
@@ -240,29 +240,29 @@
               <ScrollAnimated animation="fade-up" delay={1200 + (index * 100)}>
                 <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6 shadow-lg hover:bg-white/20 transition-colors">
                   <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-green-600/20 backdrop-blur-sm rounded-lg flex items-center justify-center mr-4 border border-green-500/30 shadow-lg">
+                    <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center mr-4 border border-white/30 shadow-lg">
                       {#if category.icon === 'play'}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-9-4h10a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2z" />
                         </svg>
                       {:else if category.icon === 'search'}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                       {:else if category.icon === 'plus'}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                       {:else if category.icon === 'shield'}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                         </svg>
                       {:else if category.icon === 'credit-card'}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                         </svg>
                       {:else if category.icon === 'cog'}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
@@ -276,7 +276,7 @@
                   <ul class="space-y-2">
                     {#each category.articles as article}
                       <li>
-                        <a href={article.link} class="text-green-400 hover:text-green-300 text-sm drop-shadow-lg">
+                        <a href={article.link} class="text-gray-300 hover:text-white text-sm drop-shadow-lg">
                           {article.title}
                         </a>
                       </li>
@@ -294,7 +294,7 @@
         <div class="text-center text-white">
           <h2 class="text-2xl md:text-3xl font-bold mb-4 drop-shadow-lg">Still Need Help?</h2>
           <p class="text-lg max-w-2xl mx-auto mb-6 text-gray-200 drop-shadow-lg">Our support team is here to help you with any questions or issues.</p>
-          <a href="/contact" class="bg-green-600/80 backdrop-blur-sm hover:bg-green-700/80 text-white text-lg px-8 py-3 rounded-lg font-semibold transition-colors border border-green-500/30 shadow-lg">Contact Support</a>
+          <a href="/contact" class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white text-lg px-8 py-3 rounded-lg font-semibold transition-colors border border-white/30 shadow-lg">Contact Support</a>
         </div>
       </ScrollAnimated>
 

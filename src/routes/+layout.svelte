@@ -45,7 +45,7 @@
 
 <Navbar />
 
-<main>
+<main class="relative pt-16" style="min-height: 100vh;">
   <slot />
 </main>
 
