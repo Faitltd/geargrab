@@ -91,7 +91,7 @@ describe('Listing Details Page', () => {
     // Check price calculation updates
     cy.get('[data-cy="total-price"]').should('contain', '$');
     
-    // Test delivery method selection
+    // Test transfer method selection
     cy.get('[data-cy="delivery-pickup"]').should('be.checked');
     cy.get('[data-cy="delivery-delivery"]').click();
     

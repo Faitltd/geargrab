@@ -2,13 +2,13 @@
   import { onMount } from 'svelte';
   import ImageUploader from '$lib/components/ImageUploader.svelte';
   import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
+  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
   import { authStore } from '$lib/stores/auth';
   import { createListing, getListing, updateListing } from '$lib/firebase/db/listings';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import type { Listing } from '$lib/types/firestore';
 
-  let videoElement: HTMLVideoElement;
   let heroVisible = false;
 
   // Edit mode variables
@@ -123,18 +123,7 @@
     };
   }
 
-  // Video event handlers
-  function handleVideoLoaded() {
-    if (videoElement) {
-      videoElement.style.opacity = '1';
-    }
-  }
 
-  function handleVideoError() {
-    if (videoElement) {
-      videoElement.style.display = 'none';
-    }
-  }
 
   // Define types for form data
   type Specification = {
@@ -585,34 +574,7 @@
 </script>
 
 <!-- Full Page Video Background -->
-<div class="fixed inset-0 z-0">
-  <!-- Background Image (always visible as fallback) -->
-  <div class="absolute inset-0">
-    <img
-      src="/pexels-bianca-gasparoto-834990-1752951.jpg"
-      alt="Mountain landscape with stars"
-      class="w-full h-full object-cover"
-    >
-  </div>
-
-  <!-- Video Background (overlays image when loaded) -->
-  <video
-    bind:this={videoElement}
-    class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-    style="opacity: 0;"
-    autoplay
-    muted
-    loop
-    playsinline
-    on:loadeddata={handleVideoLoaded}
-    on:error={handleVideoError}
-  >
-    <source src="/Stars.mp4" type="video/mp4" />
-  </video>
-
-  <!-- Light Overlay for Text Readability -->
-  <div class="absolute inset-0 bg-black opacity-30"></div>
-</div>
+<VideoBackground />
 
 <!-- Page Content with Video Background -->
 <div class="relative z-10 min-h-screen">
@@ -1419,7 +1381,7 @@
                 </div>
 
                 <div>
-                  <h4 class="text-lg font-semibold text-white mb-3">Delivery Options</h4>
+                  <h4 class="text-lg font-semibold text-white mb-3">Transfer Options</h4>
                   <div class="space-y-1 text-gray-300">
                     {#if formData.pickup}
                       <div>✓ Pickup available{formData.pickupLocation ? ` at ${formData.pickupLocation}` : ''}</div>

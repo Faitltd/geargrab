@@ -202,7 +202,7 @@
           </div>
           
           <div class="options-section">
-            <h3>Pickup / Delivery</h3>
+            <h3>Transfer Method</h3>
             <div class="option-buttons">
               <button 
                 class="option-button" 
@@ -276,7 +276,7 @@
             
             {#if fees.deliveryFee > 0}
               <div class="price-row">
-                <span>Delivery Fee</span>
+                <span>Transfer Fee</span>
                 <span>{formatCurrency(fees.deliveryFee)}</span>
               </div>
             {/if}

@@ -2,6 +2,7 @@
   export const prerender = true;
   import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
   import { onMount } from 'svelte';
+  import { slide } from 'svelte/transition';
 
   let videoElement: HTMLVideoElement;
   let heroVisible = false;
@@ -58,7 +59,7 @@
       {
         id: 'how-to-rent',
         question: 'How do I rent gear?',
-        answer: 'Browse our listings, select your dates, choose delivery options, and book securely. You can pick up gear from the owner or arrange delivery to your location or trailhead.'
+        answer: 'Browse our listings, select your dates, choose transfer options, and book securely. You can pick up gear from the owner or arrange delivery to your location or trailhead.'
       },
       {
         id: 'gear-condition',
@@ -71,8 +72,8 @@
         answer: 'Cancellation policies vary by owner, but most offer free cancellation up to 48 hours before your rental start date. Check the specific listing for details.'
       },
       {
-        id: 'delivery-options',
-        question: 'What delivery options are available?',
+        id: 'transfer-options',
+        question: 'What transfer options are available?',
         answer: 'Options include pickup from the owner, delivery to your location, delivery to trailheads, and shipping for smaller items. Delivery fees vary by distance and item size.'
       }
     ],
@@ -228,7 +229,7 @@
                   >
                     <h3 class="text-lg font-medium text-white drop-shadow-lg">{faq.question}</h3>
                     <svg
-                      class={`w-5 h-5 text-gray-300 transition-transform ${openFAQ === faq.id ? 'transform rotate-180' : ''}`}
+                      class={`w-5 h-5 text-gray-300 transition-transform duration-500 ${openFAQ === faq.id ? 'transform rotate-180' : ''}`}
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 20 20"
                       fill="currentColor"
@@ -238,7 +239,7 @@
                   </button>
 
                   {#if openFAQ === faq.id}
-                    <div class="px-6 pb-4 border-t border-white/10">
+                    <div class="px-6 pb-4 border-t border-white/10" transition:slide={{ duration: 600 }}>
                       <p class="text-gray-200 leading-relaxed drop-shadow-lg pt-4">{faq.answer}</p>
                     </div>
                   {/if}

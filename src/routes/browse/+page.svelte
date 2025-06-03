@@ -6,8 +6,9 @@
   import FilterBar from '$lib/components/forms/FilterBar.svelte';
   import GearGrid from '$lib/components/display/GearGrid.svelte';
   import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
+  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
+  import { products } from '$lib/data/products';
 
-  let videoElement: HTMLVideoElement;
   let heroVisible = false;
   let loading = true;
   let listings = [];
@@ -16,119 +17,19 @@
   let sort = 'recommended';
   let showFilters = false;
 
-  // Video event handlers
-  function handleVideoLoaded() {
-    if (videoElement) {
-      videoElement.style.opacity = '1';
-    }
-  }
-
-  function handleVideoError() {
-    if (videoElement) {
-      videoElement.style.display = 'none';
-    }
-  }
-
-  // Dummy listings data
-  const dummyListings = [
-    {
-      id: '1',
-      title: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
-      description: 'Experience the great outdoors with this spacious and reliable 4-person tent from REI Co-op. Perfect for family camping adventures.',
-      category: 'camping',
-      dailyPrice: 45,
-      images: [
-        'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
-      ],
-      location: {
-        city: 'Salt Lake City',
-        state: 'UT'
-      },
-      condition: 'Like New',
-      averageRating: 4.8,
-      reviewCount: 5
-    },
-    {
-      id: '2',
-      title: 'Mountain Bike - Trek X-Caliber 8',
-      description: 'High-quality mountain bike for trail riding.',
-      category: 'biking',
-      dailyPrice: 45,
-      images: [
-        'https://images.unsplash.com/photo-1511994298241-608e28f14fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
-      ],
-      location: {
-        city: 'Boulder',
-        state: 'CO'
-      },
-      condition: 'Good',
-      averageRating: 4.6,
-      reviewCount: 8
-    },
-    {
-      id: '3',
-      title: 'Kayak - Wilderness Systems Pungo 120',
-      description: 'Stable and comfortable kayak for lake adventures.',
-      category: 'water',
-      dailyPrice: 50,
-      images: [
-        'https://images.unsplash.com/photo-1604537466158-719b1972feb8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80'
-      ],
-      location: {
-        city: 'Fort Collins',
-        state: 'CO'
-      },
-      condition: 'Good',
-      averageRating: 4.9,
-      reviewCount: 15
-    },
-    {
-      id: '4',
-      title: 'Backpacking Set - Complete Kit',
-      description: 'Complete backpacking kit including tent, sleeping bag, pad, and cooking equipment.',
-      category: 'hiking',
-      dailyPrice: 65,
-      images: [
-        'https://images.unsplash.com/photo-1501554728187-ce583db33af7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
-      ],
-      location: {
-        city: 'Denver',
-        state: 'CO'
-      },
-      condition: 'Excellent',
-      averageRating: 4.7,
-      reviewCount: 6
-    }
-  ];
-
   onMount(() => {
     // Trigger hero animation after a short delay
     setTimeout(() => {
       heroVisible = true;
     }, 300);
 
-    // Simulate API call
+    // Load real products data
     setTimeout(() => {
-      listings = filterListings(dummyListings);
+      listings = filterListings(products);
       loading = false;
     }, 1000);
 
-    // Parallax effect
-    const handleScroll = () => {
-      const scrolled = window.pageYOffset;
-      const parallaxVideo = document.querySelector('.parallax-video') as HTMLElement;
 
-      if (parallaxVideo) {
-        const speed = -0.5; // Negative value for proper parallax effect
-        parallaxVideo.style.transform = `translateY(${scrolled * speed}px)`;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
   });
 
   function handleSearch(event) {
@@ -149,7 +50,7 @@
     // Filter listings
     loading = true;
     setTimeout(() => {
-      listings = filterListings(dummyListings);
+      listings = filterListings(products);
       loading = false;
     }, 500);
   }
@@ -164,7 +65,7 @@
     // Filter and sort listings
     loading = true;
     setTimeout(() => {
-      listings = filterListings(dummyListings);
+      listings = filterListings(products);
       loading = false;
     }, 300);
   }
@@ -190,7 +91,7 @@
     } else if (sort === 'price_high') {
       filtered = filtered.sort((a, b) => b.dailyPrice - a.dailyPrice);
     } else if (sort === 'rating') {
-      filtered = filtered.sort((a, b) => b.averageRating - a.averageRating);
+      filtered = filtered.sort((a, b) => b.owner.rating - a.owner.rating);
     }
 
     return filtered;
@@ -203,38 +104,10 @@
 </svelte:head>
 
 <!-- Full Page Video Background -->
-<div class="fixed inset-0 z-0">
-  <!-- Background Image (always visible as fallback) -->
-  <div class="absolute inset-0">
-    <img
-      src="/pexels-bianca-gasparoto-834990-1752951.jpg"
-      alt="Mountain landscape with stars"
-      class="w-full h-full object-cover"
-    >
-  </div>
-
-  <!-- Video Background (overlays image when loaded) -->
-  <video
-    bind:this={videoElement}
-    class="parallax-video absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-    style="opacity: 1;"
-    autoplay
-    muted
-    loop
-    playsinline
-    on:loadeddata={handleVideoLoaded}
-    on:error={handleVideoError}
-    on:loadstart={() => console.log('Browse video load started')}
-  >
-    <!-- Outdoor gear/equipment video for browse page -->
-    <source src="/857134-hd_1280_720_24fps.mp4" type="video/mp4" />
-    <!-- Fallback videos -->
-    <source src="https://player.vimeo.com/external/291648067.hd.mp4?s=94998971682c6a3267e4cbd19d16a7b6c720f345&profile_id=175" type="video/mp4" />
-  </video>
-
-  <!-- Light Overlay for Text Readability -->
-  <div class="absolute inset-0 bg-black opacity-30"></div>
-</div>
+<VideoBackground
+  videoSrc="/857134-hd_1280_720_24fps.mp4"
+  overlayOpacity={0.3}
+/>
 
 <!-- Page Content with Video Background -->
 <div class="relative z-10 min-h-screen">
@@ -301,13 +174,6 @@
 </div>
 
 <style>
-  .parallax-video {
-    will-change: transform;
-    transform-origin: center center;
-    min-height: 120vh;
-    min-width: 100%;
-  }
-
   /* Smooth scrolling for better parallax effect */
   :global(html) {
     scroll-behavior: smooth;

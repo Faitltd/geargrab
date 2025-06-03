@@ -4,8 +4,12 @@
   import { smoothScrollWithNavOffset } from '$lib/utils/smoothScroll';
   import { signOut } from '$lib/firebase/auth';
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
 
   let isMenuOpen = false;
+  
+  // Determine if we're on the homepage
+  $: isHomepage = $page.url.pathname === '/';
 
   function toggleMenu() {
     isMenuOpen = !isMenuOpen;
@@ -60,7 +64,7 @@
   }
 </script>
 
-<nav class="bg-black/20 backdrop-blur-sm fixed w-full z-50" aria-label="Main">
+<nav class="bg-black/20 backdrop-blur-md fixed top-0 left-0 right-0 w-full z-50 shadow-lg" aria-label="Main">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between h-16">
       <div class="flex">
@@ -136,7 +140,7 @@
   </div>
 
   {#if isMenuOpen}
-    <div id="mobile-menu" class="sm:hidden bg-black/20 backdrop-blur-sm">
+    <div id="mobile-menu" class="sm:hidden bg-black/20 backdrop-blur-md">
       <div class="pt-2 pb-3 space-y-1">
         <a href="/" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Home
