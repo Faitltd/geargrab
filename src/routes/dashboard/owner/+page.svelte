@@ -1,55 +1,63 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
+  import { authStore } from '$lib/stores/auth';
+  import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+  import { firestore } from '$lib/firebase/client';
 
-  // Sample listings data - in a real app, this would come from Firebase
-  let listings = [
-    {
-      id: '1',
-      title: 'Premium 4-Person Camping Tent',
-      description: 'Spacious and waterproof tent perfect for family camping trips.',
-      dailyPrice: 25,
-      status: 'active',
-      image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
-      views: 45,
-      bookings: 3,
-      earnings: 150
-    },
-    {
-      id: '2',
-      title: 'Professional Hiking Backpack',
-      description: '65L backpack with advanced suspension system for multi-day hikes.',
-      dailyPrice: 15,
-      status: 'active',
-      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
-      views: 32,
-      bookings: 2,
-      earnings: 90
-    },
-    {
-      id: '3',
-      title: 'Mountain Climbing Gear Set',
-      description: 'Complete climbing gear including harness, helmet, and ropes.',
-      dailyPrice: 40,
-      status: 'pending',
-      image: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
-      views: 18,
-      bookings: 0,
-      earnings: 0
-    }
-  ];
-
-  let loading = false;
+  let listings = [];
+  let loading = true;
   let totalEarnings = 0;
   let totalBookings = 0;
   let totalViews = 0;
 
-  onMount(() => {
-    // Calculate totals
-    totalEarnings = listings.reduce((sum, listing) => sum + listing.earnings, 0);
-    totalBookings = listings.reduce((sum, listing) => sum + listing.bookings, 0);
-    totalViews = listings.reduce((sum, listing) => sum + listing.views, 0);
+  onMount(async () => {
+    await loadUserListings();
   });
+
+  async function loadUserListings() {
+    try {
+      if (!$authStore.user) return;
+
+      loading = true;
+
+      // Get user's listings from Firestore
+      const listingsRef = collection(firestore, 'listings');
+      const q = query(
+        listingsRef,
+        where('ownerUid', '==', $authStore.user.uid),
+        orderBy('createdAt', 'desc')
+      );
+      const querySnapshot = await getDocs(q);
+
+      listings = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title,
+          description: data.description,
+          dailyPrice: data.dailyPrice,
+          status: data.status || 'active',
+          image: data.images?.[0] || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+          views: data.views || 0,
+          bookings: data.bookings || 0,
+          earnings: data.earnings || 0,
+          createdAt: data.createdAt
+        };
+      });
+
+      // Calculate totals
+      totalEarnings = listings.reduce((sum, listing) => sum + listing.earnings, 0);
+      totalBookings = listings.reduce((sum, listing) => sum + listing.bookings, 0);
+      totalViews = listings.reduce((sum, listing) => sum + listing.views, 0);
+
+    } catch (error) {
+      console.error('Error loading user listings:', error);
+      listings = [];
+    } finally {
+      loading = false;
+    }
+  }
 
   function editListing(listingId: string) {
     goto(`/list-gear?edit=${listingId}`);

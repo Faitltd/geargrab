@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
+  import { authStore } from '$lib/stores/auth';
 
   // Dummy listings data (enhanced version)
   const dummyListings = [
@@ -443,8 +444,36 @@
   }
 
   // Handle message owner
-  function handleMessageOwner() {
-    alert(`Messaging functionality would be implemented here. You would be able to message ${listing?.owner?.name}.`);
+  async function handleMessageOwner() {
+    if (!$authStore.user) {
+      goto('/auth/login');
+      return;
+    }
+
+    if (!listing?.owner?.uid) {
+      alert('Owner information not available');
+      return;
+    }
+
+    try {
+      // Import chat service
+      const { chatService } = await import('$lib/services/chat');
+
+      // Create or find existing conversation
+      const conversationId = await chatService.getOrCreateConversation(
+        $authStore.user.uid,
+        listing.owner.uid,
+        undefined, // no booking ID yet
+        listing.id,
+        listing.title
+      );
+
+      // Navigate to messages page with the conversation
+      goto(`/messages?conversation=${conversationId}`);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      alert('Unable to start conversation. Please try again.');
+    }
   }
 
   // Handle date picker clicks to show calendar

@@ -1,39 +1,59 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { chatService } from '$lib/services/chat';
   import { authStore } from '$lib/stores/auth';
+  import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+  import { firestore } from '$lib/firebase/client';
 
-  // Sample data for display
-  let bookings = [
-    {
-      id: 'booking_1705123456789',
-      title: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
-      status: 'pending',
-      startDate: '2024-02-15',
-      endDate: '2024-02-18',
-      totalPrice: 165,
-      image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      confirmationNumber: 'GG-123456',
-      owner: 'David Wilson',
-      ownerId: 'owner_123',
-      listingId: 'listing_123',
-      deliveryMethod: 'pickup'
-    },
-    {
-      id: 'booking_1705023456789',
-      title: 'Mountain Bike - Trek X-Caliber 8',
-      status: 'confirmed',
-      startDate: '2024-02-10',
-      endDate: '2024-02-12',
-      totalPrice: 135,
-      image: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      confirmationNumber: 'GG-234567',
-      owner: 'Lisa Martinez',
-      ownerId: 'owner_456',
-      listingId: 'listing_456',
-      deliveryMethod: 'pickup'
+  let bookings = [];
+  let loading = true;
+
+  onMount(async () => {
+    await loadUserBookings();
+  });
+
+  async function loadUserBookings() {
+    try {
+      if (!$authStore.user) return;
+
+      loading = true;
+
+      // Get user's bookings from Firestore
+      const bookingsRef = collection(firestore, 'bookings');
+      const q = query(
+        bookingsRef,
+        where('renterUid', '==', $authStore.user.uid),
+        orderBy('createdAt', 'desc')
+      );
+      const querySnapshot = await getDocs(q);
+
+      bookings = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.listingTitle || 'Gear Rental',
+          status: data.status || 'pending',
+          startDate: data.startDate ? new Date(data.startDate.toDate()).toLocaleDateString() : 'TBD',
+          endDate: data.endDate ? new Date(data.endDate.toDate()).toLocaleDateString() : 'TBD',
+          totalPrice: data.totalPrice || 0,
+          image: data.listingImage || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          confirmationNumber: data.confirmationNumber || doc.id.slice(-6).toUpperCase(),
+          owner: data.ownerEmail?.split('@')[0] || 'Owner',
+          ownerId: data.ownerUid,
+          listingId: data.listingId,
+          deliveryMethod: data.deliveryMethod || 'pickup',
+          createdAt: data.createdAt
+        };
+      });
+
+    } catch (error) {
+      console.error('Error loading user bookings:', error);
+      bookings = [];
+    } finally {
+      loading = false;
     }
-  ];
+  }
 
   // Function to handle messaging the owner
   async function messageOwner(booking: any) {
@@ -156,7 +176,14 @@
       <h2 class="text-lg font-medium text-white">Your Bookings</h2>
     </div>
     <div class="p-6">
-      {#if bookings.length === 0}
+      {#if loading}
+        <div class="flex justify-center items-center py-12">
+          <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400 mx-auto mb-4"></div>
+            <p class="text-white">Loading your bookings...</p>
+          </div>
+        </div>
+      {:else if bookings.length === 0}
         <div class="text-center py-12">
           <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />

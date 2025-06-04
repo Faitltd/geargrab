@@ -7,32 +7,74 @@
   import GearGrid from '$lib/components/display/GearGrid.svelte';
   import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
-  import { products } from '$lib/data/products';
+  import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+  import { firestore } from '$lib/firebase/client';
 
   let heroVisible = false;
   let loading = true;
   let listings = [];
+  let allListings = [];
   let category = $page.url.searchParams.get('category') || 'all';
   let location = $page.url.searchParams.get('location') || '';
   let sort = 'recommended';
   let showFilters = false;
 
-  onMount(() => {
+  onMount(async () => {
     // Trigger hero animation after a short delay
     setTimeout(() => {
       heroVisible = true;
     }, 300);
 
-    // Load real products data
-    setTimeout(() => {
-      listings = filterListings(products);
-      loading = false;
-    }, 1000);
-
-
+    // Load real listings from Firestore
+    await loadListings();
   });
 
-  function handleSearch(event) {
+  async function loadListings() {
+    try {
+      loading = true;
+
+      // Get all published listings from Firestore
+      const listingsRef = collection(firestore, 'listings');
+      const q = query(listingsRef, where('status', '==', 'published'), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+
+      allListings = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title,
+          description: data.description,
+          category: data.category,
+          dailyPrice: data.dailyPrice,
+          images: data.images || [],
+          location: {
+            city: data.location || 'Unknown',
+            state: 'UT' // Default state
+          },
+          owner: {
+            name: data.ownerEmail?.split('@')[0] || 'Owner',
+            rating: 4.5, // Default rating
+            verified: true
+          },
+          isPublished: data.isPublished,
+          ownerUid: data.ownerUid,
+          ownerEmail: data.ownerEmail,
+          createdAt: data.createdAt
+        };
+      });
+
+      // Apply filters
+      listings = filterListings(allListings);
+
+    } catch (error) {
+      console.error('Error loading listings:', error);
+      listings = [];
+    } finally {
+      loading = false;
+    }
+  }
+
+  function handleSearch(event: any) {
     const { category: newCategory, location: newLocation } = event.detail;
 
     // Update URL parameters
@@ -50,12 +92,12 @@
     // Filter listings
     loading = true;
     setTimeout(() => {
-      listings = filterListings(products);
+      listings = filterListings(allListings);
       loading = false;
     }, 500);
   }
 
-  function handleFilter(event) {
+  function handleFilter(event: any) {
     const { category: newCategory, sort: newSort } = event.detail;
 
     // Update local state
@@ -65,21 +107,21 @@
     // Filter and sort listings
     loading = true;
     setTimeout(() => {
-      listings = filterListings(products);
+      listings = filterListings(allListings);
       loading = false;
     }, 300);
   }
 
-  function filterListings(allListings) {
+  function filterListings(allListings: any[]) {
     // Filter by category
     let filtered = allListings;
     if (category && category !== 'all') {
-      filtered = filtered.filter(listing => listing.category === category);
+      filtered = filtered.filter((listing: any) => listing.category === category);
     }
 
     // Filter by location
     if (location) {
-      filtered = filtered.filter(listing =>
+      filtered = filtered.filter((listing: any) =>
         listing.location.city.toLowerCase().includes(location.toLowerCase()) ||
         listing.location.state.toLowerCase().includes(location.toLowerCase())
       );
@@ -87,11 +129,11 @@
 
     // Sort listings
     if (sort === 'price_low') {
-      filtered = filtered.sort((a, b) => a.dailyPrice - b.dailyPrice);
+      filtered = filtered.sort((a: any, b: any) => a.dailyPrice - b.dailyPrice);
     } else if (sort === 'price_high') {
-      filtered = filtered.sort((a, b) => b.dailyPrice - a.dailyPrice);
+      filtered = filtered.sort((a: any, b: any) => b.dailyPrice - a.dailyPrice);
     } else if (sort === 'rating') {
-      filtered = filtered.sort((a, b) => b.owner.rating - a.owner.rating);
+      filtered = filtered.sort((a: any, b: any) => b.owner.rating - a.owner.rating);
     }
 
     return filtered;

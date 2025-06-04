@@ -3,6 +3,7 @@
   import { authStore } from '$lib/stores/auth';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
+  import Navbar from '$lib/components/layout/Navbar.svelte';
 
   // Redirect if not logged in
   onMount(() => {
@@ -42,6 +43,11 @@
     <div class="absolute inset-0 bg-black bg-opacity-30"></div>
   </div>
 
+  <!-- Navbar -->
+  <div class="relative z-20">
+    <Navbar />
+  </div>
+
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     {#if $authStore && $authStore.loading}
       <div class="flex justify-center items-center h-64">
@@ -51,18 +57,22 @@
         </svg>
       </div>
     {:else if $authStore && $authStore.user}
-      <div class="mb-8">
+      <!-- Dashboard Header -->
+      <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 mb-6">
         <h1 class="text-3xl font-bold text-white">Dashboard</h1>
-        <p class="text-gray-200">Welcome back, {$authStore.user?.displayName || 'User'}!</p>
+        <p class="text-gray-300 mt-1">Welcome back, {$authStore.user?.displayName || $authStore.user?.email || 'User'}!</p>
       </div>
 
       <!-- Dashboard Tabs -->
-      <div class="border-b border-white/20 mb-6">
-        <nav class="-mb-px flex space-x-8">
+      <div class="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 mb-6">
+        <nav class="flex space-x-1 p-1">
           {#each tabs as tab}
             <a
               href={tab.href}
-              class="{currentTab === tab.id ? 'border-green-400 text-green-400' : 'border-transparent text-white/70 hover:text-white hover:border-white/30'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+              class="{currentTab === tab.id
+                ? 'bg-white/20 text-white border-white/30'
+                : 'text-white/70 hover:text-white hover:bg-white/10 border-transparent'
+              } flex-1 text-center py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 border"
             >
               {tab.label}
             </a>

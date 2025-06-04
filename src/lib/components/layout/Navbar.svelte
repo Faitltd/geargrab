@@ -2,11 +2,28 @@
   // Version: 2.0 - Fixed sign out button text
   import { authStore } from '$lib/stores/auth';
   import { smoothScrollWithNavOffset } from '$lib/utils/smoothScroll';
-  import { signOut } from '$lib/firebase/auth';
+  import { signOut, isCurrentUserAdmin } from '$lib/firebase/auth';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   let isMenuOpen = false;
+  let isAdmin = false;
+
+  // Check admin status when user changes
+  $: if ($authStore.user) {
+    checkAdminStatus();
+  } else {
+    isAdmin = false;
+  }
+
+  async function checkAdminStatus() {
+    try {
+      isAdmin = await isCurrentUserAdmin();
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      isAdmin = false;
+    }
+  }
   
   // Determine if we're on the homepage
   $: isHomepage = $page.url.pathname === '/';
@@ -106,8 +123,8 @@
           <a href="/dashboard" class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
             Dashboard
           </a>
-          <button 
-            on:click={handleSignOut} 
+          <button
+            on:click={handleSignOut}
             class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium disabled:opacity-50"
             disabled={isSigningOut}
           >
@@ -188,8 +205,8 @@
             <a href="/dashboard" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Dashboard
             </a>
-            <button 
-              on:click={handleSignOut} 
+            <button
+              on:click={handleSignOut}
               class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10 disabled:opacity-50"
               disabled={isSigningOut}
             >

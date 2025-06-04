@@ -1,39 +1,194 @@
 <script lang="ts">
-  // Sample user data
+  import { onMount } from 'svelte';
+  import { authStore } from '$lib/stores/auth';
+  import { updateUserProfile } from '$lib/firebase/auth';
+  import { doc, getDoc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+  import { firestore } from '$lib/firebase/client';
+  import { notifications } from '$lib/stores/notifications';
+
   let user = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    location: 'Salt Lake City, UT',
-    bio: 'Outdoor enthusiast who loves hiking, camping, and mountain biking.',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
-    verified: true,
-    memberSince: 'January 2024'
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    bio: '',
+    avatar: '',
+    verified: false,
+    memberSince: '',
+    notifications: {
+      email: true,
+      sms: false
+    }
   };
 
   let editing = false;
+  let loading = true;
+  let saving = false;
+  let originalUser = { ...user };
+
+  onMount(async () => {
+    await loadUserProfile();
+  });
+
+  async function loadUserProfile() {
+    try {
+      if (!$authStore.user) return;
+
+      loading = true;
+
+      // Get user data from Firestore
+      const userRef = doc(firestore, 'users', $authStore.user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        user = {
+          name: userData.displayName || $authStore.user.displayName || '',
+          email: userData.email || $authStore.user.email || '',
+          phone: userData.phoneNumber || '',
+          location: userData.location || '',
+          bio: userData.bio || '',
+          avatar: userData.photoURL || $authStore.user.photoURL || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+          verified: userData.isVerified || false,
+          memberSince: userData.createdAt ? new Date(userData.createdAt.toDate()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently',
+          notifications: {
+            email: userData.notifications?.email ?? true,
+            sms: userData.notifications?.sms ?? false
+          }
+        };
+      } else {
+        // Use Firebase Auth data as fallback and create user document
+        user = {
+          name: $authStore.user.displayName || '',
+          email: $authStore.user.email || '',
+          phone: '',
+          location: '',
+          bio: '',
+          avatar: $authStore.user.photoURL || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+          verified: false,
+          memberSince: 'Recently',
+          notifications: {
+            email: true,
+            sms: false
+          }
+        };
+
+        // Create user document
+        await setDoc(userRef, {
+          displayName: user.name,
+          email: user.email,
+          photoURL: user.avatar,
+          isVerified: false,
+          createdAt: serverTimestamp()
+        });
+      }
+
+      originalUser = { ...user };
+
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+      notifications.add({
+        message: 'Error loading profile data',
+        type: 'error'
+      });
+    } finally {
+      loading = false;
+    }
+  }
+
+  async function saveProfile() {
+    if (!$authStore.user) return;
+
+    try {
+      saving = true;
+
+      // Update Firebase Auth profile
+      await updateUserProfile(user.name, user.avatar);
+
+      // Update Firestore user document
+      const userRef = doc(firestore, 'users', $authStore.user.uid);
+      await updateDoc(userRef, {
+        displayName: user.name,
+        phoneNumber: user.phone,
+        location: user.location,
+        bio: user.bio,
+        photoURL: user.avatar,
+        notifications: user.notifications,
+        updatedAt: serverTimestamp()
+      });
+
+      originalUser = { ...user };
+      editing = false;
+
+      notifications.add({
+        message: 'Profile updated successfully!',
+        type: 'success'
+      });
+
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      notifications.add({
+        message: 'Error saving profile: ' + error.message,
+        type: 'error'
+      });
+    } finally {
+      saving = false;
+    }
+  }
+
+  function cancelEdit() {
+    user = { ...originalUser };
+    editing = false;
+  }
 </script>
 
 <svelte:head>
   <title>Profile - GearGrab</title>
 </svelte:head>
 
-<div class="space-y-6">
-  <!-- Header -->
-  <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6">
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold text-white">Profile Settings</h1>
-        <p class="text-gray-300 mt-1">Manage your account information and preferences</p>
-      </div>
-      <button
-        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-        on:click={() => editing = !editing}
-      >
-        {editing ? 'Save Changes' : 'Edit Profile'}
-      </button>
+{#if loading}
+  <div class="flex items-center justify-center py-12">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400 mx-auto mb-4"></div>
+      <p class="text-white">Loading profile...</p>
     </div>
   </div>
+{:else}
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-white">Profile Settings</h1>
+          <p class="text-gray-300 mt-1">Manage your account information and preferences</p>
+        </div>
+        <div class="flex space-x-3">
+          {#if editing}
+            <button
+              class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+              on:click={cancelEdit}
+              disabled={saving}
+            >
+              Cancel
+            </button>
+            <button
+              class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
+              on:click={saveProfile}
+              disabled={saving}
+            >
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          {:else}
+            <button
+              class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+              on:click={() => editing = true}
+            >
+              Edit Profile
+            </button>
+          {/if}
+        </div>
+      </div>
+    </div>
 
   <!-- Profile Overview -->
   <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6">
@@ -146,7 +301,7 @@
           <p class="text-gray-300 text-sm">Receive notifications about bookings and messages</p>
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" checked class="sr-only peer">
+          <input type="checkbox" bind:checked={user.notifications.email} class="sr-only peer" disabled={!editing}>
           <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
         </label>
       </div>
@@ -157,10 +312,11 @@
           <p class="text-gray-300 text-sm">Receive text messages for urgent updates</p>
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" class="sr-only peer">
+          <input type="checkbox" bind:checked={user.notifications.sms} class="sr-only peer" disabled={!editing}>
           <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
         </label>
       </div>
     </div>
   </div>
-</div>
+  </div>
+{/if}

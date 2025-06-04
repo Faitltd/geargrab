@@ -1,17 +1,39 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { createEventDispatcher } from 'svelte';
 
-  let selectedLocation = '';
-  let selectedQuery = '';
+  // Props that can be passed from parent components
+  export let query = '';
+  export let category = '';
+  export let location = '';
+
+  // Internal state
+  let selectedLocation = location;
+  let selectedQuery = query;
+
+  const dispatch = createEventDispatcher();
 
   function handleSearch() {
-    // Navigate to browse page with search parameters
-    const params = new URLSearchParams();
-    if (selectedQuery) params.set('q', selectedQuery);
-    if (selectedLocation) params.set('location', selectedLocation);
+    // If we're on the browse page (have event listeners), dispatch event
+    if (dispatch) {
+      dispatch('search', {
+        query: selectedQuery,
+        category: category,
+        location: selectedLocation
+      });
+    } else {
+      // Otherwise navigate to browse page with search parameters
+      const params = new URLSearchParams();
+      if (selectedQuery) params.set('q', selectedQuery);
+      if (selectedLocation) params.set('location', selectedLocation);
 
-    goto(`/browse?${params.toString()}`);
+      goto(`/browse?${params.toString()}`);
+    }
   }
+
+  // Update internal state when props change
+  $: selectedLocation = location;
+  $: selectedQuery = query;
 </script>
 
 <!-- Simple Search Form for Hero Section -->

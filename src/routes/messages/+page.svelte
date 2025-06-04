@@ -1,12 +1,35 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import ConversationList from '$lib/components/chat/ConversationList.svelte';
   import ChatWindow from '$lib/components/chat/ChatWindow.svelte';
   import { chatService, type ChatConversation } from '$lib/services/chat';
   import { authStore } from '$lib/stores/auth';
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
 
   let selectedConversation: ChatConversation | null = null;
   let otherUser: { id: string; name: string; avatar?: string } | null = null;
+  let conversations: ChatConversation[] = [];
+
+  onMount(async () => {
+    if (!$authStore.user) {
+      goto('/auth/login');
+      return;
+    }
+
+    // Check if there's a conversation ID in the URL
+    const conversationId = $page.url.searchParams.get('conversation');
+    if (conversationId) {
+      // Load conversations and select the specified one
+      const userConversations = await chatService.getRecentConversations($authStore.user.uid);
+      conversations = userConversations;
+
+      const targetConversation = userConversations.find(c => c.id === conversationId);
+      if (targetConversation) {
+        handleConversationSelect(targetConversation);
+      }
+    }
+  });
 
   function handleConversationSelect(conversation: ChatConversation) {
     selectedConversation = conversation;

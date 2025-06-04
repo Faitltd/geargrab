@@ -656,7 +656,7 @@ export const products: Product[] = [
 
   // 20. Snowboard
   {
-    id: 'snow-001',
+    id: 'snow-002',
     title: 'Burton Custom Flying V Snowboard',
     description: 'All-mountain snowboard perfect for intermediate to advanced riders. Features Flying V profile for versatile performance on groomed runs and powder.',
     category: 'skiing',
@@ -683,7 +683,7 @@ export const products: Product[] = [
 
   // 21. Kayak
   {
-    id: 'water-002',
+    id: 'water-003',
     title: 'Perception Pescador Pro 12 Fishing Kayak',
     description: 'Stable fishing kayak with excellent tracking and storage. Perfect for lakes, rivers, and coastal fishing. Includes paddle and safety gear.',
     category: 'water-sports',
@@ -791,7 +791,7 @@ export const products: Product[] = [
 
   // 25. Fat Tire Bike
   {
-    id: 'bike-003',
+    id: 'bike-004',
     title: 'Surly Ice Cream Truck Fat Bike',
     description: 'Fat tire bike perfect for snow, sand, and rough terrain. Extremely versatile and fun to ride. Great for winter cycling and beach adventures.',
     category: 'biking',
@@ -872,7 +872,7 @@ export const products: Product[] = [
 
   // 28. Surfboard
   {
-    id: 'water-003',
+    id: 'water-004',
     title: 'BOTE Breeze Aero Inflatable SUP/Surf Board',
     description: 'Versatile inflatable board perfect for SUP and surfing. Lightweight, durable, and easy to transport. Includes pump, paddle, and carry bag.',
     category: 'water-sports',
