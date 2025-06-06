@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   export let videoSrc: string = '/Stars.mp4';
   export let imageSrc: string = '/pexels-bianca-gasparoto-834990-1752951.jpg';
   export let imageAlt: string = 'Mountain landscape with stars';
@@ -7,11 +9,24 @@
   let videoElement: HTMLVideoElement;
   let videoLoaded = false;
 
+  // Try to play video on mount
+  onMount(() => {
+    if (videoElement) {
+      videoElement.play().catch(error => {
+        console.warn('Video autoplay failed:', error);
+      });
+    }
+  });
+
   // Video event handlers
   function handleVideoLoaded() {
     videoLoaded = true;
     if (videoElement) {
       videoElement.style.opacity = '1';
+      // Ensure video plays
+      videoElement.play().catch(error => {
+        console.warn('Video play failed:', error);
+      });
     }
   }
 
@@ -47,11 +62,13 @@
     muted
     loop
     playsinline
-    preload="metadata"
+    preload="auto"
     on:loadeddata={handleVideoLoaded}
+    on:canplay={handleVideoLoaded}
     on:error={handleVideoError}
   >
     <source src={videoSrc} type="video/mp4" />
+    Your browser does not support the video tag.
   </video>
 
   <!-- Light Overlay for Text Readability -->

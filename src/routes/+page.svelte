@@ -44,19 +44,19 @@
 <div class="relative z-10 min-h-screen">
   <!-- Hero Content -->
   <div class="relative min-h-screen flex flex-col items-center justify-center text-center text-white px-4 pt-20">
-    <!-- Brand Name at Top -->
-    <ScrollAnimated animation="fade-up" delay={100}>
-      <div class="absolute top-24 left-1/2 transform -translate-x-1/2">
-        <h1 class="text-2xl md:text-3xl font-bold text-white drop-shadow-lg tracking-wider">
+    <!-- Brand Name at Top - Much Larger -->
+    <ScrollAnimated animation="fade-up" delay={50}>
+      <div class="mb-8">
+        <h1 class="text-7xl md:text-8xl lg:text-9xl font-bold text-white drop-shadow-2xl tracking-wider">
           Gear Grab
         </h1>
       </div>
     </ScrollAnimated>
 
     <!-- Main Hero Content -->
-    <ScrollAnimated animation="fade-up" delay={100}>
+    <ScrollAnimated animation="fade-up" delay={200}>
       <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8 max-w-4xl mx-auto shadow-lg">
-        <h2 class="text-5xl md:text-6xl font-bold mb-6 drop-shadow-lg">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg">
           Meet Up. Gear Up. Get Out.
         </h2>
         <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto drop-shadow-lg">
