@@ -10,8 +10,9 @@
   let videoElement: HTMLVideoElement;
   let imageElement: HTMLImageElement;
   let videoLoaded = false;
-  let imageLoaded = false;
-  let shouldLoadVideo = false;
+  let imageLoaded = true; // Start visible to ensure background shows
+  let shouldLoadVideo = true; // Start loading video immediately
+  let imageError = false;
 
   // Preload image first, then video
   onMount(() => {
@@ -22,7 +23,17 @@
       shouldLoadVideo = true;
     }, 500);
 
-    return () => clearTimeout(timer);
+    // Fallback timer to ensure background is visible even if image fails
+    const fallbackTimer = setTimeout(() => {
+      if (!imageLoaded && !imageError) {
+        imageLoaded = true; // Force show background
+      }
+    }, 2000);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(fallbackTimer);
+    };
   });
 
   // Video event handlers
@@ -42,10 +53,18 @@
   function handleImageLoaded() {
     imageLoaded = true;
   }
+
+  function handleImageError() {
+    imageError = true;
+    imageLoaded = true; // Show fallback background
+  }
 </script>
 
 <!-- Full Page Video Background -->
 <div class="fixed inset-0 z-0">
+  <!-- Fallback Background Color -->
+  <div class="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800"></div>
+
   <!-- Background Image (loads immediately) -->
   <div class="absolute inset-0">
     <img
@@ -55,6 +74,7 @@
       class="w-full h-full object-cover transition-opacity duration-500"
       style="opacity: {imageLoaded ? 1 : 0};"
       on:load={handleImageLoaded}
+      on:error={handleImageError}
       loading="eager"
     >
   </div>
