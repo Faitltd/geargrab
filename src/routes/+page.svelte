@@ -18,12 +18,12 @@
     {
       title: 'Quality Guarantee',
       description: 'Every piece of gear is verified and quality-checked before rental.',
-      icon: '✓'
+      icon: '🛡️'
     },
     {
       title: '$5 to Try',
       description: 'Start your adventure with our affordable trial pricing.',
-      icon: '$'
+      icon: '💰'
     },
     {
       title: 'Local Community',
@@ -42,23 +42,37 @@
 <!-- Page Content with Video Background -->
 <div class="relative z-10 min-h-screen">
   <!-- Hero Content -->
-  <ScrollAnimated animation="fade-up" delay={200}>
-    <div class="relative min-h-screen flex flex-col items-center justify-center text-center text-white px-4 pt-20">
-      <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8 max-w-4xl mx-auto shadow-lg">
-        <h1 class="text-5xl md:text-6xl font-bold mb-6 drop-shadow-lg">
-          Meet Up. Gear Up. Get Out.
+  <div class="relative min-h-screen flex flex-col items-center justify-center text-center text-white px-4 pt-20">
+    <!-- Brand Name at Top -->
+    <ScrollAnimated animation="fade-up" delay={100}>
+      <div class="absolute top-24 left-1/2 transform -translate-x-1/2">
+        <h1 class="text-2xl md:text-3xl font-bold text-white drop-shadow-lg tracking-wider">
+          GEAR GRAB
         </h1>
+      </div>
+    </ScrollAnimated>
+
+    <!-- Main Hero Content -->
+    <ScrollAnimated animation="fade-up" delay={300}>
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8 max-w-4xl mx-auto shadow-lg">
+        <h2 class="text-5xl md:text-6xl font-bold mb-6 drop-shadow-lg">
+          Meet Up. Gear Up. Get Out.
+        </h2>
         <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto drop-shadow-lg">
           Rent Local Outdoor Gear, Save Space, Make Money, and Explore More.
         </p>
 
         <!-- Search Form -->
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto border border-white/20 shadow-lg">
-          <HeroSearch />
-        </div>
+        <ScrollAnimated animation="fade-up" delay={500}>
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto border border-white/20 shadow-lg">
+            <HeroSearch />
+          </div>
+        </ScrollAnimated>
       </div>
+    </ScrollAnimated>
 
-      <!-- Stats -->
+    <!-- Stats -->
+    <ScrollAnimated animation="fade-up" delay={700}>
       <SequentialAnimator baseDelay={800} incrementDelay={100} className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mt-16">
         {#each stats as stat}
           <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 shadow-lg">
@@ -67,8 +81,8 @@
           </div>
         {/each}
       </SequentialAnimator>
-    </div>
-  </ScrollAnimated>
+    </ScrollAnimated>
+  </div>
 
   <!-- Content Section -->
   <div class="relative">
