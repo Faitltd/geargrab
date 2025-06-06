@@ -1,52 +1,132 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
+  import { searchService, type SearchSuggestion } from '$lib/services/search';
 
-  // Props that can be passed from parent components
+  const dispatch = createEventDispatcher();
+
   export let query = '';
   export let category = '';
   export let location = '';
 
-  // Internal state
   let selectedLocation = location;
   let selectedQuery = query;
+  let selectedCategory = category;
+  let suggestions: SearchSuggestion[] = [];
+  let showSuggestions = false;
+  let searchTimeout: NodeJS.Timeout;
+  let searchInput: HTMLInputElement;
 
-  const dispatch = createEventDispatcher();
+  onMount(() => {
+    loadInitialSuggestions();
+  });
+
+  async function loadInitialSuggestions() {
+    suggestions = searchService.generateSuggestions();
+  }
+
+  async function handleQueryInput() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+      if (selectedQuery.length >= 2) {
+        suggestions = searchService.generateSuggestions(selectedQuery);
+        showSuggestions = true;
+      } else {
+        await loadInitialSuggestions();
+        showSuggestions = selectedQuery.length === 0;
+      }
+    }, 300);
+  }
+
+  function selectSuggestion(suggestion: SearchSuggestion) {
+    if (suggestion.type === 'category') {
+      selectedCategory = suggestion.text.toLowerCase().replace(/\s+/g, '_');
+      selectedQuery = '';
+    } else {
+      selectedQuery = suggestion.text;
+    }
+    showSuggestions = false;
+    handleSearch();
+  }
 
   function handleSearch() {
-    // If we're on the browse page (have event listeners), dispatch event
-    if (dispatch) {
-      dispatch('search', {
-        query: selectedQuery,
-        category: category,
-        location: selectedLocation
-      });
-    } else {
-      // Otherwise navigate to browse page with search parameters
-      const params = new URLSearchParams();
-      if (selectedQuery) params.set('q', selectedQuery);
-      if (selectedLocation) params.set('location', selectedLocation);
+    // Dispatch search event for parent components
+    dispatch('search', {
+      query: selectedQuery,
+      category: selectedCategory,
+      location: selectedLocation
+    });
 
-      goto(`/browse?${params.toString()}`);
+    // Navigate to browse page with search parameters
+    const params = new URLSearchParams();
+    if (selectedQuery) params.set('q', selectedQuery);
+    if (selectedCategory) params.set('category', selectedCategory);
+    if (selectedLocation) params.set('location', selectedLocation);
+
+    goto(`/browse?${params.toString()}`);
+  }
+
+  function handleFocus() {
+    if (suggestions.length > 0) {
+      showSuggestions = true;
     }
   }
 
-  // Update internal state when props change
-  $: selectedLocation = location;
-  $: selectedQuery = query;
+  function handleBlur() {
+    // Delay hiding suggestions to allow clicks
+    setTimeout(() => {
+      showSuggestions = false;
+    }, 200);
+  }
 </script>
 
-<!-- Simple Search Form for Hero Section -->
+<!-- Enhanced Search Form with Autocomplete -->
 <form on:submit|preventDefault={handleSearch} class="w-full">
   <div class="flex flex-col md:flex-row gap-3 items-center md:items-end">
-    <!-- Search Input -->
-    <div class="w-full md:flex-1">
+    <!-- Search Input with Autocomplete -->
+    <div class="w-full md:flex-1 relative">
       <input
+        bind:this={searchInput}
         type="text"
         bind:value={selectedQuery}
+        on:input={handleQueryInput}
+        on:focus={handleFocus}
+        on:blur={handleBlur}
         placeholder="What gear do you need?"
         class="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-800/70 backdrop-blur-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white placeholder-gray-300"
+        autocomplete="off"
       />
+
+      <!-- Search Suggestions Dropdown -->
+      {#if showSuggestions && suggestions.length > 0}
+        <div class="absolute top-full left-0 right-0 mt-1 bg-gray-800 backdrop-blur-md border border-gray-600 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
+          {#each suggestions as suggestion}
+            <button
+              type="button"
+              class="w-full px-4 py-3 text-left hover:bg-gray-700 transition-colors border-b border-gray-700/50 last:border-b-0 flex items-center justify-between"
+              on:click={() => selectSuggestion(suggestion)}
+            >
+              <div class="flex items-center space-x-3">
+                <span class="text-gray-400 text-sm">
+                  {#if suggestion.type === 'category'}
+                    📂
+                  {:else if suggestion.type === 'feature'}
+                    ⭐
+                  {:else if suggestion.type === 'location'}
+                    📍
+                  {:else}
+                    🔍
+                  {/if}
+                </span>
+                <span class="text-white">{suggestion.text}</span>
+              </div>
+              {#if suggestion.count}
+                <span class="text-gray-400 text-sm">{suggestion.count} items</span>
+              {/if}
+            </button>
+          {/each}
+        </div>
+      {/if}
     </div>
 
     <!-- Location Input -->

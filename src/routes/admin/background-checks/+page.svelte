@@ -1,10 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { verificationService, type VerificationRequest } from '$lib/services/verification';
+  import { backgroundCheckService } from '$lib/services/backgroundCheck';
   import { authStore } from '$lib/stores/auth';
-  import { isCurrentUserAdmin } from '$lib/firebase/auth';
-  import { notifications } from '$lib/stores/notifications';
-  import { goto } from '$app/navigation';
   
   let backgroundCheckRequests: VerificationRequest[] = [];
   let loading = true;
@@ -14,32 +12,6 @@
   let searchQuery = '';
   
   onMount(async () => {
-    // Check admin access
-    if (!$authStore.user) {
-      goto('/auth/login');
-      return;
-    }
-
-    try {
-      const isAdmin = await isCurrentUserAdmin();
-      if (!isAdmin) {
-        notifications.add({
-          message: 'Access denied. Admin privileges required.',
-          type: 'error'
-        });
-        goto('/dashboard');
-        return;
-      }
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      notifications.add({
-        message: 'Error verifying admin access',
-        type: 'error'
-      });
-      goto('/dashboard');
-      return;
-    }
-
     await loadBackgroundCheckRequests();
   });
   
@@ -47,104 +19,17 @@
     try {
       loading = true;
       error = '';
-
-      // Load all verification requests and filter for background checks
+      
+      // In a real implementation, this would be an admin-only endpoint
+      // For now, we'll simulate loading background check requests
       const allRequests = await verificationService.getAllVerificationRequests();
       backgroundCheckRequests = allRequests.filter(req => req.type === 'background_check');
-
-      // If no background check requests exist, add some sample data for demonstration
-      if (backgroundCheckRequests.length === 0) {
-        await createSampleBackgroundCheckData();
-        // Reload after creating sample data
-        const updatedRequests = await verificationService.getAllVerificationRequests();
-        backgroundCheckRequests = updatedRequests.filter(req => req.type === 'background_check');
-      }
-
+      
     } catch (err) {
       error = 'Failed to load background check requests';
       console.error('Error loading background checks:', err);
-      notifications.add({
-        message: 'Error loading background check requests',
-        type: 'error'
-      });
     } finally {
       loading = false;
-    }
-  }
-
-  async function createSampleBackgroundCheckData() {
-    try {
-      // Create sample background check requests for demonstration
-      const sampleRequests = [
-        {
-          userId: 'user_12345',
-          type: 'background_check',
-          status: 'pending',
-          backgroundCheckData: {
-            checkType: 'standard',
-            provider: 'checkr',
-            consentGiven: true,
-            consentTimestamp: new Date(),
-            results: {
-              criminalHistory: { status: 'pending' },
-              sexOffenderRegistry: { status: 'pending' },
-              globalWatchlist: { status: 'pending' },
-              identityVerification: { status: 'pending' }
-            }
-          }
-        },
-        {
-          userId: 'user_67890',
-          type: 'background_check',
-          status: 'approved',
-          backgroundCheckData: {
-            checkType: 'comprehensive',
-            provider: 'sterling',
-            consentGiven: true,
-            consentTimestamp: new Date(Date.now() - 86400000), // 1 day ago
-            completedAt: new Date(),
-            riskLevel: 'low',
-            overallStatus: 'pass',
-            results: {
-              criminalHistory: { status: 'clear', details: 'No criminal records found' },
-              sexOffenderRegistry: { status: 'clear', details: 'Not found in registry' },
-              globalWatchlist: { status: 'clear', details: 'No matches found' },
-              identityVerification: { status: 'verified', details: 'Identity successfully verified' }
-            }
-          }
-        },
-        {
-          userId: 'user_11111',
-          type: 'background_check',
-          status: 'in_progress',
-          backgroundCheckData: {
-            checkType: 'basic',
-            provider: 'accurate',
-            consentGiven: true,
-            consentTimestamp: new Date(Date.now() - 43200000), // 12 hours ago
-            results: {
-              criminalHistory: { status: 'clear', details: 'No criminal records found' },
-              sexOffenderRegistry: { status: 'pending' },
-              identityVerification: { status: 'verified', details: 'Identity successfully verified' }
-            }
-          }
-        }
-      ];
-
-      for (const request of sampleRequests) {
-        await verificationService.submitBackgroundCheck(
-          request.userId,
-          request.backgroundCheckData.checkType as 'basic' | 'standard' | 'comprehensive',
-          request.backgroundCheckData.provider as 'checkr' | 'sterling' | 'accurate' | 'internal'
-        );
-      }
-
-      notifications.add({
-        message: 'Sample background check data created for demonstration',
-        type: 'success'
-      });
-    } catch (error) {
-      console.error('Error creating sample data:', error);
     }
   }
   
@@ -444,7 +329,7 @@
                           {result.status}
                         </span>
                       </div>
-                      {#if 'details' in result && result.details}
+                      {#if result.details}
                         <p class="text-gray-300 text-sm">{result.details}</p>
                       {/if}
                     </div>

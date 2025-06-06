@@ -341,3 +341,545 @@ export async function sendBookingEmails(bookingData: BookingEmailData): Promise<
     ownerEmailSent
   };
 }
+
+// Additional email types for comprehensive system
+interface PaymentEmailData {
+  userId: string;
+  userEmail: string;
+  userName: string;
+  amount: number;
+  currency: string;
+  paymentIntentId: string;
+  service: string;
+  bookingId?: string;
+  listingTitle?: string;
+}
+
+interface BackgroundCheckEmailData {
+  userId: string;
+  userEmail: string;
+  userName: string;
+  requestId: string;
+  checkType: string;
+  provider: string;
+  status: string;
+  externalId?: string;
+}
+
+interface VerificationEmailData {
+  userId: string;
+  userEmail: string;
+  userName: string;
+  verificationType: string;
+  status: string;
+  requestId: string;
+}
+
+// Payment email templates
+export const paymentEmailTemplates = {
+  paymentConfirmation: (data: PaymentEmailData): EmailTemplate => ({
+    to: data.userEmail,
+    subject: `Payment Confirmation - $${data.amount} | GearGrab`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Payment Confirmation</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+          .amount { font-size: 24px; font-weight: bold; color: #10b981; }
+          .footer { text-align: center; margin-top: 20px; color: #666; font-size: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>✅ Payment Confirmed</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${data.userName},</p>
+            <p>Your payment has been successfully processed!</p>
+
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3>Payment Details</h3>
+              <p><strong>Amount:</strong> <span class="amount">$${data.amount}</span></p>
+              <p><strong>Service:</strong> ${data.service}</p>
+              <p><strong>Payment ID:</strong> ${data.paymentIntentId}</p>
+              ${data.listingTitle ? `<p><strong>Item:</strong> ${data.listingTitle}</p>` : ''}
+            </div>
+
+            <p>You can view your payment history in your dashboard.</p>
+            <p><a href="https://geargrab.co/dashboard" style="color: #10b981;">View Dashboard</a></p>
+          </div>
+          <div class="footer">
+            <p>© 2024 GearGrab. Secure payments for outdoor adventures! 🏔️</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `
+      Payment Confirmation - $${data.amount}
+
+      Hi ${data.userName},
+
+      Your payment has been successfully processed!
+
+      Payment Details:
+      - Amount: $${data.amount}
+      - Service: ${data.service}
+      - Payment ID: ${data.paymentIntentId}
+      ${data.listingTitle ? `- Item: ${data.listingTitle}` : ''}
+
+      View your dashboard: https://geargrab.co/dashboard
+
+      GearGrab Team
+    `
+  }),
+
+  paymentFailed: (data: PaymentEmailData): EmailTemplate => ({
+    to: data.userEmail,
+    subject: `Payment Failed - Action Required | GearGrab`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Payment Failed</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+          .button { background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 10px 0; }
+          .footer { text-align: center; margin-top: 20px; color: #666; font-size: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>❌ Payment Failed</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${data.userName},</p>
+            <p>We were unable to process your payment for ${data.service}.</p>
+
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3>Payment Details</h3>
+              <p><strong>Amount:</strong> $${data.amount}</p>
+              <p><strong>Service:</strong> ${data.service}</p>
+              ${data.listingTitle ? `<p><strong>Item:</strong> ${data.listingTitle}</p>` : ''}
+            </div>
+
+            <p>Please try again with a different payment method or contact your bank if the issue persists.</p>
+            <a href="https://geargrab.co/dashboard" class="button">Retry Payment</a>
+          </div>
+          <div class="footer">
+            <p>© 2024 GearGrab. Need help? Contact support@geargrab.co</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `
+      Payment Failed - Action Required
+
+      Hi ${data.userName},
+
+      We were unable to process your payment for ${data.service}.
+
+      Payment Details:
+      - Amount: $${data.amount}
+      - Service: ${data.service}
+      ${data.listingTitle ? `- Item: ${data.listingTitle}` : ''}
+
+      Please try again with a different payment method or contact your bank.
+
+      Retry payment: https://geargrab.co/dashboard
+
+      GearGrab Team
+    `
+  })
+};
+
+// Background check email templates
+export const backgroundCheckEmailTemplates = {
+  checkInitiated: (data: BackgroundCheckEmailData): EmailTemplate => ({
+    to: data.userEmail,
+    subject: `Background Check Initiated | GearGrab`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Background Check Initiated</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+          .footer { text-align: center; margin-top: 20px; color: #666; font-size: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🔍 Background Check Started</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${data.userName},</p>
+            <p>Your background check has been successfully initiated and is now being processed.</p>
+
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3>Check Details</h3>
+              <p><strong>Type:</strong> ${data.checkType.charAt(0).toUpperCase() + data.checkType.slice(1)}</p>
+              <p><strong>Provider:</strong> ${data.provider.charAt(0).toUpperCase() + data.provider.slice(1)}</p>
+              <p><strong>Request ID:</strong> ${data.requestId}</p>
+              ${data.externalId ? `<p><strong>External ID:</strong> ${data.externalId}</p>` : ''}
+            </div>
+
+            <p>We'll notify you as soon as your background check is complete. This typically takes 1-3 business days.</p>
+            <p><a href="https://geargrab.co/dashboard/verification" style="color: #3b82f6;">Check Status</a></p>
+          </div>
+          <div class="footer">
+            <p>© 2024 GearGrab. Building trust in our community! 🏔️</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `
+      Background Check Initiated
+
+      Hi ${data.userName},
+
+      Your background check has been successfully initiated and is now being processed.
+
+      Check Details:
+      - Type: ${data.checkType.charAt(0).toUpperCase() + data.checkType.slice(1)}
+      - Provider: ${data.provider.charAt(0).toUpperCase() + data.provider.slice(1)}
+      - Request ID: ${data.requestId}
+      ${data.externalId ? `- External ID: ${data.externalId}` : ''}
+
+      We'll notify you as soon as your background check is complete.
+
+      Check status: https://geargrab.co/dashboard/verification
+
+      GearGrab Team
+    `
+  }),
+
+  checkCompleted: (data: BackgroundCheckEmailData): EmailTemplate => ({
+    to: data.userEmail,
+    subject: `Background Check Complete | GearGrab`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Background Check Complete</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+          .button { background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 10px 0; }
+          .footer { text-align: center; margin-top: 20px; color: #666; font-size: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>✅ Background Check Complete</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${data.userName},</p>
+            <p>Great news! Your background check has been completed and your verification status has been updated.</p>
+
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3>Check Results</h3>
+              <p><strong>Status:</strong> ${data.status}</p>
+              <p><strong>Type:</strong> ${data.checkType.charAt(0).toUpperCase() + data.checkType.slice(1)}</p>
+              <p><strong>Request ID:</strong> ${data.requestId}</p>
+            </div>
+
+            <p>You can now access premium features and build more trust with other users.</p>
+            <a href="https://geargrab.co/dashboard/verification" class="button">View Results</a>
+          </div>
+          <div class="footer">
+            <p>© 2024 GearGrab. Verified and ready to adventure! 🏔️</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `
+      Background Check Complete
+
+      Hi ${data.userName},
+
+      Great news! Your background check has been completed and your verification status has been updated.
+
+      Check Results:
+      - Status: ${data.status}
+      - Type: ${data.checkType.charAt(0).toUpperCase() + data.checkType.slice(1)}
+      - Request ID: ${data.requestId}
+
+      You can now access premium features and build more trust with other users.
+
+      View results: https://geargrab.co/dashboard/verification
+
+      GearGrab Team
+    `
+  })
+};
+
+// Send payment emails
+export const sendPaymentEmails = {
+  async sendPaymentConfirmation(data: PaymentEmailData): Promise<boolean> {
+    const template = paymentEmailTemplates.paymentConfirmation(data);
+    return await sendEmail(template);
+  },
+
+  async sendPaymentFailure(data: PaymentEmailData): Promise<boolean> {
+    const template = paymentEmailTemplates.paymentFailed(data);
+    return await sendEmail(template);
+  }
+};
+
+// Send background check emails
+export const sendBackgroundCheckEmails = {
+  async sendCheckInitiated(data: BackgroundCheckEmailData): Promise<boolean> {
+    const template = backgroundCheckEmailTemplates.checkInitiated(data);
+    return await sendEmail(template);
+  },
+
+  async sendCheckCompleted(data: BackgroundCheckEmailData): Promise<boolean> {
+    const template = backgroundCheckEmailTemplates.checkCompleted(data);
+    return await sendEmail(template);
+  }
+};
+
+// Verification email templates
+export const verificationEmailTemplates = {
+  identityVerified: (data: VerificationEmailData): EmailTemplate => ({
+    to: data.userEmail,
+    subject: `Identity Verified ✅ | GearGrab`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Identity Verified</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+          .badge { background: #10b981; color: white; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; }
+          .footer { text-align: center; margin-top: 20px; color: #666; font-size: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🎉 Identity Verified!</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${data.userName},</p>
+            <p>Congratulations! Your identity has been successfully verified.</p>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <span class="badge">✅ VERIFIED USER</span>
+            </div>
+
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3>Verification Benefits</h3>
+              <ul>
+                <li>✅ Verified badge on your profile</li>
+                <li>🔒 Increased trust from other users</li>
+                <li>⭐ Access to premium listings</li>
+                <li>💰 Higher earning potential as an owner</li>
+                <li>🚀 Priority customer support</li>
+              </ul>
+            </div>
+
+            <p>Your verified status will be displayed on your profile and listings, helping you build trust with the GearGrab community.</p>
+            <p><a href="https://geargrab.co/profile" style="color: #10b981;">View Your Profile</a></p>
+          </div>
+          <div class="footer">
+            <p>© 2024 GearGrab. Verified and trusted! 🏔️</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `
+      Identity Verified!
+
+      Hi ${data.userName},
+
+      Congratulations! Your identity has been successfully verified.
+
+      Verification Benefits:
+      - Verified badge on your profile
+      - Increased trust from other users
+      - Access to premium listings
+      - Higher earning potential as an owner
+      - Priority customer support
+
+      Your verified status will be displayed on your profile and listings.
+
+      View your profile: https://geargrab.co/profile
+
+      GearGrab Team
+    `
+  }),
+
+  phoneVerified: (data: VerificationEmailData): EmailTemplate => ({
+    to: data.userEmail,
+    subject: `Phone Number Verified 📱 | GearGrab`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Phone Verified</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+          .footer { text-align: center; margin-top: 20px; color: #666; font-size: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>📱 Phone Verified!</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${data.userName},</p>
+            <p>Your phone number has been successfully verified! This helps keep our community safe and enables important notifications.</p>
+
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3>What's Next?</h3>
+              <p>With your phone verified, you can now:</p>
+              <ul>
+                <li>📞 Receive booking notifications via SMS</li>
+                <li>🔐 Use two-factor authentication</li>
+                <li>⚡ Get instant alerts for urgent messages</li>
+                <li>🛡️ Enhanced account security</li>
+              </ul>
+            </div>
+
+            <p>You're one step closer to being fully verified on GearGrab!</p>
+            <p><a href="https://geargrab.co/dashboard/verification" style="color: #3b82f6;">Continue Verification</a></p>
+          </div>
+          <div class="footer">
+            <p>© 2024 GearGrab. Stay connected! 🏔️</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `
+      Phone Verified!
+
+      Hi ${data.userName},
+
+      Your phone number has been successfully verified!
+
+      What's Next?
+      With your phone verified, you can now:
+      - Receive booking notifications via SMS
+      - Use two-factor authentication
+      - Get instant alerts for urgent messages
+      - Enhanced account security
+
+      You're one step closer to being fully verified on GearGrab!
+
+      Continue verification: https://geargrab.co/dashboard/verification
+
+      GearGrab Team
+    `
+  })
+};
+
+// Send verification emails
+export const sendVerificationEmails = {
+  async sendIdentityVerified(data: VerificationEmailData): Promise<boolean> {
+    const template = verificationEmailTemplates.identityVerified(data);
+    return await sendEmail(template);
+  },
+
+  async sendPhoneVerified(data: VerificationEmailData): Promise<boolean> {
+    const template = verificationEmailTemplates.phoneVerified(data);
+    return await sendEmail(template);
+  }
+};
+
+// Email automation service
+export class EmailAutomationService {
+  // Trigger booking emails automatically
+  static async triggerBookingEmails(bookingData: BookingEmailData): Promise<void> {
+    try {
+      await sendBookingEmails(bookingData);
+      console.log(`Booking emails sent for booking ${bookingData.bookingId}`);
+    } catch (error) {
+      console.error('Failed to send booking emails:', error);
+    }
+  }
+
+  // Trigger payment emails automatically
+  static async triggerPaymentEmails(paymentData: PaymentEmailData, type: 'confirmation' | 'failure'): Promise<void> {
+    try {
+      if (type === 'confirmation') {
+        await sendPaymentEmails.sendPaymentConfirmation(paymentData);
+      } else {
+        await sendPaymentEmails.sendPaymentFailure(paymentData);
+      }
+      console.log(`Payment ${type} email sent for user ${paymentData.userId}`);
+    } catch (error) {
+      console.error(`Failed to send payment ${type} email:`, error);
+    }
+  }
+
+  // Trigger background check emails automatically
+  static async triggerBackgroundCheckEmails(checkData: BackgroundCheckEmailData, type: 'initiated' | 'completed'): Promise<void> {
+    try {
+      if (type === 'initiated') {
+        await sendBackgroundCheckEmails.sendCheckInitiated(checkData);
+      } else {
+        await sendBackgroundCheckEmails.sendCheckCompleted(checkData);
+      }
+      console.log(`Background check ${type} email sent for user ${checkData.userId}`);
+    } catch (error) {
+      console.error(`Failed to send background check ${type} email:`, error);
+    }
+  }
+
+  // Trigger verification emails automatically
+  static async triggerVerificationEmails(verificationData: VerificationEmailData): Promise<void> {
+    try {
+      if (verificationData.verificationType === 'identity') {
+        await sendVerificationEmails.sendIdentityVerified(verificationData);
+      } else if (verificationData.verificationType === 'phone') {
+        await sendVerificationEmails.sendPhoneVerified(verificationData);
+      }
+      console.log(`Verification email sent for user ${verificationData.userId}`);
+    } catch (error) {
+      console.error('Failed to send verification email:', error);
+    }
+  }
+}

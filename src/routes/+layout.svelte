@@ -7,6 +7,7 @@
   import { onAuthStateChanged } from 'firebase/auth';
   import Navbar from '$lib/components/layout/Navbar.svelte';
   import Footer from '$lib/components/layout/Footer.svelte';
+  import PageTransition from '$lib/components/layout/PageTransition.svelte';
   import type { User } from '$lib/stores/auth';
 
   // Initialize auth state listener
@@ -45,8 +46,10 @@
 
 <Navbar />
 
-<main class="relative pt-16" style="min-height: 100vh;">
-  <slot />
-</main>
+<PageTransition>
+  <main class="relative pt-16 content-container">
+    <slot />
+  </main>
+</PageTransition>
 
 <Footer />

@@ -1,4 +1,8 @@
 <script lang="ts">
+  import SkeletonCard from '$lib/components/layout/SkeletonCard.svelte';
+  import ProgressiveLoader from '$lib/components/layout/ProgressiveLoader.svelte';
+  import LazyImage from '$lib/components/layout/LazyImage.svelte';
+
   export let listings = [];
   export let loading = false;
   export let emptyMessage = "No gear items found";
@@ -16,20 +20,8 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" data-cy="gear-grid">
   {#if loading}
-    <div data-cy="loading">
-    {#each Array(8) as _}
-      <div class="animate-pulse rounded-lg bg-gray-800/40 backdrop-blur-sm border border-gray-600/50 overflow-hidden">
-        <div class="bg-gray-700/50 h-48 w-full"></div>
-        <div class="p-4 space-y-2">
-          <div class="h-5 bg-gray-600/50 rounded w-3/4"></div>
-          <div class="h-4 bg-gray-600/50 rounded w-1/2"></div>
-          <div class="flex justify-between items-center mt-2">
-            <div class="h-5 bg-gray-600/50 rounded w-1/4"></div>
-            <div class="h-4 bg-gray-600/50 rounded w-1/6"></div>
-          </div>
-        </div>
-      </div>
-    {/each}
+    <div data-cy="loading" class="contents">
+      <SkeletonCard variant="gear" count={8} />
     </div>
   {:else if listings.length === 0}
     <div class="col-span-full py-12 text-center">
@@ -40,22 +32,24 @@
       <p class="text-white/60 text-sm mt-2 drop-shadow-lg">Try adjusting your search criteria or browse all categories</p>
     </div>
   {:else}
-    {#each listings as listing (listing.id)}
-      <a href={`/listing/${listing.id}`} class="group bg-gray-800/60 backdrop-blur-sm rounded-lg border border-gray-600/50 overflow-hidden hover:bg-gray-800/70 hover:border-gray-500/70 transition-all duration-300" data-cy="gear-card">
-        <!-- Image -->
-        <div class="relative aspect-[4/3] overflow-hidden">
-          <img
-            src={listing.images[0]}
-            alt={listing.title}
-            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-            <p class="text-white font-bold text-lg drop-shadow-lg">{formatCurrency(listing.dailyPrice)}/day</p>
+    {#each listings as listing, index (listing.id)}
+      <ProgressiveLoader delay={index * 100} animation="slide-up">
+        <a href={`/listing/${listing.id}`} class="group bg-gray-800/60 backdrop-blur-sm rounded-2xl border border-gray-600/50 overflow-hidden hover:bg-gray-800/70 hover:border-gray-500/70 transition-all duration-300" data-cy="gear-card">
+          <!-- Image -->
+          <div class="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
+            <LazyImage
+              src={listing.images[0]}
+              alt={listing.title}
+              aspectRatio="4/3"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+              <p class="text-white font-bold text-lg drop-shadow-lg">{formatCurrency(listing.dailyPrice)}/day</p>
+            </div>
           </div>
-        </div>
 
         <!-- Content -->
-        <div class="p-4">
+        <div class="p-4 rounded-b-2xl">
           <h3 class="font-semibold text-white group-hover:text-green-400 transition-colors drop-shadow-lg">{listing.title}</h3>
           <p class="text-sm text-gray-300 mt-1 drop-shadow-lg" data-cy="location">{listing.location.city}, {listing.location.state}</p>
 
@@ -63,15 +57,16 @@
           <div class="flex items-center mt-2">
             <div class="flex items-center">
               {#each Array(5) as _, i}
-                <svg class="w-4 h-4 {i < Math.floor(listing.owner.rating) ? 'text-yellow-400' : 'text-gray-500'} drop-shadow-sm" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-4 h-4 {i < Math.floor(listing.averageRating) ? 'text-yellow-400' : 'text-gray-500'} drop-shadow-sm" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                 </svg>
               {/each}
             </div>
-            <span class="text-xs text-gray-400 ml-1 drop-shadow-lg">({listing.owner.reviewCount})</span>
+            <span class="text-xs text-gray-400 ml-1 drop-shadow-lg">({listing.reviewCount})</span>
           </div>
         </div>
-      </a>
+        </a>
+      </ProgressiveLoader>
     {/each}
   {/if}
 </div>

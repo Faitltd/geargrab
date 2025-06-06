@@ -1,15 +1,15 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { authStore } from '$lib/stores/auth';
   import { makeUserAdmin, isCurrentUserAdmin, removeAdminPrivileges } from '$lib/firebase/auth';
   import { notifications } from '$lib/stores/notifications';
   import { goto } from '$app/navigation';
-  import { collection, getDocs, query, orderBy, where } from 'firebase/firestore';
+  import { collection, getDocs } from 'firebase/firestore';
   import { firestore } from '$lib/firebase/client';
+  import SkeletonCard from '$lib/components/layout/SkeletonCard.svelte';
+  import ProgressiveLoader from '$lib/components/layout/ProgressiveLoader.svelte';
 
   let loading = true;
   let isAdmin = false;
-  let newAdminEmail = '';
   let newAdminUid = '';
   let processing = false;
   let users = [];
@@ -357,7 +357,6 @@
         message: `Successfully granted admin privileges to user ${newAdminUid}`,
         timeout: 5000
       });
-      newAdminEmail = '';
       newAdminUid = '';
     } catch (error) {
       console.error('Error adding admin:', error);
@@ -389,7 +388,6 @@
         message: `Successfully removed admin privileges from user ${newAdminUid}`,
         timeout: 5000
       });
-      newAdminEmail = '';
       newAdminUid = '';
     } catch (error) {
       console.error('Error removing admin:', error);
@@ -430,9 +428,20 @@
   </div>
 
   {#if loading}
-    <div class="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20 text-center">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-400 mx-auto mb-4"></div>
-      <p class="text-gray-400">Loading users...</p>
+    <div class="space-y-6">
+      <!-- Loading skeleton for filters -->
+      <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="skeleton h-10 rounded"></div>
+          <div class="skeleton h-10 rounded"></div>
+          <div class="skeleton h-10 rounded"></div>
+        </div>
+      </div>
+
+      <!-- Loading skeleton for user cards -->
+      <div class="space-y-4">
+        <SkeletonCard variant="user" count={6} />
+      </div>
     </div>
   {:else}
     <!-- Filters -->
@@ -491,8 +500,9 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-white/10">
-              {#each filteredUsers as user}
-                <tr class="hover:bg-white/5">
+              {#each filteredUsers as user, index}
+                <ProgressiveLoader delay={index * 100} animation="slide-up">
+                  <tr class="hover:bg-white/5">
                   <td class="px-6 py-4">
                     <div class="flex items-center">
                       <div class="h-10 w-10 bg-gray-600 rounded-full mr-4 flex items-center justify-center">
@@ -587,7 +597,8 @@
                       {/if}
                     </div>
                   </td>
-                </tr>
+                  </tr>
+                </ProgressiveLoader>
               {/each}
             </tbody>
           </table>

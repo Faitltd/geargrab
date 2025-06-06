@@ -140,7 +140,46 @@ const mockFirestore = {
         }));
       }
 
-      return { docs };
+      return { docs, size: docs.length };
+    },
+    limit: (limitCount) => ({
+      get: async () => {
+        let docs = [];
+
+        if (collectionName === 'users') {
+          docs = Array.from(mockUsers.entries()).slice(0, limitCount).map(([id, data]) => ({
+            id,
+            data: () => data,
+            exists: true
+          }));
+        } else if (collectionName === 'adminUsers') {
+          docs = Array.from(mockAdminUsers.entries()).slice(0, limitCount).map(([id, data]) => ({
+            id,
+            data: () => data,
+            exists: true
+          }));
+        }
+
+        return { docs, size: docs.length };
+      }
+    }),
+    add: async (data) => {
+      const id = `mock_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+
+      if (collectionName === 'users') {
+        mockUsers.set(id, data);
+      } else if (collectionName === 'adminUsers') {
+        mockAdminUsers.set(id, data);
+      }
+
+      return {
+        id,
+        get: async () => ({
+          id,
+          data: () => data,
+          exists: true
+        })
+      };
     },
     where: () => ({
       orderBy: () => ({

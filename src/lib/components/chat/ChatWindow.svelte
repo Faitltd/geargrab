@@ -17,9 +17,8 @@
   let messagesContainer: HTMLElement;
   let unsubscribe: Unsubscribe | null = null;
   let sending = false;
-  let showFlagModal = false;
-  let flaggingMessage: ChatMessage | null = null;
-  let flagReason = '';
+  let fileInput: HTMLInputElement;
+  let uploadingFile = false;
 
   onMount(() => {
     if (conversationId) {
@@ -100,11 +99,71 @@
 
   function shouldShowDateSeparator(currentMessage: ChatMessage, previousMessage: ChatMessage | undefined): boolean {
     if (!previousMessage) return true;
-    
+
     const currentDate = new Date(currentMessage.timestamp);
     const previousDate = new Date(previousMessage.timestamp);
-    
+
     return currentDate.toDateString() !== previousDate.toDateString();
+  }
+
+  function handleAttachmentClick() {
+    fileInput?.click();
+  }
+
+  async function handleFileSelect(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+
+    if (!file) return;
+
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      notifications.add({
+        type: 'error',
+        message: 'File size must be less than 10MB',
+        timeout: 5000
+      });
+      return;
+    }
+
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'text/plain'];
+    if (!allowedTypes.includes(file.type)) {
+      notifications.add({
+        type: 'error',
+        message: 'Only images, PDFs, and text files are allowed',
+        timeout: 5000
+      });
+      return;
+    }
+
+    try {
+      uploadingFile = true;
+
+      // In a real app, you would upload to cloud storage first
+      // For now, we'll simulate the upload and send a message with file info
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate upload
+
+      const fileMessage = `📎 Shared a file: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      await chatService.sendMessage(conversationId, $authStore.user!.uid, fileMessage);
+
+      notifications.add({
+        type: 'success',
+        message: 'File shared successfully',
+        timeout: 3000
+      });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      notifications.add({
+        type: 'error',
+        message: 'Failed to share file. Please try again.',
+        timeout: 5000
+      });
+    } finally {
+      uploadingFile = false;
+      // Reset file input
+      target.value = '';
+    }
   }
 </script>
 
@@ -195,11 +254,30 @@
 
   <!-- Message Input -->
   <div class="p-4 border-t border-white/20">
+    <!-- Hidden file input -->
+    <input
+      bind:this={fileInput}
+      type="file"
+      on:change={handleFileSelect}
+      accept="image/*,.pdf,.txt"
+      class="hidden"
+    />
+
     <div class="flex items-end space-x-2">
-      <button class="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
-        </svg>
+      <!-- Attachment button -->
+      <button
+        on:click={handleAttachmentClick}
+        disabled={uploadingFile}
+        class="p-2 text-gray-300 hover:text-white hover:bg-white/10 disabled:text-gray-600 rounded-lg transition-colors"
+        title="Attach file"
+      >
+        {#if uploadingFile}
+          <div class="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+        {:else}
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+          </svg>
+        {/if}
       </button>
       
       <div class="flex-1">

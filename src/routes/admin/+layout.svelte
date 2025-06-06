@@ -17,8 +17,15 @@
     { id: 'bookings', label: 'Bookings Management', href: '/admin/bookings', icon: '📅' },
     { id: 'messages', label: 'Messages', href: '/admin/messages', icon: '💬' },
     { id: 'background-checks', label: 'Background Checks', href: '/admin/background-checks', icon: '🔍' },
+    { id: 'background-check-test', label: 'BG Check Testing', href: '/admin/background-checks/test', icon: '🧪' },
     { id: 'verification', label: 'User Verification', href: '/admin/verification', icon: '✅' },
     { id: 'claims', label: 'Insurance Claims', href: '/admin/claims', icon: '🛡️' },
+    { id: 'webhooks', label: 'Webhook Testing', href: '/admin/webhooks', icon: '🔗' },
+    { id: 'email-test', label: 'Email Testing', href: '/admin/emails/test', icon: '📧' },
+    { id: 'system-health', label: 'System Health', href: '/admin/system-health', icon: '🏥' },
+    { id: 'integration-tests', label: 'Integration Tests', href: '/admin/integration-tests', icon: '🧪' },
+    { id: 'e2e-testing', label: 'E2E Testing', href: '/admin/e2e-testing', icon: '🔬' },
+    { id: 'security', label: 'Security Dashboard', href: '/admin/security', icon: '🔒' },
     { id: 'analytics', label: 'Analytics', href: '/admin/analytics', icon: '📈' },
     { id: 'settings', label: 'System Settings', href: '/admin/settings', icon: '⚙️' }
   ];

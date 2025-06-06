@@ -16,7 +16,7 @@ import {
   type User
 } from 'firebase/auth';
 import { firestore } from './client';
-import { doc, setDoc, getDoc, serverTimestamp, deleteDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import type { User as FirestoreUser } from '$types/firestore';
 
 // Sign in with email and password
@@ -153,73 +153,77 @@ export async function reauthenticate(password: string): Promise<UserCredential> 
 
 // Admin functions
 export async function isCurrentUserAdmin(): Promise<boolean> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  if (!auth.currentUser) return false;
-
   try {
-    const adminRef = doc(firestore, 'adminUsers', auth.currentUser.uid);
-    const adminSnap = await getDoc(adminRef);
-    return adminSnap.exists() && adminSnap.data()?.isAdmin === true;
+    if (!browser) return false;
+    const user = auth.currentUser;
+    if (!user) return false;
+
+    const adminDoc = await getDoc(doc(firestore, 'adminUsers', user.uid));
+    return adminDoc.exists() && adminDoc.data()?.isAdmin === true;
   } catch (error) {
     console.error('Error checking admin status:', error);
     return false;
   }
 }
 
-export async function makeUserAdmin(uid: string): Promise<void> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  if (!auth.currentUser) throw new Error('No user is signed in');
-
-  // Check if current user is admin
-  const isAdmin = await isCurrentUserAdmin();
-  if (!isAdmin) throw new Error('Only admins can grant admin privileges');
-
+export async function makeUserAdmin(userId: string): Promise<void> {
   try {
-    const adminRef = doc(firestore, 'adminUsers', uid);
-    await setDoc(adminRef, {
+    if (!browser) throw new Error('Admin functions can only be called in the browser');
+
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new Error('Must be logged in to grant admin privileges');
+    }
+
+    // Check if current user is admin
+    const isAdmin = await isCurrentUserAdmin();
+    if (!isAdmin) {
+      throw new Error('Only admins can grant admin privileges');
+    }
+
+    // Create admin document
+    await setDoc(doc(firestore, 'adminUsers', userId), {
       isAdmin: true,
       role: 'admin',
       createdAt: serverTimestamp(),
-      createdBy: auth.currentUser.uid,
-      permissions: ['all']
+      permissions: ['all'],
+      createdBy: currentUser.uid,
+      createdByEmail: currentUser.email
     });
+
+    console.log(`Successfully granted admin privileges to user: ${userId}`);
   } catch (error) {
     console.error('Error making user admin:', error);
     throw error;
   }
 }
 
-export async function removeAdminPrivileges(uid: string): Promise<void> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  if (!auth.currentUser) throw new Error('No user is signed in');
-
-  // Check if current user is admin
-  const isAdmin = await isCurrentUserAdmin();
-  if (!isAdmin) throw new Error('Only admins can remove admin privileges');
-
-  // Don't allow removing own admin privileges
-  if (uid === auth.currentUser.uid) {
-    throw new Error('Cannot remove your own admin privileges');
-  }
-
+export async function removeAdminPrivileges(userId: string): Promise<void> {
   try {
-    const adminRef = doc(firestore, 'adminUsers', uid);
-    await deleteDoc(adminRef);
+    if (!browser) throw new Error('Admin functions can only be called in the browser');
+
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new Error('Must be logged in to remove admin privileges');
+    }
+
+    // Check if current user is admin
+    const isAdmin = await isCurrentUserAdmin();
+    if (!isAdmin) {
+      throw new Error('Only admins can remove admin privileges');
+    }
+
+    // Prevent removing own admin privileges
+    if (userId === currentUser.uid) {
+      throw new Error('Cannot remove your own admin privileges');
+    }
+
+    // Remove admin document
+    await deleteDoc(doc(firestore, 'adminUsers', userId));
+
+    console.log(`Successfully removed admin privileges from user: ${userId}`);
   } catch (error) {
     console.error('Error removing admin privileges:', error);
     throw error;
-  }
-}
-
-export async function isUserAdmin(uid: string): Promise<boolean> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-
-  try {
-    const adminRef = doc(firestore, 'adminUsers', uid);
-    const adminSnap = await getDoc(adminRef);
-    return adminSnap.exists() && adminSnap.data()?.isAdmin === true;
-  } catch (error) {
-    console.error('Error checking user admin status:', error);
-    return false;
   }
 }

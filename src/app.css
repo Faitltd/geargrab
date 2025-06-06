@@ -25,9 +25,21 @@ body {
   box-sizing: border-box;
 }
 
-/* Ensure navbar is always visible */
+/* Ensure navbar is always visible and properly styled */
 nav {
   z-index: 9999 !important;
+}
+
+/* Make navbar darker on pages with bright backgrounds */
+body:has([class*="dashboard"]) nav,
+.dashboard-page nav,
+nav[data-page="dashboard"] {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Fallback for browsers that don't support :has() */
+.bright-background nav {
+  background-color: rgba(0, 0, 0, 0.8) !important;
 }
 
 

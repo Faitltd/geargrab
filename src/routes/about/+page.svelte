@@ -149,7 +149,7 @@
           <h2 class="text-3xl md:text-4xl font-bold mb-6 drop-shadow-lg">Ready to Join Our Community?</h2>
           <p class="text-xl max-w-2xl mx-auto mb-8 text-gray-200 drop-shadow-lg">Start sharing gear and connecting with fellow adventurers today.</p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/browse" class="bg-green-600/80 backdrop-blur-sm hover:bg-green-700/80 text-white text-lg px-8 py-3 rounded-lg font-semibold transition-colors border border-green-500/30 shadow-lg">Browse Gear</a>
+            <a href="/browse" class="bg-green-600 hover:bg-green-700 text-white text-lg px-8 py-3 rounded-lg font-semibold transition-colors shadow-lg">Browse Gear</a>
             <a href="/list-gear" class="bg-transparent border-2 border-white/70 text-white hover:bg-white/20 hover:border-white text-lg px-8 py-3 rounded-lg font-semibold transition-colors backdrop-blur-sm">List Your Gear</a>
           </div>
         </div>

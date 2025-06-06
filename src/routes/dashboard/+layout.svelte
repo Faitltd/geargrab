@@ -3,7 +3,9 @@
   import { authStore } from '$lib/stores/auth';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
-  import Navbar from '$lib/components/layout/Navbar.svelte';
+  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
+  import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
+  import SequentialAnimator from '$lib/components/layout/SequentialAnimator.svelte';
 
   // Redirect if not logged in
   onMount(() => {
@@ -32,21 +34,13 @@
   <title>Dashboard - GearGrab</title>
 </svelte:head>
 
-<div class="min-h-screen relative">
-  <!-- Background Image -->
-  <div class="absolute inset-0">
-    <img
-      src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80"
-      alt="Forest background"
-      class="w-full h-full object-cover"
-    >
-    <div class="absolute inset-0 bg-black bg-opacity-30"></div>
-  </div>
+<!-- Full Page Video Background -->
+<VideoBackground
+  videoSrc="/857134-hd_1280_720_24fps.mp4"
+  overlayOpacity={0.3}
+/>
 
-  <!-- Navbar -->
-  <div class="relative z-20">
-    <Navbar />
-  </div>
+<div class="min-h-screen relative z-10">
 
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     {#if $authStore && $authStore.loading}
@@ -58,43 +52,53 @@
       </div>
     {:else if $authStore && $authStore.user}
       <!-- Dashboard Header -->
-      <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 mb-6">
-        <h1 class="text-3xl font-bold text-white">Dashboard</h1>
-        <p class="text-gray-300 mt-1">Welcome back, {$authStore.user?.displayName || $authStore.user?.email || 'User'}!</p>
-      </div>
+      <ScrollAnimated animation="fade-up" delay={200}>
+        <div class="mb-8">
+          <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 shadow-lg">
+            <h1 class="text-3xl font-bold text-white drop-shadow-lg">Dashboard</h1>
+            <p class="text-gray-200 drop-shadow-lg">Welcome back, {$authStore.user?.displayName || 'User'}!</p>
+          </div>
+        </div>
+      </ScrollAnimated>
 
       <!-- Dashboard Tabs -->
-      <div class="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 mb-6">
-        <nav class="flex space-x-1 p-1">
-          {#each tabs as tab}
-            <a
-              href={tab.href}
-              class="{currentTab === tab.id
-                ? 'bg-white/20 text-white border-white/30'
-                : 'text-white/70 hover:text-white hover:bg-white/10 border-transparent'
-              } flex-1 text-center py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 border"
-            >
-              {tab.label}
-            </a>
-          {/each}
-        </nav>
-      </div>
+      <ScrollAnimated animation="fade-up" delay={400}>
+        <div class="mb-8">
+          <nav class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-lg p-1 flex space-x-1">
+            {#each tabs as tab}
+              <a
+                href={tab.href}
+                class="{currentTab === tab.id
+                  ? 'bg-green-600 text-white shadow-lg transform scale-105'
+                  : 'text-white/90 hover:text-white hover:bg-white/10 hover:transform hover:scale-102'}
+                  whitespace-nowrap py-3 px-4 rounded-xl font-medium text-sm transition-all duration-300 drop-shadow-lg"
+              >
+                {tab.label}
+              </a>
+            {/each}
+          </nav>
+        </div>
+      </ScrollAnimated>
 
       <!-- Dashboard Content -->
-      <div>
-        <slot />
-      </div>
+      <ScrollAnimated animation="fade-up" delay={600}>
+        <div>
+          <slot />
+        </div>
+      </ScrollAnimated>
     {:else}
       <!-- Fallback for when store is not initialized or user is not logged in -->
-      <div class="flex justify-center items-center h-64">
-        <div class="text-center">
-          <h2 class="text-xl font-semibold text-gray-900 mb-2">Access Restricted</h2>
-          <p class="text-gray-600 mb-4">Please log in to access the dashboard.</p>
-          <a href="/auth/login" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-            Log In
-          </a>
+      <ScrollAnimated animation="fade-up" delay={200}>
+        <div class="flex justify-center items-center h-64">
+          <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8 text-center shadow-lg">
+            <h2 class="text-xl font-semibold text-white mb-2 drop-shadow-lg">Access Restricted</h2>
+            <p class="text-gray-200 mb-4 drop-shadow-lg">Please log in to access the dashboard.</p>
+            <a href="/auth/login" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-lg">
+              Log In
+            </a>
+          </div>
         </div>
-      </div>
+      </ScrollAnimated>
     {/if}
   </div>
 </div>

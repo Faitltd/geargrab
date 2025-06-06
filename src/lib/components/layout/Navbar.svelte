@@ -2,28 +2,11 @@
   // Version: 2.0 - Fixed sign out button text
   import { authStore } from '$lib/stores/auth';
   import { smoothScrollWithNavOffset } from '$lib/utils/smoothScroll';
-  import { signOut, isCurrentUserAdmin } from '$lib/firebase/auth';
+  import { signOut } from '$lib/firebase/auth';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   let isMenuOpen = false;
-  let isAdmin = false;
-
-  // Check admin status when user changes
-  $: if ($authStore.user) {
-    checkAdminStatus();
-  } else {
-    isAdmin = false;
-  }
-
-  async function checkAdminStatus() {
-    try {
-      isAdmin = await isCurrentUserAdmin();
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      isAdmin = false;
-    }
-  }
   
   // Determine if we're on the homepage
   $: isHomepage = $page.url.pathname === '/';
@@ -123,8 +106,8 @@
           <a href="/dashboard" class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
             Dashboard
           </a>
-          <button
-            on:click={handleSignOut}
+          <button 
+            on:click={handleSignOut} 
             class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium disabled:opacity-50"
             disabled={isSigningOut}
           >
@@ -157,7 +140,7 @@
   </div>
 
   {#if isMenuOpen}
-    <div id="mobile-menu" class="sm:hidden bg-black/20 backdrop-blur-md">
+    <div id="mobile-menu" class="sm:hidden navbar-glass">
       <div class="pt-2 pb-3 space-y-1">
         <a href="/" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Home
@@ -205,8 +188,8 @@
             <a href="/dashboard" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Dashboard
             </a>
-            <button
-              on:click={handleSignOut}
+            <button 
+              on:click={handleSignOut} 
               class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10 disabled:opacity-50"
               disabled={isSigningOut}
             >
@@ -227,3 +210,19 @@
     </div>
   {/if}
 </nav>
+
+<style>
+  .navbar-glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Fallback for browsers that don't support backdrop-filter */
+  @supports not (backdrop-filter: blur(12px)) {
+    .navbar-glass {
+      background: rgba(0, 0, 0, 0.1);
+    }
+  }
+</style>

@@ -7,80 +7,70 @@
   import GearGrid from '$lib/components/display/GearGrid.svelte';
   import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
-  import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
-  import { firestore } from '$lib/firebase/client';
+  import { searchService, type SearchFilters } from '$lib/services/search';
+  import { products } from '$lib/data/products';
 
   let heroVisible = false;
   let loading = true;
-  let listings = [];
-  let allListings = [];
+  let listings: any[] = [];
   let category = $page.url.searchParams.get('category') || 'all';
   let location = $page.url.searchParams.get('location') || '';
   let sort = 'recommended';
   let showFilters = false;
+  let query = $page.url.searchParams.get('q') || '';
+  let totalCount = 0;
+  let hasMore = false;
 
-  onMount(async () => {
+  onMount(() => {
     // Trigger hero animation after a short delay
     setTimeout(() => {
       heroVisible = true;
     }, 300);
 
-    // Load real listings from Firestore
-    await loadListings();
+    // Load initial search results
+    performSearch();
   });
 
-  async function loadListings() {
+  async function performSearch() {
     try {
       loading = true;
 
-      // Get all published listings from Firestore
-      const listingsRef = collection(firestore, 'listings');
-      const q = query(listingsRef, where('status', '==', 'published'), orderBy('createdAt', 'desc'));
-      const querySnapshot = await getDocs(q);
+      const filters: SearchFilters = {
+        query: query || undefined,
+        category: category !== 'all' ? category : undefined,
+        sortBy: sort as SearchFilters['sortBy'],
+        location: location ? { city: location, state: '' } : undefined,
+        limit: 20
+      };
 
-      allListings = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          title: data.title,
-          description: data.description,
-          category: data.category,
-          dailyPrice: data.dailyPrice,
-          images: data.images || [],
-          location: {
-            city: data.location || 'Unknown',
-            state: 'UT' // Default state
-          },
-          owner: {
-            name: data.ownerEmail?.split('@')[0] || 'Owner',
-            rating: 4.5, // Default rating
-            verified: true
-          },
-          isPublished: data.isPublished,
-          ownerUid: data.ownerUid,
-          ownerEmail: data.ownerEmail,
-          createdAt: data.createdAt
-        };
-      });
+      const results = await searchService.search(filters);
+      listings = results.results;
+      totalCount = results.totalCount;
+      hasMore = results.hasMore;
 
-      // Apply filters
-      listings = filterListings(allListings);
-
+      // Save search for analytics
+      if (query || category !== 'all') {
+        await searchService.saveSearch(query, filters);
+      }
     } catch (error) {
-      console.error('Error loading listings:', error);
-      listings = [];
+      console.error('Search error:', error);
+      // Fall back to mock data
+      listings = filterListings(products);
+      totalCount = listings.length;
+      hasMore = false;
     } finally {
       loading = false;
     }
   }
 
   function handleSearch(event: any) {
-    const { category: newCategory, location: newLocation } = event.detail;
+    const { category: newCategory, location: newLocation, query: newQuery } = event.detail;
 
     // Update URL parameters
     const url = new URL(window.location.href);
     if (newCategory) url.searchParams.set('category', newCategory);
     if (newLocation) url.searchParams.set('location', newLocation);
+    if (newQuery) url.searchParams.set('q', newQuery);
 
     // Navigate to the new URL
     goto(url.toString(), { replaceState: true });
@@ -88,13 +78,10 @@
     // Update local state
     category = newCategory || category;
     location = newLocation || location;
+    query = newQuery || query;
 
-    // Filter listings
-    loading = true;
-    setTimeout(() => {
-      listings = filterListings(allListings);
-      loading = false;
-    }, 500);
+    // Perform new search
+    performSearch();
   }
 
   function handleFilter(event: any) {
@@ -104,24 +91,20 @@
     category = newCategory || category;
     sort = newSort || sort;
 
-    // Filter and sort listings
-    loading = true;
-    setTimeout(() => {
-      listings = filterListings(allListings);
-      loading = false;
-    }, 300);
+    // Perform new search with updated filters
+    performSearch();
   }
 
-  function filterListings(allListings: any[]) {
+  function filterListings(allListings) {
     // Filter by category
     let filtered = allListings;
     if (category && category !== 'all') {
-      filtered = filtered.filter((listing: any) => listing.category === category);
+      filtered = filtered.filter(listing => listing.category === category);
     }
 
     // Filter by location
     if (location) {
-      filtered = filtered.filter((listing: any) =>
+      filtered = filtered.filter(listing =>
         listing.location.city.toLowerCase().includes(location.toLowerCase()) ||
         listing.location.state.toLowerCase().includes(location.toLowerCase())
       );
@@ -129,11 +112,11 @@
 
     // Sort listings
     if (sort === 'price_low') {
-      filtered = filtered.sort((a: any, b: any) => a.dailyPrice - b.dailyPrice);
+      filtered = filtered.sort((a, b) => a.dailyPrice - b.dailyPrice);
     } else if (sort === 'price_high') {
-      filtered = filtered.sort((a: any, b: any) => b.dailyPrice - a.dailyPrice);
+      filtered = filtered.sort((a, b) => b.dailyPrice - a.dailyPrice);
     } else if (sort === 'rating') {
-      filtered = filtered.sort((a: any, b: any) => b.owner.rating - a.owner.rating);
+      filtered = filtered.sort((a, b) => b.owner.rating - a.owner.rating);
     }
 
     return filtered;
@@ -161,7 +144,7 @@
       <ScrollAnimated animation="fade-up" delay={200}>
         <div class="mb-8">
           <HeroSearch
-            query=""
+            {query}
             {category}
             {location}
             on:search={handleSearch}

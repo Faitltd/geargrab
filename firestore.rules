@@ -42,8 +42,8 @@ service cloud.firestore {
     }
 
     // For development - temporary open access (remove in production)
-    match /{document=**} {
-      allow read, write: if true;
-    }
+    // match /{document=**} {
+    //   allow read, write: if true;
+    // }
   }
 }

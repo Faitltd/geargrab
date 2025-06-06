@@ -171,8 +171,9 @@ class SearchService {
     suggestions?: SearchSuggestion[];
   }> {
     try {
-      // In a real implementation, this would use Algolia, Elasticsearch, or Firebase's full-text search
-      // For now, we'll return sample data that matches the filters
+      // Use real Firestore data with client-side filtering
+      // In production, this should be replaced with a proper search service like Algolia
+      return await this.searchFirestore(filters);
       
       const sampleResults: SearchResult[] = [
         {
@@ -334,6 +335,229 @@ class SearchService {
       console.error('Error performing search:', error);
       throw error;
     }
+  }
+
+  // Real Firestore search implementation
+  private async searchFirestore(filters: SearchFilters): Promise<{
+    results: SearchResult[];
+    totalCount: number;
+    hasMore: boolean;
+    suggestions?: SearchSuggestion[];
+  }> {
+    try {
+      const listingsRef = collection(firestore, 'listings');
+      let constraints: any[] = [
+        where('isPublished', '==', true),
+        where('isActive', '==', true)
+      ];
+
+      // Add category filter
+      if (filters.category && filters.category !== 'all') {
+        constraints.push(where('category', '==', filters.category));
+      }
+
+      // Add price range filter (for daily price)
+      if (filters.priceRange) {
+        if (filters.priceRange.min > 0) {
+          constraints.push(where('dailyPrice', '>=', filters.priceRange.min));
+        }
+        if (filters.priceRange.max < 10000) {
+          constraints.push(where('dailyPrice', '<=', filters.priceRange.max));
+        }
+      }
+
+      // Add location filter (basic city/state matching)
+      if (filters.location?.city) {
+        constraints.push(where('location.city', '==', filters.location.city));
+      }
+      if (filters.location?.state) {
+        constraints.push(where('location.state', '==', filters.location.state));
+      }
+
+      // Add verified owners filter
+      if (filters.verifiedOwners) {
+        constraints.push(where('ownerVerified', '==', true));
+      }
+
+      // Add instant book filter
+      if (filters.instantBook) {
+        constraints.push(where('instantBook', '==', true));
+      }
+
+      // Add sorting
+      switch (filters.sortBy) {
+        case 'price_low':
+          constraints.push(orderBy('dailyPrice', 'asc'));
+          break;
+        case 'price_high':
+          constraints.push(orderBy('dailyPrice', 'desc'));
+          break;
+        case 'rating':
+          constraints.push(orderBy('averageRating', 'desc'));
+          break;
+        case 'newest':
+          constraints.push(orderBy('createdAt', 'desc'));
+          break;
+        default:
+          // Default to newest for now (relevance would require search indexing)
+          constraints.push(orderBy('createdAt', 'desc'));
+      }
+
+      // Add pagination
+      const pageSize = filters.limit || 20;
+      constraints.push(limit(pageSize + 1)); // Get one extra to check if there are more
+
+      if (filters.lastDoc) {
+        constraints.push(startAfter(filters.lastDoc));
+      }
+
+      const q = query(listingsRef, ...constraints);
+      const querySnapshot = await getDocs(q);
+
+      let listings: any[] = [];
+      querySnapshot.forEach((doc) => {
+        listings.push({ id: doc.id, ...doc.data() });
+      });
+
+      // Apply client-side text search if query provided
+      if (filters.query) {
+        const searchTerms = filters.query.toLowerCase().split(' ');
+        listings = listings.filter(listing => {
+          const searchableText = [
+            listing.title,
+            listing.description,
+            listing.brand,
+            listing.model,
+            listing.category,
+            ...(listing.features || [])
+          ].join(' ').toLowerCase();
+
+          return searchTerms.every(term => searchableText.includes(term));
+        });
+      }
+
+      // Apply additional client-side filters
+      if (filters.condition && filters.condition.length > 0) {
+        listings = listings.filter(listing =>
+          filters.condition!.includes(listing.condition)
+        );
+      }
+
+      if (filters.features && filters.features.length > 0) {
+        listings = listings.filter(listing =>
+          filters.features!.some(feature =>
+            listing.features?.includes(feature)
+          )
+        );
+      }
+
+      if (filters.deliveryOptions && filters.deliveryOptions.length > 0) {
+        listings = listings.filter(listing =>
+          filters.deliveryOptions!.some(option =>
+            listing.deliveryOptions?.includes(option)
+          )
+        );
+      }
+
+      if (filters.minRating && filters.minRating > 0) {
+        listings = listings.filter(listing =>
+          (listing.averageRating || 0) >= filters.minRating!
+        );
+      }
+
+      // Check if there are more results
+      const hasMore = listings.length > pageSize;
+      if (hasMore) {
+        listings = listings.slice(0, pageSize);
+      }
+
+      // Convert to SearchResult format
+      const results: SearchResult[] = listings.map(listing => ({
+        id: listing.id,
+        title: listing.title,
+        description: listing.description,
+        price: listing.dailyPrice,
+        priceUnit: 'day',
+        category: listing.category,
+        location: {
+          city: listing.location?.city || '',
+          state: listing.location?.state || '',
+          distance: 0 // Would calculate based on user location
+        },
+        images: listing.images || [],
+        rating: listing.averageRating || 0,
+        reviewCount: listing.reviewCount || 0,
+        owner: {
+          id: listing.ownerId,
+          name: listing.ownerName || 'Owner',
+          avatar: listing.ownerAvatar,
+          verified: listing.ownerVerified || false,
+          rating: listing.ownerRating || 0
+        },
+        features: listing.features || [],
+        condition: listing.condition || 'good',
+        instantBook: listing.instantBook || false,
+        deliveryOptions: listing.deliveryOptions || ['pickup'],
+        availability: {
+          available: true,
+          nextAvailable: new Date()
+        }
+      }));
+
+      return {
+        results,
+        totalCount: results.length,
+        hasMore,
+        suggestions: this.generateSuggestions(filters.query)
+      };
+
+    } catch (error) {
+      console.error('Error searching Firestore:', error);
+      // Fall back to mock data if Firestore fails
+      return this.searchMockData(filters);
+    }
+  }
+
+  // Keep the original mock data search as fallback
+  private async searchMockData(filters: SearchFilters): Promise<{
+    results: SearchResult[];
+    totalCount: number;
+    hasMore: boolean;
+    suggestions?: SearchSuggestion[];
+  }> {
+    // Return mock data for fallback
+    const mockResults: SearchResult[] = [
+      {
+        id: 'mock-1',
+        title: 'Professional DSLR Camera',
+        description: 'High-quality camera perfect for outdoor photography',
+        price: 45,
+        priceUnit: 'day',
+        category: 'photography',
+        location: { city: 'San Francisco', state: 'CA', distance: 2.5 },
+        images: ['https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=400'],
+        rating: 4.8,
+        reviewCount: 24,
+        owner: {
+          id: 'owner-1',
+          name: 'Sarah Johnson',
+          verified: true,
+          rating: 4.9
+        },
+        features: ['Weather Resistant', 'Professional Grade'],
+        condition: 'excellent',
+        instantBook: true,
+        deliveryOptions: ['pickup', 'delivery'],
+        availability: { available: true, nextAvailable: new Date() }
+      }
+    ];
+
+    return {
+      results: mockResults,
+      totalCount: mockResults.length,
+      hasMore: false,
+      suggestions: this.generateSuggestions(filters.query)
+    };
   }
 
   // Get search suggestions
