@@ -32,7 +32,7 @@
   let totalSteps = 3;
   
   // Get redirect URL from query parameters
-  $: redirectTo = $page.url.searchParams.get('redirectTo') || '/dashboard';
+  $: redirectTo = $page.url.searchParams.get('redirectTo') || '/';
 
   // US States for dropdown
   const states = [

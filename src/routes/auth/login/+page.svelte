@@ -23,7 +23,7 @@
   });
 
   // Get redirect URL from query parameters
-  $: redirectTo = $page.url.searchParams.get('redirectTo') || '/dashboard';
+  $: redirectTo = $page.url.searchParams.get('redirectTo') || '/';
 
   // Validate form
   function validateForm() {
