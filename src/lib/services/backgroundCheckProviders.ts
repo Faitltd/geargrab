@@ -99,56 +99,87 @@ class CheckrProvider extends BackgroundCheckProvider {
 
   async initiateBackgroundCheck(request: BackgroundCheckRequest): Promise<string> {
     try {
+      // Validate API key
+      if (!this.apiKey || this.apiKey === 'test_key') {
+        throw new Error('Checkr API key not configured. Please set CHECKR_API_KEY environment variable.');
+      }
+
+      console.log(`Initiating Checkr background check for request: ${request.requestId}`);
+
       // Create candidate
+      const candidatePayload = {
+        first_name: request.personalInfo.firstName,
+        last_name: request.personalInfo.lastName,
+        email: request.personalInfo.email,
+        phone: request.personalInfo.phone,
+        dob: request.personalInfo.dateOfBirth,
+        ssn: request.personalInfo.ssn,
+        zipcode: request.personalInfo.address.zipCode,
+        driver_license_number: '', // Optional
+        driver_license_state: request.personalInfo.address.state
+      };
+
       const candidateResponse = await fetch(`${this.baseUrl}/candidates`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'User-Agent': 'GearGrab/1.0'
         },
-        body: JSON.stringify({
-          first_name: request.personalInfo.firstName,
-          last_name: request.personalInfo.lastName,
-          email: request.personalInfo.email,
-          phone: request.personalInfo.phone,
-          dob: request.personalInfo.dateOfBirth,
-          ssn: request.personalInfo.ssn,
-          zipcode: request.personalInfo.address.zipCode,
-          driver_license_number: '', // Optional
-          driver_license_state: request.personalInfo.address.state
-        })
+        body: JSON.stringify(candidatePayload)
       });
 
       if (!candidateResponse.ok) {
-        throw new Error(`Checkr API error: ${candidateResponse.statusText}`);
+        const errorData = await candidateResponse.json().catch(() => ({}));
+        console.error('Checkr candidate creation failed:', {
+          status: candidateResponse.status,
+          statusText: candidateResponse.statusText,
+          error: errorData
+        });
+        throw new Error(`Failed to create candidate: ${candidateResponse.statusText} - ${JSON.stringify(errorData)}`);
       }
 
       const candidate = await candidateResponse.json();
+      console.log(`Checkr candidate created: ${candidate.id}`);
 
       // Create report
       const reportPackage = this.getReportPackage(request.checkType);
+      const reportPayload = {
+        candidate_id: candidate.id,
+        package: reportPackage,
+        tags: [`geargrab_${request.requestId}`],
+        consider: 'all' // Consider all records for comprehensive screening
+      };
+
       const reportResponse = await fetch(`${this.baseUrl}/reports`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'User-Agent': 'GearGrab/1.0'
         },
-        body: JSON.stringify({
-          candidate_id: candidate.id,
-          package: reportPackage,
-          tags: [`geargrab_${request.requestId}`]
-        })
+        body: JSON.stringify(reportPayload)
       });
 
       if (!reportResponse.ok) {
-        throw new Error(`Checkr report creation error: ${reportResponse.statusText}`);
+        const errorData = await reportResponse.json().catch(() => ({}));
+        console.error('Checkr report creation failed:', {
+          status: reportResponse.status,
+          statusText: reportResponse.statusText,
+          error: errorData
+        });
+        throw new Error(`Failed to create report: ${reportResponse.statusText} - ${JSON.stringify(errorData)}`);
       }
 
       const report = await reportResponse.json();
+      console.log(`Checkr report created: ${report.id} for request: ${request.requestId}`);
+
       return report.id;
 
     } catch (error) {
       console.error('Checkr API error:', error);
+      // Log error for monitoring
+      await this.logBackgroundCheckError(request.requestId, error);
       throw new Error(`Failed to initiate background check: ${error.message}`);
     }
   }
@@ -245,6 +276,23 @@ class CheckrProvider extends BackgroundCheckProvider {
       case 'complete': return 'completed';
       case 'disputed': return 'failed';
       default: return 'pending';
+    }
+  }
+
+  private async logBackgroundCheckError(requestId: string, error: any): Promise<void> {
+    try {
+      // In production, this would send to monitoring service
+      console.error('Background check error logged:', {
+        requestId,
+        provider: 'checkr',
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+
+      // Could integrate with services like Sentry, DataDog, etc.
+      // await monitoringService.logError('background_check_error', { requestId, error });
+    } catch (logError) {
+      console.error('Failed to log background check error:', logError);
     }
   }
 }

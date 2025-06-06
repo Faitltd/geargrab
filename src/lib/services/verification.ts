@@ -271,58 +271,68 @@ class VerificationService {
     return this.submitVerificationRequest(userId, 'email', emailData);
   }
 
-  // Verify phone number
-  async verifyPhone(userId: string, phoneNumber: string): Promise<string> {
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    const phoneData = {
-      phoneNumber,
-      verificationCode,
-      attempts: 0,
-      lastAttempt: new Date()
-    };
+  // Verify phone number using Twilio API
+  async verifyPhone(userId: string, phoneNumber: string): Promise<{ success: boolean; message: string; expiresAt?: string }> {
+    try {
+      const response = await fetch('/api/verify-phone/request-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phoneNumber })
+      });
 
-    // In a real implementation, send SMS here
-    console.log(`SMS verification code for ${phoneNumber}: ${verificationCode}`);
-    
-    return this.submitVerificationRequest(userId, 'phone', phoneData);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to send verification code');
+      }
+
+      return {
+        success: true,
+        message: 'Verification code sent successfully',
+        expiresAt: result.expiresAt
+      };
+    } catch (error) {
+      console.error('Error sending verification code:', error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to send verification code'
+      };
+    }
   }
 
-  // Confirm phone verification
-  async confirmPhoneVerification(requestId: string, code: string): Promise<boolean> {
+  // Confirm phone verification using Twilio API
+  async confirmPhoneVerification(userId: string, code: string): Promise<{ success: boolean; message: string; phoneNumber?: string }> {
     try {
-      const requestRef = doc(firestore, 'verificationRequests', requestId);
-      const requestDoc = await getDoc(requestRef);
-      
-      if (!requestDoc.exists()) {
-        throw new Error('Verification request not found');
+      const response = await fetch('/api/verify-phone/confirm-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: result.error || 'Failed to verify code'
+        };
       }
 
-      const request = requestDoc.data() as VerificationRequest;
-      
-      if (request.phoneData?.verificationCode === code) {
-        await updateDoc(requestRef, {
-          status: 'approved',
-          reviewedAt: serverTimestamp(),
-          'phoneData.verified': true
-        });
-        
-        // Update user verification status
-        await this.updateUserVerificationStatus(request.userId);
-        
-        return true;
-      } else {
-        // Increment attempts
-        await updateDoc(requestRef, {
-          'phoneData.attempts': (request.phoneData?.attempts || 0) + 1,
-          'phoneData.lastAttempt': serverTimestamp()
-        });
-        
-        return false;
-      }
+      return {
+        success: true,
+        message: 'Phone number verified successfully',
+        phoneNumber: result.phoneNumber
+      };
     } catch (error) {
       console.error('Error confirming phone verification:', error);
-      throw error;
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to verify code'
+      };
     }
   }
 

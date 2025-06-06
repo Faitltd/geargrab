@@ -24,7 +24,13 @@
     "test:parallel": "node cypress/scripts/run-tests.js parallel core auth dashboard",
     "test:ci": "node cypress/scripts/run-tests.js ci",
     "test:setup": "node cypress/scripts/setup-tests.js",
-    "setup:firebase": "node scripts/setup-firebase-env.js"
+    "setup:firebase": "node scripts/setup-firebase-env.js",
+    "test:production-readiness": "node scripts/production-readiness-test.js",
+    "audit:security": "node scripts/security-audit.js",
+    "deploy:check": "npm run test:production-readiness && npm run audit:security",
+    "test:fcra": "node -e \"import('./src/lib/jobs/finalAdverseCron.js').then(m => m.finalAdverseNoticeJob.runJob())\"",
+    "test:background-check": "curl -X POST http://localhost:5173/api/webhooks/iprospect?reportId=test_report_123",
+    "test:iprospectcheck": "node scripts/test-iprospectcheck.js"
   },
   "devDependencies": {
     "@sveltejs/adapter-node": "^1.0.0",
@@ -42,12 +48,16 @@
   },
   "dependencies": {
     "@stripe/stripe-js": "^7.3.1",
+    "axios": "^1.9.0",
     "date-fns": "^2.30.0",
     "express": "^5.1.0",
     "firebase": "^9.22.0",
-    "firebase-admin": "^11.8.0",
+    "firebase-admin": "^11.11.1",
     "isomorphic-dompurify": "^2.25.0",
+    "node-cron": "^4.1.0",
+    "nodemailer": "^7.0.3",
     "stripe": "^18.2.0",
-    "svelte-dnd-action": "^0.9.61"
+    "svelte-dnd-action": "^0.9.61",
+    "twilio": "^5.7.0"
   }
 }

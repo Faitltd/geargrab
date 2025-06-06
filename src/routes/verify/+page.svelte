@@ -38,13 +38,18 @@
 
   async function startPhoneVerification() {
     if (!$authStore.user || !phoneNumber) return;
-    
+
     try {
-      await verificationService.verifyPhone($authStore.user.uid, phoneNumber);
-      alert('Verification code sent via SMS!');
-      activeStep = 'phone-confirm';
+      const result = await verificationService.verifyPhone($authStore.user.uid, phoneNumber);
+      if (result.success) {
+        alert('Verification code sent via SMS!');
+        activeStep = 'phone-confirm';
+      } else {
+        alert(`Error: ${result.message}`);
+      }
     } catch (error) {
       console.error('Error starting phone verification:', error);
+      alert('Failed to send verification code. Please try again.');
     }
   }
 
@@ -72,17 +77,18 @@
     if (!$authStore.user || !verificationCode) return;
 
     try {
-      const success = await verificationService.confirmPhoneVerification($authStore.user.uid, verificationCode);
-      if (success) {
+      const result = await verificationService.confirmPhoneVerification($authStore.user.uid, verificationCode);
+      if (result.success) {
         alert('Phone verified successfully!');
         activeStep = 'overview';
         // Reload verification status
         verificationStatus = await verificationService.getUserVerificationStatus($authStore.user.uid);
       } else {
-        alert('Invalid verification code. Please try again.');
+        alert(`Error: ${result.message}`);
       }
     } catch (error) {
       console.error('Error confirming phone verification:', error);
+      alert('Failed to verify code. Please try again.');
     }
   }
 

@@ -171,9 +171,8 @@ class SearchService {
     suggestions?: SearchSuggestion[];
   }> {
     try {
-      // Use real Firestore data with client-side filtering
-      // In production, this should be replaced with a proper search service like Algolia
-      return await this.searchFirestore(filters);
+      // Use the new search API endpoint
+      return await this.searchAPI(filters);
       
       const sampleResults: SearchResult[] = [
         {
@@ -334,6 +333,100 @@ class SearchService {
     } catch (error) {
       console.error('Error performing search:', error);
       throw error;
+    }
+  }
+
+  // New API-based search implementation
+  private async searchAPI(filters: SearchFilters): Promise<{
+    results: SearchResult[];
+    totalCount: number;
+    hasMore: boolean;
+    suggestions?: SearchSuggestion[];
+  }> {
+    try {
+      // Build query parameters
+      const searchParams = new URLSearchParams();
+
+      if (filters.query) searchParams.set('q', filters.query);
+      if (filters.location?.coordinates?.lat) searchParams.set('lat', filters.location.coordinates.lat.toString());
+      if (filters.location?.coordinates?.lng) searchParams.set('lng', filters.location.coordinates.lng.toString());
+      if (filters.location?.radius) searchParams.set('radius', filters.location.radius.toString());
+      if (filters.category && filters.category !== 'all') searchParams.set('category', filters.category);
+      if (filters.priceRange?.min !== undefined) searchParams.set('minPrice', filters.priceRange.min.toString());
+      if (filters.priceRange?.max !== undefined) searchParams.set('maxPrice', filters.priceRange.max.toString());
+      if (filters.limit) searchParams.set('limit', filters.limit.toString());
+      if (filters.sortBy) searchParams.set('sortBy', filters.sortBy);
+
+      // Make API call
+      const response = await fetch(`/api/search/listings?${searchParams.toString()}`);
+
+      if (!response.ok) {
+        throw new Error(`Search failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Search failed');
+      }
+
+      // Convert API response to SearchResult format
+      const results: SearchResult[] = (data.listings || []).map((listing: any) => ({
+        id: listing.id,
+        title: listing.title,
+        description: listing.description,
+        category: listing.category,
+        subcategory: listing.subcategory,
+        dailyPrice: listing.dailyPrice,
+        weeklyPrice: listing.weeklyPrice,
+        monthlyPrice: listing.monthlyPrice,
+        images: listing.images || [],
+        location: {
+          city: listing.location?.city || '',
+          state: listing.location?.state || '',
+          coordinates: listing.location?.lat && listing.location?.lng ? {
+            lat: listing.location.lat,
+            lng: listing.location.lng
+          } : undefined
+        },
+        owner: {
+          id: listing.ownerUid,
+          name: listing.ownerName || 'Owner',
+          avatar: listing.ownerAvatar,
+          rating: listing.ownerRating || 0,
+          reviewCount: listing.ownerReviewCount || 0,
+          isVerified: listing.ownerVerified || false
+        },
+        features: listing.features || [],
+        condition: listing.condition || 'good',
+        rating: listing.averageRating || 0,
+        reviewCount: listing.reviewCount || 0,
+        distance: listing.distance,
+        availability: {
+          instantBook: listing.instantBook || false,
+          deliveryOptions: listing.deliveryOptions || ['pickup'],
+          nextAvailable: listing.nextAvailable ? new Date(listing.nextAvailable) : new Date()
+        },
+        insurance: {
+          required: listing.insuranceRequired || false,
+          tiers: listing.insuranceTiers || ['basic']
+        },
+        createdAt: listing.createdAt ? new Date(listing.createdAt) : new Date(),
+        lastBooked: listing.lastBooked ? new Date(listing.lastBooked) : undefined,
+        isPromoted: listing.isPromoted || false
+      }));
+
+      return {
+        results,
+        totalCount: data.totalCount || 0,
+        hasMore: data.listings?.length === (filters.limit || 20),
+        suggestions: this.generateSuggestions(filters.query)
+      };
+
+    } catch (error) {
+      console.error('Error searching via API:', error);
+      // Fall back to mock data if API fails
+      return this.searchMockData(filters);
     }
   }
 
