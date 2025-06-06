@@ -48,7 +48,7 @@
     <ScrollAnimated animation="fade-up" delay={100}>
       <div class="absolute top-24 left-1/2 transform -translate-x-1/2">
         <h1 class="text-2xl md:text-3xl font-bold text-white drop-shadow-lg tracking-wider">
-          GearGrab
+          Gear Grab
         </h1>
       </div>
     </ScrollAnimated>
