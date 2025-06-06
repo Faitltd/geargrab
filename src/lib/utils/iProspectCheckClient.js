@@ -7,9 +7,17 @@ import axios from 'axios';
 
 class IProspectCheckClient {
   constructor() {
+    this.baseURL = 'https://api.iprospectcheck.com/v1';
+    this.client = null;
+    this.initialized = false;
+  }
+
+  // Lazy initialization to avoid build-time errors
+  initialize() {
+    if (this.initialized) return;
+
     this.apiKey = process.env.IPROSPECT_API_KEY;
     this.apiSecret = process.env.IPROSPECT_API_SECRET;
-    this.baseURL = 'https://api.iprospectcheck.com/v1';
 
     if (!this.apiKey || !this.apiSecret) {
       throw new Error('IPROSPECT_API_KEY and IPROSPECT_API_SECRET environment variables are required');
@@ -26,6 +34,8 @@ class IProspectCheckClient {
         'User-Agent': 'GearGrab/1.0'
       }
     });
+
+    this.initialized = true;
   }
 
   /**
@@ -42,6 +52,7 @@ class IProspectCheckClient {
    * @returns {Promise<Object>} Report object
    */
   async createReport(candidateData, metadata = {}) {
+    this.initialize();
     try {
       const payload = {
         candidate: {
@@ -98,6 +109,7 @@ class IProspectCheckClient {
    * @returns {Promise<Object>} Report object with status and results
    */
   async fetchReport(reportId) {
+    this.initialize();
     try {
       const response = await this.client.get(`/reports/${reportId}`);
 
@@ -126,6 +138,7 @@ class IProspectCheckClient {
    * @returns {Promise<string>} PDF URL
    */
   async getReportPdfUrl(reportId) {
+    this.initialize();
     try {
       const report = await this.fetchReport(reportId);
       return report.pdf_url || `https://portal.iprospectcheck.com/reports/${reportId}`;
@@ -144,6 +157,7 @@ class IProspectCheckClient {
    * @returns {Promise<Object>} Completed report object
    */
   async pollReportCompletion(reportId, maxAttempts = 120, intervalMs = 5000) {
+    this.initialize();
     let attempts = 0;
 
     while (attempts < maxAttempts) {

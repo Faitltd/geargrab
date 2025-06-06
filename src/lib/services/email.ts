@@ -883,3 +883,62 @@ export class EmailAutomationService {
     }
   }
 }
+
+// Generic email template sender function
+export async function sendEmailTemplate(
+  templateType: string,
+  data: any
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    let template: EmailTemplate;
+
+    switch (templateType) {
+      case 'phoneVerified':
+        template = verificationEmailTemplates.phoneVerified({
+          userId: data.userId || '',
+          userEmail: data.userEmail,
+          userName: data.userName,
+          verificationType: 'phone',
+          status: 'verified',
+          requestId: data.requestId || '',
+          phoneNumber: data.phoneNumber
+        });
+        break;
+
+      case 'identityVerified':
+        template = verificationEmailTemplates.identityVerified({
+          userId: data.userId || '',
+          userEmail: data.userEmail,
+          userName: data.userName,
+          verificationType: 'identity',
+          status: 'verified',
+          requestId: data.requestId || ''
+        });
+        break;
+
+      case 'paymentConfirmation':
+        template = paymentEmailTemplates.paymentConfirmation(data);
+        break;
+
+      case 'paymentFailed':
+        template = paymentEmailTemplates.paymentFailed(data);
+        break;
+
+      default:
+        return {
+          success: false,
+          error: `Unknown email template type: ${templateType}`
+        };
+    }
+
+    const success = await sendEmail(template);
+    return { success };
+
+  } catch (error) {
+    console.error('Error sending email template:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+}
