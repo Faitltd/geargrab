@@ -82,9 +82,9 @@
 
 <!-- Enhanced Search Form with Autocomplete -->
 <form on:submit|preventDefault={handleSearch} class="w-full">
-  <div class="flex flex-col md:flex-row gap-3 items-center md:items-end">
+  <div class="flex flex-col gap-3 items-center">
     <!-- Search Input with Autocomplete -->
-    <div class="w-full md:flex-1 relative">
+    <div class="w-full relative">
       <input
         bind:this={searchInput}
         type="text"
@@ -130,7 +130,7 @@
     </div>
 
     <!-- Location Input -->
-    <div class="w-full md:flex-1">
+    <div class="w-full">
       <input
         type="text"
         bind:value={selectedLocation}
@@ -140,10 +140,10 @@
     </div>
 
     <!-- Search Button -->
-    <div class="w-full md:w-auto">
+    <div class="w-full">
       <button
         type="submit"
-        class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-lg transition-colors whitespace-nowrap"
+        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-lg transition-colors"
       >
         Search Gear
       </button>
