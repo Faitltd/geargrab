@@ -54,9 +54,9 @@
   function getVerificationLevelColor(level: string): string {
     switch (level) {
       case 'none': return 'text-gray-400';
-      case 'basic': return 'text-blue-400';
+      case 'basic': return 'text-green-400';
       case 'standard': return 'text-green-400';
-      case 'premium': return 'text-purple-400';
+      case 'premium': return 'text-green-400';
       default: return 'text-gray-400';
     }
   }
@@ -152,7 +152,7 @@
             </div>
           </div>
           {#if !verificationStatus.verifiedMethods.email}
-            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
+            <button class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
               Verify Email
             </button>
           {/if}
@@ -176,7 +176,7 @@
             </div>
           </div>
           {#if !verificationStatus.verifiedMethods.phone}
-            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
+            <button class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
               Verify Phone
             </button>
           {/if}
@@ -200,7 +200,7 @@
             </div>
           </div>
           {#if !verificationStatus.verifiedMethods.identity}
-            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
+            <button class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
               Upload ID
             </button>
           {/if}
@@ -224,7 +224,7 @@
             </div>
           </div>
           {#if !verificationStatus.verifiedMethods.payment}
-            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
+            <button class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
               Add Payment Method
             </button>
           {/if}
@@ -248,7 +248,7 @@
             </div>
           </div>
           {#if !verificationStatus.verifiedMethods.address}
-            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
+            <button class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
               Verify Address
             </button>
           {/if}

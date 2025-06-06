@@ -63,7 +63,7 @@
   function getStatusColor(status: string) {
     switch (status) {
       case 'active': return 'bg-green-500';
-      case 'confirmed': return 'bg-blue-500';
+      case 'confirmed': return 'bg-green-500';
       case 'pending': return 'bg-yellow-500';
       case 'completed': return 'bg-gray-500';
       case 'cancelled': return 'bg-red-500';
@@ -116,7 +116,7 @@
     <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6">
       <div class="flex items-center">
         <div class="flex-shrink-0">
-          <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+          <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
@@ -134,7 +134,7 @@
     <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6">
       <div class="flex items-center">
         <div class="flex-shrink-0">
-          <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
+          <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
             </svg>
@@ -220,7 +220,7 @@
                     </div>
                     <div class="flex space-x-2">
                       <button
-                        class="text-blue-400 hover:text-blue-300 text-sm font-medium inline-flex items-center space-x-1 bg-blue-500/20 hover:bg-blue-500/30 px-3 py-1 rounded-lg transition-all"
+                        class="text-green-400 hover:text-green-300 text-sm font-medium inline-flex items-center space-x-1 bg-green-500/20 hover:bg-green-500/30 px-3 py-1 rounded-lg transition-all"
                         on:click={() => goto(`/listing/${booking.listingId}`)}
                       >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
