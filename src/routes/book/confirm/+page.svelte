@@ -4,6 +4,8 @@
   import { goto } from '$app/navigation';
   import { authStore } from '$lib/stores/auth';
   import StripePaymentForm from '$lib/components/payments/StripePaymentForm.svelte';
+  import { firestore } from '$lib/firebase/client';
+  import { doc, getDoc } from 'firebase/firestore';
 
   // Get booking details from URL parameters
   let listingId = '';
@@ -32,6 +34,11 @@
   let specialRequests = '';
   let agreeToTerms = false;
 
+  // Reactive statement to populate user info when auth state changes
+  $: if ($authStore.user && !contactInfo.email) {
+    populateUserInfo();
+  }
+
   onMount(() => {
     // Get URL parameters
     const urlParams = $page.url.searchParams;
@@ -48,9 +55,62 @@
       return;
     }
 
+    // Pre-populate form with user information
+    populateUserInfo();
+
     // Load listing data (in a real app, this would fetch from API)
     loadListingData();
   });
+
+  async function populateUserInfo() {
+    if ($authStore.user) {
+      const user = $authStore.user;
+
+      try {
+        // Fetch complete user profile from Firestore
+        const userRef = doc(firestore, 'users', user.uid);
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+
+          // Use firstName and lastName from Firestore if available
+          if (userData.firstName && userData.lastName) {
+            contactInfo.firstName = userData.firstName;
+            contactInfo.lastName = userData.lastName;
+          } else if (user.displayName) {
+            // Fall back to splitting display name
+            const nameParts = user.displayName.trim().split(' ');
+            contactInfo.firstName = nameParts[0] || '';
+            contactInfo.lastName = nameParts.slice(1).join(' ') || '';
+          }
+
+          // Set email and phone from user profile
+          contactInfo.email = user.email || '';
+          contactInfo.phone = userData.phoneNumber || '';
+
+        } else {
+          // Fall back to basic auth user data if no Firestore profile
+          if (user.displayName) {
+            const nameParts = user.displayName.trim().split(' ');
+            contactInfo.firstName = nameParts[0] || '';
+            contactInfo.lastName = nameParts.slice(1).join(' ') || '';
+          }
+          contactInfo.email = user.email || '';
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+
+        // Fall back to basic auth user data on error
+        if (user.displayName) {
+          const nameParts = user.displayName.trim().split(' ');
+          contactInfo.firstName = nameParts[0] || '';
+          contactInfo.lastName = nameParts.slice(1).join(' ') || '';
+        }
+        contactInfo.email = user.email || '';
+      }
+    }
+  }
 
   function loadListingData() {
     // Simulate API call - in real app, fetch listing by ID
