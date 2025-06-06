@@ -33,9 +33,10 @@
   ];
 </script>
 
-<!-- Full Page Video Background -->
+<!-- Full Page Video Background with Performance Optimization -->
 <VideoBackground
   videoSrc="/1877846-hd_1920_1080_30fps.mp4"
+  imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
   overlayOpacity={0.4}
 />
 
@@ -53,7 +54,7 @@
     </ScrollAnimated>
 
     <!-- Main Hero Content -->
-    <ScrollAnimated animation="fade-up" delay={300}>
+    <ScrollAnimated animation="fade-up" delay={100}>
       <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8 max-w-4xl mx-auto shadow-lg">
         <h2 class="text-5xl md:text-6xl font-bold mb-6 drop-shadow-lg">
           Meet Up. Gear Up. Get Out.
@@ -63,11 +64,9 @@
         </p>
 
         <!-- Search Form -->
-        <ScrollAnimated animation="fade-up" delay={500}>
-          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto border border-white/20 shadow-lg">
-            <HeroSearch />
-          </div>
-        </ScrollAnimated>
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto border border-white/20 shadow-lg">
+          <HeroSearch />
+        </div>
       </div>
     </ScrollAnimated>
 
@@ -158,7 +157,7 @@
             </p>
           </div>
 
-          <SequentialAnimator baseDelay={300} incrementDelay={150} className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <SequentialAnimator baseDelay={100} incrementDelay={100} className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {#each features as feature}
               <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 hover:border-green-500 transition-all duration-300 shadow-lg">
                 <div class="text-4xl mb-4">{feature.icon}</div>
