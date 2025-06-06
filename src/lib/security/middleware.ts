@@ -1,7 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
 import { adminAuth } from '$firebase/server';
-import rateLimit from '$lib/security/rateLimit';
+import { rateLimit } from '$lib/security/rateLimit';
 import { validateInput } from '$lib/security/validation';
 import { auditLog } from '$lib/security/audit';
 

@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { adminAuth, adminFirestore } from '$firebase/server';
 import { createSecureHandler, ValidationSchemas } from '$lib/security/middleware';
 import { auditLog } from '$lib/security/audit';
-import { serverTimestamp } from 'firebase-admin/firestore';
+import { FieldValue } from 'firebase-admin/firestore';
 
 // Enhanced session creation with security features
 export const POST: RequestHandler = createSecureHandler(
@@ -44,10 +44,10 @@ export const POST: RequestHandler = createSecureHandler(
         ip: getClientAddress(),
         userAgent: request.headers.get('User-Agent') || 'unknown',
         deviceInfo: deviceInfo || {},
-        createdAt: serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
         expiresAt: new Date(Date.now() + expiresIn),
         isActive: true,
-        lastActivity: serverTimestamp()
+        lastActivity: FieldValue.serverTimestamp()
       });
 
       // Set secure session cookie
@@ -134,7 +134,7 @@ export const DELETE: RequestHandler = createSecureHandler(
       if (sessionId) {
         await adminFirestore.collection('userSessions').doc(sessionId).update({
           isActive: false,
-          loggedOutAt: serverTimestamp(),
+          loggedOutAt: FieldValue.serverTimestamp(),
           logoutIp: getClientAddress()
         });
       }
@@ -197,7 +197,7 @@ export const GET: RequestHandler = createSecureHandler(
 
           // Update last activity
           await sessionDoc.ref.update({
-            lastActivity: serverTimestamp()
+            lastActivity: FieldValue.serverTimestamp()
           });
         }
       } catch (error) {

@@ -1,5 +1,5 @@
 import { adminFirestore } from '$firebase/server';
-import { serverTimestamp } from 'firebase-admin/firestore';
+import { FieldValue } from 'firebase-admin/firestore';
 
 // Audit event types
 export type AuditEventType = 
@@ -101,8 +101,8 @@ export class AuditLogger {
         .collection(this.COLLECTIONS.SECURITY_EVENTS)
         .add({
           ...event,
-          timestamp: serverTimestamp(),
-          createdAt: serverTimestamp()
+          timestamp: FieldValue.serverTimestamp(),
+          createdAt: FieldValue.serverTimestamp()
         });
 
       // Log high-risk events to console for immediate attention
@@ -129,8 +129,8 @@ export class AuditLogger {
         .collection(this.COLLECTIONS.USER_ACTIVITIES)
         .add({
           ...activity,
-          timestamp: serverTimestamp(),
-          createdAt: serverTimestamp()
+          timestamp: FieldValue.serverTimestamp(),
+          createdAt: FieldValue.serverTimestamp()
         });
 
     } catch (error) {
@@ -145,8 +145,8 @@ export class AuditLogger {
         .collection(this.COLLECTIONS.ADMIN_ACTIONS)
         .add({
           ...action,
-          timestamp: serverTimestamp(),
-          createdAt: serverTimestamp()
+          timestamp: FieldValue.serverTimestamp(),
+          createdAt: FieldValue.serverTimestamp()
         });
 
       // Always log admin actions to console
@@ -175,8 +175,8 @@ export class AuditLogger {
           event,
           details,
           severity,
-          timestamp: serverTimestamp(),
-          createdAt: serverTimestamp()
+          timestamp: FieldValue.serverTimestamp(),
+          createdAt: FieldValue.serverTimestamp()
         });
 
     } catch (error) {
