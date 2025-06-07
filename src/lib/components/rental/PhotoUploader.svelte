@@ -224,21 +224,4 @@
   </div>
 </div>
 
-<style>
-  .upload-area {
-    @apply border-2 border-dashed border-white/30 rounded-lg p-8 cursor-pointer transition-all duration-200;
-    @apply hover:border-green-500/50 hover:bg-white/5;
-  }
-  
-  .upload-area.active {
-    @apply border-green-500/70 bg-green-500/10;
-  }
-  
-  .upload-area.uploading {
-    @apply cursor-not-allowed border-gray-500/50 bg-gray-500/10;
-  }
-  
-  .upload-area:focus {
-    @apply outline-none ring-2 ring-green-500/50 border-green-500/50;
-  }
-</style>
+
