@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createSecureHandler } from '$lib/security/middleware';
-import { adminStorage } from '$firebase/server';
+import { adminStorage } from '$lib/firebase/server';
 import { auditLog } from '$lib/security/audit';
 import crypto from 'crypto';
 

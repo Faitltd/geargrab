@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { adminAuth, adminFirestore } from '$firebase/server';
+import { adminAuth, adminFirestore } from '$lib/firebase/server';
 import { createSecureHandler, ValidationSchemas } from '$lib/security/middleware';
 import { auditLog } from '$lib/security/audit';
 import { FieldValue } from 'firebase-admin/firestore';

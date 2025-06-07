@@ -2,28 +2,38 @@
   import { onMount, onDestroy } from 'svelte';
   import { chatService, type ChatConversation } from '$lib/services/chat';
   import { authStore } from '$lib/stores/auth';
-  import type { Unsubscribe } from 'firebase/firestore';
 
   export let selectedConversationId: string | null = null;
   export let onConversationSelect: (conversation: ChatConversation) => void;
 
   let conversations: ChatConversation[] = [];
-  let unsubscribe: Unsubscribe | null = null;
+  let refreshInterval: number | null = null;
   let loading = true;
 
   onMount(() => {
     if ($authStore.user) {
-      // Subscribe to conversations
-      unsubscribe = chatService.subscribeToConversations($authStore.user.uid, (newConversations) => {
-        conversations = newConversations;
-        loading = false;
-      });
+      loadConversations();
+
+      // Set up periodic refresh for real-time updates
+      refreshInterval = setInterval(loadConversations, 5000); // Refresh every 5 seconds
     }
   });
 
+  async function loadConversations() {
+    if (!$authStore.user) return;
+
+    try {
+      conversations = await chatService.getRecentConversations($authStore.user.uid);
+      loading = false;
+    } catch (error) {
+      console.error('Error loading conversations:', error);
+      loading = false;
+    }
+  }
+
   onDestroy(() => {
-    if (unsubscribe) {
-      unsubscribe();
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
     }
   });
 

@@ -3,6 +3,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { searchService, GEAR_CATEGORIES, GEAR_FEATURES, type SearchFilters, type SearchResult } from '$lib/services/search';
+  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
 
   let searchQuery = '';
   let results: SearchResult[] = [];
@@ -94,16 +95,11 @@
 </svelte:head>
 
 <!-- Full Page Background -->
-<div class="fixed inset-0 z-0">
-  <div class="absolute inset-0">
-    <img
-      src="/pexels-bianca-gasparoto-834990-1752951.jpg"
-      alt="Mountain landscape"
-      class="w-full h-full object-cover"
-    >
-  </div>
-  <div class="absolute inset-0 bg-black opacity-40"></div>
-</div>
+<VideoBackground
+  videoSrc="/Milky Way.mp4"
+  imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
+  overlayOpacity={0.4}
+/>
 
 <!-- Page Content -->
 <div class="relative z-10 min-h-screen py-8">

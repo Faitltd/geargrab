@@ -79,121 +79,109 @@ async function populateSampleData() {
       }
     ];
 
-    // Sample listings
+    // Sample listings - New realistic outdoor gear listing
     const listings = [
       {
-        id: 'listing1',
-        title: 'Professional Camera Kit',
-        description: 'High-end DSLR camera with multiple lenses perfect for photography enthusiasts.',
-        category: 'Photography',
-        dailyPrice: 75,
-        ownerUid: 'user1',
-        ownerEmail: 'john@example.com',
-        isPublished: true,
-        createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
-        images: ['camera1.jpg', 'camera2.jpg'],
-        status: 'published'
-      },
-      {
-        id: 'listing2',
-        title: 'Drone with 4K Camera',
-        description: 'Professional drone for aerial photography and videography.',
-        category: 'Photography',
-        dailyPrice: 120,
-        ownerUid: 'user2',
-        ownerEmail: 'sarah@example.com',
-        isPublished: true,
-        createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
-        images: ['drone1.jpg'],
-        status: 'published'
-      },
-      {
-        id: 'listing3',
-        title: 'Mountain Bike',
-        description: 'High-performance mountain bike for trail adventures.',
-        category: 'Sports',
+        id: '3',
+        title: 'REI Co-op Half Dome 4 Plus Tent - Family Camping',
+        description: 'Spacious 4-person tent perfect for family camping adventures. Features two large vestibules for gear storage, color-coded clips for easy setup, and excellent weather protection. Recently used on only 3 camping trips - in excellent condition!',
+        category: 'camping',
+        subcategory: 'tents',
+        brand: 'REI Co-op',
+        model: 'Half Dome 4 Plus',
+        condition: 'excellent',
+        ageInYears: 1,
         dailyPrice: 45,
+        weeklyPrice: 250,
+        monthlyPrice: 800,
+        securityDeposit: 150,
         ownerUid: 'user1',
-        ownerEmail: 'john@example.com',
+        ownerEmail: 'sarah.outdoors@example.com',
+        ownerName: 'Sarah Johnson',
+        ownerPhone: '+1-801-555-0123',
         isPublished: true,
+        isActive: true,
+        status: 'published',
         createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-        images: ['bike1.jpg'],
-        status: 'published'
-      },
-      {
-        id: 'listing4',
-        title: 'Camping Tent (4-person)',
-        description: 'Spacious 4-person tent perfect for family camping trips.',
-        category: 'Camping',
-        dailyPrice: 35,
-        ownerUid: 'user4',
-        ownerEmail: 'lisa@example.com',
-        isPublished: true,
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-        images: ['tent1.jpg'],
-        status: 'published'
-      },
-      {
-        id: 'listing5',
-        title: 'Kayak with Paddle',
-        description: 'Single-person kayak with paddle for water adventures.',
-        category: 'Water Sports',
-        dailyPrice: 55,
-        ownerUid: 'user2',
-        ownerEmail: 'sarah@example.com',
-        isPublished: true,
-        createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000),
-        images: ['kayak1.jpg'],
-        status: 'published'
+        updatedAt: new Date(),
+        images: [
+          'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          'https://images.unsplash.com/photo-1571863533956-01c88e79957e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+        ],
+        location: {
+          city: 'Salt Lake City',
+          state: 'UT',
+          zipCode: '84101',
+          coordinates: {
+            lat: 40.7608,
+            lng: -111.8910
+          }
+        },
+        features: ['Waterproof', 'Easy Setup', 'Two Vestibules', 'Color-Coded Clips', 'Freestanding'],
+        specifications: {
+          'Capacity': '4 people',
+          'Weight': '8.5 lbs',
+          'Floor Area': '55 sq ft',
+          'Peak Height': '6 ft',
+          'Seasons': '3-season',
+          'Setup Time': '10 minutes'
+        },
+        availability: {
+          instantBook: true,
+          minimumRental: 1,
+          maximumRental: 14,
+          deliveryOptions: ['pickup', 'delivery'],
+          deliveryRadius: 25,
+          unavailableDates: []
+        },
+        rules: [
+          'Clean and dry the tent before returning',
+          'Report any damage immediately',
+          'No smoking in or around the tent',
+          'Follow Leave No Trace principles'
+        ],
+        includedItems: [
+          'Tent body and rainfly',
+          'Tent poles and stakes',
+          'Guy lines and tensioners',
+          'Stuff sack and setup instructions',
+          'Footprint (ground tarp)'
+        ],
+        insurance: {
+          required: true,
+          coverage: 'standard',
+          deductible: 50
+        },
+        cancellationPolicy: 'flexible',
+        tags: ['camping', 'tent', 'family', 'outdoor', 'hiking', 'backpacking', 'rei'],
+        searchKeywords: 'family tent camping outdoor gear rei half dome',
+        views: 0,
+        bookingCount: 0,
+        averageRating: 0,
+        reviewCount: 0
       }
     ];
 
-    // Sample bookings
+    // Sample bookings - Updated to reference the new listing
     const bookings = [
       {
         id: 'booking1',
-        listingId: 'listing1',
-        listingTitle: 'Professional Camera Kit',
+        listingId: '3',
+        listingTitle: 'REI Co-op Half Dome 4 Plus Tent - Family Camping',
         renterUid: 'user3',
         renterEmail: 'mike@example.com',
         ownerUid: 'user1',
-        ownerEmail: 'john@example.com',
-        startDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-        endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
-        dailyPrice: 75,
-        totalAmount: 225, // 3 days * $75
-        status: 'active',
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
-      },
-      {
-        id: 'booking2',
-        listingId: 'listing2',
-        listingTitle: 'Drone with 4K Camera',
-        renterUid: 'user5',
-        renterEmail: 'david@example.com',
-        ownerUid: 'user2',
-        ownerEmail: 'sarah@example.com',
-        startDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
-        endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-        dailyPrice: 120,
-        totalAmount: 240, // 2 days * $120
-        status: 'active',
-        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
-      },
-      {
-        id: 'booking3',
-        listingId: 'listing4',
-        listingTitle: 'Camping Tent (4-person)',
-        renterUid: 'user1',
-        renterEmail: 'john@example.com',
-        ownerUid: 'user4',
-        ownerEmail: 'lisa@example.com',
-        startDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-        endDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-        dailyPrice: 35,
-        totalAmount: 35, // 1 day * $35
-        status: 'completed',
-        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+        ownerEmail: 'sarah.outdoors@example.com',
+        startDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        endDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
+        dailyPrice: 45,
+        totalAmount: 135, // 3 days * $45
+        status: 'confirmed',
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        paymentStatus: 'paid',
+        transferMethod: 'pickup',
+        pickupLocation: 'Salt Lake City, UT',
+        specialInstructions: 'Please bring the tent clean and dry. Looking forward to our camping trip!'
       }
     ];
 

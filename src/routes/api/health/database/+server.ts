@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { adminFirestore } from '$firebase/server';
+import { adminFirestore } from '$lib/firebase/server';
 
 export const GET: RequestHandler = async () => {
   try {

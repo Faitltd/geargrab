@@ -70,11 +70,13 @@
       <div class="flex">
         <div class="flex-shrink-0 flex items-center">
           <a href="/" class="flex items-center">
-            <img
-              src="/geargrab-logo-transparent.png"
-              alt="GearGrab"
-              class="h-10 w-auto"
-            />
+            <div class="bg-white rounded-full p-2 shadow-lg flex items-center justify-center">
+              <img
+                src="/geargrab-logo.png"
+                alt="GearGrab"
+                class="h-8 w-auto object-contain"
+              />
+            </div>
           </a>
         </div>
         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">

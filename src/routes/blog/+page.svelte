@@ -1,45 +1,15 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
+  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
 
-  let videoElement: HTMLVideoElement;
   let heroVisible = false;
-
-  // Video event handlers
-  function handleVideoLoaded() {
-    if (videoElement) {
-      videoElement.style.opacity = '1';
-    }
-  }
-
-  function handleVideoError() {
-    if (videoElement) {
-      videoElement.style.display = 'none';
-    }
-  }
 
   onMount(() => {
     // Trigger hero animation after a short delay
     setTimeout(() => {
       heroVisible = true;
     }, 300);
-
-    // Parallax effect
-    const handleScroll = () => {
-      const scrolled = window.pageYOffset;
-      const parallaxVideo = document.querySelector('.parallax-video') as HTMLElement;
-
-      if (parallaxVideo) {
-        const speed = -0.5; // Negative value for proper parallax effect
-        parallaxVideo.style.transform = `translateY(${scrolled * speed}px)`;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
   });
 
   // Sample blog posts
@@ -131,39 +101,11 @@
 </svelte:head>
 
 <!-- Full Page Video Background -->
-<div class="fixed inset-0 z-0">
-  <!-- Background Image (always visible as fallback) -->
-  <div class="absolute inset-0">
-    <img
-      src="/pexels-bianca-gasparoto-834990-1752951.jpg"
-      alt="Mountain landscape with stars"
-      class="w-full h-full object-cover"
-    >
-  </div>
-
-  <!-- Video Background (overlays image when loaded) -->
-  <video
-    bind:this={videoElement}
-    class="parallax-video absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-    style="opacity: 1;"
-    autoplay
-    muted
-    loop
-    playsinline
-    on:loadeddata={handleVideoLoaded}
-    on:error={handleVideoError}
-    on:loadstart={() => console.log('Blog video load started')}
-  >
-    <!-- Adventure/nature video for blog -->
-    <source src="/1877846-hd_1920_1080_30fps.mp4" type="video/mp4" />
-    <!-- Fallback videos -->
-    <source src="/857134-hd_1280_720_24fps.mp4" type="video/mp4" />
-    <source src="https://player.vimeo.com/external/291648067.hd.mp4?s=94998971682c6a3267e4cbd19d16a7b6c720f345&profile_id=175" type="video/mp4" />
-  </video>
-
-  <!-- Light Overlay for Text Readability -->
-  <div class="absolute inset-0 bg-black opacity-30"></div>
-</div>
+<VideoBackground
+  videoSrc="/1877846-hd_1920_1080_30fps.mp4"
+  imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
+  overlayOpacity={0.4}
+/>
 
 <!-- Page Content with Video Background -->
 <div class="relative z-10 min-h-screen" style="position: relative; z-index: 10;">
@@ -281,11 +223,6 @@
 </div>
 
 <style>
-  .parallax-video {
-    will-change: transform;
-    transform-origin: center center;
-  }
-
   /* Ensure scrolling works properly */
   :global(html) {
     scroll-behavior: smooth;

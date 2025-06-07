@@ -1,211 +1,86 @@
 import { dev } from '$app/environment';
+import { initializeApp, getApps, cert, type App } from 'firebase-admin/app';
+import { getAuth, type Auth } from 'firebase-admin/auth';
+import { getFirestore, type Firestore } from 'firebase-admin/firestore';
+import { getStorage, type Storage } from 'firebase-admin/storage';
 
-// Mock data store for development
-let mockUsers = new Map();
-let mockAdminUsers = new Map();
+// Firebase Admin configuration
+let adminApp: App;
+let adminAuth: Auth;
+let adminFirestore: Firestore;
+let adminStorage: Storage;
 
-// Initialize with some sample data
-mockUsers.set('NivAg90815PbcmUrbtYOtqX30J02', {
-  uid: 'NivAg90815PbcmUrbtYOtqX30J02',
-  email: 'admin@itsfait.com',
-  displayName: 'Admin User',
-  isVerified: true,
-  status: 'active',
-  createdAt: new Date('2024-01-01'),
-  profileComplete: true
-});
+// Initialize Firebase Admin SDK
+try {
+  if (getApps().length === 0) {
+    const projectId = process.env.FIREBASE_PROJECT_ID || 'geargrabco';
+    const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
+    const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
-mockAdminUsers.set('NivAg90815PbcmUrbtYOtqX30J02', {
-  isAdmin: true,
-  role: 'admin',
-  createdAt: new Date('2024-01-01'),
-  permissions: ['all'],
-  userEmail: 'admin@itsfait.com'
-});
+    // Check if we have valid credentials
+    if (clientEmail && privateKey && projectId) {
+      adminApp = initializeApp({
+        credential: cert({
+          projectId,
+          clientEmail,
+          privateKey
+        }),
+        storageBucket: `${projectId}.appspot.com`
+      });
 
-// Add a few sample users
-mockUsers.set('user_sample_1', {
-  uid: 'user_sample_1',
-  email: 'john.doe@example.com',
-  displayName: 'John Doe',
-  isVerified: true,
-  status: 'active',
-  createdAt: new Date('2024-01-15'),
-  profileComplete: true
-});
+      // Initialize services
+      adminAuth = getAuth(adminApp);
+      adminFirestore = getFirestore(adminApp);
+      adminStorage = getStorage(adminApp);
 
-mockUsers.set('user_sample_2', {
-  uid: 'user_sample_2',
-  email: 'jane.smith@example.com',
-  displayName: 'Jane Smith',
-  isVerified: false,
-  status: 'active',
-  createdAt: new Date('2024-01-20'),
-  profileComplete: false
-});
+      console.log('✅ Firebase Admin SDK initialized successfully');
+    } else {
+      console.log('⚠️ Firebase Admin credentials not found, skipping server-side initialization');
+      console.log('This is normal for development when using client-side Firebase only');
 
-// Create mock objects for development
-const mockAuth = {
-  verifySessionCookie: async () => ({ uid: 'mock-user-id' }),
-  createSessionCookie: async () => 'mock-session-cookie',
-  createUser: async (userData) => {
-    const uid = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    const userRecord = {
-      uid,
-      email: userData.email,
-      displayName: userData.displayName || '',
-      emailVerified: userData.emailVerified || false
-    };
-
-    // Store in mock data
-    mockUsers.set(uid, {
-      ...userRecord,
-      createdAt: new Date(),
-      isVerified: false,
-      status: 'active'
-    });
-
-    console.log('Mock: Created user', userRecord);
-    return userRecord;
-  },
-  deleteUser: async (uid) => {
-    mockUsers.delete(uid);
-    mockAdminUsers.delete(uid);
-    console.log('Mock: Deleted user', uid);
+      // Create placeholder objects to prevent errors
+      adminApp = null as any;
+      adminAuth = null as any;
+      adminFirestore = null as any;
+      adminStorage = null as any;
+    }
+  } else {
+    adminApp = getApps()[0];
+    adminAuth = getAuth(adminApp);
+    adminFirestore = getFirestore(adminApp);
+    adminStorage = getStorage(adminApp);
   }
-};
+} catch (error) {
+  console.error('❌ Failed to initialize Firebase Admin SDK:', error);
+  console.log('⚠️ Continuing without server-side Firebase (client-side will still work)');
 
-const mockFirestore = {
-  collection: (collectionName) => ({
-    doc: (docId) => ({
-      get: async () => {
-        let data = null;
-        let exists = false;
+  // Create placeholder objects to prevent errors
+  adminApp = null as any;
+  adminAuth = null as any;
+  adminFirestore = null as any;
+  adminStorage = null as any;
+}
 
-        if (collectionName === 'users' && mockUsers.has(docId)) {
-          data = mockUsers.get(docId);
-          exists = true;
-        } else if (collectionName === 'adminUsers' && mockAdminUsers.has(docId)) {
-          data = mockAdminUsers.get(docId);
-          exists = true;
-        }
+// Export Firebase Admin services with safe fallbacks
+export { adminApp, adminAuth, adminFirestore, adminStorage };
 
-        return {
-          exists,
-          data: () => data,
-          id: docId
-        };
-      },
-      set: async (data) => {
-        if (collectionName === 'users') {
-          mockUsers.set(docId, { ...data, id: docId });
-        } else if (collectionName === 'adminUsers') {
-          mockAdminUsers.set(docId, { ...data, id: docId });
-        }
-        console.log(`Mock: Set ${collectionName}/${docId}`, data);
-      },
-      update: async (data) => {
-        if (collectionName === 'users' && mockUsers.has(docId)) {
-          const existing = mockUsers.get(docId);
-          mockUsers.set(docId, { ...existing, ...data });
-        } else if (collectionName === 'adminUsers' && mockAdminUsers.has(docId)) {
-          const existing = mockAdminUsers.get(docId);
-          mockAdminUsers.set(docId, { ...existing, ...data });
-        }
-        console.log(`Mock: Updated ${collectionName}/${docId}`, data);
-      },
-      delete: async () => {
-        if (collectionName === 'users') {
-          mockUsers.delete(docId);
-        } else if (collectionName === 'adminUsers') {
-          mockAdminUsers.delete(docId);
-        }
-        console.log(`Mock: Deleted ${collectionName}/${docId}`);
-      }
-    }),
-    get: async () => {
-      let docs = [];
+// Helper function to check if Firebase Admin is available
+export function isFirebaseAdminAvailable(): boolean {
+  return adminApp !== null && adminFirestore !== null;
+}
 
-      if (collectionName === 'users') {
-        docs = Array.from(mockUsers.entries()).map(([id, data]) => ({
-          id,
-          data: () => data,
-          exists: true
-        }));
-      } else if (collectionName === 'adminUsers') {
-        docs = Array.from(mockAdminUsers.entries()).map(([id, data]) => ({
-          id,
-          data: () => data,
-          exists: true
-        }));
-      }
+// Safe wrapper for Firestore operations
+export function safeAdminFirestore() {
+  if (!adminFirestore) {
+    throw new Error('Firebase Admin not initialized - server-side operations not available');
+  }
+  return adminFirestore;
+}
 
-      return { docs, size: docs.length };
-    },
-    limit: (limitCount) => ({
-      get: async () => {
-        let docs = [];
-
-        if (collectionName === 'users') {
-          docs = Array.from(mockUsers.entries()).slice(0, limitCount).map(([id, data]) => ({
-            id,
-            data: () => data,
-            exists: true
-          }));
-        } else if (collectionName === 'adminUsers') {
-          docs = Array.from(mockAdminUsers.entries()).slice(0, limitCount).map(([id, data]) => ({
-            id,
-            data: () => data,
-            exists: true
-          }));
-        }
-
-        return { docs, size: docs.length };
-      }
-    }),
-    add: async (data) => {
-      const id = `mock_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-
-      if (collectionName === 'users') {
-        mockUsers.set(id, data);
-      } else if (collectionName === 'adminUsers') {
-        mockAdminUsers.set(id, data);
-      }
-
-      return {
-        id,
-        get: async () => ({
-          id,
-          data: () => data,
-          exists: true
-        })
-      };
-    },
-    where: () => ({
-      orderBy: () => ({
-        limit: () => ({
-          get: async () => ({
-            docs: [],
-            forEach: () => {}
-          })
-        })
-      })
-    })
-  })
-};
-
-const mockStorage = {
-  bucket: () => ({
-    file: () => ({
-      getSignedUrl: async () => ['mock-url'],
-      save: async () => {},
-      delete: async () => {}
-    })
-  })
-};
-
-// Export mock objects for development
-export const adminAuth = mockAuth;
-export const adminFirestore = mockFirestore;
-export const adminStorage = mockStorage;
-export const adminApp = { name: 'mock-app' };
+// Safe wrapper for Auth operations
+export function safeAdminAuth() {
+  if (!adminAuth) {
+    throw new Error('Firebase Admin not initialized - server-side auth operations not available');
+  }
+  return adminAuth;
+}

@@ -123,6 +123,43 @@ export interface Booking {
   returnCondition?: string;
   ownerNotes?: string;
   renterNotes?: string;
+
+  // Enhanced photo documentation for insurance
+  photoDocumentation?: {
+    preRental?: {
+      ownerPhotos?: RentalPhoto[];
+      renterPhotos?: RentalPhoto[];
+      ownerConfirmed?: boolean;
+      renterConfirmed?: boolean;
+      confirmedAt?: Timestamp;
+    };
+    postRental?: {
+      ownerPhotos?: RentalPhoto[];
+      renterPhotos?: RentalPhoto[];
+      ownerConfirmed?: boolean;
+      renterConfirmed?: boolean;
+      confirmedAt?: Timestamp;
+      damageReported?: boolean;
+      damageDescription?: string;
+    };
+  };
+
+  // Handoff tracking
+  handoffDetails?: {
+    pickupConfirmed?: {
+      confirmedBy: string;
+      confirmedAt: Timestamp;
+      location?: string;
+      notes?: string;
+    };
+    returnConfirmed?: {
+      confirmedBy: string;
+      confirmedAt: Timestamp;
+      location?: string;
+      notes?: string;
+      conditionNotes?: string;
+    };
+  };
 }
 
 export interface Review {
@@ -166,6 +203,59 @@ export interface Conversation {
   unreadCount: Record<string, number>;
   bookingId?: string;
   listingId?: string;
+}
+
+export interface RentalPhoto {
+  id: string;
+  url: string;
+  fileName: string;
+  uploadedBy: string;
+  uploadedAt: Timestamp;
+  photoType: 'condition' | 'damage' | 'general' | 'serial_number' | 'accessories';
+  description?: string;
+  metadata?: {
+    location?: string;
+    timestamp?: string;
+    deviceInfo?: string;
+  };
+}
+
+export interface InsuranceClaim {
+  id: string;
+  bookingId: string;
+  listingId: string;
+  claimantId: string; // User filing the claim
+  respondentId: string; // Other party in the rental
+  type: 'damage' | 'theft' | 'loss' | 'personal_injury' | 'other';
+  status: 'submitted' | 'under_review' | 'approved' | 'denied' | 'settled' | 'closed';
+  description: string;
+  incidentDate: Timestamp;
+  reportedDate: Timestamp;
+  estimatedCost?: number;
+  actualCost?: number;
+  evidence: {
+    photos: string[]; // URLs to evidence photos
+    documents: string[]; // URLs to supporting documents
+    witnessStatements: string[];
+  };
+  timeline: ClaimTimelineEntry[];
+  resolution?: {
+    outcome: 'approved' | 'denied' | 'settled';
+    amount?: number;
+    notes?: string;
+    resolvedAt: Timestamp;
+    resolvedBy: string;
+  };
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface ClaimTimelineEntry {
+  date: Timestamp;
+  action: string;
+  actor: string; // User ID or 'system' or 'insurance_agent'
+  notes?: string;
+  attachments?: string[];
 }
 
 export interface VerificationSession {

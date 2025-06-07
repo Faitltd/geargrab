@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { onMount, onDestroy, afterUpdate } from 'svelte';
+  import { onMount, afterUpdate } from 'svelte';
   import { chatService, type ChatMessage } from '$lib/services/chat';
   import { authStore } from '$lib/stores/auth';
-  import type { Unsubscribe } from 'firebase/firestore';
+  import { notifications } from '$lib/stores/notifications';
 
   export let conversationId: string;
   export let otherUser: {
@@ -15,30 +15,45 @@
   let messages: ChatMessage[] = [];
   let newMessage = '';
   let messagesContainer: HTMLElement;
-  let unsubscribe: Unsubscribe | null = null;
   let sending = false;
+  let loading = true;
   let fileInput: HTMLInputElement;
   let uploadingFile = false;
 
   onMount(() => {
     if (conversationId) {
-      // Subscribe to messages
-      unsubscribe = chatService.subscribeToMessages(conversationId, (newMessages) => {
-        messages = newMessages;
-        
-        // Mark messages as read
-        if ($authStore.user) {
-          chatService.markMessagesAsRead(conversationId, $authStore.user.uid);
-        }
-      });
+      loadMessages();
+
+      // Set up periodic refresh for real-time updates
+      const interval = setInterval(loadMessages, 3000); // Refresh every 3 seconds
+
+      // Mark messages as read when conversation is opened
+      if ($authStore.user) {
+        chatService.markMessagesAsRead(conversationId, $authStore.user.uid);
+      }
+
+      // Clean up interval on destroy
+      return () => clearInterval(interval);
     }
   });
 
-  onDestroy(() => {
-    if (unsubscribe) {
-      unsubscribe();
+  async function loadMessages() {
+    if (!conversationId) return;
+
+    try {
+      const response = await fetch(`/api/conversations/${conversationId}/messages?limit=50`);
+      if (response.ok) {
+        const result = await response.json();
+        messages = result.messages;
+        loading = false;
+      }
+    } catch (error) {
+      console.error('Error loading messages:', error);
+      loading = false;
     }
-  });
+  }
+
+  // Cleanup is handled by the interval cleanup in onMount
 
   afterUpdate(() => {
     // Scroll to bottom when new messages arrive
@@ -58,6 +73,9 @@
         newMessage.trim()
       );
       newMessage = '';
+
+      // Refresh messages immediately after sending
+      await loadMessages();
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {

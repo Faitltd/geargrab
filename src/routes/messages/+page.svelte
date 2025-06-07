@@ -49,14 +49,20 @@
 
   // Navigation functions for quick actions
   function handleFindGear() {
+    console.log('Find Gear button clicked');
+    alert('Navigating to Browse page...');
     goto('/browse');
   }
 
   function handleListGear() {
+    console.log('List Gear button clicked');
+    alert('Navigating to List Gear page...');
     goto('/list-gear');
   }
 
   function handleViewBookings() {
+    console.log('View Bookings button clicked');
+    alert('Navigating to Dashboard...');
     goto('/dashboard');
   }
 </script>
@@ -229,8 +235,9 @@
       <h2 class="text-lg font-semibold text-white mb-4">Quick Actions</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <button
+          type="button"
           on:click={handleFindGear}
-          class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center"
+          class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center cursor-pointer"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -238,8 +245,9 @@
           Find Gear to Rent
         </button>
         <button
+          type="button"
           on:click={handleListGear}
-          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center cursor-pointer"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -247,8 +255,9 @@
           List Your Gear
         </button>
         <button
+          type="button"
           on:click={handleViewBookings}
-          class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center"
+          class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center cursor-pointer"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>

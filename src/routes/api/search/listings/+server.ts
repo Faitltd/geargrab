@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { adminFirestore } from '$firebase/server';
+import { adminFirestore, isFirebaseAdminAvailable } from '$lib/firebase/server';
 import { calculateDistance, getBoundingBox, kmToMiles } from '$lib/services/geocoding';
 import type { Listing } from '$types/firestore';
 
@@ -18,6 +18,16 @@ export const GET: RequestHandler = async ({ url }) => {
     const sortBy = url.searchParams.get('sortBy') || 'relevance'; // relevance, price, distance, date
 
     console.log('Search parameters:', { query, lat, lng, radius, category, minPrice, maxPrice, limit, sortBy });
+
+    // Check if Firebase Admin is available
+    if (!isFirebaseAdminAvailable()) {
+      console.log('Firebase Admin not available, returning empty results for development');
+      return json({
+        listings: [],
+        total: 0,
+        message: 'Firebase Admin not configured - using client-side data only'
+      });
+    }
 
     // Build Firestore query
     let firestoreQuery = adminFirestore.collection('listings')

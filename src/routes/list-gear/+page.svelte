@@ -574,7 +574,11 @@
 </script>
 
 <!-- Full Page Video Background -->
-<VideoBackground />
+<VideoBackground
+  videoSrc="/Milky Way.mp4"
+  imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
+  overlayOpacity={0.4}
+/>
 
 <!-- Page Content with Video Background -->
 <div class="relative z-10 min-h-screen">

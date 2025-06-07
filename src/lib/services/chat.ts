@@ -62,43 +62,26 @@ class ChatService {
     listingTitle?: string
   ): Promise<string> {
     try {
-      // Check if conversation already exists
-      const conversationsRef = collection(firestore, 'conversations');
-      const q = query(
-        conversationsRef,
-        where('participants', 'array-contains', currentUserId)
-      );
-      
-      const querySnapshot = await getDocs(q);
-      let existingConversation = null;
-      
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.participants.includes(otherUserId)) {
-          existingConversation = { id: doc.id, ...data };
-        }
+      // Use API endpoint to create or get conversation
+      const response = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          otherUserId,
+          bookingId,
+          listingId,
+          listingTitle
+        })
       });
 
-      if (existingConversation) {
-        return existingConversation.id;
+      if (!response.ok) {
+        throw new Error('Failed to create conversation');
       }
 
-      // Create new conversation
-      const newConversation = {
-        participants: [currentUserId, otherUserId],
-        unreadCount: {
-          [currentUserId]: 0,
-          [otherUserId]: 0
-        },
-        bookingId: bookingId || null,
-        listingId: listingId || null,
-        listingTitle: listingTitle || null,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      };
-
-      const docRef = await addDoc(conversationsRef, newConversation);
-      return docRef.id;
+      const result = await response.json();
+      return result.conversation.id;
     } catch (error) {
       console.error('Error creating conversation:', error);
       throw error;
@@ -114,30 +97,23 @@ class ChatService {
     attachments?: string[]
   ): Promise<void> {
     try {
-      const messagesRef = collection(firestore, 'conversations', conversationId, 'messages');
-      
-      const messageData = {
-        senderId,
-        content,
-        type,
-        attachments: attachments || [],
-        timestamp: serverTimestamp(),
-        read: false
-      };
-
-      await addDoc(messagesRef, messageData);
-
-      // Update conversation with last message
-      const conversationRef = doc(firestore, 'conversations', conversationId);
-      await updateDoc(conversationRef, {
-        lastMessage: {
-          content,
-          senderId,
-          timestamp: serverTimestamp()
+      const response = await fetch(`/api/conversations/${conversationId}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        updatedAt: serverTimestamp()
+        body: JSON.stringify({
+          content,
+          type,
+          attachments: attachments || []
+        })
       });
 
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      // The API handles updating the conversation and message creation
     } catch (error) {
       console.error('Error sending message:', error);
       throw error;
@@ -222,28 +198,16 @@ class ChatService {
   // Mark messages as read
   async markMessagesAsRead(conversationId: string, userId: string): Promise<void> {
     try {
-      const messagesRef = collection(firestore, 'conversations', conversationId, 'messages');
-      const q = query(
-        messagesRef,
-        where('senderId', '!=', userId),
-        where('read', '==', false)
-      );
-
-      const querySnapshot = await getDocs(q);
-      const batch = [];
-
-      querySnapshot.forEach((doc) => {
-        batch.push(updateDoc(doc.ref, { read: true }));
+      const response = await fetch(`/api/conversations/${conversationId}/mark-read`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
 
-      await Promise.all(batch);
-
-      // Reset unread count for this user
-      const conversationRef = doc(firestore, 'conversations', conversationId);
-      await updateDoc(conversationRef, {
-        [`unreadCount.${userId}`]: 0
-      });
-
+      if (!response.ok) {
+        throw new Error('Failed to mark messages as read');
+      }
     } catch (error) {
       console.error('Error marking messages as read:', error);
       throw error;
@@ -253,41 +217,29 @@ class ChatService {
   // Get recent conversations
   async getRecentConversations(userId: string, limitCount: number = 20): Promise<ChatConversation[]> {
     try {
-      const conversationsRef = collection(firestore, 'conversations');
-      const q = query(
-        conversationsRef,
-        where('participants', 'array-contains', userId),
-        orderBy('updatedAt', 'desc'),
-        limit(limitCount)
-      );
-
-      const querySnapshot = await getDocs(q);
-      const conversations: ChatConversation[] = [];
-
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        conversations.push({
-          id: doc.id,
-          participants: data.participants.map((id: string) => ({
-            id,
-            name: 'User',
-            avatar: undefined
-          })),
-          lastMessage: data.lastMessage ? {
-            content: data.lastMessage.content,
-            senderId: data.lastMessage.senderId,
-            timestamp: data.lastMessage.timestamp?.toDate() || new Date()
-          } : undefined,
-          unreadCount: data.unreadCount || {},
-          bookingId: data.bookingId,
-          listingId: data.listingId,
-          listingTitle: data.listingTitle,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date()
-        });
+      const response = await fetch(`/api/conversations?limit=${limitCount}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
 
-      return conversations;
+      if (!response.ok) {
+        throw new Error('Failed to fetch conversations');
+      }
+
+      const result = await response.json();
+      return result.conversations.map((conv: any) => ({
+        id: conv.id,
+        participants: conv.participants,
+        lastMessage: conv.lastMessage,
+        unreadCount: conv.unreadCount || 0,
+        bookingId: conv.bookingId,
+        listingId: conv.listingId,
+        listingTitle: conv.listingTitle,
+        createdAt: conv.createdAt,
+        updatedAt: conv.updatedAt
+      }));
     } catch (error) {
       console.error('Error getting conversations:', error);
       throw error;
