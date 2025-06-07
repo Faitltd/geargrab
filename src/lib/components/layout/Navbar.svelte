@@ -69,7 +69,13 @@
     <div class="flex justify-between h-16">
       <div class="flex">
         <div class="flex-shrink-0 flex items-center">
-          <a href="/" class="text-white font-bold text-xl">GearGrab</a>
+          <a href="/" class="flex items-center">
+            <img
+              src="/geargrab-logo-transparent.png"
+              alt="GearGrab"
+              class="h-10 w-auto"
+            />
+          </a>
         </div>
         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
           <a href="/" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">

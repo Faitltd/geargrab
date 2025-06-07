@@ -43,36 +43,38 @@
 <!-- Page Content with Video Background -->
 <div class="relative z-10 min-h-screen">
   <!-- Hero Content -->
-  <div class="relative min-h-screen flex flex-col items-center justify-center text-center text-white px-4 pt-20">
-    <!-- Brand Name at Top - Much Larger -->
+  <div class="relative min-h-screen flex flex-col text-center text-white px-4 pt-20">
+    <!-- Brand Name at Top - Positioned between navbar and main content -->
     <ScrollAnimated animation="fade-up" delay={50}>
-      <div class="mb-8">
-        <h1 class="text-7xl md:text-8xl lg:text-9xl font-bold text-white drop-shadow-2xl tracking-wider">
-          Gear Grab
+      <div class="flex justify-center pt-24 pb-0">
+        <h1 class="text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-white drop-shadow-lg mb-0">
+          GearGrab
         </h1>
       </div>
     </ScrollAnimated>
 
-    <!-- Main Hero Content -->
-    <ScrollAnimated animation="fade-up" delay={200}>
-      <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8 max-w-4xl mx-auto shadow-lg">
-        <h2 class="text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg">
-          Meet Up. Gear Up. Get Out.
-        </h2>
-        <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto drop-shadow-lg">
-          Rent Local Outdoor Gear, Save Space, Make Money, and Explore More.
-        </p>
+    <!-- Main Hero Content - Centered in remaining space -->
+    <div class="flex-1 flex items-center justify-center pt-4">
+      <ScrollAnimated animation="fade-up" delay={200}>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 max-w-4xl mx-auto shadow-lg">
+          <h2 class="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
+            Meet Up. Gear Up. Get Out.
+          </h2>
+          <p class="text-xl md:text-2xl mb-6 max-w-2xl mx-auto drop-shadow-lg">
+            Rent Local Outdoor Gear, Save Space, Make Money, and Explore More.
+          </p>
 
-        <!-- Search Form -->
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto border border-white/20 shadow-lg">
-          <HeroSearch />
+          <!-- Search Form -->
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto border border-white/20 shadow-lg">
+            <HeroSearch />
+          </div>
         </div>
-      </div>
-    </ScrollAnimated>
+      </ScrollAnimated>
+    </div>
 
     <!-- Stats -->
     <ScrollAnimated animation="fade-up" delay={700}>
-      <SequentialAnimator baseDelay={800} incrementDelay={100} className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mt-16">
+      <SequentialAnimator baseDelay={800} incrementDelay={100} className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mt-8">
         {#each stats as stat}
           <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 shadow-lg">
             <div class="text-3xl md:text-4xl font-bold text-green-400 mb-2 drop-shadow-lg">{stat.number}</div>
@@ -85,7 +87,7 @@
 
   <!-- Content Section -->
   <div class="relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
       <!-- Featured Gear -->
       <ScrollAnimated animation="fade-up" delay={200}>
