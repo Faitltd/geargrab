@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
 
   export const prerender = true;
@@ -105,7 +105,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
 
       <!-- Tab Navigation -->
-      <ScrollAnimated animation="fade-up" delay={400}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0} endOffset={0.4}>
         <div class="flex justify-center mb-12">
           <div class="bg-gray-800/70 backdrop-blur-sm p-1 rounded-lg border border-gray-600/50 shadow-lg">
             <button
@@ -122,12 +122,12 @@
             </button>
           </div>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
       <!-- Steps Content -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
         {#each (activeTab === 'renter' ? renterSteps : ownerSteps) as step, index}
-          <ScrollAnimated animation="scale-in" delay={600 + (index * 150)}>
+          <ScrollLinkedAnimator animation="scale-in" startOffset={0.1 + (index * 0.05)} endOffset={0.6 + (index * 0.05)}>
             <div class="text-center">
               <div class="w-16 h-16 bg-green-600/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30 shadow-lg">
                 {#if step.icon === 'search'}
@@ -169,17 +169,17 @@
               <p class="text-gray-200 mb-3 drop-shadow-lg">{step.description}</p>
               <p class="text-sm text-gray-300 drop-shadow-lg">{step.details}</p>
             </div>
-          </ScrollAnimated>
+          </ScrollLinkedAnimator>
         {/each}
       </div>
 
       <!-- Safety & Trust Section -->
-      <ScrollAnimated animation="fade-up" delay={200}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.7}>
         <div class="mb-16">
           <h2 class="text-3xl font-bold text-center mb-12 text-white drop-shadow-lg">Safety & Trust</h2>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <ScrollAnimated animation="fade-left" delay={400}>
+            <ScrollLinkedAnimator animation="scale-in" startOffset={0.3} endOffset={0.8}>
               <div class="text-center">
                 <div class="w-16 h-16 bg-green-600/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30 shadow-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -189,9 +189,9 @@
                 <h3 class="text-xl font-bold mb-3 text-white drop-shadow-lg">Verified Users</h3>
                 <p class="text-gray-200 drop-shadow-lg">All users go through identity verification and background checks for your safety and peace of mind.</p>
               </div>
-            </ScrollAnimated>
+            </ScrollLinkedAnimator>
 
-            <ScrollAnimated animation="fade-up" delay={550}>
+            <ScrollLinkedAnimator animation="scale-in" startOffset={0.35} endOffset={0.85}>
               <div class="text-center">
                 <div class="w-16 h-16 bg-green-600/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30 shadow-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -201,9 +201,9 @@
                 <h3 class="text-xl font-bold mb-3 text-white drop-shadow-lg">Secure Payments</h3>
                 <p class="text-gray-200 drop-shadow-lg">All payments are processed securely through encrypted channels with fraud protection and dispute resolution.</p>
               </div>
-            </ScrollAnimated>
+            </ScrollLinkedAnimator>
 
-            <ScrollAnimated animation="fade-right" delay={700}>
+            <ScrollLinkedAnimator animation="scale-in" startOffset={0.4} endOffset={0.9}>
               <div class="text-center">
                 <div class="w-16 h-16 bg-green-600/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30 shadow-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -213,13 +213,13 @@
                 <h3 class="text-xl font-bold mb-3 text-white drop-shadow-lg">Insurance Coverage</h3>
                 <p class="text-gray-200 drop-shadow-lg">Every rental includes damage protection and liability coverage to protect both renters and gear owners.</p>
               </div>
-            </ScrollAnimated>
+            </ScrollLinkedAnimator>
           </div>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
       <!-- Call to Action Section -->
-      <ScrollAnimated animation="scale-in" delay={200}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.7}>
         <div class="text-center mb-16">
           <h2 class="text-3xl font-bold mb-4 text-white drop-shadow-lg">Ready to Start Your Adventure?</h2>
           <p class="text-lg mb-6 text-gray-200 drop-shadow-lg">Join thousands of outdoor enthusiasts sharing and renting gear.</p>
@@ -232,15 +232,15 @@
             </a>
           </div>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
       <!-- FAQ Section -->
-      <ScrollAnimated animation="fade-up" delay={200}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.7}>
         <div class="mb-16">
           <h2 class="text-3xl font-bold text-center mb-12 text-white drop-shadow-lg">Frequently Asked Questions</h2>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <ScrollAnimated animation="fade-left" delay={400}>
+            <ScrollLinkedAnimator animation="scale-in" startOffset={0.3} endOffset={0.8}>
               <div>
                 <h3 class="text-lg font-bold mb-2 text-white drop-shadow-lg">How do I know the gear is in good condition?</h3>
                 <p class="text-gray-200 mb-4 drop-shadow-lg">All gear owners provide detailed condition reports and photos. You can also message owners directly with questions before booking.</p>
@@ -251,9 +251,9 @@
                 <h3 class="text-lg font-bold mb-2 text-white drop-shadow-lg">How do I get my gear to the adventure location?</h3>
                 <p class="text-gray-200 drop-shadow-lg">Choose from pickup, delivery, or shipping options. Many owners offer convenient transfer to trailheads or adventure locations.</p>
               </div>
-            </ScrollAnimated>
+            </ScrollLinkedAnimator>
 
-            <ScrollAnimated animation="fade-right" delay={600}>
+            <ScrollLinkedAnimator animation="scale-in" startOffset={0.35} endOffset={0.85}>
               <div>
                 <h3 class="text-lg font-bold mb-2 text-white drop-shadow-lg">How much can I earn renting out my gear?</h3>
                 <p class="text-gray-200 mb-4 drop-shadow-lg">Earnings vary by gear type and demand, but many owners earn $100-500+ per month from gear that would otherwise sit unused.</p>
@@ -264,10 +264,10 @@
                 <h3 class="text-lg font-bold mb-2 text-white drop-shadow-lg">How do I set competitive prices?</h3>
                 <p class="text-gray-200 drop-shadow-lg">Our platform provides pricing suggestions based on similar gear in your area, condition, and demand.</p>
               </div>
-            </ScrollAnimated>
+            </ScrollLinkedAnimator>
           </div>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
     </div>
   </div>

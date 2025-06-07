@@ -5,7 +5,7 @@
   import HeroSearch from '$lib/components/forms/HeroSearch.svelte';
   import FilterBar from '$lib/components/forms/FilterBar.svelte';
   import GearGrid from '$lib/components/display/GearGrid.svelte';
-  import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
   import { searchService, type SearchFilters } from '$lib/services/search';
   import { products } from '$lib/data/products';
@@ -141,7 +141,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
       <!-- Search and Filter Section -->
-      <ScrollAnimated animation="fade-up" delay={200}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0} endOffset={0.4}>
         <div class="mb-8">
           <HeroSearch
             {query}
@@ -150,9 +150,9 @@
             on:search={handleSearch}
           />
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
-      <ScrollAnimated animation="fade-up" delay={400}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.1} endOffset={0.5}>
         <div class="mb-12">
           <FilterBar
             {showFilters}
@@ -161,38 +161,38 @@
             on:filter={handleFilter}
           />
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
       <!-- Page Title and Count -->
-      <ScrollAnimated animation="fade-up" delay={600}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.6}>
         <div class="mb-8">
-          <h1 class="text-3xl md:text-4xl font-bold text-white drop-shadow-lg mb-2 {heroVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'} transition-all duration-800">
+          <h1 class="text-3xl md:text-4xl font-bold text-white drop-shadow-lg mb-2">
             {category === 'all' ? 'All Outdoor Gear' :
               category.charAt(0).toUpperCase() + category.slice(1) + ' Gear'}
             {location ? ` in ${location}` : ''}
           </h1>
-          <p class="text-gray-200 text-lg drop-shadow-lg {heroVisible ? 'animate-fade-in-up animate-delay-200' : 'opacity-0 translate-y-8'} transition-all duration-800">
+          <p class="text-gray-200 text-lg drop-shadow-lg">
             {listings.length} items available
           </p>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
       <!-- Gear Listings -->
-      <ScrollAnimated animation="fade-up" delay={800}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.3} endOffset={0.7}>
         <div class="mb-16">
           <GearGrid {listings} {loading} />
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
       <!-- Adventure Call-to-Action -->
-      <ScrollAnimated animation="scale-in" delay={1000}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.4} endOffset={0.8}>
         <div class="text-center text-white">
           <h2 class="text-3xl md:text-4xl font-bold mb-4 drop-shadow-lg">Adventure Awaits</h2>
           <p class="text-xl max-w-3xl mx-auto drop-shadow-lg">
             Discover amazing outdoor gear from local owners and start your next adventure today.
           </p>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
     </div>
   </div>

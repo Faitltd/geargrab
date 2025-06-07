@@ -1,8 +1,8 @@
 <script lang="ts">
   import HeroSearch from '$lib/components/forms/HeroSearch.svelte';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
-  import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
-  import SequentialAnimator from '$lib/components/layout/SequentialAnimator.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
+  import ScrollLinkedSequential from '$lib/components/layout/ScrollLinkedSequential.svelte';
   import { featuredGear, categories } from '$lib/data/products';
 
   // Stats data
@@ -45,17 +45,17 @@
   <!-- Hero Content -->
   <div class="relative min-h-screen flex flex-col text-center text-white px-4 pt-20">
     <!-- Brand Name at Top - Positioned between navbar and main content -->
-    <ScrollAnimated animation="fade-up" delay={50}>
+    <ScrollLinkedAnimator animation="scale-in" startOffset={0} endOffset={0.3}>
       <div class="flex justify-center pt-24 pb-0">
         <h1 class="text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-white drop-shadow-lg mb-0">
           GearGrab
         </h1>
       </div>
-    </ScrollAnimated>
+    </ScrollLinkedAnimator>
 
     <!-- Main Hero Content - Centered in remaining space -->
     <div class="flex-1 flex items-center justify-center pt-4">
-      <ScrollAnimated animation="fade-up" delay={200}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.1} endOffset={0.5}>
         <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 max-w-4xl mx-auto shadow-lg">
           <h2 class="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
             Meet Up. Gear Up. Get Out.
@@ -69,20 +69,20 @@
             <HeroSearch />
           </div>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
     </div>
 
     <!-- Stats -->
-    <ScrollAnimated animation="fade-up" delay={700}>
-      <SequentialAnimator baseDelay={800} incrementDelay={100} className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mt-8">
-        {#each stats as stat}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mt-8">
+      {#each stats as stat}
+        <ScrollLinkedAnimator animation="scale-in" startOffset={0.05} endOffset={0.3}>
           <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 shadow-lg">
             <div class="text-3xl md:text-4xl font-bold text-green-400 mb-2 drop-shadow-lg">{stat.number}</div>
             <div class="text-gray-200 drop-shadow-lg">{stat.label}</div>
           </div>
-        {/each}
-      </SequentialAnimator>
-    </ScrollAnimated>
+        </ScrollLinkedAnimator>
+      {/each}
+    </div>
   </div>
 
   <!-- Content Section -->
@@ -90,7 +90,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
       <!-- Featured Gear -->
-      <ScrollAnimated animation="fade-up" delay={200}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.1} endOffset={0.4}>
         <div class="text-center mb-20">
           <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
             <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Featured Gear</h2>
@@ -99,7 +99,7 @@
             </p>
           </div>
 
-          <SequentialAnimator baseDelay={300} incrementDelay={100} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <ScrollLinkedSequential animation="scale-in" baseDelay={0} incrementDelay={0.05} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" startOffset={0.15} endOffset={0.45}>
             {#each featuredGear as gear}
               <a href="/listing/{gear.id}" class="block group">
                 <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 transition-all duration-300 hover:border-green-500 hover:transform hover:scale-105 shadow-lg">
@@ -114,18 +114,18 @@
                 </div>
               </a>
             {/each}
-          </SequentialAnimator>
+          </ScrollLinkedSequential>
 
-          <ScrollAnimated animation="fade-up" delay={800}>
+          <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.5}>
             <a href="/browse" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
               Browse All Gear
             </a>
-          </ScrollAnimated>
+          </ScrollLinkedAnimator>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
       <!-- Explore Categories -->
-      <ScrollAnimated animation="fade-up" delay={200}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.25} endOffset={0.55}>
         <div class="text-center mb-20">
           <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
             <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Explore Categories</h2>
@@ -134,7 +134,7 @@
             </p>
           </div>
 
-          <SequentialAnimator baseDelay={300} incrementDelay={80} className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 max-w-6xl mx-auto">
+          <ScrollLinkedSequential animation="scale-in" baseDelay={0} incrementDelay={0.02} className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 max-w-6xl mx-auto" startOffset={0.3} endOffset={0.6}>
             {#each categories as category}
               <a href="/browse?category={category.id}" class="group">
                 <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 hover:border-green-500 transition-all duration-300 hover:transform hover:scale-105 shadow-lg">
@@ -145,12 +145,12 @@
                 </div>
               </a>
             {/each}
-          </SequentialAnimator>
+          </ScrollLinkedSequential>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
       <!-- Why Choose GearGrab -->
-      <ScrollAnimated animation="fade-up" delay={200}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.35} endOffset={0.65}>
         <div class="text-center mb-20">
           <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
             <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Why Choose GearGrab?</h2>
@@ -159,7 +159,7 @@
             </p>
           </div>
 
-          <SequentialAnimator baseDelay={100} incrementDelay={100} className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <ScrollLinkedSequential animation="scale-in" baseDelay={0} incrementDelay={0.05} className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto" startOffset={0.4} endOffset={0.7}>
             {#each features as feature}
               <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 hover:border-green-500 transition-all duration-300 shadow-lg">
                 <div class="text-4xl mb-4">{feature.icon}</div>
@@ -167,12 +167,12 @@
                 <p class="text-gray-200 drop-shadow-lg">{feature.description}</p>
               </div>
             {/each}
-          </SequentialAnimator>
+          </ScrollLinkedSequential>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
       <!-- Call to Action -->
-      <ScrollAnimated animation="fade-up" delay={200}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.45} endOffset={0.75}>
         <div class="text-center">
           <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 max-w-3xl mx-auto border border-white/20 shadow-lg">
             <h2 class="text-4xl font-bold text-white mb-6 drop-shadow-lg">Ready to Start Your Adventure?</h2>
@@ -180,17 +180,17 @@
               Join thousands of outdoor enthusiasts who are saving money and exploring more with GearGrab.
             </p>
 
-            <SequentialAnimator baseDelay={300} incrementDelay={100} className="flex flex-col sm:flex-row gap-4 justify-center">
+            <ScrollLinkedSequential animation="scale-in" baseDelay={0} incrementDelay={0.05} className="flex flex-col sm:flex-row gap-4 justify-center" startOffset={0.5} endOffset={0.8}>
               <a href="/browse" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
                 Start Browsing
               </a>
               <a href="/list-gear" class="border-2 border-white text-white hover:bg-white hover:text-gray-900 font-bold py-3 px-8 rounded-lg transition-all shadow-lg">
                 List Your Gear
               </a>
-            </SequentialAnimator>
+            </ScrollLinkedSequential>
           </div>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
     </div>
   </div>

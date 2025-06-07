@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import ImageUploader from '$lib/components/ImageUploader.svelte';
-  import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
+  import ScrollLinkedSequential from '$lib/components/layout/ScrollLinkedSequential.svelte';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
   import { authStore } from '$lib/stores/auth';
   import { createListing, getListing, updateListing } from '$lib/firebase/db/listings';
@@ -599,19 +600,19 @@
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
       <!-- Hero Section -->
-      <ScrollAnimated animation="fade-up" delay={200}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0} endOffset={0.4}>
         <div class="text-center mb-12">
-          <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 {heroVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-8'} transition-all duration-800 drop-shadow-lg">
+          <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
             {isEditMode ? 'Edit Your Listing' : 'List Your Gear'}
           </h1>
-          <p class="text-xl text-gray-200 drop-shadow-lg max-w-2xl mx-auto {heroVisible ? 'animate-fade-in-up animate-delay-200' : 'opacity-0 translate-y-8'} transition-all duration-800">
+          <p class="text-xl text-gray-200 drop-shadow-lg max-w-2xl mx-auto">
             {isEditMode ? 'Update your gear listing information' : 'Share your outdoor equipment with fellow adventurers and earn money'}
           </p>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
       <!-- Progress bar -->
-      <ScrollAnimated animation="fade-up" delay={400}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.1} endOffset={0.5}>
         <div class="mb-8">
           <div class="flex justify-between mb-2">
             {#each Array(totalSteps) as _, i}
@@ -650,12 +651,12 @@
             {/each}
           </div>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
       <!-- Form steps -->
       {#if currentStep === 1}
         <!-- Step 1: Basic Information -->
-        <ScrollAnimated animation="fade-up" delay={600}>
+        <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.7}>
           <div class="space-y-8">
             <div class="text-center mb-12">
               <h2 class="text-3xl font-bold text-white drop-shadow-lg">Basic Information</h2>
@@ -754,11 +755,11 @@
             </p>
           </div>
         </div>
-        </ScrollAnimated>
+        </ScrollLinkedAnimator>
       {/if}
       {#if currentStep === 2}
         <!-- Step 2: Gear Details -->
-        <ScrollAnimated animation="fade-up" delay={600}>
+        <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.7}>
           <div class="space-y-8">
             <div class="text-center mb-12">
               <h2 class="text-3xl font-bold text-white drop-shadow-lg">Gear Details</h2>
@@ -881,12 +882,12 @@
             {/if}
           </div>
         </div>
-        </ScrollAnimated>
+        </ScrollLinkedAnimator>
       {/if}
 
       {#if currentStep === 3}
         <!-- Step 3: Images -->
-        <ScrollAnimated animation="fade-up" delay={600}>
+        <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.7}>
           <div class="space-y-8">
             <div class="text-center mb-12">
               <h2 class="text-3xl font-bold text-white drop-shadow-lg">Images</h2>
@@ -966,12 +967,12 @@
             </div>
           {/if}
         </div>
-        </ScrollAnimated>
+        </ScrollLinkedAnimator>
       {/if}
 
       {#if currentStep === 4}
         <!-- Step 4: Pricing & Location -->
-        <ScrollAnimated animation="fade-up" delay={600}>
+        <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.7}>
           <div class="space-y-8">
             <div class="text-center mb-12">
               <h2 class="text-3xl font-bold text-white drop-shadow-lg">Pricing & Location</h2>
@@ -1225,12 +1226,12 @@
             {/if}
           </div>
         </div>
-        </ScrollAnimated>
+        </ScrollLinkedAnimator>
       {/if}
 
       {#if currentStep === 5}
         <!-- Step 5: Preview -->
-        <ScrollAnimated animation="fade-up" delay={600}>
+        <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.7}>
           <div class="space-y-8">
             <div class="text-center mb-12">
               <h2 class="text-3xl font-bold text-white drop-shadow-lg">Preview Your Listing</h2>
@@ -1402,11 +1403,11 @@
             </div>
           </div>
         </div>
-        </ScrollAnimated>
+        </ScrollLinkedAnimator>
       {/if}
 
       <!-- Navigation Buttons -->
-      <ScrollAnimated animation="fade-up" delay={800}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.3} endOffset={0.8}>
         <div class="flex justify-between mt-12">
         {#if currentStep > 1}
           <button
@@ -1447,7 +1448,7 @@
           </button>
         {/if}
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
     </div>
   </div>
   {/if}
