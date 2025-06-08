@@ -504,14 +504,14 @@
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        subcategory: formData.subcategory || undefined,
-        brand: formData.brand || undefined,
-        model: formData.model || undefined,
+        subcategory: formData.subcategory || '',
+        brand: formData.brand || '',
+        model: formData.model || '',
         condition: formData.condition as 'New' | 'Like New' | 'Good' | 'Fair' | 'Poor',
-        ageInYears: formData.ageInYears || undefined,
+        ageInYears: formData.ageInYears || 0,
         dailyPrice: formData.dailyPrice,
-        weeklyPrice: formData.weeklyPrice || undefined,
-        monthlyPrice: formData.monthlyPrice || undefined,
+        weeklyPrice: formData.weeklyPrice || 0,
+        monthlyPrice: formData.monthlyPrice || 0,
         securityDeposit: formData.securityDeposit,
         location: {
           city: formData.city,
@@ -522,9 +522,9 @@
           pickup: formData.pickup,
           dropoff: formData.dropoff,
           shipping: formData.shipping,
-          pickupLocation: formData.pickup ? formData.pickupLocation : undefined,
-          dropoffDistance: formData.dropoff ? formData.dropoffDistance : undefined,
-          shippingFee: formData.shipping ? formData.shippingFee : undefined
+          pickupLocation: formData.pickup ? formData.pickupLocation : '',
+          dropoffDistance: formData.dropoff ? formData.dropoffDistance : 0,
+          shippingFee: formData.shipping ? formData.shippingFee : 0
         },
         images: formData.images,
         features: formData.features.filter(f => f.trim() !== ''),
@@ -535,11 +535,11 @@
             return acc;
           }, {} as Record<string, string>),
         includesInsurance: formData.includesInsurance,
-        insuranceDetails: formData.includesInsurance ? formData.insuranceDetails : undefined,
+        insuranceDetails: formData.includesInsurance ? formData.insuranceDetails : '',
         availabilityCalendar: {},
         status: 'active' as const,
-        averageRating: undefined,
-        reviewCount: undefined
+        averageRating: 0,
+        reviewCount: 0
       };
 
       if (isEditMode && editingListingId) {
