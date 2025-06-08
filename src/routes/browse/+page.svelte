@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ListingCard3D from '$lib/components/ListingCard3D.svelte';
+
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
@@ -35,28 +37,38 @@
     try {
       loading = true;
 
-      const filters: SearchFilters = {
-        query: query || undefined,
-        category: category !== 'all' ? category : undefined,
-        sortBy: sort as SearchFilters['sortBy'],
-        location: location ? { city: location, state: '' } : undefined,
-        limit: 20
-      };
+      console.log('Products imported:', products?.length || 0);
+      console.log('First product:', products?.[0]);
+      console.log('Current filters:', { category, location, query, sort });
 
-      const results = await searchService.search(filters);
-      listings = results.results;
-      totalCount = results.totalCount;
-      hasMore = results.hasMore;
+      // Use the local products data as the primary source
+      listings = filterListings(products);
+      totalCount = listings.length;
+      hasMore = false;
 
-      // Save search for analytics
+      console.log('Filtered listings count:', listings.length);
+      console.log('First listing:', listings?.[0]);
+
+      // Save search for analytics if there are filters applied
       if (query || category !== 'all') {
-        await searchService.saveSearch(query, filters);
+        try {
+          const filters: SearchFilters = {
+            query: query || undefined,
+            category: category !== 'all' ? category : undefined,
+            sortBy: sort as SearchFilters['sortBy'],
+            location: location ? { city: location, state: '' } : undefined,
+            limit: 20
+          };
+          await searchService.saveSearch(query, filters);
+        } catch (analyticsError) {
+          console.log('Analytics not available:', analyticsError);
+        }
       }
     } catch (error) {
       console.error('Search error:', error);
-      // Fall back to mock data
-      listings = filterListings(products);
-      totalCount = listings.length;
+      // Fall back to empty listings if products data fails
+      listings = [];
+      totalCount = 0;
       hasMore = false;
     } finally {
       loading = false;
@@ -95,11 +107,64 @@
     performSearch();
   }
 
-  function filterListings(allListings) {
+  // Transform products data to match expected listing structure
+  function transformProductsToListings(products: any[]) {
+    return products.map(product => ({
+      id: product.id,
+      title: product.title,
+      description: product.description,
+      category: product.category,
+      subcategory: product.subcategory,
+      brand: product.brand,
+      model: product.model,
+      condition: product.condition,
+      ageInYears: product.ageInYears,
+      dailyPrice: product.dailyPrice,
+      weeklyPrice: product.weeklyPrice,
+      monthlyPrice: product.monthlyPrice,
+      securityDeposit: product.securityDeposit,
+      location: product.location,
+      images: product.images,
+      features: product.features,
+      specifications: product.specifications,
+      // Transform owner data to match expected structure
+      averageRating: product.owner.rating,
+      reviewCount: product.owner.reviewCount,
+      // Add other expected fields
+      availabilityCalendar: {
+        unavailableDates: product.availability.unavailableDates
+      },
+      owner: {
+        uid: product.owner.id,
+        name: product.owner.name,
+        image: product.owner.avatar,
+        averageRating: product.owner.rating,
+        reviews: product.owner.reviewCount
+      },
+      reviews: product.reviews,
+      status: product.status,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt
+    }));
+  }
+
+  function filterListings(allListings: any[]) {
+    // First transform the products to the expected structure
+    const transformedListings = transformProductsToListings(allListings);
+    let filtered = [...transformedListings];
+
     // Filter by category
-    let filtered = allListings;
     if (category && category !== 'all') {
       filtered = filtered.filter(listing => listing.category === category);
+    }
+
+    // Filter by query (search in title and description)
+    if (query) {
+      const searchTerm = query.toLowerCase();
+      filtered = filtered.filter(listing =>
+        listing.title.toLowerCase().includes(searchTerm) ||
+        listing.description.toLowerCase().includes(searchTerm)
+      );
     }
 
     // Filter by location
@@ -116,7 +181,7 @@
     } else if (sort === 'price_high') {
       filtered = filtered.sort((a, b) => b.dailyPrice - a.dailyPrice);
     } else if (sort === 'rating') {
-      filtered = filtered.sort((a, b) => b.owner.rating - a.owner.rating);
+      filtered = filtered.sort((a, b) => b.averageRating - a.averageRating);
     }
 
     return filtered;

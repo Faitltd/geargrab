@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ListingCard3D from '$lib/components/ListingCard3D.svelte';
+
   import HeroSearch from '$lib/components/forms/HeroSearch.svelte';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
   import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
