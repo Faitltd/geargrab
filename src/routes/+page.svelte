@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import HeroSearch from '$lib/components/forms/HeroSearch.svelte';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
+  import ScrollLinkedSequential from '$lib/components/layout/ScrollLinkedSequential.svelte';
   import UniverseCard from '$lib/components/cards/UniverseCard.svelte';
   import { categories } from '$lib/data/products';
 
@@ -111,14 +113,16 @@
     </div>
 
     <!-- Stats -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mt-8">
-      {#each stats as stat}
-        <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 shadow-lg">
-          <div class="text-3xl md:text-4xl font-bold text-green-400 mb-2 drop-shadow-lg">{stat.number}</div>
-          <div class="text-gray-200 drop-shadow-lg">{stat.label}</div>
-        </div>
-      {/each}
-    </div>
+    <ScrollLinkedSequential animation="scale-in" startOffset={0.1} endOffset={0.5} incrementDelay={0.1}>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mt-8">
+        {#each stats as stat}
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 shadow-lg">
+            <div class="text-3xl md:text-4xl font-bold text-green-400 mb-2 drop-shadow-lg">{stat.number}</div>
+            <div class="text-gray-200 drop-shadow-lg">{stat.label}</div>
+          </div>
+        {/each}
+      </div>
+    </ScrollLinkedSequential>
   </div>
 
   <!-- Content Section -->
@@ -128,19 +132,22 @@
 
       <!-- Featured Listings with Clean Cards -->
       <div class="text-center mb-20">
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
-          <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Featured Listings</h2>
-          <p class="text-xl text-gray-200 drop-shadow-lg">
-            Discover premium outdoor gear from trusted local owners.
-          </p>
-        </div>
+        <ScrollLinkedAnimator animation="fade-up" startOffset={0.2} endOffset={0.6}>
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
+            <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Featured Listings</h2>
+            <p class="text-xl text-gray-200 drop-shadow-lg">
+              Discover premium outdoor gear from trusted local owners.
+            </p>
+          </div>
+        </ScrollLinkedAnimator>
 
-        <div class="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto mb-12">
-          {#if featuredListings.length > 0}
-            {#each featuredListings as listing}
-              <UniverseCard {listing} onClick={() => handleCardClick(listing)} width="220px" height="280px" />
-            {/each}
-          {:else}
+        <ScrollLinkedSequential animation="scale-in" startOffset={0.3} endOffset={0.8} incrementDelay={0.1}>
+          <div class="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto mb-12">
+            {#if featuredListings.length > 0}
+              {#each featuredListings as listing}
+                <UniverseCard {listing} onClick={() => handleCardClick(listing)} width="220px" height="280px" />
+              {/each}
+            {:else}
             <div class="text-white text-center p-8">
               <p class="text-lg mb-4">Loading featured listings...</p>
               <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-4 border border-white/20">
@@ -169,7 +176,8 @@
               </div>
             </div>
           {/if}
-        </div>
+          </div>
+        </ScrollLinkedSequential>
 
         <a href="/browse" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
           View All Listings
@@ -178,73 +186,83 @@
 
       <!-- Explore Categories -->
       <div class="text-center mb-20">
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
-          <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Explore Categories</h2>
-          <p class="text-xl text-gray-200 drop-shadow-lg">
-            Find the perfect gear for your outdoor adventure.
-          </p>
-        </div>
+        <ScrollLinkedAnimator animation="fade-up" startOffset={0.4} endOffset={0.8}>
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
+            <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Explore Categories</h2>
+            <p class="text-xl text-gray-200 drop-shadow-lg">
+              Find the perfect gear for your outdoor adventure.
+            </p>
+          </div>
+        </ScrollLinkedAnimator>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 max-w-6xl mx-auto">
-          {#each categories as category}
-            <a href="/browse?category={category.id}" class="group">
-              <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 hover:border-green-500 transition-all duration-300 hover:transform hover:scale-105 shadow-lg hover:shadow-xl">
-                <div class="relative h-24 overflow-hidden">
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    loading="lazy"
-                    on:error={handleImageError}
-                  >
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <ScrollLinkedSequential animation="scale-in" startOffset={0.5} endOffset={0.9} incrementDelay={0.05}>
+          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 max-w-6xl mx-auto">
+            {#each categories as category}
+              <a href="/browse?category={category.id}" class="group">
+                <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 hover:border-green-500 transition-all duration-300 hover:transform hover:scale-105 shadow-lg hover:shadow-xl">
+                  <div class="relative h-24 overflow-hidden">
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      loading="lazy"
+                      on:error={handleImageError}
+                    >
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  <div class="p-3">
+                    <h3 class="text-white font-semibold text-sm group-hover:text-green-400 transition-colors drop-shadow-lg text-center">{category.name}</h3>
+                  </div>
                 </div>
-                <div class="p-3">
-                  <h3 class="text-white font-semibold text-sm group-hover:text-green-400 transition-colors drop-shadow-lg text-center">{category.name}</h3>
-                </div>
-              </div>
-            </a>
-          {/each}
-        </div>
+              </a>
+            {/each}
+          </div>
+        </ScrollLinkedSequential>
       </div>
 
       <!-- Why Choose GearGrab -->
       <div class="text-center mb-20">
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
-          <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Why Choose GearGrab?</h2>
-          <p class="text-xl text-gray-200 drop-shadow-lg">
-            Experience the future of outdoor gear access with our trusted platform.
-          </p>
-        </div>
+        <ScrollLinkedAnimator animation="fade-up" startOffset={0.6} endOffset={1.0}>
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
+            <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Why Choose GearGrab?</h2>
+            <p class="text-xl text-gray-200 drop-shadow-lg">
+              Experience the future of outdoor gear access with our trusted platform.
+            </p>
+          </div>
+        </ScrollLinkedAnimator>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          {#each features as feature}
-            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 hover:border-green-500 transition-all duration-300 shadow-lg">
-              <div class="text-4xl mb-4">{feature.icon}</div>
-              <h3 class="text-xl font-bold text-white mb-4 drop-shadow-lg">{feature.title}</h3>
-              <p class="text-gray-200 drop-shadow-lg">{feature.description}</p>
-            </div>
-          {/each}
-        </div>
+        <ScrollLinkedSequential animation="fade-up" startOffset={0.7} endOffset={1.0} incrementDelay={0.15}>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {#each features as feature}
+              <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 hover:border-green-500 transition-all duration-300 shadow-lg">
+                <div class="text-4xl mb-4">{feature.icon}</div>
+                <h3 class="text-xl font-bold text-white mb-4 drop-shadow-lg">{feature.title}</h3>
+                <p class="text-gray-200 drop-shadow-lg">{feature.description}</p>
+              </div>
+            {/each}
+          </div>
+        </ScrollLinkedSequential>
       </div>
 
       <!-- Call to Action -->
       <div class="text-center">
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 max-w-3xl mx-auto border border-white/20 shadow-lg">
-          <h2 class="text-4xl font-bold text-white mb-6 drop-shadow-lg">Ready to Start Your Adventure?</h2>
-          <p class="text-xl text-gray-200 mb-8 drop-shadow-lg">
-            Join thousands of outdoor enthusiasts who are saving money and exploring more with GearGrab.
-          </p>
+        <ScrollLinkedAnimator animation="scale-in" startOffset={0.8} endOffset={1.0}>
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 max-w-3xl mx-auto border border-white/20 shadow-lg">
+            <h2 class="text-4xl font-bold text-white mb-6 drop-shadow-lg">Ready to Start Your Adventure?</h2>
+            <p class="text-xl text-gray-200 mb-8 drop-shadow-lg">
+              Join thousands of outdoor enthusiasts who are saving money and exploring more with GearGrab.
+            </p>
 
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/browse" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
-              Start Browsing
-            </a>
-            <a href="/list-gear" class="border-2 border-white text-white hover:bg-white hover:text-gray-900 font-bold py-3 px-8 rounded-lg transition-all shadow-lg">
-              List Your Gear
-            </a>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/browse" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
+                Start Browsing
+              </a>
+              <a href="/list-gear" class="border-2 border-white text-white hover:bg-white hover:text-gray-900 font-bold py-3 px-8 rounded-lg transition-all shadow-lg">
+                List Your Gear
+              </a>
+            </div>
           </div>
-        </div>
+        </ScrollLinkedAnimator>
       </div>
 
     </div>
