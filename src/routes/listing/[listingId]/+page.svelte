@@ -3,6 +3,8 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
+  import ScrollLinkedSequential from '$lib/components/layout/ScrollLinkedSequential.svelte';
   import { products } from '$lib/data/products';
   // import { getListing } from '$lib/firebase/db/listings'; // Temporarily disabled
 
@@ -633,7 +635,7 @@
         <!-- Main Content: Images and Details -->
         <div class="space-y-16 w-full">
           <!-- Listing Title & Info - Floating Blur Box -->
-          <div class="animate-fade-in-up" style="animation-delay: 0.2s;">
+          <ScrollLinkedAnimator animation="fade-up" startOffset={0} endOffset={0.6}>
             <div class="bg-white/20 backdrop-blur-xl rounded-2xl border border-white/30 p-8 shadow-2xl max-w-4xl mx-auto hover:bg-white/25 transition-all duration-300 text-center">
             <h1 class="text-3xl font-bold mb-4 text-white drop-shadow-lg">
               {#if listing}
@@ -680,11 +682,10 @@
                 <span>{listing.location.city}, {listing.location.state}</span>
               </div>
             </div>
-          </div>
-          </div>
+          </ScrollLinkedAnimator>
 
           <!-- Image Gallery - Floating Blur Box -->
-          <div class="animate-fade-in-up" style="animation-delay: 0.4s;">
+          <ScrollLinkedAnimator animation="scale-in" startOffset={0.1} endOffset={0.7}>
             <div class="bg-white/20 backdrop-blur-xl rounded-2xl border border-white/30 p-8 shadow-2xl max-w-4xl mx-auto hover:bg-white/25 transition-all duration-300">
             <div class="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg overflow-hidden mb-4">
               <img
@@ -706,10 +707,10 @@
                 {/each}
               </div>
             {/if}
-          </div>
+          </ScrollLinkedAnimator>
 
           <!-- Tabs - Floating Blur Box -->
-          <div class="animate-fade-in-up mt-16" style="animation-delay: 0.6s;">
+          <ScrollLinkedAnimator animation="fade-left" startOffset={0.2} endOffset={0.8} className="mt-16">
             <div class="bg-white/20 backdrop-blur-xl rounded-2xl border border-white/30 p-8 shadow-2xl max-w-4xl mx-auto hover:bg-white/25 transition-all duration-300">
             <div class="border-b border-white/20">
               <nav class="flex -mb-px space-x-8 justify-center">
@@ -953,11 +954,10 @@
                 {/if}
               </div>
             </div>
-          </div>
-          </div>
+          </ScrollLinkedAnimator>
 
         <!-- Booking Form -->
-        <div class="animate-fade-in-up" style="animation-delay: 0.8s;">
+        <ScrollLinkedAnimator animation="fade-right" startOffset={0.3} endOffset={0.9}>
           <div class="bg-white/20 backdrop-blur-xl rounded-2xl border border-white/30 shadow-2xl max-w-2xl mx-auto hover:bg-white/25 transition-all duration-300">
             <div class="p-6">
               <div class="flex items-center justify-between mb-6">
@@ -1195,7 +1195,7 @@
               </form>
             </div>
           </div>
-        </div>
+        </ScrollLinkedAnimator>
       </div>
 
     </div>
@@ -1203,9 +1203,12 @@
     <!-- Similar Products -->
     {#if similarListings && similarListings.length > 0}
       <div class="mt-16 text-center max-w-6xl mx-auto px-8 sm:px-12 lg:px-16">
-        <h2 class="text-2xl font-bold mb-6 text-white drop-shadow-lg">Similar Products</h2>
+        <ScrollLinkedAnimator animation="fade-up" startOffset={0.4} endOffset={1.0}>
+          <h2 class="text-2xl font-bold mb-6 text-white drop-shadow-lg">Similar Products</h2>
+        </ScrollLinkedAnimator>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 justify-center max-w-4xl mx-auto">
+        <ScrollLinkedSequential animation="scale-in" startOffset={0.5} endOffset={1.0} incrementDelay={0.1}>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 justify-center max-w-4xl mx-auto">
             {#each similarListings as item}
               <a href="/listing/{item.id}" class="bg-white/10 backdrop-blur-md rounded-lg border border-white/20 shadow-lg overflow-hidden hover:bg-white/20 transition-all">
                 <div class="aspect-w-16 aspect-h-9 bg-gray-200">
@@ -1228,8 +1231,9 @@
               </a>
             {/each}
           </div>
-        </div>
-      {/if}
+        </ScrollLinkedSequential>
+      </div>
+    {/if}
     </div>
   </div>
 {/if}
