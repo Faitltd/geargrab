@@ -1174,16 +1174,16 @@ export const featuredGear = [
 
 // Categories for homepage
 export const categories = [
-  { id: 'camping', name: 'Camping', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'biking', name: 'Biking', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'electric-mobility', name: 'E-Mobility', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'skating', name: 'Skating', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'hiking', name: 'Hiking', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'skiing', name: 'Skiing', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'climbing', name: 'Climbing', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'water-sports', name: 'Water Sports', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'photography', name: 'Photography', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'fishing', name: 'Fishing', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+  { id: 'camping', name: 'Camping', image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'biking', name: 'Biking', image: 'https://images.unsplash.com/photo-1502744688674-c619d1586c9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'electric-mobility', name: 'E-Mobility', image: 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'skating', name: 'Skating', image: 'https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop' },
+  { id: 'hiking', name: 'Hiking', image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'skiing', name: 'Skiing', image: 'https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop' },
+  { id: 'climbing', name: 'Climbing', image: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'water-sports', name: 'Water Sports', image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'photography', name: 'Photography', image: 'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'fishing', name: 'Fishing', image: 'https://images.unsplash.com/photo-1445991842772-097fea258e7b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
 ];
 
 // Helper functions for product data

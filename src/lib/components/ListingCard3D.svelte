@@ -23,7 +23,7 @@
   $: dailyPrice = listing?.dailyPrice || 25;
   $: location = listing?.location || { city: 'Local', state: 'Area' };
   $: images = listing?.images || [];
-  $: primaryImage = images[0] || '/default-gear-image.jpg';
+  $: primaryImage = images[0] || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
 </script>
 
 <div class="parent" on:click={handleClick} on:keydown={handleClick} role="button" tabindex="0">

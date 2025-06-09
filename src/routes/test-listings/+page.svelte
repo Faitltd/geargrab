@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import HoverCard from '$lib/components/HoverCard.svelte';
+  import UniverseCard from '$lib/components/cards/UniverseCard.svelte';
   import { createListing, addNewListing, testListingCreation } from '$lib/utils/listingHelpers';
 
   let testListings: any[] = [];
@@ -144,7 +144,7 @@
       
       <div class="listings-grid">
         {#each testListings as listing}
-          <HoverCard {listing} onClick={() => handleCardClick(listing)} />
+          <UniverseCard {listing} onClick={() => handleCardClick(listing)} width="250px" height="300px" />
         {/each}
       </div>
     </div>

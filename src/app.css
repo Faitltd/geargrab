@@ -7,6 +7,7 @@ html {
   scroll-behavior: smooth;
   margin: 0;
   padding: 0;
+  min-height: 100vh;
 }
 
 body {
@@ -16,6 +17,9 @@ body {
   overflow-y: auto;
   margin: 0;
   padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Remove any default margins/padding */
@@ -23,6 +27,22 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* App container for sticky footer */
+#svelte {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-container {
+  flex: 1;
+}
+
+/* Ensure footer sticks to bottom */
+footer {
+  margin-top: auto;
 }
 
 /* Ensure navbar is always visible and properly styled */

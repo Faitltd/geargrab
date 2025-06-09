@@ -9,6 +9,8 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import type { Listing } from '$lib/types/firestore';
+  import { toastNotifications } from '$lib/stores/notifications';
+  import Modal from '$lib/components/ui/Modal.svelte';
 
   let heroVisible = false;
 
@@ -40,14 +42,14 @@
       const listing = await getListing(listingId);
 
       if (!listing) {
-        alert('Listing not found');
+        toastNotifications.error('Listing not found');
         goto('/list-gear');
         return;
       }
 
       // Check if user owns this listing
       if (listing.ownerUid !== $authStore.user?.uid) {
-        alert('You can only edit your own listings');
+        toastNotifications.error('You can only edit your own listings');
         goto('/list-gear');
         return;
       }
@@ -62,7 +64,7 @@
 
     } catch (error) {
       console.error('Error loading listing for edit:', error);
-      alert('Error loading listing. Please try again.');
+      toastNotifications.error('Error loading listing. Please try again.');
       goto('/list-gear');
     } finally {
       isLoadingListing = false;
@@ -421,6 +423,11 @@
 
   let isSubmitting = false;
 
+  // Success modal state
+  let showSuccessModal = false;
+  let successMessage = '';
+  let successRedirectUrl = '';
+
   // Navigation and submission functions
   function getValidationSummary() {
     const stepNames = ['Basic Information', 'Details', 'Images', 'Pricing & Location', 'Preview'];
@@ -456,8 +463,8 @@
       if (!isValid) {
         const stepNames = ['Basic Information', 'Details', 'Images', 'Pricing & Location', 'Preview'];
         const errorCount = Object.keys(errors).length;
-        const errorList = Object.values(errors).join('\n• ');
-        alert(`Please fix the following ${errorCount} error${errorCount > 1 ? 's' : ''} in ${stepNames[currentStep - 1]} before continuing:\n\n• ${errorList}`);
+        const errorList = Object.values(errors).join(', ');
+        toastNotifications.error(`Please fix ${errorCount} error${errorCount > 1 ? 's' : ''} in ${stepNames[currentStep - 1]}: ${errorList}`);
         return;
       }
 
@@ -474,7 +481,7 @@
 
   async function submitForm(): Promise<void> {
     if (!$authStore.user) {
-      alert('Please sign in to list your gear.');
+      toastNotifications.error('Please sign in to list your gear.');
       goto('/auth/signin');
       return;
     }
@@ -490,9 +497,9 @@
         `${stepError.name} (${stepError.errorCount} error${stepError.errorCount > 1 ? 's' : ''})`
       ).join(', ');
 
-      const errorMessage = `Please fix ${validationSummary.totalErrors} validation error${validationSummary.totalErrors > 1 ? 's' : ''} in the following sections:\n\n${errorDetails}\n\nYou've been taken to the first section with errors.`;
+      const errorMessage = `Please fix ${validationSummary.totalErrors} validation error${validationSummary.totalErrors > 1 ? 's' : ''} in: ${errorDetails}. You've been taken to the first section with errors.`;
 
-      alert(errorMessage);
+      toastNotifications.error(errorMessage);
       return;
     }
 
@@ -546,19 +553,25 @@
         // Update existing listing
         await updateListing(editingListingId, listingData);
         console.log('Listing updated successfully with ID:', editingListingId);
-        alert('Your listing has been updated successfully!');
-        goto(`/listing/${editingListingId}`);
+
+        // Show success modal
+        successMessage = 'Your listing has been updated successfully!';
+        successRedirectUrl = `/listing/${editingListingId}`;
+        showSuccessModal = true;
       } else {
         // Create new listing
         const listingId = await createListing(listingData);
         console.log('Listing created successfully with ID:', listingId);
-        alert('Your gear has been listed successfully! You can view and manage your listings in your dashboard.');
-        goto(`/listing/${listingId}`);
+
+        // Show success modal
+        successMessage = 'Your gear has been listed successfully! You can view and manage your listings in your dashboard.';
+        successRedirectUrl = `/listing/${listingId}`;
+        showSuccessModal = true;
       }
 
     } catch (error) {
       console.error('Error creating listing:', error);
-      alert('There was an error creating your listing. Please try again.');
+      toastNotifications.error('There was an error creating your listing. Please try again.');
     } finally {
       isSubmitting = false;
     }
@@ -571,6 +584,13 @@
     }
   }
 
+  // Handle success modal close and redirect
+  function handleSuccessModalClose() {
+    showSuccessModal = false;
+    if (successRedirectUrl) {
+      goto(successRedirectUrl);
+    }
+  }
 
 </script>
 
@@ -1425,7 +1445,7 @@
           <button
             type="button"
             on:click={nextStep}
-            class="bg-green-600/80 hover:bg-green-600/90 text-white px-6 py-3 rounded-lg backdrop-blur-sm border border-green-500/50 transition-all duration-200 shadow-lg"
+            class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg backdrop-blur-sm border border-green-500/50 transition-all duration-200 shadow-lg"
           >
             Next →
           </button>
@@ -1434,7 +1454,7 @@
             type="button"
             on:click={submitForm}
             disabled={isSubmitting}
-            class="bg-green-600/80 hover:bg-green-600/90 text-white px-8 py-3 rounded-lg backdrop-blur-sm border border-green-500/50 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg backdrop-blur-sm border border-green-500/50 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {#if isSubmitting}
               <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -1453,6 +1473,41 @@
   </div>
   {/if}
 </div>
+
+<!-- Success Modal -->
+<Modal
+  bind:show={showSuccessModal}
+  title="Success!"
+  maxWidth="max-w-md"
+  on:close={handleSuccessModalClose}
+>
+  <div class="p-6">
+    <div class="flex items-center justify-center mb-4">
+      <div class="w-16 h-16 bg-green-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-green-500/30">
+        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+    </div>
+
+    <p class="text-center text-white mb-6">{successMessage}</p>
+
+    <div class="flex justify-center space-x-4">
+      <button
+        on:click={() => goto('/dashboard')}
+        class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+      >
+        Go to Dashboard
+      </button>
+      <button
+        on:click={handleSuccessModalClose}
+        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+      >
+        View Listing
+      </button>
+    </div>
+  </div>
+</Modal>
 
 <style>
   /* Smooth scrolling for better parallax effect */

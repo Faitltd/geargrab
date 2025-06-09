@@ -8,6 +8,7 @@
   import Navbar from '$lib/components/layout/Navbar.svelte';
   import Footer from '$lib/components/layout/Footer.svelte';
   import PageTransition from '$lib/components/layout/PageTransition.svelte';
+  import ToastNotifications from '$lib/components/ui/ToastNotifications.svelte';
   import type { User } from '$lib/stores/auth';
 
   // Initialize auth state listener
@@ -53,3 +54,6 @@
 </PageTransition>
 
 <Footer />
+
+<!-- Toast Notifications -->
+<ToastNotifications />

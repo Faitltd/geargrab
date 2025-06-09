@@ -1,43 +1,82 @@
 <script lang="ts">
-  import HoverCard from '$lib/components/HoverCard.svelte';
-  import { goto } from '$app/navigation';
-  import SkeletonCard from '$lib/components/layout/SkeletonCard.svelte';
-  import ScrollLinkedSequential from '$lib/components/layout/ScrollLinkedSequential.svelte';
+  import UniverseCard from '$lib/components/cards/UniverseCard.svelte';
 
   export let listings = [];
   export let loading = false;
   export let emptyMessage = "No gear items found";
+
+  function handleCardClick(listing: any) {
+    // Navigate to listing detail page
+    window.location.href = `/listing/${listing.id}`;
+  }
 </script>
 
-<div data-cy="gear-grid">
+<div data-cy="gear-grid" class="p-8">
+  <h2 class="text-white text-2xl mb-4">Listings: {listings.length}</h2>
+
   {#if loading}
-    <div data-cy="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8 justify-items-center">
-      <SkeletonCard variant="gear" count={8} />
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p class="text-white">Loading amazing gear...</p>
     </div>
   {:else if !listings || listings.length === 0}
-    <div class="py-12 text-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-white/70 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-      </svg>
-      <p class="text-white/80 text-lg drop-shadow-lg">{emptyMessage}</p>
-      <p class="text-white/60 text-sm mt-2 drop-shadow-lg">Try adjusting your search criteria or browse all categories</p>
+    <div class="empty-container">
+      <p class="text-white text-xl">{emptyMessage}</p>
+      <p class="text-white/60 mt-2">Try adjusting your search filters</p>
     </div>
   {:else}
-    <ScrollLinkedSequential
-      animation="fade-up"
-      baseDelay={0}
-      incrementDelay={0.02}
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8 justify-items-center"
-      startOffset={0.1}
-      endOffset={0.9}
-      smoothness={0.15}
-    >
+    <div class="cards">
       {#each listings as listing}
-        <HoverCard 
-          {listing} 
-          onClick={() => goto(`/listing/${listing.id}`)} 
-        />
+        <UniverseCard {listing} onClick={() => handleCardClick(listing)} />
       {/each}
-    </ScrollLinkedSequential>
+    </div>
   {/if}
 </div>
+
+<style>
+  /* Card Grid Container */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+    justify-items: center;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .cards {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .cards {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+  }
+
+  /* Loading and Empty States */
+  .loading-container,
+  .empty-container {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+
+  .loading-spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>

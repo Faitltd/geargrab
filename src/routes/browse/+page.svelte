@@ -16,7 +16,6 @@
   let category = $page.url.searchParams.get('category') || 'all';
   let location = $page.url.searchParams.get('location') || '';
   let sort = 'recommended';
-  let showFilters = false;
   let query = $page.url.searchParams.get('q') || '';
   let totalCount = 0;
   let hasMore = false;
@@ -28,7 +27,7 @@
 
   async function performSearch() {
     loading = true;
-    
+
     try {
       // Use the local products data as the primary source
       listings = filterListings(products);
@@ -226,7 +225,7 @@
     </ScrollLinkedAnimator>
 
     <!-- Gear Listings -->
-    <div class="mb-16">
+    <div class="mb-16 relative z-50">
       <GearGrid {listings} {loading} />
     </div>
 

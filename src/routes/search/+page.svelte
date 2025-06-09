@@ -5,6 +5,7 @@
   import { searchService, GEAR_CATEGORIES, GEAR_FEATURES, type SearchFilters, type SearchResult } from '$lib/services/search';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
   import Checkbox from '$lib/components/ui/Checkbox.svelte';
+  import UniverseCard from '$lib/components/cards/UniverseCard.svelte';
 
   let searchQuery = '';
   let results: SearchResult[] = [];
@@ -43,7 +44,7 @@
       results = searchResults.results;
       totalCount = searchResults.totalCount;
       hasMore = searchResults.hasMore;
-      
+
       // Update URL
       const url = new URL(window.location.href);
       if (searchQuery) {
@@ -52,12 +53,16 @@
         url.searchParams.delete('q');
       }
       goto(url.pathname + url.search, { replaceState: true });
-      
+
     } catch (error) {
       console.error('Search error:', error);
     } finally {
       loading = false;
     }
+  }
+
+  function handleCardClick(item: any) {
+    window.location.href = `/listing/${item.id}`;
   }
 
   function handleSearchSubmit() {
@@ -286,88 +291,9 @@
           </div>
         </div>
       {:else}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="flex flex-wrap justify-center gap-6">
           {#each results as item}
-            <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 overflow-hidden hover:bg-white/15 transition-all group">
-              <!-- Image -->
-              <div class="relative h-48 overflow-hidden">
-                <img
-                  src={item.images[0]}
-                  alt={item.title}
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                {#if item.isPromoted}
-                  <div class="absolute top-2 left-2 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded">
-                    FEATURED
-                  </div>
-                {/if}
-                {#if item.availability.instantBook}
-                  <div class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
-                    INSTANT BOOK
-                  </div>
-                {/if}
-              </div>
-
-              <!-- Content -->
-              <div class="p-4">
-                <div class="flex items-start justify-between mb-2">
-                  <h3 class="text-lg font-semibold text-white line-clamp-2">{item.title}</h3>
-                  <div class="text-right ml-2">
-                    <div class="text-lg font-bold text-white">{formatCurrency(item.dailyPrice)}</div>
-                    <div class="text-xs text-gray-300">per day</div>
-                  </div>
-                </div>
-
-                <!-- Rating and Reviews -->
-                <div class="flex items-center space-x-2 mb-2">
-                  <span class="text-yellow-400 text-sm">{getRatingStars(item.rating)}</span>
-                  <span class="text-sm text-gray-300">{item.rating}</span>
-                  <span class="text-sm text-gray-400">({item.reviewCount} reviews)</span>
-                </div>
-
-                <!-- Location and Distance -->
-                <div class="flex items-center text-sm text-gray-300 mb-3">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  </svg>
-                  <span>{item.location.city}, {item.location.state}</span>
-                  {#if item.distance}
-                    <span class="ml-2">• {formatDistance(item.distance)} away</span>
-                  {/if}
-                </div>
-
-                <!-- Owner Info -->
-                <div class="flex items-center space-x-2 mb-3">
-                  <img
-                    src={item.owner.avatar}
-                    alt={item.owner.name}
-                    class="w-6 h-6 rounded-full"
-                  />
-                  <span class="text-sm text-gray-300">{item.owner.name}</span>
-                  {#if item.owner.isVerified}
-                    <span class="text-green-400 text-xs">✓ Verified</span>
-                  {/if}
-                </div>
-
-                <!-- Features -->
-                <div class="flex flex-wrap gap-1 mb-3">
-                  {#each item.features.slice(0, 3) as feature}
-                    <span class="bg-white/10 text-xs text-gray-300 px-2 py-1 rounded">
-                      {feature}
-                    </span>
-                  {/each}
-                  {#if item.features.length > 3}
-                    <span class="text-xs text-gray-400">+{item.features.length - 3} more</span>
-                  {/if}
-                </div>
-
-                <!-- Action Button -->
-                <button class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                  View Details
-                </button>
-              </div>
-            </div>
+            <UniverseCard listing={item} onClick={() => handleCardClick(item)} width="220px" height="280px" />
           {/each}
         </div>
 
