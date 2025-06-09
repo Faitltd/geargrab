@@ -250,11 +250,14 @@
     errors = {};
 
     try {
-      await signInWithGoogle();
+      console.log('🔐 Starting Google sign-up process...');
+      const result = await signInWithGoogle();
+
+      console.log('✅ Google sign-up successful:', result.user.email);
 
       notifications.add({
         type: 'success',
-        message: 'Successfully signed up with Google!',
+        message: `Successfully signed up with Google! Welcome, ${result.user.displayName || result.user.email}`,
         timeout: 5000
       });
 
@@ -264,8 +267,16 @@
       // Navigate to redirect URL
       await goto(redirectTo);
     } catch (error: any) {
-      console.error('Google sign-in error:', error);
-      errors.auth = error.message || 'An error occurred during Google sign-in';
+      console.error('❌ Google sign-up error:', error);
+
+      // Show user-friendly error message
+      errors.auth = error.message || 'An error occurred during Google sign-up';
+
+      notifications.add({
+        type: 'error',
+        message: errors.auth,
+        timeout: 8000
+      });
     } finally {
       loading = false;
     }

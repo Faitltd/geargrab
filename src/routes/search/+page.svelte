@@ -4,6 +4,7 @@
   import { goto } from '$app/navigation';
   import { searchService, GEAR_CATEGORIES, GEAR_FEATURES, type SearchFilters, type SearchResult } from '$lib/services/search';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
+  import Checkbox from '$lib/components/ui/Checkbox.svelte';
 
   let searchQuery = '';
   let results: SearchResult[] = [];
@@ -236,22 +237,14 @@
         <!-- Additional Filters -->
         <div class="mt-6 pt-6 border-t border-white/20">
           <div class="flex flex-wrap gap-4">
-            <label class="flex items-center">
-              <input
-                type="checkbox"
-                bind:checked={filters.verifiedOwners}
-                class="mr-2 rounded text-green-600 focus:ring-green-500"
-              />
-              <span class="text-white">Verified Owners Only</span>
-            </label>
-            <label class="flex items-center">
-              <input
-                type="checkbox"
-                bind:checked={filters.instantBook}
-                class="mr-2 rounded text-green-600 focus:ring-green-500"
-              />
-              <span class="text-white">Instant Book</span>
-            </label>
+            <Checkbox
+              bind:checked={filters.verifiedOwners}
+              label="Verified Owners Only"
+            />
+            <Checkbox
+              bind:checked={filters.instantBook}
+              label="Instant Book"
+            />
           </div>
         </div>
 

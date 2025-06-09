@@ -128,6 +128,12 @@
           <a href="/auth/signup" class="bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-md text-sm font-medium ml-2">
             Sign Up
           </a>
+          <!-- Debug link for development -->
+          {#if import.meta.env.DEV}
+            <a href="/debug/auth" class="text-yellow-400 hover:text-yellow-300 px-3 py-2 rounded-md text-xs font-medium ml-2">
+              🔍 Debug
+            </a>
+          {/if}
         {/if}
       </div>
       <div class="-mr-2 flex items-center sm:hidden">
@@ -212,6 +218,12 @@
             <a href="/auth/signup" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Sign Up
             </a>
+            <!-- Debug link for development -->
+            {#if import.meta.env.DEV}
+              <a href="/debug/auth" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-yellow-400 hover:text-yellow-300 hover:bg-white/10">
+                🔍 Debug Auth
+              </a>
+            {/if}
           </div>
         {/if}
       </div>

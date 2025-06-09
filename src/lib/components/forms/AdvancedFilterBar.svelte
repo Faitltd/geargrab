@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { GEAR_CATEGORIES, type SearchFilters } from '$lib/services/search';
+  import Checkbox from '$lib/components/ui/Checkbox.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -286,15 +287,11 @@
           <div class="block text-sm font-medium text-white mb-3">Delivery Options</div>
           <div class="space-y-2">
             {#each deliveryOptions as option}
-              <label class="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  checked={selectedDeliveryOptions.includes(option.id)}
-                  on:change={() => toggleDeliveryOption(option.id)}
-                  class="w-4 h-4 text-green-600 bg-gray-700 border-gray-600 rounded focus:ring-green-500"
-                />
-                <span class="text-white text-sm">{option.icon} {option.name}</span>
-              </label>
+              <Checkbox
+                checked={selectedDeliveryOptions.includes(option.id)}
+                label="{option.icon} {option.name}"
+                on:change={() => toggleDeliveryOption(option.id)}
+              />
             {/each}
           </div>
         </div>
@@ -303,24 +300,16 @@
         <div>
           <div class="block text-sm font-medium text-white mb-3">Quick Options</div>
           <div class="space-y-3">
-            <label class="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                bind:checked={verifiedOwners}
-                on:change={applyFilters}
-                class="w-4 h-4 text-green-600 bg-gray-700 border-gray-600 rounded focus:ring-green-500"
-              />
-              <span class="text-white text-sm">✓ Verified Owners Only</span>
-            </label>
-            <label class="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                bind:checked={instantBook}
-                on:change={applyFilters}
-                class="w-4 h-4 text-green-600 bg-gray-700 border-gray-600 rounded focus:ring-green-500"
-              />
-              <span class="text-white text-sm">⚡ Instant Book Available</span>
-            </label>
+            <Checkbox
+              bind:checked={verifiedOwners}
+              label="✓ Verified Owners Only"
+              on:change={applyFilters}
+            />
+            <Checkbox
+              bind:checked={instantBook}
+              label="⚡ Instant Book Available"
+              on:change={applyFilters}
+            />
           </div>
         </div>
 

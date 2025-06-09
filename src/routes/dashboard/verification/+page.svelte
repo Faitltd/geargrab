@@ -254,7 +254,8 @@
           {/if}
         </div>
 
-        <!-- Background Check -->
+        <!-- HIDDEN: Background Check - Temporarily disabled -->
+        <!--
         <div class="bg-white/5 rounded-lg p-4 border border-white/10">
           <div class="flex items-center justify-between mb-2">
             <div class="flex items-center space-x-3">
@@ -283,7 +284,7 @@
             </div>
           </div>
           {#if !verificationStatus.verifiedMethods.background_check && verificationStatus.backgroundCheckStatus?.status !== 'pending' && verificationStatus.backgroundCheckStatus?.status !== 'in_progress'}
-            <a 
+            <a
               href="/dashboard/verification/background-check"
               class="block w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm text-center"
             >
@@ -295,6 +296,7 @@
             </div>
           {/if}
         </div>
+        -->
       </div>
     </div>
 

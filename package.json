@@ -30,7 +30,8 @@
     "deploy:check": "npm run test:production-readiness && npm run audit:security",
     "test:fcra": "node -e \"import('./src/lib/jobs/finalAdverseCron.js').then(m => m.finalAdverseNoticeJob.runJob())\"",
     "test:background-check": "curl -X POST http://localhost:5173/api/webhooks/iprospect?reportId=test_report_123",
-    "test:iprospectcheck": "node scripts/test-iprospectcheck.js"
+    "test:iprospectcheck": "node scripts/test-iprospectcheck.js",
+    "verify-google-auth": "node scripts/verify-google-auth.js"
   },
   "devDependencies": {
     "@sveltejs/adapter-node": "^1.0.0",

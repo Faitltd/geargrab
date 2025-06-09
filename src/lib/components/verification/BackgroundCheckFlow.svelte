@@ -3,6 +3,7 @@
   import { authStore } from '$lib/stores/auth';
   import { verificationService } from '$lib/services/verification';
   import { backgroundCheckService, type BackgroundCheckProvider } from '$lib/services/backgroundCheck';
+  import Checkbox from '$lib/components/ui/Checkbox.svelte';
   
   export let currentStep: 'consent' | 'provider' | 'payment' | 'processing' | 'complete' = 'consent';
   export let selectedProvider: BackgroundCheckProvider['id'] = 'checkr';
@@ -190,18 +191,17 @@
       </div>
 
       <div class="space-y-4">
-        <label class="flex items-start space-x-3">
-          <input 
-            type="checkbox" 
-            bind:checked={consentGiven}
-            class="mt-1 w-4 h-4 text-blue-600 bg-white/10 border-white/20 rounded focus:ring-blue-500 focus:ring-2"
-          />
+        <Checkbox
+          bind:checked={consentGiven}
+          labelClass="text-gray-300 text-sm"
+          wrapperClass="items-start"
+        >
           <span class="text-gray-300 text-sm">
-            I authorize GearGrab and its designated agents to conduct a comprehensive background check. 
-            I understand that this information will be used to verify my identity and assess my eligibility 
+            I authorize GearGrab and its designated agents to conduct a comprehensive background check.
+            I understand that this information will be used to verify my identity and assess my eligibility
             to participate in the platform. I have read and agree to the background check consent terms.
           </span>
-        </label>
+        </Checkbox>
       </div>
 
       <div class="flex justify-end">

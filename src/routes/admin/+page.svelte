@@ -250,7 +250,8 @@
         </div>
       </div>
 
-      <!-- Background Checks -->
+      <!-- HIDDEN: Background Checks - Temporarily disabled -->
+      <!--
       <div class="bg-gradient-to-br from-red-500/20 to-red-600/20 backdrop-blur-md rounded-xl p-6 border border-red-500/30">
         <div class="flex items-center justify-between">
           <div>
@@ -265,6 +266,7 @@
           </a>
         </div>
       </div>
+      -->
     </div>
 
     <!-- Recent Activity -->

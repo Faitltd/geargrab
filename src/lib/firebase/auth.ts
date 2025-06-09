@@ -28,8 +28,45 @@ export async function signInWithEmail(email: string, password: string): Promise<
 // Sign in with Google
 export async function signInWithGoogle(): Promise<UserCredential> {
   if (!browser) throw new Error('Auth functions can only be called in the browser');
+
   const provider = new GoogleAuthProvider();
-  return signInWithPopup(auth, provider);
+
+  // Add additional scopes if needed
+  provider.addScope('email');
+  provider.addScope('profile');
+
+  // Set custom parameters
+  provider.setCustomParameters({
+    prompt: 'select_account'
+  });
+
+  try {
+    console.log('🔐 Attempting Google sign-in...');
+    const result = await signInWithPopup(auth, provider);
+    console.log('✅ Google sign-in successful:', result.user.email);
+
+    // Create or update user document in Firestore
+    await createUserDocument(result.user);
+
+    return result;
+  } catch (error: any) {
+    console.error('❌ Google sign-in error:', error);
+
+    // Handle specific Google auth errors
+    if (error.code === 'auth/popup-closed-by-user') {
+      throw new Error('Sign-in was cancelled. Please try again.');
+    } else if (error.code === 'auth/popup-blocked') {
+      throw new Error('Pop-up was blocked by your browser. Please allow pop-ups and try again.');
+    } else if (error.code === 'auth/cancelled-popup-request') {
+      throw new Error('Another sign-in attempt is in progress. Please wait.');
+    } else if (error.code === 'auth/operation-not-allowed') {
+      throw new Error('Google sign-in is not enabled. Please contact support.');
+    } else if (error.code === 'auth/unauthorized-domain') {
+      throw new Error('This domain is not authorized for Google sign-in.');
+    } else {
+      throw new Error(`Google sign-in failed: ${error.message}`);
+    }
+  }
 }
 
 // Sign up with email and password

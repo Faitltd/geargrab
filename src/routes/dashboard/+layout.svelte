@@ -4,7 +4,7 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
-  import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
   import SequentialAnimator from '$lib/components/layout/SequentialAnimator.svelte';
 
   // Redirect if not logged in
@@ -52,17 +52,17 @@
       </div>
     {:else if $authStore && $authStore.user}
       <!-- Dashboard Header -->
-      <ScrollAnimated animation="fade-up" delay={200}>
+      <ScrollLinkedAnimator animation="fade-up" startOffset={0} endOffset={0.4}>
         <div class="mb-8">
           <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 shadow-lg">
             <h1 class="text-3xl font-bold text-white drop-shadow-lg">Dashboard</h1>
             <p class="text-gray-200 drop-shadow-lg">Welcome back, {$authStore.user?.displayName || 'User'}!</p>
           </div>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
       <!-- Dashboard Tabs -->
-      <ScrollAnimated animation="fade-up" delay={400}>
+      <ScrollLinkedAnimator animation="fade-up" startOffset={0.1} endOffset={0.5}>
         <div class="mb-8">
           <nav class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-lg p-1 flex space-x-1">
             {#each tabs as tab}
@@ -78,17 +78,17 @@
             {/each}
           </nav>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
 
       <!-- Dashboard Content -->
-      <ScrollAnimated animation="fade-up" delay={600}>
+      <ScrollLinkedAnimator animation="fade-up" startOffset={0.2} endOffset={0.6}>
         <div>
           <slot />
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
     {:else}
       <!-- Fallback for when store is not initialized or user is not logged in -->
-      <ScrollAnimated animation="fade-up" delay={200}>
+      <ScrollLinkedAnimator animation="fade-up" startOffset={0} endOffset={0.5}>
         <div class="flex justify-center items-center h-64">
           <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8 text-center shadow-lg">
             <h2 class="text-xl font-semibold text-white mb-2 drop-shadow-lg">Access Restricted</h2>
@@ -98,7 +98,7 @@
             </a>
           </div>
         </div>
-      </ScrollAnimated>
+      </ScrollLinkedAnimator>
     {/if}
   </div>
 </div>

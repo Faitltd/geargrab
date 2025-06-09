@@ -89,22 +89,33 @@
     errors = {};
 
     try {
-      await signInWithGoogle();
+      console.log('🔐 Starting Google sign-in process...');
+      const result = await signInWithGoogle();
+
+      console.log('✅ Google sign-in successful:', result.user.email);
 
       notifications.add({
         type: 'success',
-        message: 'Successfully logged in with Google!',
+        message: `Successfully logged in with Google! Welcome, ${result.user.displayName || result.user.email}`,
         timeout: 5000
       });
 
       // Wait for auth state to propagate
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       // Navigate to redirect URL
       await goto(redirectTo);
     } catch (error: any) {
-      console.error('Google sign-in error:', error);
+      console.error('❌ Google sign-in error:', error);
+
+      // Show user-friendly error message
       errors.auth = error.message || 'An error occurred during Google sign-in';
+
+      notifications.add({
+        type: 'error',
+        message: errors.auth,
+        timeout: 8000
+      });
     } finally {
       loading = false;
     }

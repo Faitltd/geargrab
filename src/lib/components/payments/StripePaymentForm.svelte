@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, createEventDispatcher } from 'svelte';
-  import { initializeStripe, createPaymentIntent, confirmPayment } from '$lib/services/payments';
+  import { initializeStripe, createPaymentIntent } from '$lib/services/payments';
   
   export let amount: number;
   export let currency: string = 'usd';
@@ -11,7 +11,6 @@
   
   let stripe: any = null;
   let elements: any = null;
-  let cardElement: any = null;
   let paymentElement: any = null;
   let clientSecret: string = '';
   let processing: boolean = false;
@@ -23,16 +22,31 @@
   
   onMount(async () => {
     try {
+      console.log('Initializing payment form with amount:', amount);
+
       // Initialize Stripe
       stripe = await initializeStripe();
       if (!stripe) {
-        throw new Error('Failed to initialize Stripe');
+        throw new Error('Failed to initialize Stripe - check publishable key');
       }
-      
+      console.log('Stripe initialized successfully');
+
       // Create payment intent
+      console.log('Creating payment intent...');
       const { clientSecret: secret } = await createPaymentIntent(amount, currency, metadata);
       clientSecret = secret;
-      
+      console.log('Payment intent created successfully');
+
+      // Check if this is a mock payment intent (development mode)
+      const isMockPayment = secret.includes('mock');
+
+      if (isMockPayment) {
+        console.log('Development mode: Using mock payment form');
+        paymentReady = true;
+        // Don't create Stripe elements for mock payments
+        return;
+      }
+
       // Create elements
       elements = stripe.elements({
         clientSecret,
@@ -64,11 +78,12 @@
           }
         }
       });
-      
+
       // Create payment element
       paymentElement = elements.create('payment');
       paymentElement.mount(paymentElementContainer);
-      
+      console.log('Payment element mounted successfully');
+
       // Listen for changes
       paymentElement.on('change', (event: any) => {
         if (event.error) {
@@ -79,40 +94,80 @@
           paymentReady = event.complete;
         }
       });
-      
+
       paymentElement.on('ready', () => {
         paymentReady = true;
+        console.log('Payment element ready');
       });
-      
+
     } catch (err) {
       console.error('Error setting up payment:', err);
-      error = 'Failed to initialize payment form';
+      console.error('Error details:', {
+        message: err.message,
+        stack: err.stack,
+        amount,
+        currency,
+        metadata
+      });
+
+      // Provide more specific error messages
+      if (err.message?.includes('payment intent')) {
+        error = 'Failed to create payment intent. Please check your connection and try again.';
+      } else if (err.message?.includes('Stripe')) {
+        error = 'Failed to initialize Stripe. Please refresh the page and try again.';
+      } else {
+        error = `Failed to initialize payment form: ${err.message}`;
+      }
     }
   });
   
   async function handleSubmit() {
-    if (!stripe || !elements || processing) return;
-    
     processing = true;
     error = '';
-    
+
     try {
+      // Check if this is a mock payment (development mode)
+      const isMockPayment = clientSecret.includes('mock');
+
+      if (isMockPayment) {
+        console.log('Development mode: Simulating successful payment');
+        // Simulate a successful payment for development
+        setTimeout(() => {
+          dispatch('success', {
+            paymentIntent: {
+              id: clientSecret.split('_secret_')[0],
+              status: 'succeeded',
+              amount: amount * 100,
+              currency
+            },
+            paymentIntentId: clientSecret.split('_secret_')[0]
+          });
+          processing = false;
+        }, 1000);
+        return;
+      }
+
+      // Real Stripe payment flow
+      if (!stripe || !elements) {
+        throw new Error('Payment system not initialized');
+      }
+
       // Confirm payment
       const { error: submitError } = await elements.submit();
       if (submitError) {
         throw new Error(submitError.message);
       }
-      
+
       const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
         elements,
         clientSecret,
         redirect: 'if_required'
       });
-      
+
       if (confirmError) {
         throw new Error(confirmError.message);
       }
-      
+
       if (paymentIntent.status === 'succeeded') {
         dispatch('success', {
           paymentIntent,
@@ -121,7 +176,7 @@
       } else {
         throw new Error('Payment was not successful');
       }
-      
+
     } catch (err) {
       console.error('Payment error:', err);
       error = err.message || 'Payment failed. Please try again.';
@@ -151,10 +206,26 @@
   <!-- Payment Form -->
   <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6">
     <h3 class="text-lg font-semibold text-white mb-4">Payment Information</h3>
-    
+
+    <!-- Development Mode Notice -->
+    {#if clientSecret && clientSecret.includes('mock')}
+      <div class="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-4">
+        <p class="text-yellow-200 text-sm">
+          🚧 <strong>Development Mode:</strong> This is a test payment. No real charges will be made.
+        </p>
+      </div>
+    {/if}
+
     <!-- Stripe Payment Element Container -->
-    <div bind:this={paymentElementContainer} class="mb-6"></div>
-    
+    <div bind:this={paymentElementContainer} class="mb-6">
+      {#if clientSecret && clientSecret.includes('mock')}
+        <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-600">
+          <p class="text-gray-300 text-sm mb-2">💳 Mock Payment Form</p>
+          <p class="text-gray-400 text-xs">In development mode - click "Pay Now" to simulate payment</p>
+        </div>
+      {/if}
+    </div>
+
     <!-- Error Display -->
     {#if error}
       <div class="bg-red-500/20 border border-red-500/50 rounded-lg p-3 mb-4">

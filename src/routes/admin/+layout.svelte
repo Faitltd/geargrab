@@ -16,8 +16,9 @@
     { id: 'listings', label: 'Listings Management', href: '/admin/listings', icon: '📦' },
     { id: 'bookings', label: 'Bookings Management', href: '/admin/bookings', icon: '📅' },
     { id: 'messages', label: 'Messages', href: '/admin/messages', icon: '💬' },
-    { id: 'background-checks', label: 'Background Checks', href: '/admin/background-checks', icon: '🔍' },
-    { id: 'background-check-test', label: 'BG Check Testing', href: '/admin/background-checks/test', icon: '🧪' },
+    // HIDDEN: Background check functionality temporarily disabled
+    // { id: 'background-checks', label: 'Background Checks', href: '/admin/background-checks', icon: '🔍' },
+    // { id: 'background-check-test', label: 'BG Check Testing', href: '/admin/background-checks/test', icon: '🧪' },
     { id: 'verification', label: 'User Verification', href: '/admin/verification', icon: '✅' },
     { id: 'claims', label: 'Insurance Claims', href: '/admin/claims', icon: '🛡️' },
     { id: 'webhooks', label: 'Webhook Testing', href: '/admin/webhooks', icon: '🔗' },

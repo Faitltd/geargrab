@@ -40,6 +40,8 @@ export async function createPaymentIntent(
   metadata: Record<string, string> = {}
 ): Promise<{ clientSecret: string; paymentIntentId: string }> {
   try {
+    console.log('Creating payment intent:', { amount: amount * 100, currency, metadata });
+
     const response = await fetch('/api/payments/create-intent', {
       method: 'POST',
       headers: {
@@ -53,10 +55,26 @@ export async function createPaymentIntent(
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create payment intent');
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Payment intent creation failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      });
+
+      if (response.status === 401) {
+        throw new Error('Authentication required. Please log in and try again.');
+      } else if (response.status === 400) {
+        throw new Error(errorData.error || 'Invalid payment amount or details.');
+      } else if (response.status === 500) {
+        throw new Error('Payment service error. Please try again later.');
+      } else {
+        throw new Error(`Failed to create payment intent (${response.status})`);
+      }
     }
 
     const { clientSecret, paymentIntentId } = await response.json();
+    console.log('Payment intent created successfully:', { paymentIntentId });
     return { clientSecret, paymentIntentId };
   } catch (error) {
     console.error('Error creating payment intent:', error);

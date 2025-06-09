@@ -1,4 +1,14 @@
 // Comprehensive product catalog for GearGrab
+//
+// 🚀 NEW LISTINGS: Use the validation utilities to ensure proper display!
+// Import: import { createListing, addNewListing } from '$lib/utils/listingHelpers';
+// Usage: const newListing = createListing({ title: 'My Gear', category: 'biking', dailyPrice: 40 });
+//
+// The validation system automatically:
+// ✅ Ensures proper image URLs with fallbacks
+// ✅ Validates required fields
+// ✅ Provides category-appropriate default images
+// ✅ Handles missing or invalid data gracefully
 export interface Product {
   id: string;
   title: string;
@@ -68,8 +78,8 @@ export const products: Product[] = [
       zipCode: '80202'
     },
     images: [
-      'https://https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
     ],
     features: ['Waterproof', 'Easy Setup', 'Two Vestibules', 'Color-coded Clips'],
     specifications: {
@@ -82,7 +92,7 @@ export const products: Product[] = [
     owner: {
       id: 'owner-001',
       name: 'John Smith',
-      avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
       rating: 4.8,
       reviewCount: 23
     },
@@ -127,7 +137,7 @@ export const products: Product[] = [
       zipCode: '80301'
     },
     images: [
-      'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      'https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
     ],
     features: ['Self-Balancing', 'App Connectivity', 'LED Lights', 'Regenerative Braking'],
     specifications: {
@@ -140,7 +150,7 @@ export const products: Product[] = [
     owner: {
       id: 'owner-002',
       name: 'Emily Chen',
-      avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
       rating: 4.9,
       reviewCount: 31
     },
@@ -185,7 +195,7 @@ export const products: Product[] = [
       zipCode: '81657'
     },
     images: [
-      'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      'https://images.unsplash.com/photo-1544191696-15693072e0b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
     ],
     features: ['Hydraulic Disc Brakes', 'Front Suspension', 'Shimano Components', '29-inch Wheels'],
     specifications: {
@@ -198,7 +208,7 @@ export const products: Product[] = [
     owner: {
       id: 'owner-003',
       name: 'David Wilson',
-      avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
       rating: 4.7,
       reviewCount: 18
     },
@@ -238,10 +248,10 @@ export const products: Product[] = [
     monthlyPrice: 500,
     securityDeposit: 100,
     location: { city: 'Fort Collins', state: 'CO', zipCode: '80524' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Adjustable Sizing', 'ABEC 5 Bearings', 'Comfort Padding', 'Durable Frame'],
     specifications: { 'Size Range': 'US 9-10', 'Wheel Size': '80mm', 'Bearings': 'ABEC 5', 'Frame': 'Composite', 'Closure': 'Lace + Strap' },
-    owner: { id: 'owner-004', name: 'Maria Garcia', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.6, reviewCount: 15 },
+    owner: { id: 'owner-004', name: 'Maria Garcia', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.6, reviewCount: 15 },
     availability: { unavailableDates: ['2024-06-25'], minimumRental: 1, maximumRental: 7 },
     reviews: [{ id: 'review-004', userId: 'user-004', userName: 'Mike Johnson', rating: 5, text: 'Perfect skates for getting back into skating!', date: '2024-04-20' }],
     status: 'active',
@@ -265,10 +275,10 @@ export const products: Product[] = [
     monthlyPrice: 800,
     securityDeposit: 200,
     location: { city: 'Denver', state: 'CO', zipCode: '80203' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['40.4 Mile Range', 'Foldable Design', 'App Connectivity', 'Pneumatic Tires'],
     specifications: { 'Top Speed': '18.6 mph', 'Range': '40.4 miles', 'Weight': '41.2 lbs', 'Max Load': '220 lbs', 'Charging Time': '6 hours' },
-    owner: { id: 'owner-005', name: 'James Park', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 27 },
+    owner: { id: 'owner-005', name: 'James Park', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 27 },
     availability: { unavailableDates: ['2024-07-01', '2024-07-02'], minimumRental: 1, maximumRental: 10 },
     reviews: [{ id: 'review-005', userId: 'user-005', userName: 'Anna Kim', rating: 5, text: 'Amazing scooter! Great range and very reliable.', date: '2024-04-15' }],
     status: 'active',
@@ -292,10 +302,10 @@ export const products: Product[] = [
     monthlyPrice: 1000,
     securityDeposit: 250,
     location: { city: 'Boulder', state: 'CO', zipCode: '80302' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Carbon Fork', 'Shimano 105', 'Lightweight Frame', 'Drop Handlebars'],
     specifications: { 'Frame Size': 'Medium (54cm)', 'Weight': '22 lbs', 'Gears': '11-speed', 'Wheel Size': '700c', 'Frame Material': 'Aluminum' },
-    owner: { id: 'owner-006', name: 'Rachel Thompson', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 22 },
+    owner: { id: 'owner-006', name: 'Rachel Thompson', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 22 },
     availability: { unavailableDates: ['2024-06-30'], minimumRental: 1, maximumRental: 14 },
     reviews: [{ id: 'review-006', userId: 'user-006', userName: 'Tom Wilson', rating: 5, text: 'Excellent road bike! Perfect for long rides.', date: '2024-05-01' }],
     status: 'active',
@@ -319,10 +329,10 @@ export const products: Product[] = [
     monthlyPrice: 600,
     securityDeposit: 120,
     location: { city: 'Aspen', state: 'CO', zipCode: '81611' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Anti-Gravity Suspension', 'Adjustable Torso', 'Rain Cover', 'Multiple Pockets'],
     specifications: { 'Capacity': '65 liters', 'Weight': '4.5 lbs', 'Torso Length': 'Adjustable', 'Material': 'Nylon', 'Hydration Compatible': 'Yes' },
-    owner: { id: 'owner-007', name: 'Chris Martinez', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.7, reviewCount: 19 },
+    owner: { id: 'owner-007', name: 'Chris Martinez', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.7, reviewCount: 19 },
     availability: { unavailableDates: ['2024-08-15', '2024-08-16'], minimumRental: 2, maximumRental: 21 },
     reviews: [{ id: 'review-007', userId: 'user-007', userName: 'Jennifer Lee', rating: 5, text: 'Excellent backpack! Very comfortable even with heavy loads.', date: '2024-04-25' }],
     status: 'active',
@@ -346,10 +356,10 @@ export const products: Product[] = [
     monthlyPrice: 1100,
     securityDeposit: 250,
     location: { city: 'Vail', state: 'CO', zipCode: '81657' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['All-Mountain', 'Intermediate Level', 'Recently Tuned', 'Complete Set'],
     specifications: { 'Ski Length': '170cm', 'Boot Size': '10.5 US', 'Pole Length': '125cm', 'Binding': 'Look SPX 12', 'Waist Width': '88mm' },
-    owner: { id: 'owner-008', name: 'Michael Snow', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 25 },
+    owner: { id: 'owner-008', name: 'Michael Snow', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 25 },
     availability: { unavailableDates: ['2024-12-25', '2024-12-26'], minimumRental: 1, maximumRental: 7 },
     reviews: [{ id: 'review-008', userId: 'user-008', userName: 'Sarah Davis', rating: 5, text: 'Amazing ski set! Perfect condition and great performance.', date: '2024-03-20' }],
     status: 'active',
@@ -373,10 +383,10 @@ export const products: Product[] = [
     monthlyPrice: 800,
     securityDeposit: 180,
     location: { city: 'Boulder', state: 'CO', zipCode: '80304' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Complete Set', 'Safety Certified', 'Adjustable Harness', 'Climbing Shoes Included'],
     specifications: { 'Harness Size': 'Medium', 'Shoe Size': 'US 10', 'Helmet': 'UIAA Certified', 'Quickdraws': '12 included', 'Rope': '60m Dynamic' },
-    owner: { id: 'owner-009', name: 'Alex Climber', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 33 },
+    owner: { id: 'owner-009', name: 'Alex Climber', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 33 },
     availability: { unavailableDates: ['2024-07-15'], minimumRental: 1, maximumRental: 10 },
     reviews: [{ id: 'review-009', userId: 'user-009', userName: 'Emma Stone', rating: 5, text: 'Perfect climbing kit! Everything you need to get started.', date: '2024-04-10' }],
     status: 'active',
@@ -400,10 +410,10 @@ export const products: Product[] = [
     monthlyPrice: 1200,
     securityDeposit: 300,
     location: { city: 'Grand Junction', state: 'CO', zipCode: '81501' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Fishing Ready', 'Rod Holders', 'Storage Compartments', 'Stable Design'],
     specifications: { 'Length': '12 feet', 'Width': '33 inches', 'Weight': '68 lbs', 'Capacity': '375 lbs', 'Material': 'Polyethylene' },
-    owner: { id: 'owner-010', name: 'River Guide Co', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.7, reviewCount: 41 },
+    owner: { id: 'owner-010', name: 'River Guide Co', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.7, reviewCount: 41 },
     availability: { unavailableDates: ['2024-07-20', '2024-07-21'], minimumRental: 1, maximumRental: 14 },
     reviews: [{ id: 'review-010', userId: 'user-010', userName: 'Jake Fisher', rating: 4, text: 'Great kayak for fishing! Very stable and comfortable.', date: '2024-05-05' }],
     status: 'active',
@@ -427,10 +437,10 @@ export const products: Product[] = [
     monthlyPrice: 1400,
     securityDeposit: 350,
     location: { city: 'Denver', state: 'CO', zipCode: '80205' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Electric Motor', '45+ Mile Range', 'LCD Display', 'Integrated Lights'],
     specifications: { 'Motor': '750W Geared Hub', 'Battery': '48V 14Ah', 'Range': '45+ miles', 'Top Speed': '20 mph', 'Weight': '65 lbs' },
-    owner: { id: 'owner-011', name: 'Urban Cycles', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 29 },
+    owner: { id: 'owner-011', name: 'Urban Cycles', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 29 },
     availability: { unavailableDates: ['2024-06-28', '2024-06-29'], minimumRental: 1, maximumRental: 10 },
     reviews: [{ id: 'review-011', userId: 'user-011', userName: 'Lisa Chen', rating: 5, text: 'Amazing e-bike! Makes commuting so much easier.', date: '2024-04-30' }],
     status: 'active',
@@ -454,10 +464,10 @@ export const products: Product[] = [
     monthlyPrice: 1000,
     securityDeposit: 200,
     location: { city: 'Breckenridge', state: 'CO', zipCode: '80424' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['All-Mountain', 'Complete Set', 'Tuned and Waxed', 'Intermediate/Advanced'],
     specifications: { 'Board Length': '158cm', 'Boot Size': 'US 10', 'Binding': 'Burton Cartel', 'Flex': 'Medium', 'Shape': 'Directional Twin' },
-    owner: { id: 'owner-012', name: 'Mountain Sports', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.6, reviewCount: 38 },
+    owner: { id: 'owner-012', name: 'Mountain Sports', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.6, reviewCount: 38 },
     availability: { unavailableDates: ['2024-12-31', '2025-01-01'], minimumRental: 1, maximumRental: 7 },
     reviews: [{ id: 'review-012', userId: 'user-012', userName: 'Mark Snow', rating: 4, text: 'Solid snowboard setup! Great for all mountain riding.', date: '2024-03-10' }],
     status: 'active',
@@ -481,10 +491,10 @@ export const products: Product[] = [
     monthlyPrice: 700,
     securityDeposit: 150,
     location: { city: 'Steamboat Springs', state: 'CO', zipCode: '80487' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['850 Fill Down', '20°F Rating', 'Ultra-Lightweight', 'Compressible'],
     specifications: { 'Temperature Rating': '20°F', 'Weight': '2 lbs 3 oz', 'Fill': '850-fill down', 'Length': 'Regular (6 ft)', 'Stuff Sack': 'Included' },
-    owner: { id: 'owner-013', name: 'Alpine Gear Co', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 45 },
+    owner: { id: 'owner-013', name: 'Alpine Gear Co', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 45 },
     availability: { unavailableDates: ['2024-08-10', '2024-08-11'], minimumRental: 2, maximumRental: 21 },
     reviews: [{ id: 'review-013', userId: 'user-013', userName: 'Adventure Mike', rating: 5, text: 'Incredible sleeping bag! Kept me warm in freezing temps.', date: '2024-04-05' }],
     status: 'active',
@@ -508,10 +518,10 @@ export const products: Product[] = [
     monthlyPrice: 400,
     securityDeposit: 80,
     location: { city: 'Colorado Springs', state: 'CO', zipCode: '80903' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Complete Setup', 'Professional Grade', 'Street Ready', 'Quality Bearings'],
     specifications: { 'Deck Size': '8.25 inches', 'Trucks': 'Independent', 'Wheels': '53mm', 'Bearings': 'Bones Reds', 'Grip Tape': 'Mob' },
-    owner: { id: 'owner-014', name: 'Skate Shop Pro', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.5, reviewCount: 28 },
+    owner: { id: 'owner-014', name: 'Skate Shop Pro', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.5, reviewCount: 28 },
     availability: { unavailableDates: ['2024-07-10'], minimumRental: 1, maximumRental: 7 },
     reviews: [{ id: 'review-014', userId: 'user-014', userName: 'Tony Hawk Jr', rating: 4, text: 'Solid skateboard! Perfect for learning tricks.', date: '2024-04-18' }],
     status: 'active',
@@ -535,10 +545,10 @@ export const products: Product[] = [
     monthlyPrice: 900,
     securityDeposit: 200,
     location: { city: 'Durango', state: 'CO', zipCode: '81301' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Inflatable', 'Complete Kit', 'Stable Design', 'Easy Transport'],
     specifications: { 'Length': '10\'6"', 'Width': '33 inches', 'Thickness': '6 inches', 'Weight': '25 lbs', 'Capacity': '275 lbs' },
-    owner: { id: 'owner-015', name: 'River Adventures', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 52 },
+    owner: { id: 'owner-015', name: 'River Adventures', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 52 },
     availability: { unavailableDates: ['2024-07-25', '2024-07-26'], minimumRental: 1, maximumRental: 14 },
     reviews: [{ id: 'review-015', userId: 'user-015', userName: 'Water Lover', rating: 5, text: 'Amazing SUP! So stable and easy to use.', date: '2024-05-12' }],
     status: 'active',
@@ -562,10 +572,10 @@ export const products: Product[] = [
     monthlyPrice: 300,
     securityDeposit: 75,
     location: { city: 'Aspen', state: 'CO', zipCode: '81611' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Multi-Fuel', 'Lightweight', 'Windscreen Included', 'Fuel Bottle Included'],
     specifications: { 'Weight': '11.2 oz', 'Fuel Types': 'White gas, kerosene, unleaded auto gas', 'Boil Time': '3.5 minutes', 'Burn Time': '1.5 hours' },
-    owner: { id: 'owner-016', name: 'Mountain Chef', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 28 },
+    owner: { id: 'owner-016', name: 'Mountain Chef', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 28 },
     availability: { unavailableDates: ['2024-08-15'], minimumRental: 1, maximumRental: 14 },
     reviews: [{ id: 'review-016', userId: 'user-016', userName: 'Backpack Chef', rating: 5, text: 'Excellent stove! Reliable and efficient.', date: '2024-05-20' }],
     status: 'active',
@@ -589,10 +599,10 @@ export const products: Product[] = [
     monthlyPrice: 800,
     securityDeposit: 200,
     location: { city: 'Steamboat Springs', state: 'CO', zipCode: '80487' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Complete Kit', 'Beginner Friendly', 'Includes Flies', 'Tackle Box Included'],
     specifications: { 'Rod Length': '9 feet', 'Weight': '5wt', 'Pieces': '4-piece', 'Reel': 'Clearwater Large Arbor', 'Line': 'WF5F' },
-    owner: { id: 'owner-017', name: 'River Guide Pro', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.7, reviewCount: 35 },
+    owner: { id: 'owner-017', name: 'River Guide Pro', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.7, reviewCount: 35 },
     availability: { unavailableDates: ['2024-07-10', '2024-07-11'], minimumRental: 1, maximumRental: 10 },
     reviews: [{ id: 'review-017', userId: 'user-017', userName: 'Fly Fisher', rating: 4, text: 'Great setup for learning fly fishing!', date: '2024-04-25' }],
     status: 'active',
@@ -616,10 +626,10 @@ export const products: Product[] = [
     monthlyPrice: 1700,
     securityDeposit: 500,
     location: { city: 'Boulder', state: 'CO', zipCode: '80303' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Weather Sealed', 'Professional Quality', 'Tripod Included', 'Extra Batteries'],
     specifications: { 'Resolution': '45MP', 'Video': '8K RAW', 'ISO Range': '100-51200', 'Lens': 'RF 24-105mm f/4L', 'Storage': 'CFexpress + SD' },
-    owner: { id: 'owner-018', name: 'Adventure Photographer', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 42 },
+    owner: { id: 'owner-018', name: 'Adventure Photographer', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 42 },
     availability: { unavailableDates: ['2024-06-20', '2024-06-21', '2024-06-22'], minimumRental: 1, maximumRental: 7 },
     reviews: [{ id: 'review-018', userId: 'user-018', userName: 'Nature Photographer', rating: 5, text: 'Incredible camera! Perfect for landscape photography.', date: '2024-05-05' }],
     status: 'active',
@@ -643,10 +653,10 @@ export const products: Product[] = [
     monthlyPrice: 700,
     securityDeposit: 150,
     location: { city: 'Vail', state: 'CO', zipCode: '81657' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Complete Set', 'Waxless Base', 'Comfortable Boots', 'Adjustable Poles'],
     specifications: { 'Ski Length': '190cm', 'Boot Size': 'US 10', 'Pole Length': '150cm', 'Binding': 'SNS Pilot', 'Base': 'Waxless' },
-    owner: { id: 'owner-019', name: 'Nordic Ski Shop', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.6, reviewCount: 31 },
+    owner: { id: 'owner-019', name: 'Nordic Ski Shop', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.6, reviewCount: 31 },
     availability: { unavailableDates: ['2024-12-25', '2024-12-26'], minimumRental: 1, maximumRental: 14 },
     reviews: [{ id: 'review-019', userId: 'user-019', userName: 'XC Skier', rating: 4, text: 'Great skis for exploring winter trails!', date: '2024-02-15' }],
     status: 'active',
@@ -670,10 +680,10 @@ export const products: Product[] = [
     monthlyPrice: 900,
     securityDeposit: 200,
     location: { city: 'Breckenridge', state: 'CO', zipCode: '80424' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['All-Mountain', 'Flying V Profile', 'Directional Shape', 'Medium Flex'],
     specifications: { 'Length': '158cm', 'Width': '25.2cm', 'Flex': '6/10', 'Profile': 'Flying V', 'Stance': '22.5 inches' },
-    owner: { id: 'owner-020', name: 'Powder Rider', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 24 },
+    owner: { id: 'owner-020', name: 'Powder Rider', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 24 },
     availability: { unavailableDates: ['2024-12-31', '2025-01-01'], minimumRental: 1, maximumRental: 14 },
     reviews: [{ id: 'review-020', userId: 'user-020', userName: 'Snowboard Pro', rating: 5, text: 'Awesome board! Great for all conditions.', date: '2024-03-10' }],
     status: 'active',
@@ -697,10 +707,10 @@ export const products: Product[] = [
     monthlyPrice: 1100,
     securityDeposit: 250,
     location: { city: 'Grand Junction', state: 'CO', zipCode: '81501' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Fishing Ready', 'Rod Holders', 'Storage Compartments', 'Paddle Included'],
     specifications: { 'Length': '12 feet', 'Width': '33 inches', 'Weight': '68 lbs', 'Capacity': '375 lbs', 'Material': 'Polyethylene' },
-    owner: { id: 'owner-021', name: 'River Explorer', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.7, reviewCount: 38 },
+    owner: { id: 'owner-021', name: 'River Explorer', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.7, reviewCount: 38 },
     availability: { unavailableDates: ['2024-07-04', '2024-07-05'], minimumRental: 1, maximumRental: 10 },
     reviews: [{ id: 'review-021', userId: 'user-021', userName: 'Kayak Fisher', rating: 5, text: 'Perfect kayak for fishing! Very stable.', date: '2024-04-30' }],
     status: 'active',
@@ -724,10 +734,10 @@ export const products: Product[] = [
     monthlyPrice: 700,
     securityDeposit: 150,
     location: { city: 'Denver', state: 'CO', zipCode: '80202' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['40-mile Range', 'Foldable', 'App Connectivity', 'LED Display'],
     specifications: { 'Max Speed': '18.6 mph', 'Range': '40.4 miles', 'Weight': '41.2 lbs', 'Max Load': '220 lbs', 'Charge Time': '6 hours' },
-    owner: { id: 'owner-022', name: 'Urban Rider', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 45 },
+    owner: { id: 'owner-022', name: 'Urban Rider', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 45 },
     availability: { unavailableDates: ['2024-06-15'], minimumRental: 1, maximumRental: 7 },
     reviews: [{ id: 'review-022', userId: 'user-022', userName: 'City Explorer', rating: 5, text: 'Amazing scooter! Great range and speed.', date: '2024-05-08' }],
     status: 'active',
@@ -751,10 +761,10 @@ export const products: Product[] = [
     monthlyPrice: 1200,
     securityDeposit: 300,
     location: { city: 'Boulder', state: 'CO', zipCode: '80302' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Complete Set', 'Safety Inspected', 'Multiple Sizes', 'Guidebook Included'],
     specifications: { 'Harness Size': 'Medium', 'Shoe Size': 'US 10', 'Helmet': 'MIPS Technology', 'Quickdraws': '12 included', 'Rope': '70m Dynamic' },
-    owner: { id: 'owner-023', name: 'Vertical Adventures', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 67 },
+    owner: { id: 'owner-023', name: 'Vertical Adventures', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 67 },
     availability: { unavailableDates: ['2024-06-28', '2024-06-29'], minimumRental: 1, maximumRental: 7 },
     reviews: [{ id: 'review-023', userId: 'user-023', userName: 'Rock Climber', rating: 5, text: 'Excellent gear! Everything you need to start climbing.', date: '2024-04-18' }],
     status: 'active',
@@ -778,10 +788,10 @@ export const products: Product[] = [
     monthlyPrice: 400,
     securityDeposit: 100,
     location: { city: 'Fort Collins', state: 'CO', zipCode: '80525' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Complete Set', 'Lightweight', 'Nesting Design', 'Easy Clean'],
     specifications: { 'Serves': '4 people', 'Weight': '3.5 lbs', 'Material': 'Hard Anodized Aluminum', 'Includes': 'Pots, pans, plates, cups, utensils', 'Storage': 'Mesh bag included' },
-    owner: { id: 'owner-024', name: 'Camp Kitchen Pro', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.7, reviewCount: 33 },
+    owner: { id: 'owner-024', name: 'Camp Kitchen Pro', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.7, reviewCount: 33 },
     availability: { unavailableDates: ['2024-07-20'], minimumRental: 1, maximumRental: 14 },
     reviews: [{ id: 'review-024', userId: 'user-024', userName: 'Camp Cook', rating: 4, text: 'Great cookset! Everything you need for camp meals.', date: '2024-05-02' }],
     status: 'active',
@@ -805,10 +815,10 @@ export const products: Product[] = [
     monthlyPrice: 1000,
     securityDeposit: 250,
     location: { city: 'Crested Butte', state: 'CO', zipCode: '81224' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Fat Tires', 'All-Terrain', 'Steel Frame', 'Winter Ready'],
     specifications: { 'Tire Size': '4.8 inches', 'Frame': 'Steel', 'Gears': '1x11 speed', 'Weight': '35 lbs', 'Wheel Size': '26 inches' },
-    owner: { id: 'owner-025', name: 'Fat Bike Fanatic', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.6, reviewCount: 29 },
+    owner: { id: 'owner-025', name: 'Fat Bike Fanatic', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.6, reviewCount: 29 },
     availability: { unavailableDates: ['2024-12-20', '2024-12-21'], minimumRental: 1, maximumRental: 10 },
     reviews: [{ id: 'review-025', userId: 'user-025', userName: 'Winter Cyclist', rating: 5, text: 'Amazing bike for snow riding! So much fun.', date: '2024-02-28' }],
     status: 'active',
@@ -832,10 +842,10 @@ export const products: Product[] = [
     monthlyPrice: 500,
     securityDeposit: 125,
     location: { city: 'Colorado Springs', state: 'CO', zipCode: '80903' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Anti-Gravity Suspension', 'Rain Cover', 'Hydration Compatible', 'Multiple Pockets'],
     specifications: { 'Capacity': '65 liters', 'Weight': '4.56 lbs', 'Torso Length': 'Medium', 'Material': 'Nylon', 'Warranty': 'All Mighty Guarantee' },
-    owner: { id: 'owner-026', name: 'Trail Master', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 41 },
+    owner: { id: 'owner-026', name: 'Trail Master', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 41 },
     availability: { unavailableDates: ['2024-08-10', '2024-08-11'], minimumRental: 1, maximumRental: 14 },
     reviews: [{ id: 'review-026', userId: 'user-026', userName: 'Backpacker', rating: 5, text: 'Most comfortable pack I\'ve ever used!', date: '2024-04-12' }],
     status: 'active',
@@ -859,10 +869,10 @@ export const products: Product[] = [
     monthlyPrice: 1500,
     securityDeposit: 400,
     location: { city: 'Durango', state: 'CO', zipCode: '81301' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['4K Video', '20MP Photos', 'Extra Batteries', 'ND Filters'],
     specifications: { 'Video': '4K/60fps', 'Photo': '20MP', 'Flight Time': '31 minutes', 'Range': '12km', 'Weight': '595g' },
-    owner: { id: 'owner-027', name: 'Aerial Photographer', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 56 },
+    owner: { id: 'owner-027', name: 'Aerial Photographer', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 56 },
     availability: { unavailableDates: ['2024-07-15', '2024-07-16'], minimumRental: 1, maximumRental: 5 },
     reviews: [{ id: 'review-027', userId: 'user-027', userName: 'Drone Pilot', rating: 5, text: 'Amazing drone! Perfect for landscape photography.', date: '2024-05-01' }],
     status: 'active',
@@ -886,10 +896,10 @@ export const products: Product[] = [
     monthlyPrice: 900,
     securityDeposit: 200,
     location: { city: 'Glenwood Springs', state: 'CO', zipCode: '81601' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Inflatable', 'SUP & Surf', 'Pump Included', 'Carry Bag'],
     specifications: { 'Length': '10\'6"', 'Width': '32 inches', 'Thickness': '4.5 inches', 'Weight': '22 lbs', 'Capacity': '240 lbs' },
-    owner: { id: 'owner-028', name: 'Water Sports Pro', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.7, reviewCount: 34 },
+    owner: { id: 'owner-028', name: 'Water Sports Pro', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.7, reviewCount: 34 },
     availability: { unavailableDates: ['2024-06-30'], minimumRental: 1, maximumRental: 10 },
     reviews: [{ id: 'review-028', userId: 'user-028', userName: 'SUP Surfer', rating: 4, text: 'Great board! Easy to inflate and very stable.', date: '2024-04-20' }],
     status: 'active',
@@ -913,10 +923,10 @@ export const products: Product[] = [
     monthlyPrice: 1300,
     securityDeposit: 300,
     location: { city: 'Telluride', state: 'CO', zipCode: '81435' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Electric Motor', 'Fat Tires', 'Long Range', 'Pedal Assist'],
     specifications: { 'Motor': '750W', 'Battery': '48V 14Ah', 'Range': '45+ miles', 'Top Speed': '20 mph', 'Weight': '73 lbs' },
-    owner: { id: 'owner-029', name: 'E-Bike Explorer', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 39 },
+    owner: { id: 'owner-029', name: 'E-Bike Explorer', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.8, reviewCount: 39 },
     availability: { unavailableDates: ['2024-08-05'], minimumRental: 1, maximumRental: 7 },
     reviews: [{ id: 'review-029', userId: 'user-029', userName: 'E-Bike Rider', rating: 5, text: 'Incredible e-bike! So much power and range.', date: '2024-04-28' }],
     status: 'active',
@@ -940,10 +950,10 @@ export const products: Product[] = [
     monthlyPrice: 600,
     securityDeposit: 150,
     location: { city: 'Estes Park', state: 'CO', zipCode: '80517' },
-    images: ['https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'],
+    images: ['https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
     features: ['Complete Setup', 'Lightweight', 'Weather Protection', 'Easy Setup'],
     specifications: { 'Capacity': '2 people', 'Weight': '3.5 lbs total', 'Dimensions': '9\'4" x 6\'2"', 'Material': 'Nylon Taffeta', 'Includes': 'Hammock, straps, tarp, underquilt' },
-    owner: { id: 'owner-030', name: 'Hammock Camper', avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 27 },
+    owner: { id: 'owner-030', name: 'Hammock Camper', avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', rating: 4.9, reviewCount: 27 },
     availability: { unavailableDates: ['2024-09-01', '2024-09-02'], minimumRental: 1, maximumRental: 14 },
     reviews: [{ id: 'review-030', userId: 'user-030', userName: 'Tree Sleeper', rating: 5, text: 'Best hammock setup ever! So comfortable.', date: '2024-05-15' }],
     status: 'active',
@@ -968,8 +978,8 @@ export const products: Product[] = [
     securityDeposit: 400,
     location: { city: 'Aspen', state: 'CO', zipCode: '81611' },
     images: [
-      'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
     ],
     features: ['Lightweight', 'Touring Bindings', 'Avalanche Safety Gear', 'Professional Grade'],
     specifications: {
@@ -983,7 +993,7 @@ export const products: Product[] = [
     owner: {
       id: 'owner-031',
       name: 'Alpine Guide Services',
-      avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
       rating: 4.9,
       reviewCount: 73
     },
@@ -1032,8 +1042,8 @@ export const products: Product[] = [
     securityDeposit: 400,
     location: { city: 'Boulder', state: 'CO', zipCode: '80301' },
     images: [
-      'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
     ],
     features: ['Carbon Frame', 'Electronic Shifting', 'Tubeless Ready', 'Adventure Geometry'],
     specifications: {
@@ -1048,7 +1058,7 @@ export const products: Product[] = [
     owner: {
       id: 'owner-032',
       name: 'Gravel Cycling Co',
-      avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
       rating: 4.8,
       reviewCount: 47
     },
@@ -1097,8 +1107,8 @@ export const products: Product[] = [
     securityDeposit: 600,
     location: { city: 'Buena Vista', state: 'CO', zipCode: '81211' },
     images: [
-      'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
     ],
     features: ['Self-Bailing', 'Complete Safety Gear', 'Professional Grade', 'Multi-Day Capable'],
     specifications: {
@@ -1113,7 +1123,7 @@ export const products: Product[] = [
     owner: {
       id: 'owner-033',
       name: 'Colorado River Expeditions',
-      avatar: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      avatar: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
       rating: 4.9,
       reviewCount: 89
     },
@@ -1156,24 +1166,24 @@ export const products: Product[] = [
 
 // Featured gear for homepage (subset of products)
 export const featuredGear = [
-  { id: 'camp-001', title: 'Premium 4-Person Tent', price: '$35/day', location: 'Denver, CO', image: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'emob-001', title: 'OneWheel Pint X Electric Board', price: '$65/day', location: 'Boulder, CO', image: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'bike-004', title: 'Specialized Diverge Expert Carbon Gravel Bike', price: '$75/day', location: 'Boulder, CO', image: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'water-004', title: 'AIRE Super Puma 14ft Whitewater Raft', price: '$120/day', location: 'Buena Vista, CO', image: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+  { id: 'camp-001', title: 'Premium 4-Person Tent', price: '$35/day', location: 'Denver, CO', image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+  { id: 'emob-001', title: 'OneWheel Pint X Electric Board', price: '$65/day', location: 'Boulder, CO', image: 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+  { id: 'bike-004', title: 'Specialized Diverge Expert Carbon Gravel Bike', price: '$75/day', location: 'Boulder, CO', image: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+  { id: 'water-004', title: 'AIRE Super Puma 14ft Whitewater Raft', price: '$120/day', location: 'Buena Vista, CO', image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }
 ];
 
 // Categories for homepage
 export const categories = [
-  { id: 'camping', name: 'Camping', image: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'biking', name: 'Biking', image: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'electric-mobility', name: 'E-Mobility', image: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'skating', name: 'Skating', image: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'hiking', name: 'Hiking', image: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'camping', name: 'Camping', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'biking', name: 'Biking', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'electric-mobility', name: 'E-Mobility', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'skating', name: 'Skating', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'hiking', name: 'Hiking', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
   { id: 'skiing', name: 'Skiing', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'climbing', name: 'Climbing', image: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'water-sports', name: 'Water Sports', image: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'photography', name: 'Photography', image: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-  { id: 'fishing', name: 'Fishing', image: 'https://https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+  { id: 'climbing', name: 'Climbing', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'water-sports', name: 'Water Sports', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'photography', name: 'Photography', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+  { id: 'fishing', name: 'Fishing', image: 'https://images.unsplash.com/photo-1551524164-6cf2ac2d7d6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
 ];
 
 // Helper functions for product data

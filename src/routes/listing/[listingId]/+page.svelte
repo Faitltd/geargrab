@@ -3,6 +3,7 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
+  import { products } from '$lib/data/products';
   // import { getListing } from '$lib/firebase/db/listings'; // Temporarily disabled
 
   // Get the listing ID from the URL
@@ -13,17 +14,76 @@
   let loading = true;
   let error = '';
 
-  // Load listing data from Firestore
+  // Load listing data from products or fallback to dummy data
   onMount(async () => {
     try {
       loading = true;
       console.log('Loading listing with ID:', listingId);
 
-      // For now, skip Firestore and just use dummy data to get the page working
-      console.log('Skipping Firestore for now, using dummy data only');
+      // First try to find the listing in the products array
+      const productListing = products.find(product => product.id === listingId);
 
-      // Set dummy data immediately
-      if (fallbackListing) {
+      if (productListing) {
+        // Transform product data to match expected listing structure
+        listing = {
+          id: productListing.id,
+          title: productListing.title,
+          description: productListing.description,
+          category: productListing.category,
+          subcategory: productListing.subcategory,
+          brand: productListing.brand,
+          model: productListing.model,
+          condition: productListing.condition,
+          ageInYears: productListing.ageInYears,
+          dailyPrice: productListing.dailyPrice,
+          weeklyPrice: productListing.weeklyPrice,
+          monthlyPrice: productListing.monthlyPrice,
+          securityDeposit: productListing.securityDeposit,
+          location: productListing.location,
+          images: productListing.images,
+          features: productListing.features,
+          specifications: productListing.specifications,
+          averageRating: productListing.owner.rating,
+          reviewCount: productListing.owner.reviewCount,
+          availabilityCalendar: {
+            unavailableDates: productListing.availability.unavailableDates
+          },
+          owner: {
+            uid: productListing.owner.id,
+            name: productListing.owner.name,
+            image: productListing.owner.avatar,
+            averageRating: productListing.owner.rating,
+            reviews: productListing.owner.reviewCount,
+            verified: true,
+            responseRate: 95,
+            responseTime: 'within hours',
+            listings: 5,
+            bio: `Outdoor enthusiast sharing quality ${productListing.category} gear.`,
+            joinedDate: '2023-01-15',
+            languages: ['English'],
+            location: `${productListing.location.city}, ${productListing.location.state}`
+          },
+          reviews: productListing.reviews.map(review => ({
+            ...review,
+            userImage: 'https://randomuser.me/api/portraits/men/32.jpg',
+            comment: review.text
+          })),
+          status: productListing.status,
+          createdAt: { seconds: new Date(productListing.createdAt).getTime() / 1000, nanoseconds: 0 },
+          updatedAt: { seconds: new Date(productListing.updatedAt).getTime() / 1000, nanoseconds: 0 },
+          includesInsurance: true,
+          insuranceDetails: 'Basic damage coverage included',
+          deliveryOptions: {
+            pickup: true,
+            dropoff: true,
+            shipping: false,
+            pickupLocation: `${productListing.location.city}, ${productListing.location.state}`,
+            dropoffDistance: 25
+          }
+        };
+        console.log('Using product listing:', listing.title);
+      } else if (fallbackListing) {
+        // Fall back to dummy data if product not found
         listing = fallbackListing;
         console.log('Using dummy listing:', listing.title);
       } else {

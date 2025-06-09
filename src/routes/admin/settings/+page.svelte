@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { notifications } from '$lib/stores/notifications';
+  import Checkbox from '$lib/components/ui/Checkbox.svelte';
 
   let loading = false;
   let settings = {
@@ -155,33 +156,23 @@
     </div>
     
     <div class="mt-6 space-y-4">
-      <label class="flex items-center">
-        <input
-          type="checkbox"
+      <div class="flex items-center">
+        <Checkbox
           bind:checked={settings.platform.maintenanceMode}
-          class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
+          label="Maintenance Mode"
         />
-        <span class="ml-2 text-white">Maintenance Mode</span>
         <span class="ml-2 text-gray-400 text-sm">(Disables public access)</span>
-      </label>
-      
-      <label class="flex items-center">
-        <input
-          type="checkbox"
-          bind:checked={settings.platform.allowNewRegistrations}
-          class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
-        />
-        <span class="ml-2 text-white">Allow New Registrations</span>
-      </label>
-      
-      <label class="flex items-center">
-        <input
-          type="checkbox"
-          bind:checked={settings.platform.requireEmailVerification}
-          class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
-        />
-        <span class="ml-2 text-white">Require Email Verification</span>
-      </label>
+      </div>
+
+      <Checkbox
+        bind:checked={settings.platform.allowNewRegistrations}
+        label="Allow New Registrations"
+      />
+
+      <Checkbox
+        bind:checked={settings.platform.requireEmailVerification}
+        label="Require Email Verification"
+      />
     </div>
   </div>
 
@@ -226,28 +217,20 @@
       <label class="block text-sm font-medium text-gray-300 mb-2">Payment Methods</label>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
         {#each paymentMethodOptions as method}
-          <label class="flex items-center">
-            <input
-              type="checkbox"
-              checked={settings.payments.paymentMethods.includes(method.value)}
-              on:change={() => togglePaymentMethod(method.value)}
-              class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
-            />
-            <span class="ml-2 text-white">{method.label}</span>
-          </label>
+          <Checkbox
+            checked={settings.payments.paymentMethods.includes(method.value)}
+            label={method.label}
+            on:change={() => togglePaymentMethod(method.value)}
+          />
         {/each}
       </div>
     </div>
-    
+
     <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-      <label class="flex items-center">
-        <input
-          type="checkbox"
-          bind:checked={settings.payments.autoPayoutEnabled}
-          class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
-        />
-        <span class="ml-2 text-white">Auto Payout Enabled</span>
-      </label>
+      <Checkbox
+        bind:checked={settings.payments.autoPayoutEnabled}
+        label="Auto Payout Enabled"
+      />
       
       <div>
         <label class="block text-sm font-medium text-gray-300 mb-2">Payout Schedule</label>
@@ -302,23 +285,18 @@
     </div>
     
     <div class="mt-6 space-y-4">
-      <label class="flex items-center">
-        <input
-          type="checkbox"
-          bind:checked={settings.security.requireBackgroundChecks}
-          class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
-        />
-        <span class="ml-2 text-white">Require Background Checks</span>
-      </label>
-      
-      <label class="flex items-center">
-        <input
-          type="checkbox"
-          bind:checked={settings.security.twoFactorRequired}
-          class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
-        />
-        <span class="ml-2 text-white">Require Two-Factor Authentication</span>
-      </label>
+      <!-- HIDDEN: Background check setting temporarily disabled -->
+      <!--
+      <Checkbox
+        bind:checked={settings.security.requireBackgroundChecks}
+        label="Require Background Checks"
+      />
+      -->
+
+      <Checkbox
+        bind:checked={settings.security.twoFactorRequired}
+        label="Require Two-Factor Authentication"
+      />
     </div>
   </div>
 
@@ -327,52 +305,32 @@
     <h2 class="text-xl font-bold text-white mb-4">Notification Settings</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="space-y-4">
-        <label class="flex items-center">
-          <input
-            type="checkbox"
-            bind:checked={settings.notifications.emailNotifications}
-            class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
-          />
-          <span class="ml-2 text-white">Email Notifications</span>
-        </label>
-        
-        <label class="flex items-center">
-          <input
-            type="checkbox"
-            bind:checked={settings.notifications.smsNotifications}
-            class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
-          />
-          <span class="ml-2 text-white">SMS Notifications</span>
-        </label>
-        
-        <label class="flex items-center">
-          <input
-            type="checkbox"
-            bind:checked={settings.notifications.pushNotifications}
-            class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
-          />
-          <span class="ml-2 text-white">Push Notifications</span>
-        </label>
+        <Checkbox
+          bind:checked={settings.notifications.emailNotifications}
+          label="Email Notifications"
+        />
+
+        <Checkbox
+          bind:checked={settings.notifications.smsNotifications}
+          label="SMS Notifications"
+        />
+
+        <Checkbox
+          bind:checked={settings.notifications.pushNotifications}
+          label="Push Notifications"
+        />
       </div>
-      
+
       <div class="space-y-4">
-        <label class="flex items-center">
-          <input
-            type="checkbox"
-            bind:checked={settings.notifications.adminAlerts}
-            class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
-          />
-          <span class="ml-2 text-white">Admin Alerts</span>
-        </label>
-        
-        <label class="flex items-center">
-          <input
-            type="checkbox"
-            bind:checked={settings.notifications.userWelcomeEmails}
-            class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
-          />
-          <span class="ml-2 text-white">User Welcome Emails</span>
-        </label>
+        <Checkbox
+          bind:checked={settings.notifications.adminAlerts}
+          label="Admin Alerts"
+        />
+
+        <Checkbox
+          bind:checked={settings.notifications.userWelcomeEmails}
+          label="User Welcome Emails"
+        />
       </div>
     </div>
   </div>
@@ -427,14 +385,10 @@
     </div>
     
     <div class="mt-6">
-      <label class="flex items-center">
-        <input
-          type="checkbox"
-          bind:checked={settings.content.moderationEnabled}
-          class="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
-        />
-        <span class="ml-2 text-white">Content Moderation Enabled</span>
-      </label>
+      <Checkbox
+        bind:checked={settings.content.moderationEnabled}
+        label="Content Moderation Enabled"
+      />
     </div>
   </div>
 

@@ -84,7 +84,7 @@
 <form on:submit|preventDefault={handleSearch} class="w-full">
   <div class="flex flex-col gap-3 items-center">
     <!-- Search Input with Autocomplete -->
-    <div class="w-full relative">
+    <div class="w-full relative z-[100]">
       <input
         bind:this={searchInput}
         type="text"
@@ -99,7 +99,7 @@
 
       <!-- Search Suggestions Dropdown -->
       {#if showSuggestions && suggestions.length > 0}
-        <div class="absolute top-full left-0 right-0 mt-1 bg-gray-800 backdrop-blur-md border border-gray-600 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
+        <div class="absolute top-full left-0 right-0 mt-1 bg-gray-800 backdrop-blur-md border border-gray-600 rounded-lg shadow-xl max-h-64 overflow-y-auto z-50">
           {#each suggestions as suggestion}
             <button
               type="button"

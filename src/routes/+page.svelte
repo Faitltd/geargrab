@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
   import ListingCard3D from '$lib/components/ListingCard3D.svelte';
-
   import HeroSearch from '$lib/components/forms/HeroSearch.svelte';
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
   import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
@@ -33,6 +34,29 @@
       icon: '👥'
     }
   ];
+
+  // Featured listings for homepage
+  let featuredListings = [];
+  
+  onMount(async () => {
+    try {
+      // Import products and take first 6 as featured
+      const { products } = await import('$lib/data/products');
+      featuredListings = products.slice(0, 6).map(product => ({
+        id: product.id,
+        title: product.title,
+        description: product.description,
+        category: product.category,
+        dailyPrice: product.dailyPrice,
+        images: product.images,
+        location: product.location,
+        averageRating: (product as any).averageRating || 4.5,
+        reviewCount: (product as any).reviewCount || 12
+      }));
+    } catch (error) {
+      console.error('Error loading featured listings:', error);
+    }
+  });
 </script>
 
 <!-- Full Page Video Background with Performance Optimization -->
@@ -123,6 +147,28 @@
               Browse All Gear
             </a>
           </ScrollLinkedAnimator>
+        </div>
+      </ScrollLinkedAnimator>
+
+      
+      <!-- Featured Listings with 3D Cards -->
+      <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.5}>
+        <div class="text-center mb-20">
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
+            <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Featured Listings</h2>
+            <p class="text-xl text-gray-200 drop-shadow-lg">
+              Experience our stunning 3D listing cards with the latest gear.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center mb-12">
+            {#each featuredListings as listing}
+              <ListingCard3D 
+                {listing} 
+                onClick={() => goto(`/listing/${listing.id}`)} 
+              />
+            {/each}
+          </div>
         </div>
       </ScrollLinkedAnimator>
 

@@ -9,7 +9,7 @@
   export let startOffset: number = 0;
   export let endOffset: number = 0.8;
   export let reverseOnScrollUp: boolean = true;
-  export let smoothness: number = 0.1;
+  export let smoothness: number = 0.15;
   
   let containerElement: HTMLElement;
   let childElements: HTMLElement[] = [];
@@ -56,16 +56,21 @@
           targetProgress = reverseOnScrollUp ? 0 : 1;
         }
         
-        // Smooth container progress
-        containerProgress += (targetProgress - containerProgress) * smoothness;
-        
+        // Smooth container progress with improved easing
+        const progressDiff = targetProgress - containerProgress;
+        containerProgress += progressDiff * smoothness;
+
         // Apply animation to each child with staggered timing
         childElements.forEach((child, index) => {
           const childDelay = baseDelay + (index * incrementDelay);
-          const childProgress = Math.max(0, Math.min(1, 
-            (containerProgress - childDelay) / (1 - childDelay)
-          ));
-          
+
+          // Improved progress calculation for smoother sequential loading
+          let childProgress = 0;
+          if (containerProgress > childDelay) {
+            const adjustedProgress = (containerProgress - childDelay) / Math.max(0.1, 1 - childDelay);
+            childProgress = Math.max(0, Math.min(1, adjustedProgress));
+          }
+
           applyAnimation(child, childProgress);
         });
         
@@ -94,13 +99,13 @@
     // Clamp progress between 0 and 1
     progress = Math.max(0, Math.min(1, progress));
     
-    // Apply easing function
-    const easedProgress = easeOutCubic(progress);
+    // Apply easing function for smoother animation
+    const easedProgress = easeOutQuart(progress);
     
     switch (animation) {
       case 'fade-up':
         element.style.opacity = easedProgress.toString();
-        element.style.transform = `translateY(${(1 - easedProgress) * 30}px)`;
+        element.style.transform = `translateY(${(1 - easedProgress) * 40}px) scale(${0.95 + (easedProgress * 0.05)})`;
         break;
         
       case 'fade-left':
@@ -115,7 +120,7 @@
         
       case 'scale-in':
         element.style.opacity = easedProgress.toString();
-        element.style.transform = `scale(${0.9 + (easedProgress * 0.1)})`;
+        element.style.transform = `scale(${0.85 + (easedProgress * 0.15)}) translateY(${(1 - easedProgress) * 20}px)`;
         break;
         
       case 'slide-down':
@@ -125,8 +130,8 @@
     }
   }
   
-  function easeOutCubic(t: number): number {
-    return 1 - Math.pow(1 - t, 3);
+  function easeOutQuart(t: number): number {
+    return 1 - Math.pow(1 - t, 4);
   }
 </script>
 
@@ -137,8 +142,4 @@
   <slot />
 </div>
 
-<style>
-  .scroll-linked-sequential {
-    /* Container styles */
-  }
-</style>
+
