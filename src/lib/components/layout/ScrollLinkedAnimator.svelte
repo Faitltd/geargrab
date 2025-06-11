@@ -132,6 +132,7 @@
   bind:this={element}
   class="scroll-linked-animator {className}"
   style="opacity: 0; transform: scale(0.8); will-change: transform, opacity;"
+  data-scroll-linked="true"
 >
   <slot />
 </div>

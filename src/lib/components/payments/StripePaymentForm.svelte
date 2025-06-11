@@ -111,7 +111,9 @@
       });
 
       // Provide more specific error messages
-      if (err.message?.includes('payment intent')) {
+      if (err.message?.includes('Authentication required')) {
+        error = 'Authentication required. Please log in and try again.';
+      } else if (err.message?.includes('payment intent')) {
         error = 'Failed to create payment intent. Please check your connection and try again.';
       } else if (err.message?.includes('Stripe')) {
         error = 'Failed to initialize Stripe. Please refresh the page and try again.';

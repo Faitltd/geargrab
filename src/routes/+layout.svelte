@@ -14,35 +14,105 @@
   // Initialize auth state listener
   onMount(() => {
     if (browser) {
-      const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-        if (firebaseUser) {
-          const user: User = {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email || '',
-            displayName: firebaseUser.displayName || '',
-            photoURL: firebaseUser.photoURL || ''
-          };
+      console.log('🔐 Initializing auth state listener...');
+      console.log('🔐 Auth object:', auth);
+      console.log('🔐 Browser environment:', browser);
 
-          authStore.set({
-            user,
-            loading: false,
-            error: null
-          });
+      // Immediate check of current user
+      const currentUser = auth?.currentUser;
+      console.log('🔐 Current user on mount:', currentUser?.email || 'null');
+
+      // Set a shorter timeout to prevent infinite loading
+      const loadingTimeout = setTimeout(() => {
+        console.warn('⚠️ Auth state loading timeout - forcing resolution');
+        const currentUser = auth?.currentUser;
+
+        if (currentUser) {
+          const user: User = {
+            uid: currentUser.uid,
+            email: currentUser.email || '',
+            displayName: currentUser.displayName || '',
+            photoURL: currentUser.photoURL || ''
+          };
+          authStore.set({ user, loading: false, error: null });
         } else {
-          authStore.set({
-            user: null,
-            loading: false,
-            error: null
-          });
+          authStore.set({ user: null, loading: false, error: null });
         }
-      });
+      }, 3000); // Reduced to 3 seconds
+
+      // Set up auth state listener
+      let unsubscribe: (() => void) | null = null;
+
+      try {
+        if (auth) {
+          unsubscribe = onAuthStateChanged(auth,
+            (firebaseUser) => {
+              console.log('🔐 Auth state changed:', firebaseUser ? firebaseUser.email : 'null');
+              clearTimeout(loadingTimeout);
+
+              if (firebaseUser) {
+                const user: User = {
+                  uid: firebaseUser.uid,
+                  email: firebaseUser.email || '',
+                  displayName: firebaseUser.displayName || '',
+                  photoURL: firebaseUser.photoURL || ''
+                };
+
+                authStore.set({
+                  user,
+                  loading: false,
+                  error: null
+                });
+              } else {
+                authStore.set({
+                  user: null,
+                  loading: false,
+                  error: null
+                });
+              }
+            },
+            (error) => {
+              console.error('🔐 Auth state error:', error);
+              clearTimeout(loadingTimeout);
+              authStore.set({
+                user: null,
+                loading: false,
+                error: error.message
+              });
+            }
+          );
+
+          console.log('🔐 Auth listener set up successfully');
+        } else {
+          console.warn('⚠️ Auth object not available');
+          clearTimeout(loadingTimeout);
+          authStore.set({ user: null, loading: false, error: 'Auth not initialized' });
+        }
+      } catch (error) {
+        console.error('🔐 Failed to set up auth listener:', error);
+        clearTimeout(loadingTimeout);
+        authStore.set({
+          user: null,
+          loading: false,
+          error: 'Failed to initialize authentication'
+        });
+      }
 
       // Cleanup subscription on component destroy
       return () => {
-        unsubscribe();
+        clearTimeout(loadingTimeout);
+        if (unsubscribe) {
+          unsubscribe();
+        }
       };
+    } else {
+      // Not in browser - set to not loading immediately
+      console.log('🔐 Not in browser environment - setting auth to not loading');
+      authStore.set({ user: null, loading: false, error: null });
     }
   });
+
+
 </script>
 
 <Navbar />

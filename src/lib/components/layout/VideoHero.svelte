@@ -1,7 +1,7 @@
 <script lang="ts">
   export let title: string;
   export let subtitle: string = '';
-  export let height: string = 'h-screen';
+  export let height: string = 'h-[50vh]';
   export let showContent: boolean = true;
 
   let videoElement: HTMLVideoElement;

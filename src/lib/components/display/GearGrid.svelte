@@ -15,7 +15,7 @@
   <h2 class="text-white text-2xl mb-4">Listings: {listings.length}</h2>
 
   {#if loading}
-    <div class="loading-container">
+    <div class="loading-container" data-cy="loading">
       <div class="loading-spinner"></div>
       <p class="text-white">Loading amazing gear...</p>
     </div>

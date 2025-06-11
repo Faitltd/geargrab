@@ -1,14 +1,27 @@
 import type { Handle } from '@sveltejs/kit';
+import { SecurityMiddleware } from '$lib/security/middleware';
 
 export const handle: Handle = async ({ event, resolve }) => {
-  // Initialize locals with dummy user data for development
+  // Initialize locals
   event.locals.user = null;
   event.locals.userId = null;
 
   const start = Date.now();
 
-  // For now, we're not implementing authentication
-  // This will be replaced with actual Firebase authentication later
+  // Try to authenticate user from session cookie or Authorization header
+  try {
+    const auth = await SecurityMiddleware.authenticateUser(event);
+    if (auth) {
+      event.locals.userId = auth.userId;
+      event.locals.user = {
+        uid: auth.userId,
+        isAdmin: auth.isAdmin
+      };
+    }
+  } catch (error) {
+    // Authentication failed, but continue with null user
+    console.log('Authentication failed:', error.message);
+  }
 
   const response = await resolve(event);
 
@@ -17,7 +30,8 @@ export const handle: Handle = async ({ event, resolve }) => {
     path: event.url.pathname,
     method: event.request.method,
     status: response.status,
-    duration
+    duration,
+    userId: event.locals.userId || 'anonymous'
   };
 
   if (response.status >= 400) {

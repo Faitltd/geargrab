@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pure HTML Test</title>
+    <style>
+        body {
+            background: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        button {
+            background: red;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: darkred;
+        }
+        .result {
+            background: #333;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 Pure HTML/JS Test</h1>
+        <p>This tests if basic JavaScript works in your browser without any frameworks.</p>
+        
+        <div class="result">
+            <h2>Counter: <span id="counter">0</span></h2>
+            <button onclick="increment()">Click Me!</button>
+        </div>
+        
+        <div class="result">
+            <h2>Test Results:</h2>
+            <div id="results">
+                <p>⏳ Waiting for tests...</p>
+            </div>
+        </div>
+        
+        <div class="result">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Click the red button above</li>
+                <li>The counter should increase</li>
+                <li>If it works, the issue is with Svelte/SvelteKit</li>
+                <li>If it doesn't work, the issue is with your browser or JavaScript</li>
+                <li>Check browser console (F12) for any errors</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        let count = 0;
+        
+        function increment() {
+            count++;
+            document.getElementById('counter').textContent = count;
+            console.log('Pure HTML button clicked! Count:', count);
+            
+            // Update results
+            const results = document.getElementById('results');
+            results.innerHTML = `
+                <p>✅ JavaScript is working!</p>
+                <p>✅ DOM manipulation works!</p>
+                <p>✅ Event handlers work!</p>
+                <p>✅ Button clicked ${count} times</p>
+                <p style="color: lime;">🎯 The issue is likely with Svelte/SvelteKit, not your browser!</p>
+            `;
+        }
+        
+        // Test basic JavaScript on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Pure HTML page loaded successfully');
+            
+            // Test setTimeout
+            setTimeout(function() {
+                const results = document.getElementById('results');
+                results.innerHTML = `
+                    <p>✅ Page loaded successfully</p>
+                    <p>✅ JavaScript execution works</p>
+                    <p>✅ setTimeout works</p>
+                    <p>⏳ Now click the button to test event handlers...</p>
+                `;
+                console.log('setTimeout test completed');
+            }, 500);
+        });
+    </script>
+</body>
+</html>

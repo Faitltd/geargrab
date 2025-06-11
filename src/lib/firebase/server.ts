@@ -3,6 +3,7 @@ import { initializeApp, getApps, cert, type App } from 'firebase-admin/app';
 import { getAuth, type Auth } from 'firebase-admin/auth';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 import { getStorage, type Storage } from 'firebase-admin/storage';
+import { firebaseAdminConfig, validateFirebaseAdminConfig } from './config';
 
 // Firebase Admin configuration
 let adminApp: App;
@@ -13,19 +14,15 @@ let adminStorage: Storage;
 // Initialize Firebase Admin SDK
 try {
   if (getApps().length === 0) {
-    const projectId = process.env.FIREBASE_PROJECT_ID || 'geargrabco';
-    const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
-    const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n');
-
     // Check if we have valid credentials
-    if (clientEmail && privateKey && projectId) {
+    if (validateFirebaseAdminConfig()) {
       adminApp = initializeApp({
         credential: cert({
-          projectId,
-          clientEmail,
-          privateKey
+          projectId: firebaseAdminConfig.projectId,
+          clientEmail: firebaseAdminConfig.clientEmail!,
+          privateKey: firebaseAdminConfig.privateKey!
         }),
-        storageBucket: `${projectId}.appspot.com`
+        storageBucket: `${firebaseAdminConfig.projectId}.appspot.com`
       });
 
       // Initialize services

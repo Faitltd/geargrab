@@ -24,14 +24,24 @@ async function getStripe() {
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   try {
-    // Check if user is authenticated
-    if (!locals.userId) {
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+
+    // Check if user is authenticated (allow mock users in development)
+    if (!locals.userId && !isDevelopment) {
       console.log('Payment intent creation failed: No user authentication');
-      return json({ error: 'Authentication required' }, { status: 401 });
+      return json({ error: 'Authentication required. Please log in and try again.' }, { status: 401 });
+    }
+
+    // In development, use a mock user ID if none exists
+    const userId = locals.userId || (isDevelopment ? 'dev_user_mock' : null);
+
+    if (!userId) {
+      console.log('Payment intent creation failed: No user authentication');
+      return json({ error: 'Authentication required. Please log in and try again.' }, { status: 401 });
     }
 
     const { amount, currency = 'usd', metadata = {} } = await request.json();
-    console.log('Payment intent request:', { amount, currency, metadata, userId: locals.userId });
+    console.log('Payment intent request:', { amount, currency, metadata, userId });
 
     // Validate amount
     if (!amount || amount < 50) { // Minimum $0.50
@@ -41,7 +51,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // Check if we're in development mode and Stripe is not properly configured
     const secretKey = process.env.STRIPE_SECRET_KEY;
-    const isDevelopment = process.env.NODE_ENV !== 'production';
 
     if (isDevelopment && (!secretKey || !secretKey.startsWith('sk_'))) {
       console.log('Development mode: Using mock payment intent');
@@ -69,7 +78,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       amount: Math.round(amount), // Amount in cents
       currency,
       metadata: {
-        userId: locals.userId,
+        userId: userId,
         ...metadata
       },
       automatic_payment_methods: {
@@ -93,7 +102,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     });
 
     // In development mode, if Stripe fails, return a mock response
-    const isDevelopment = process.env.NODE_ENV !== 'production';
     if (isDevelopment && error.message?.includes('Stripe configuration error')) {
       console.log('Development fallback: Using mock payment intent due to Stripe config error');
       const mockPaymentIntent = {

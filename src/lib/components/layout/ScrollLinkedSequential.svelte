@@ -135,9 +135,10 @@
   }
 </script>
 
-<div 
+<div
   bind:this={containerElement}
   class="scroll-linked-sequential {className}"
+  data-scroll-linked="true"
 >
   <slot />
 </div>

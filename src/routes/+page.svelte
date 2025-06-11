@@ -87,7 +87,7 @@
 <!-- Page Content with Video Background -->
 <div class="relative z-10 min-h-screen">
   <!-- Hero Content -->
-  <div class="relative min-h-screen flex flex-col text-center text-white px-4 pt-20">
+  <div class="relative min-h-[60vh] flex flex-col text-center text-white px-4 pt-20">
     <!-- Brand Name at Top - Positioned between navbar and main content -->
     <div class="flex justify-center pt-24 pb-0">
       <h1 class="text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-white drop-shadow-lg mb-0">
@@ -222,7 +222,7 @@
 
       <!-- Why Choose GearGrab -->
       <div class="text-center mb-20">
-        <ScrollLinkedAnimator animation="fade-up" startOffset={0.6} endOffset={1.0}>
+        <ScrollLinkedAnimator animation="fade-up" startOffset={0.2} endOffset={0.8}>
           <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
             <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Why Choose GearGrab?</h2>
             <p class="text-xl text-gray-200 drop-shadow-lg">
@@ -231,7 +231,7 @@
           </div>
         </ScrollLinkedAnimator>
 
-        <ScrollLinkedSequential animation="fade-up" startOffset={0.7} endOffset={1.0} incrementDelay={0.15}>
+        <ScrollLinkedSequential animation="fade-up" startOffset={0.3} endOffset={0.9} incrementDelay={0.15}>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {#each features as feature}
               <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 hover:border-green-500 transition-all duration-300 shadow-lg">
@@ -294,5 +294,16 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
     line-clamp: 1;
+  }
+
+  /* Force blue hue styling for homepage search inputs */
+  :global(.bg-white\/10 input[type="text"]) {
+    background-color: rgba(31, 41, 55, 0.7) !important;
+    border-color: rgb(75, 85, 99) !important;
+    color: white !important;
+  }
+
+  :global(.bg-white\/10 input[type="text"]::placeholder) {
+    color: rgb(209, 213, 219) !important;
   }
 </style>

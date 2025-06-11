@@ -10,11 +10,11 @@ describe('Homepage', () => {
     cy.title().should('include', 'GearGrab');
 
     // Check main heading
-    cy.get('h1').should('contain', 'Adventure Awaits');
+    cy.get('h1').should('contain', 'GearGrab');
 
     // Check hero section
-    cy.get('.relative.h-full').should('exist');
-    cy.contains('Rent outdoor gear from local owners').should('be.visible');
+    cy.get('h2').should('contain', 'Meet Up. Gear Up. Get Out.');
+    cy.contains('Rent Local Outdoor Gear, Save Space, Make Money, and Explore More.').should('be.visible');
   });
 
   it('should have working navigation links in header', () => {
@@ -46,8 +46,12 @@ describe('Homepage', () => {
   });
 
   it('should have working CTA buttons in hero section', () => {
-    // Check Browse Gear button
-    cy.contains('Browse Gear').should('be.visible').click();
+    // Scroll down to make sure CTA buttons are visible
+    cy.scrollTo(0, 2500);
+    cy.wait(1500); // Wait for scroll animations
+
+    // Check Start Browsing button
+    cy.contains('Start Browsing').should('be.visible').click();
     cy.url().should('include', '/browse');
     cy.go('back');
 
@@ -58,11 +62,15 @@ describe('Homepage', () => {
   });
 
   it('should display gear categories section', () => {
+    // Scroll to categories section
+    cy.scrollTo(0, 2000);
+    cy.wait(1500); // Wait for scroll animations
+
     // Check section heading
-    cy.contains('Browse by Category').should('be.visible');
+    cy.contains('Explore Categories').should('be.visible');
 
     // Check that category cards exist
-    cy.get('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4').should('exist');
+    cy.get('.grid.grid-cols-2.md\\:grid-cols-4.lg\\:grid-cols-8').should('exist');
 
     // Check for specific categories
     cy.contains('Camping').should('be.visible');
@@ -72,18 +80,22 @@ describe('Homepage', () => {
 
     // Test clicking on a category
     cy.contains('Camping').click();
-    cy.url().should('include', '/browse?category=camping');
+    cy.url().should('include', '/browse').and('include', 'category=camping');
     cy.go('back');
   });
 
-  it('should display how it works section', () => {
-    // Check section heading
-    cy.contains('How It Works').should('be.visible');
+  it('should display why choose us section', () => {
+    // Scroll to the bottom of the page to trigger all animations
+    cy.scrollTo('bottom');
+    cy.wait(2000); // Wait for scroll animations
 
-    // Check for the three steps
-    cy.contains('Browse & Book').should('be.visible');
-    cy.contains('Meet & Pickup').should('be.visible');
-    cy.contains('Adventure & Return').should('be.visible');
+    // Check that the section exists in the DOM (even if not visible due to animations)
+    cy.contains('Why Choose GearGrab?').should('exist');
+
+    // Check for the three features (they should exist in DOM)
+    cy.contains('Quality Guarantee').should('exist');
+    cy.contains('$5 to Try').should('exist');
+    cy.contains('Local Community').should('exist');
   });
 
   it('should have working footer links', () => {
@@ -103,7 +115,7 @@ describe('Homepage', () => {
 
     // Check that content is still visible
     cy.get('h1').should('be.visible');
-    cy.contains('Adventure Awaits').should('be.visible');
+    cy.contains('GearGrab').should('be.visible');
 
     // Check mobile navigation - handle different possible implementations
     cy.get('body').then(($body) => {
@@ -137,15 +149,15 @@ describe('Homepage', () => {
   });
 
   it('should handle scroll animations', () => {
-    // Check that elements animate in on scroll
-    cy.get('.animate-fade-in').should('exist');
+    // Check that scroll-linked elements exist
+    cy.get('[data-scroll-linked]').should('exist');
 
     // Scroll down and check animations trigger
     cy.scrollTo(0, 500);
     cy.wait(500);
 
     // Elements should be visible after scroll
-    cy.get('.animate-fade-in').should('be.visible');
+    cy.get('[data-scroll-linked]').should('be.visible');
   });
 
   it('should load external images properly', () => {

@@ -93,7 +93,8 @@
         on:focus={handleFocus}
         on:blur={handleBlur}
         placeholder="What gear do you need?"
-        class="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-800/70 backdrop-blur-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white placeholder-gray-300 text-sm md:text-base"
+        class="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-800/70 backdrop-blur-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white placeholder-gray-300 text-sm md:text-base transition-colors duration-200"
+        style="background-color: rgba(31, 41, 55, 0.7) !important; border-color: rgb(75, 85, 99) !important; color: white !important;"
         autocomplete="off"
       />
 
@@ -135,7 +136,8 @@
         type="text"
         bind:value={selectedLocation}
         placeholder="Where?"
-        class="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-800/70 backdrop-blur-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white placeholder-gray-300 text-sm md:text-base"
+        class="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-800/70 backdrop-blur-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white placeholder-gray-300 text-sm md:text-base transition-colors duration-200"
+        style="background-color: rgba(31, 41, 55, 0.7) !important; border-color: rgb(75, 85, 99) !important; color: white !important;"
       />
     </div>
 

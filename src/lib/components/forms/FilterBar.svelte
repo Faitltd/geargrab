@@ -80,7 +80,7 @@
         <select
           bind:value={selectedCategory}
           on:change={handleCategoryChange}
-          class="form-select rounded-md border-gray-600 bg-gray-800/70 backdrop-blur-sm py-2 pl-3 pr-8 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          class="form-select rounded-lg border-gray-600 bg-gray-800/70 backdrop-blur-sm py-3 pl-4 pr-8 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
         >
           {#each categories as category}
             <option value={category.id} class="bg-gray-800 text-white">{category.name}</option>
@@ -93,7 +93,7 @@
         <select
           bind:value={selectedSort}
           on:change={handleSortChange}
-          class="form-select rounded-md border-gray-600 bg-gray-800/70 backdrop-blur-sm py-2 pl-3 pr-8 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          class="form-select rounded-lg border-gray-600 bg-gray-800/70 backdrop-blur-sm py-3 pl-4 pr-8 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
           data-cy="sort-select"
         >
           {#each sortOptions as option}

@@ -173,7 +173,7 @@
         type="text"
         bind:value={title}
         placeholder="Summarize your experience..."
-        class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+        class="w-full px-4 py-3 rounded-lg bg-gray-800/70 border border-gray-600 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
         maxlength="100"
         required
       />
@@ -186,7 +186,7 @@
         bind:value={comment}
         placeholder="Share details about your experience..."
         rows="4"
-        class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+        class="w-full px-4 py-3 rounded-lg bg-gray-800/70 border border-gray-600 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
         maxlength="1000"
         required
       ></textarea>
@@ -201,7 +201,7 @@
             type="text"
             bind:value={pros[index]}
             placeholder="Something positive..."
-            class="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+            class="flex-1 px-4 py-3 rounded-lg bg-gray-800/70 border border-gray-600 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
           />
           {#if pros.length > 1}
             <button
@@ -232,7 +232,7 @@
             type="text"
             bind:value={cons[index]}
             placeholder="Something to improve..."
-            class="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+            class="flex-1 px-4 py-3 rounded-lg bg-gray-800/70 border border-gray-600 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
           />
           {#if cons.length > 1}
             <button

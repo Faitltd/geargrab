@@ -77,6 +77,7 @@
                 class="h-8 w-auto object-contain"
               />
             </div>
+            <span class="ml-3 text-xl font-bold text-white">GearGrab</span>
           </a>
         </div>
         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -114,10 +115,11 @@
           <a href="/dashboard" class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
             Dashboard
           </a>
-          <button 
-            on:click={handleSignOut} 
+          <button
+            on:click={handleSignOut}
             class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium disabled:opacity-50"
             disabled={isSigningOut}
+            data-cy="logout"
           >
             {isSigningOut ? 'Signing out...' : 'Sign Out'}
           </button>
@@ -202,10 +204,11 @@
             <a href="/dashboard" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Dashboard
             </a>
-            <button 
-              on:click={handleSignOut} 
+            <button
+              on:click={handleSignOut}
               class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10 disabled:opacity-50"
               disabled={isSigningOut}
+              data-cy="logout"
             >
               {isSigningOut ? 'Signing out...' : 'Sign Out'}
             </button>
