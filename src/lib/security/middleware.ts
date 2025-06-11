@@ -53,8 +53,14 @@ export class SecurityMiddleware {
   static async requireAuth(event: RequestEvent): Promise<{ userId: string; isAdmin: boolean } | Response> {
     // Check if Firebase Admin is available
     if (!adminAuth) {
-      console.log('Firebase Admin not available, authentication required but cannot verify');
-      return json({ error: 'Authentication required. Please log in and try again.' }, { status: 401 });
+      console.log('Firebase Admin not available, using fallback authentication');
+      // In development or when Firebase Admin is not configured, use a temporary user ID
+      const isDevelopment = process.env.NODE_ENV !== 'production';
+      if (isDevelopment) {
+        return { userId: 'dev_user_mock', isAdmin: false };
+      } else {
+        return json({ error: 'Authentication required. Please log in and try again.' }, { status: 401 });
+      }
     }
 
     const auth = await this.authenticateUser(event);

@@ -45,8 +45,8 @@ export const POST: RequestHandler = createSecureHandler(
         return json({ error: 'Invalid date format' }, { status: 400 });
       }
 
-      if (start >= end) {
-        return json({ error: 'End date must be after start date' }, { status: 400 });
+      if (start > end) {
+        return json({ error: 'End date must be on or after start date' }, { status: 400 });
       }
 
       if (start < now) {

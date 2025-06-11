@@ -252,17 +252,26 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     // Validate payment intent if provided
     if (bookingData.paymentIntentId) {
       try {
-        const stripeInstance = await getStripe();
-        const paymentIntent = await stripeInstance.paymentIntents.retrieve(bookingData.paymentIntentId);
+        const isDevelopment = process.env.NODE_ENV !== 'production';
 
-        if (paymentIntent.status !== 'succeeded') {
-          return json({ error: 'Payment not completed' }, { status: 400 });
-        }
+        // Check if this is a mock payment intent (development mode)
+        if (isDevelopment && bookingData.paymentIntentId.startsWith('pi_mock_')) {
+          console.log('Development mode: Accepting mock payment intent:', bookingData.paymentIntentId);
+          // In development, accept mock payment intents without verification
+        } else {
+          // Production mode: verify with Stripe
+          const stripeInstance = await getStripe();
+          const paymentIntent = await stripeInstance.paymentIntents.retrieve(bookingData.paymentIntentId);
 
-        // Verify payment amount matches booking total
-        const expectedAmount = Math.round(bookingData.totalPrice * 100); // Convert to cents
-        if (paymentIntent.amount !== expectedAmount) {
-          return json({ error: 'Payment amount mismatch' }, { status: 400 });
+          if (paymentIntent.status !== 'succeeded') {
+            return json({ error: 'Payment not completed' }, { status: 400 });
+          }
+
+          // Verify payment amount matches booking total
+          const expectedAmount = Math.round(bookingData.totalPrice * 100); // Convert to cents
+          if (paymentIntent.amount !== expectedAmount) {
+            return json({ error: 'Payment amount mismatch' }, { status: 400 });
+          }
         }
       } catch (paymentError) {
         console.error('Payment verification error:', paymentError);
@@ -279,9 +288,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     // Validate dates
     const startDate = new Date(bookingData.startDate);
     const endDate = new Date(bookingData.endDate);
-    
-    if (startDate >= endDate) {
-      return json({ error: 'End date must be after start date' }, { status: 400 });
+
+    if (startDate > endDate) {
+      return json({ error: 'End date must be on or after start date' }, { status: 400 });
     }
 
     if (startDate < new Date()) {
