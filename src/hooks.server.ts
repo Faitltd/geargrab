@@ -1,5 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
 import { SecurityMiddleware } from '$lib/security/middleware';
+import { isFirebaseAdminAvailable } from '$lib/firebase/server';
 
 export const handle: Handle = async ({ event, resolve }) => {
   // Initialize locals
@@ -10,13 +11,25 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   // Try to authenticate user from session cookie or Authorization header
   try {
-    const auth = await SecurityMiddleware.authenticateUser(event);
-    if (auth) {
-      event.locals.userId = auth.userId;
-      event.locals.user = {
-        uid: auth.userId,
-        isAdmin: auth.isAdmin
-      };
+    // Only attempt authentication if Firebase Admin is available
+    if (isFirebaseAdminAvailable()) {
+      const auth = await SecurityMiddleware.authenticateUser(event);
+      if (auth) {
+        event.locals.userId = auth.userId;
+        event.locals.user = {
+          uid: auth.userId,
+          isAdmin: auth.isAdmin
+        };
+      }
+    } else {
+      // In development or when Firebase Admin is not available,
+      // check for a development mode flag or mock authentication
+      const isDevelopment = process.env.NODE_ENV !== 'production';
+      if (isDevelopment) {
+        // For development, we can set a mock user if needed
+        // This allows payment testing without full authentication setup
+        console.log('Firebase Admin not available - running in development mode');
+      }
     }
   } catch (error) {
     // Authentication failed, but continue with null user
