@@ -19,6 +19,12 @@ export class SecurityMiddleware {
   // Authenticate user from session or token
   static async authenticateUser(event: RequestEvent): Promise<{ userId: string; isAdmin: boolean } | null> {
     try {
+      // Check if Firebase Admin is available
+      if (!adminAuth) {
+        console.log('Firebase Admin not available, skipping authentication');
+        return null;
+      }
+
       // Try session cookie first
       const sessionCookie = event.cookies.get('__session');
       if (sessionCookie) {
@@ -45,6 +51,12 @@ export class SecurityMiddleware {
 
   // Require authentication
   static async requireAuth(event: RequestEvent): Promise<{ userId: string; isAdmin: boolean } | Response> {
+    // Check if Firebase Admin is available
+    if (!adminAuth) {
+      console.log('Firebase Admin not available, authentication required but cannot verify');
+      return json({ error: 'Authentication required. Please log in and try again.' }, { status: 401 });
+    }
+
     const auth = await this.authenticateUser(event);
     if (!auth) {
       await auditLog.logSecurityEvent({
@@ -54,7 +66,7 @@ export class SecurityMiddleware {
         path: event.url.pathname,
         timestamp: new Date()
       });
-      return json({ error: 'Unauthorized' }, { status: 401 });
+      return json({ error: 'Authentication required. Please log in and try again.' }, { status: 401 });
     }
     return auth;
   }
