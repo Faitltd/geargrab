@@ -12,8 +12,8 @@
     ? `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`
     : 'Select dates';
     
-  $: days = startDate && endDate 
-    ? Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+  $: days = startDate && endDate
+    ? Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)))
     : 0;
     
   $: totalPrice = days * price;

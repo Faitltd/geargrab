@@ -78,14 +78,16 @@
   }
   
   function handleHandoffConfirmed(event: CustomEvent) {
-    const { phase, userRole: confirmedRole } = event.detail;
-    
+    const { phase, userRole: confirmedRole, reportId } = event.detail;
+
     // Refresh data to get updated status
     loadBookingData();
-    
+
     // Show success message
-    const phaseLabel = phase === 'pre' ? 'Pre-rental' : 'Post-rental';
-    alert(`${phaseLabel} handoff confirmed successfully!`);
+    const phaseLabel = phase === 'pickup' ? 'Pickup' : 'Return';
+    alert(`${phaseLabel} condition report confirmed successfully!`);
+
+    console.log('Condition report confirmed:', { phase, userRole: confirmedRole, reportId });
   }
   
   function getBookingStatusBadge(status: string) {
@@ -304,12 +306,12 @@
         </div>
       </div>
 
-      <!-- Pre-Rental Handoff -->
+      <!-- Pickup Handoff -->
       {#if showPreRental}
         <div class="mb-8">
           <RentalHandoff
             {booking}
-            phase="pre"
+            phase="pickup"
             {userRole}
             on:confirmed={handleHandoffConfirmed}
             on:refresh={loadBookingData}
@@ -317,12 +319,12 @@
         </div>
       {/if}
 
-      <!-- Post-Rental Handoff -->
+      <!-- Return Handoff -->
       {#if showPostRental}
         <div class="mb-8">
           <RentalHandoff
             {booking}
-            phase="post"
+            phase="return"
             {userRole}
             on:confirmed={handleHandoffConfirmed}
             on:refresh={loadBookingData}
@@ -340,13 +342,13 @@
           <div class="space-x-4">
             <RentalHandoff
               {booking}
-              phase="pre"
+              phase="pickup"
               {userRole}
               readonly={true}
             />
             <RentalHandoff
               {booking}
-              phase="post"
+              phase="return"
               {userRole}
               readonly={true}
             />

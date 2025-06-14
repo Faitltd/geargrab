@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { adminFirestore } from '$firebase/server';
+import { adminFirestore } from '$lib/firebase/server';
 import { sendBookingEmails, sendPaymentEmails } from '$lib/services/email';
 import crypto from 'crypto';
 

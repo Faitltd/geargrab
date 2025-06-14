@@ -63,12 +63,24 @@
                   loading: false,
                   error: null
                 });
+
+                // Store auth token for API calls
+                firebaseUser.getIdToken().then(token => {
+                  localStorage.setItem('authToken', token);
+                  console.log('✅ Auth token stored for API calls');
+                }).catch(error => {
+                  console.error('❌ Error storing auth token:', error);
+                });
               } else {
                 authStore.set({
                   user: null,
                   loading: false,
                   error: null
                 });
+
+                // Clear stored auth token
+                localStorage.removeItem('authToken');
+                console.log('🗑️ Auth token cleared');
               }
             },
             (error) => {

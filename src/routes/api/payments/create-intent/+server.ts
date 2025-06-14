@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { SecurityMiddleware } from '$lib/security/middleware';
 // Temporarily removed authentication middleware for debugging
 
 export const GET: RequestHandler = async ({ url, getClientAddress }) => {
@@ -39,66 +40,77 @@ async function getStripe() {
   return stripe;
 }
 
-export const POST: RequestHandler = async ({ request, url, getClientAddress }) => {
-  console.log('🚀 BULLETPROOF Payment intent endpoint - NO AUTHENTICATION REQUIRED');
+export const POST: RequestHandler = async (event) => {
+  console.log('🚀 Payment intent endpoint called');
 
   try {
-    const body = await request.json();
+    // Authenticate user
+    const auth = await SecurityMiddleware.requireAuth(event);
+    if (auth instanceof Response) return auth;
+
+    const body = await event.request.json();
     const { amount, currency = 'usd', metadata = {} } = body;
 
-    console.log('📝 Payment request:', { amount, currency, metadata });
-    console.log('✅ AUTHENTICATION COMPLETELY BYPASSED - ALWAYS WORKS');
+    console.log('📝 Payment request:', { amount, currency, metadata, userId: auth.userId });
 
-    // Always return a working payment intent - never fail
-    const finalAmount = Math.max(amount || 1000, 50); // Minimum $0.50
+    // Validate required parameters
+    if (!amount || amount < 50) {
+      return json({
+        error: 'Invalid amount. Minimum $0.50 required.',
+        code: 'INVALID_AMOUNT'
+      }, { status: 400 });
+    }
 
-    // Try Stripe first, fall back to mock if anything fails
+    // Get Stripe configuration
     const secretKey = process.env.STRIPE_SECRET_KEY;
 
     if (!secretKey || !secretKey.startsWith('sk_')) {
-      console.log('⚠️ No Stripe config - returning mock payment intent');
+      console.error('❌ Stripe secret key not configured');
       return json({
-        clientSecret: `pi_mock_${Date.now()}_secret_mock`,
-        paymentIntentId: `pi_mock_${Date.now()}`,
-        mock: true,
-        amount: finalAmount
-      });
+        error: 'Payment system not configured. Please contact support.',
+        code: 'PAYMENT_CONFIG_ERROR'
+      }, { status: 500 });
     }
 
-    // Try to create real Stripe payment intent
+    // Create Stripe payment intent
     try {
       const stripeInstance = await getStripe();
-      const paymentIntent = await stripeInstance.paymentIntents.create({
-        amount: finalAmount,
-        currency,
-        metadata: { service: 'gear_rental', ...metadata },
-        automatic_payment_methods: { enabled: true }
-      });
 
-      console.log('✅ Real Stripe payment intent created:', paymentIntent.id);
+      const paymentIntentData = {
+        amount: Math.round(amount), // Amount in cents
+        currency,
+        metadata: {
+          service: 'gear_rental',
+          userId: auth.userId,
+          ...metadata
+        },
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      };
+
+      console.log('🔄 Creating Stripe payment intent...');
+      const paymentIntent = await stripeInstance.paymentIntents.create(paymentIntentData);
+
+      console.log('✅ Payment intent created successfully:', paymentIntent.id);
       return json({
         clientSecret: paymentIntent.client_secret,
-        paymentIntentId: paymentIntent.id,
-        mock: false
+        paymentIntentId: paymentIntent.id
       });
+
     } catch (stripeError) {
-      console.log('⚠️ Stripe failed, using mock:', stripeError.message);
+      console.error('❌ Stripe error:', stripeError);
       return json({
-        clientSecret: `pi_fallback_${Date.now()}_secret_fallback`,
-        paymentIntentId: `pi_fallback_${Date.now()}`,
-        mock: true,
-        fallback: true
-      });
+        error: 'Failed to create payment intent. Please try again.',
+        code: 'STRIPE_ERROR'
+      }, { status: 500 });
     }
 
   } catch (error) {
-    console.log('⚠️ Unexpected error, using mock:', error.message);
-    // ALWAYS return a working payment intent - never fail
+    console.error('❌ Unexpected error in payment endpoint:', error);
     return json({
-      clientSecret: `pi_error_${Date.now()}_secret_error`,
-      paymentIntentId: `pi_error_${Date.now()}`,
-      mock: true,
-      error_fallback: true
-    });
+      error: 'Payment system error. Please try again.',
+      code: 'INTERNAL_ERROR'
+    }, { status: 500 });
   }
 };

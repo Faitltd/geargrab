@@ -9,6 +9,9 @@ node_modules/
 .env.*
 !.env.example
 
+# Deployment secrets (DO NOT COMMIT)
+scripts/env-secrets.sh
+
 # Build output
 /build
 /.svelte-kit

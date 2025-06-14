@@ -46,7 +46,7 @@ export async function createPaymentIntent(
   metadata: Record<string, string> = {}
 ): Promise<{ clientSecret: string; paymentIntentId: string }> {
   try {
-    console.log('Creating payment intent for authenticated user:', { amount: amount * 100, currency, metadata });
+    console.log('Creating payment intent:', { amount: amount * 100, currency, metadata });
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -54,8 +54,9 @@ export async function createPaymentIntent(
 
     // Temporarily disable authentication for debugging payment issues
     console.log('🔧 Authentication temporarily disabled for payment debugging');
+    console.log('🔧 Skipping Firebase authentication token');
 
-    // Send payment request for authenticated user
+    // Use main endpoint - authentication has been disabled for debugging
     const response = await fetch('/api/payments/create-intent', {
       method: 'POST',
       headers,

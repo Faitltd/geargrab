@@ -1,83 +1,66 @@
 <!--
   Rental Handoff Component
-  Handles photo documentation for both pre-rental and post-rental phases
-  Used by both owners and renters for insurance documentation
+  Handles comprehensive condition documentation for both pre-rental and post-rental phases
+  Uses the new condition report system with detailed photo categorization
 -->
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import { authStore } from '$lib/stores/auth';
-  import type { Booking, RentalPhoto } from '$lib/types/firestore';
-  import PhotoUploader from './PhotoUploader.svelte';
-  import PhotoGallery from './PhotoGallery.svelte';
-  
+  import type { Booking } from '$lib/types/firestore';
+  import type { GearConditionReport } from '$lib/types/gear-condition';
+  import ConditionReport from '../condition/ConditionReport.svelte';
+  import { getConditionReportsForBooking } from '$lib/services/condition-photos';
+
   // Props
   export let booking: Booking;
-  export let phase: 'pre' | 'post'; // pre-rental or post-rental
+  export let phase: 'pickup' | 'return'; // pickup or return
   export let userRole: 'owner' | 'renter';
   export let readonly: boolean = false;
-  
+
   // Internal state
-  let loading = false;
-  let uploading = false;
-  let confirmationStep = false;
-  let damageReported = false;
-  let damageDescription = '';
-  let conditionNotes = '';
-  
+  let conditionReports: GearConditionReport[] = [];
+  let currentReport: GearConditionReport | null = null;
+  let showConditionReport = false;
+
   // Event dispatcher
   const dispatch = createEventDispatcher();
-  
-  // Get current photos
-  $: currentPhotos = getPhotosForUser();
-  $: otherPartyPhotos = getPhotosForOtherParty();
-  $: isConfirmed = getUserConfirmationStatus();
-  $: otherPartyConfirmed = getOtherPartyConfirmationStatus();
-  $: allPhotosUploaded = currentPhotos.length >= getMinimumPhotoCount();
-  
-  function getPhotosForUser(): RentalPhoto[] {
-    const phaseData = booking.photoDocumentation?.[`${phase}Rental`];
-    if (!phaseData) return [];
-    return phaseData[`${userRole}Photos`] || [];
-  }
-  
-  function getPhotosForOtherParty(): RentalPhoto[] {
-    const phaseData = booking.photoDocumentation?.[`${phase}Rental`];
-    if (!phaseData) return [];
-    const otherRole = userRole === 'owner' ? 'renter' : 'owner';
-    return phaseData[`${otherRole}Photos`] || [];
-  }
-  
-  function getUserConfirmationStatus(): boolean {
-    const phaseData = booking.photoDocumentation?.[`${phase}Rental`];
-    return phaseData?.[`${userRole}Confirmed`] || false;
-  }
-  
-  function getOtherPartyConfirmationStatus(): boolean {
-    const phaseData = booking.photoDocumentation?.[`${phase}Rental`];
-    const otherRole = userRole === 'owner' ? 'renter' : 'owner';
-    return phaseData?.[`${otherRole}Confirmed`] || false;
-  }
-  
-  function getMinimumPhotoCount(): number {
-    // Require minimum photos based on phase and role
-    if (phase === 'pre') {
-      return 3; // Overall condition, serial numbers, accessories
-    } else {
-      return damageReported ? 5 : 3; // More photos if damage reported
+
+  onMount(async () => {
+    await loadConditionReports();
+  });
+
+  async function loadConditionReports() {
+    try {
+      conditionReports = await getConditionReportsForBooking(booking.id);
+      currentReport = conditionReports.find(report =>
+        report.reportType === phase &&
+        report.createdBy === $authStore.user?.uid
+      ) || null;
+    } catch (error) {
+      console.error('Error loading condition reports:', error);
     }
   }
+
+  // Get current status
+  $: isConfirmed = currentReport?.status === 'completed';
+  $: hasReport = currentReport !== null;
+  $: otherPartyReport = conditionReports.find(report =>
+    report.reportType === phase &&
+    report.createdBy !== $authStore.user?.uid
+  );
+  $: otherPartyConfirmed = otherPartyReport?.status === 'completed';
   
   function getPhaseTitle(): string {
-    if (phase === 'pre') {
-      return userRole === 'owner' ? 'Pre-Rental Handoff' : 'Pre-Rental Inspection';
+    if (phase === 'pickup') {
+      return userRole === 'owner' ? 'Gear Pickup Handoff' : 'Gear Pickup Inspection';
     } else {
-      return userRole === 'owner' ? 'Post-Rental Return' : 'Post-Rental Handoff';
+      return userRole === 'owner' ? 'Gear Return Inspection' : 'Gear Return Handoff';
     }
   }
-  
+
   function getPhaseDescription(): string {
-    if (phase === 'pre') {
-      return userRole === 'owner' 
+    if (phase === 'pickup') {
+      return userRole === 'owner'
         ? 'Document the condition of your gear before handing it over to the renter.'
         : 'Inspect and document the condition of the gear you\'re receiving.';
     } else {
@@ -86,57 +69,30 @@
         : 'Document the condition of the gear you\'re returning to the owner.';
     }
   }
-  
-  async function handlePhotoUploaded(event: CustomEvent) {
-    const { photo } = event.detail;
-    
-    // Refresh booking data to get updated photos
-    dispatch('refresh');
+
+  function startConditionReport() {
+    showConditionReport = true;
   }
-  
-  async function confirmHandoff() {
-    if (!$authStore.user) return;
-    
-    loading = true;
-    try {
-      const response = await fetch(`/api/bookings/${booking.id}/confirm-handoff`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          phase,
-          userRole,
-          conditionNotes: conditionNotes.trim() || undefined,
-          damageReported: phase === 'post' ? damageReported : undefined,
-          damageDescription: phase === 'post' && damageReported ? damageDescription.trim() : undefined
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to confirm handoff');
-      }
-      
-      dispatch('confirmed', { phase, userRole });
-      
-    } catch (error) {
-      console.error('Error confirming handoff:', error);
-      alert('Failed to confirm handoff. Please try again.');
-    } finally {
-      loading = false;
+
+  function handleReportConfirmed(event: CustomEvent) {
+    const { reportId } = event.detail;
+    console.log('Condition report confirmed:', reportId);
+
+    // Reload reports to get updated status
+    loadConditionReports();
+
+    // Close the condition report
+    showConditionReport = false;
+
+    // Notify parent component
+    dispatch('confirmed', { phase, userRole, reportId });
+  }
+
+  function viewOtherPartyReport() {
+    if (otherPartyReport) {
+      // Navigate to view the other party's report
+      dispatch('viewReport', { reportId: otherPartyReport.id });
     }
-  }
-  
-  function proceedToConfirmation() {
-    if (currentPhotos.length < getMinimumPhotoCount()) {
-      alert(`Please upload at least ${getMinimumPhotoCount()} photos before proceeding.`);
-      return;
-    }
-    confirmationStep = true;
-  }
-  
-  function goBackToPhotos() {
-    confirmationStep = false;
   }
 </script>
 
@@ -158,151 +114,121 @@
     <p class="text-gray-300 text-sm">{getPhaseDescription()}</p>
   </div>
 
-  {#if !confirmationStep}
-    <!-- Photo Upload Section -->
+  {#if showConditionReport}
+    <!-- Condition Report Interface -->
+    <ConditionReport
+      bookingId={booking.id}
+      listingId={booking.listingId}
+      reportType={phase}
+      {userRole}
+      existingReportId={currentReport?.id}
+      on:confirmed={handleReportConfirmed}
+    />
+  {:else}
+    <!-- Status Overview -->
     <div class="space-y-6">
-      <!-- Your Photos -->
-      <div>
-        <h3 class="text-lg font-semibold text-white mb-3">
-          Your Photos ({currentPhotos.length}/{getMinimumPhotoCount()} minimum)
-        </h3>
-        
-        {#if !readonly && !isConfirmed}
-          <PhotoUploader
-            {booking}
-            {phase}
-            {userRole}
-            on:uploaded={handlePhotoUploaded}
-            bind:uploading
-          />
-        {/if}
-        
-        {#if currentPhotos.length > 0}
-          <PhotoGallery photos={currentPhotos} editable={!readonly && !isConfirmed} />
-        {:else}
-          <div class="text-center py-8 text-gray-400">
-            <p>No photos uploaded yet</p>
-            {#if !readonly && !isConfirmed}
-              <p class="text-sm mt-1">Upload photos to document the gear condition</p>
-            {/if}
-          </div>
-        {/if}
-      </div>
-
-      <!-- Other Party's Photos -->
-      {#if otherPartyPhotos.length > 0}
-        <div>
-          <h3 class="text-lg font-semibold text-white mb-3">
-            {userRole === 'owner' ? 'Renter\'s' : 'Owner\'s'} Photos
-            {#if otherPartyConfirmed}
-              <span class="text-green-300 text-sm ml-2">✓ Confirmed</span>
-            {/if}
-          </h3>
-          <PhotoGallery photos={otherPartyPhotos} editable={false} />
+      <!-- Current Status -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Your Status -->
+        <div class="bg-white/5 rounded-lg p-4 border border-white/10">
+          <h3 class="text-lg font-semibold text-white mb-3">Your Status</h3>
+          {#if isConfirmed}
+            <div class="flex items-center text-green-300">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Condition report completed
+            </div>
+            <p class="text-gray-400 text-sm mt-2">
+              You have documented the gear condition and confirmed the handoff.
+            </p>
+          {:else if hasReport}
+            <div class="flex items-center text-yellow-300">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Condition report in progress
+            </div>
+            <p class="text-gray-400 text-sm mt-2">
+              Continue documenting the gear condition.
+            </p>
+          {:else}
+            <div class="flex items-center text-gray-300">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Condition report not started
+            </div>
+            <p class="text-gray-400 text-sm mt-2">
+              Start documenting the gear condition with photos and notes.
+            </p>
+          {/if}
         </div>
-      {/if}
+
+        <!-- Other Party Status -->
+        <div class="bg-white/5 rounded-lg p-4 border border-white/10">
+          <h3 class="text-lg font-semibold text-white mb-3">
+            {userRole === 'owner' ? 'Renter\'s' : 'Owner\'s'} Status
+          </h3>
+          {#if otherPartyConfirmed}
+            <div class="flex items-center text-green-300">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Condition report completed
+            </div>
+            <p class="text-gray-400 text-sm mt-2">
+              They have completed their condition documentation.
+            </p>
+            {#if otherPartyReport}
+              <button
+                type="button"
+                on:click={viewOtherPartyReport}
+                class="mt-3 text-blue-400 hover:text-blue-300 text-sm underline"
+              >
+                View their report
+              </button>
+            {/if}
+          {:else if otherPartyReport}
+            <div class="flex items-center text-yellow-300">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Condition report in progress
+            </div>
+            <p class="text-gray-400 text-sm mt-2">
+              They are currently documenting the gear condition.
+            </p>
+          {:else}
+            <div class="flex items-center text-gray-300">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Waiting for their report
+            </div>
+            <p class="text-gray-400 text-sm mt-2">
+              They haven't started their condition documentation yet.
+            </p>
+          {/if}
+        </div>
+      </div>
 
       <!-- Action Buttons -->
       {#if !readonly && !isConfirmed}
         <div class="flex justify-end space-x-3 pt-4 border-t border-white/10">
           <button
             type="button"
-            on:click={proceedToConfirmation}
-            disabled={!allPhotosUploaded || uploading}
-            class="bg-green-600/80 hover:bg-green-600/90 disabled:bg-gray-600/50 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg backdrop-blur-sm border border-green-500/50 transition-all duration-200"
+            on:click={startConditionReport}
+            class="bg-green-600/80 hover:bg-green-600/90 text-white px-6 py-2 rounded-lg backdrop-blur-sm border border-green-500/50 transition-all duration-200"
           >
-            {#if uploading}
-              Uploading...
+            {#if hasReport}
+              Continue Condition Report
             {:else}
-              Proceed to Confirmation
+              Start Condition Report
             {/if}
           </button>
         </div>
       {/if}
-    </div>
-
-  {:else}
-    <!-- Confirmation Step -->
-    <div class="space-y-6">
-      <div class="bg-white/5 rounded-lg p-4 border border-white/10">
-        <h3 class="text-lg font-semibold text-white mb-3">Confirm Handoff</h3>
-        <p class="text-gray-300 text-sm mb-4">
-          Please review the photos and confirm the condition of the gear.
-        </p>
-
-        <!-- Condition Notes -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-white mb-2">
-            Condition Notes (Optional)
-          </label>
-          <textarea
-            bind:value={conditionNotes}
-            placeholder="Add any notes about the gear condition..."
-            class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-transparent"
-            rows="3"
-          ></textarea>
-        </div>
-
-        <!-- Damage Reporting (Post-rental only) -->
-        {#if phase === 'post'}
-          <div class="mb-4">
-            <label class="flex items-center space-x-2 text-white">
-              <input
-                type="checkbox"
-                bind:checked={damageReported}
-                class="rounded border-white/20 bg-white/10 text-green-600 focus:ring-green-500/50"
-              />
-              <span class="text-sm">Report damage or issues</span>
-            </label>
-            
-            {#if damageReported}
-              <div class="mt-3">
-                <label class="block text-sm font-medium text-white mb-2">
-                  Damage Description *
-                </label>
-                <textarea
-                  bind:value={damageDescription}
-                  placeholder="Describe the damage or issues in detail..."
-                  class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-transparent"
-                  rows="3"
-                  required
-                ></textarea>
-              </div>
-            {/if}
-          </div>
-        {/if}
-
-        <!-- Photo Summary -->
-        <div class="mb-6">
-          <p class="text-sm text-gray-300">
-            You have uploaded <strong>{currentPhotos.length}</strong> photos for this handoff.
-          </p>
-        </div>
-      </div>
-
-      <!-- Confirmation Buttons -->
-      <div class="flex justify-between">
-        <button
-          type="button"
-          on:click={goBackToPhotos}
-          class="bg-gray-600/80 hover:bg-gray-600/90 text-white px-6 py-2 rounded-lg backdrop-blur-sm border border-gray-500/50 transition-all duration-200"
-        >
-          Back to Photos
-        </button>
-        
-        <button
-          type="button"
-          on:click={confirmHandoff}
-          disabled={loading || (damageReported && !damageDescription.trim())}
-          class="bg-green-600/80 hover:bg-green-600/90 disabled:bg-gray-600/50 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg backdrop-blur-sm border border-green-500/50 transition-all duration-200"
-        >
-          {#if loading}
-            Confirming...
-          {:else}
-            Confirm Handoff
-          {/if}
-        </button>
-      </div>
     </div>
   {/if}
 </div>

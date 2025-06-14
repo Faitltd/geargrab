@@ -19,7 +19,7 @@ export const firebaseAdminConfig = {
 
 // Emulator configuration
 export const emulatorConfig = {
-  useEmulators: import.meta.env.VITE_USE_EMULATORS === 'true',
+  useEmulators: import.meta.env.VITE_USE_EMULATORS === 'true' && import.meta.env.DEV,
   auth: {
     host: 'localhost',
     port: 9099

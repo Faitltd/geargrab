@@ -9,18 +9,19 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   const start = Date.now();
 
-  // Temporarily disable authentication for debugging payment issues
-  try {
-    console.log('🔧 Authentication temporarily disabled for debugging');
-    // Set a mock user for testing
-    event.locals.userId = 'debug_user_' + Date.now();
-    event.locals.user = {
-      uid: event.locals.userId,
-      isAdmin: false
-    };
-  } catch (error) {
-    // Authentication failed, but continue with null user
-    console.log('Authentication failed:', error.message);
+  // Check if Firebase Admin is available
+  if (await isFirebaseAdminAvailable()) {
+    // Authenticate user if Firebase Admin is available
+    const auth = await SecurityMiddleware.authenticateUser(event);
+    if (auth) {
+      event.locals.userId = auth.userId;
+      event.locals.user = {
+        uid: auth.userId,
+        isAdmin: auth.isAdmin
+      };
+    }
+  } else {
+    console.log('⚠️ Firebase Admin not available, skipping authentication');
   }
 
   const response = await resolve(event);
@@ -34,19 +35,15 @@ export const handle: Handle = async ({ event, resolve }) => {
     userId: event.locals.userId || 'anonymous'
   };
 
-  if (response.status >= 400) {
-    console.error('Request error', logData);
-  } else {
-    console.log('Request processed', logData);
-  }
+  console.log('Request processed', logData);
 
   return response;
 };
 
-export function handleError({ error, event }) {
+export function handleError({ error, event }: { error: any, event: any }) {
   const errorReport = {
-    message: error.message,
-    stack: error.stack,
+    message: error?.message || 'Unknown error',
+    stack: error?.stack || 'No stack trace',
     path: event.url.pathname,
     method: event.request.method,
     timestamp: new Date().toISOString()
@@ -55,7 +52,6 @@ export function handleError({ error, event }) {
   console.error(JSON.stringify(errorReport));
 
   return {
-    message: 'An unexpected error occurred',
-    code: error.code || 'UNKNOWN'
+    message: 'An unexpected error occurred'
   };
 }

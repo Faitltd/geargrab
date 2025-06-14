@@ -463,9 +463,9 @@
   let deliveryMethod = 'pickup';
   let insuranceTier = 'standard';
 
-  // Calculate number of days between start and end dates
+  // Calculate number of days between start and end dates (minimum 1 day for same-day rentals)
   $: days = startDate && endDate ?
-    Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) : 0;
+    Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))) : 0;
 
   // Calculate base price based on rental period
   $: basePrice = rentalPeriod === 'daily' ? (listing?.dailyPrice || 0) * days :

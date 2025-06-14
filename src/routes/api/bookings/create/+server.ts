@@ -17,7 +17,7 @@ function datesOverlap(
 // Helper function to calculate days between dates
 function calculateDays(startDate: Date, endDate: Date): number {
   const timeDiff = endDate.getTime() - startDate.getTime();
-  return Math.ceil(timeDiff / (1000 * 3600 * 24));
+  return Math.max(1, Math.ceil(timeDiff / (1000 * 3600 * 24)));
 }
 
 export const POST: RequestHandler = createSecureHandler(
@@ -46,7 +46,7 @@ export const POST: RequestHandler = createSecureHandler(
       }
 
       if (start > end) {
-        return json({ error: 'End date must be on or after start date' }, { status: 400 });
+        return json({ error: 'End date cannot be before start date' }, { status: 400 });
       }
 
       if (start < now) {
