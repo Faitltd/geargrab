@@ -188,6 +188,16 @@
     paymentProcessing = true;
 
     try {
+      // Get authentication token
+      const { auth } = await import('$lib/firebase/client');
+      const user = auth?.currentUser;
+
+      if (!user) {
+        throw new Error('You must be signed in to complete booking. Please log in and try again.');
+      }
+
+      const token = await user.getIdToken();
+
       // Create booking via API with payment confirmation
       const bookingData = {
         listingId,
@@ -206,7 +216,8 @@
       const response = await fetch('/api/book', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(bookingData)
       });

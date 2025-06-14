@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { createSecureHandler } from '$lib/security/middleware';
 
 // Stripe server-side integration
 let stripe: any = null;
@@ -237,9 +238,13 @@ The GearGrab Team
 }
 
 // Create a new booking
-export const POST: RequestHandler = async ({ request, locals }) => {
-  try {
-    const bookingData = await request.json();
+export const POST: RequestHandler = createSecureHandler(
+  async ({ request }, { auth, body }) => {
+    if (!auth) {
+      return json({ error: 'Authentication required. Please log in and try again.' }, { status: 401 });
+    }
+
+    const bookingData = body;
 
     // Validate required fields
     const requiredFields = ['listingId', 'startDate', 'endDate', 'contactInfo', 'totalPrice'];
@@ -395,13 +400,33 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     console.error('Error creating booking:', error);
     return json({ error: 'Failed to create booking' }, { status: 500 });
   }
-};
+},
+{
+  requireAuth: true,
+  rateLimit: 'api',
+  inputSchema: {
+    listingId: { required: true, type: 'string' as const, minLength: 1 },
+    startDate: { required: true, type: 'string' as const },
+    endDate: { required: true, type: 'string' as const },
+    contactInfo: { required: true, type: 'object' as const },
+    totalPrice: { required: true, type: 'number' as const, min: 0 },
+    deliveryMethod: { required: false, type: 'string' as const },
+    insuranceTier: { required: false, type: 'string' as const },
+    specialRequests: { required: false, type: 'string' as const },
+    paymentIntentId: { required: false, type: 'string' as const }
+  }
+}
+);
 
 // Get booking details
-export const GET: RequestHandler = async ({ url }) => {
-  try {
+export const GET: RequestHandler = createSecureHandler(
+  async ({ url }, { auth }) => {
+    if (!auth) {
+      return json({ error: 'Authentication required. Please log in and try again.' }, { status: 401 });
+    }
+
     const bookingId = url.searchParams.get('bookingId');
-    
+
     if (!bookingId) {
       return json({ error: 'Booking ID is required' }, { status: 400 });
     }
@@ -433,4 +458,8 @@ export const GET: RequestHandler = async ({ url }) => {
     console.error('Error fetching booking:', error);
     return json({ error: 'Failed to fetch booking' }, { status: 500 });
   }
-};
+},
+{
+  requireAuth: true
+}
+);
