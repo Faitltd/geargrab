@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { createSecureHandler } from '$lib/security/middleware';
 
 // Stripe server-side integration
 let stripe: any = null;
@@ -22,43 +23,44 @@ async function getStripe() {
   return stripe;
 }
 
-export const POST: RequestHandler = async ({ request, locals }) => {
-  try {
-    const isDevelopment = process.env.NODE_ENV !== 'production';
-
-    // Check if user is authenticated
-    // In production without proper Firebase Admin setup, allow payments to proceed
-    // This is a temporary measure until Firebase Admin credentials are properly configured
-    let userId = locals.userId;
-
-    if (!userId) {
-      if (isDevelopment) {
-        // In development, use a mock user ID
-        userId = 'dev_user_mock';
-        console.log('Development mode: Using mock user ID for payment');
-      } else {
-        // In production, if Firebase Admin is not set up, use a temporary user ID
-        // This allows the payment system to work while authentication is being configured
-        userId = 'temp_user_' + Date.now();
-        console.log('Production mode: Firebase Admin not configured, using temporary user ID');
-      }
+export const POST: RequestHandler = createSecureHandler(
+  async ({ request }, { auth, body }) => {
+    if (!auth) {
+      return json({
+        error: 'Authentication required. Please log in and try again.',
+        code: 'AUTH_REQUIRED'
+      }, { status: 401 });
     }
 
-    const { amount, currency = 'usd', metadata = {} } = await request.json();
-    console.log('Payment intent request:', { amount, currency, metadata, userId });
+    try {
+      const isDevelopment = process.env.NODE_ENV !== 'production';
+      const userId = auth.userId;
+
+      console.log('🚀 Payment intent creation started');
+      console.log('🔍 Environment:', { isDevelopment, userId });
+
+      const { amount, currency = 'usd', metadata = {} } = body;
+      console.log('📝 Payment request:', { amount, currency, metadata });
+
+      console.log('✅ Authenticated user payment:', { userId });
 
     // Validate amount
     if (!amount || amount < 50) { // Minimum $0.50
-      console.log('Payment intent creation failed: Invalid amount', amount);
-      return json({ error: 'Invalid amount. Minimum $0.50 required.' }, { status: 400 });
+      console.log('❌ Invalid amount:', amount);
+      return json({
+        error: 'Invalid amount. Minimum $0.50 required.',
+        code: 'INVALID_AMOUNT'
+      }, { status: 400 });
     }
 
-    // Check if we're in development mode and Stripe is not properly configured
+
+
+    // Check Stripe configuration
     const secretKey = process.env.STRIPE_SECRET_KEY;
 
-    if (isDevelopment && (!secretKey || !secretKey.startsWith('sk_'))) {
-      console.log('Development mode: Using mock payment intent');
-      // Return a mock payment intent for development
+    if (!secretKey || !secretKey.startsWith('sk_')) {
+      console.log('⚠️ Stripe not configured, using mock payment intent');
+      // Return a mock payment intent for development/testing
       const mockPaymentIntent = {
         id: `pi_mock_${Date.now()}`,
         client_secret: `pi_mock_${Date.now()}_secret_mock`,
@@ -69,43 +71,58 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
       return json({
         clientSecret: mockPaymentIntent.client_secret,
-        paymentIntentId: mockPaymentIntent.id
+        paymentIntentId: mockPaymentIntent.id,
+        mock: true
       });
     }
 
-    const stripeInstance = await getStripe();
-    console.log('Stripe instance initialized');
+    // Create Stripe payment intent
+    try {
+      const stripeInstance = await getStripe();
+      console.log('✅ Stripe instance initialized');
 
-    // Create payment intent
-    console.log('Creating Stripe payment intent...');
-    const paymentIntent = await stripeInstance.paymentIntents.create({
-      amount: Math.round(amount), // Amount in cents
-      currency,
-      metadata: {
-        userId: userId,
-        ...metadata
-      },
-      automatic_payment_methods: {
-        enabled: true,
-      },
-    });
+      const paymentIntentData = {
+        amount: Math.round(amount), // Amount in cents
+        currency,
+        metadata: {
+          userId: userId,
+          service: 'gear_rental',
+          ...metadata
+        },
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      };
 
-    console.log('Payment intent created successfully:', paymentIntent.id);
-    return json({
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id
-    });
+      console.log('🔄 Creating Stripe payment intent...');
+      const paymentIntent = await stripeInstance.paymentIntents.create(paymentIntentData);
+
+      console.log('✅ Payment intent created successfully:', paymentIntent.id);
+      return json({
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id,
+        mock: false
+      });
+    } catch (stripeError) {
+      console.error('❌ Stripe error:', stripeError);
+      throw stripeError;
+    }
 
   } catch (error) {
-    console.error('Error creating payment intent:', error);
-    console.error('Error details:', {
+    console.error('❌ Error creating payment intent:', error);
+    console.error('❌ Error details:', {
       message: error.message,
       type: error.type,
       code: error.code,
-      stack: error.stack
+      stack: error.stack,
+      name: error.name
     });
 
+    // Log the full error object for debugging
+    console.error('❌ Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+
     // In development mode, if Stripe fails, return a mock response
+    const isDevelopment = process.env.NODE_ENV !== 'production';
     if (isDevelopment && error.message?.includes('Stripe configuration error')) {
       console.log('Development fallback: Using mock payment intent due to Stripe config error');
       const mockPaymentIntent = {
@@ -137,4 +154,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       );
     }
   }
-};
+},
+{
+  requireAuth: true,
+  rateLimit: 'payment',
+  inputSchema: {
+    amount: { required: true, type: 'number' as const, min: 50 }, // Minimum $0.50
+    currency: { required: false, type: 'string' as const, allowedValues: ['usd'] },
+    metadata: { required: false, type: 'object' as const }
+  }
+}
+);
