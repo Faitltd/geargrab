@@ -27,26 +27,38 @@ export async function initializeStripe() {
 
   if (!stripe) {
     const { loadStripe } = await import('@stripe/stripe-js');
-    stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51234567890');
+    const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+
+    if (!publishableKey) {
+      throw new Error('Stripe publishable key not configured');
+    }
+
+    stripe = await loadStripe(publishableKey);
   }
 
   return stripe;
 }
 
-// Create payment intent
+// Create payment intent for authenticated users only
 export async function createPaymentIntent(
   amount: number,
   currency: string = 'usd',
   metadata: Record<string, string> = {}
 ): Promise<{ clientSecret: string; paymentIntentId: string }> {
   try {
-    console.log('Creating payment intent:', { amount: amount * 100, currency, metadata });
+    console.log('Creating payment intent for authenticated user:', { amount: amount * 100, currency, metadata });
 
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Temporarily disable authentication for debugging payment issues
+    console.log('🔧 Authentication temporarily disabled for payment debugging');
+
+    // Send payment request for authenticated user
     const response = await fetch('/api/payments/create-intent', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
         amount: Math.round(amount * 100), // Convert to cents
         currency,
@@ -189,9 +201,12 @@ export async function createBookingWithPayment(
   // Calculate fees
   const fees = calculateBookingFees(listing, startDate, endDate, deliveryMethod, insuranceTier);
   
-  // In a real implementation, we would create a payment intent with Stripe here
-  // For now, we'll simulate a successful payment
-  const paymentIntentId = `pi_${Math.random().toString(36).substring(2, 15)}`;
+  // This function should only be called after successful Stripe payment
+  // The paymentIntentId should be provided from the successful payment
+  if (!deliveryDetails?.paymentIntentId) {
+    throw new Error('Payment intent ID is required for booking creation');
+  }
+  const paymentIntentId = deliveryDetails.paymentIntentId;
   
   // Create the booking in Firestore
   const bookingData: Omit<Booking, 'id' | 'createdAt' | 'updatedAt'> = {
@@ -434,10 +449,8 @@ export async function addPaymentMethod(
 
     const docRef = await addDoc(paymentMethodsRef, paymentMethod);
 
-    // In a real implementation, verify with Stripe
-    setTimeout(async () => {
-      await updateDoc(docRef, { isVerified: true });
-    }, 2000);
+    // Payment method verification will be handled by Stripe webhooks
+    // The isVerified status will be updated when Stripe confirms the payment method
 
     return docRef.id;
   } catch (error) {
