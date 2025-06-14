@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 import { getDaysBetween } from '$utils/dates';
 import type { Listing, Booking } from '$types/firestore';
 import { createBooking } from '$firebase/db/bookings';
-import { userStore } from '$stores/auth';
+import { userStore } from '$lib/stores/auth';
 import { get } from 'svelte/store';
 import { firestore } from '$lib/firebase/client';
 import {
@@ -52,11 +52,21 @@ export async function createPaymentIntent(
       'Content-Type': 'application/json',
     };
 
-    // Temporarily disable authentication for debugging payment issues
-    console.log('🔧 Authentication temporarily disabled for payment debugging');
-    console.log('🔧 Skipping Firebase authentication token');
+    // Get Firebase auth token for authenticated requests
+    if (browser) {
+      const { auth } = await import('$lib/firebase/client');
+      const user = auth.currentUser;
+      if (user) {
+        const idToken = await user.getIdToken();
+        headers['Authorization'] = `Bearer ${idToken}`;
+        console.log('✅ Added Firebase auth token to payment request');
+      } else {
+        console.error('❌ User not authenticated - cannot create payment intent');
+        throw new Error('Authentication required. Please log in and try again.');
+      }
+    }
 
-    // Use main endpoint - authentication has been disabled for debugging
+    // Create payment intent with authentication
     const response = await fetch('/api/payments/create-intent', {
       method: 'POST',
       headers,

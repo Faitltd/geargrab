@@ -5,6 +5,7 @@
   import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
   import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
   import ScrollLinkedSequential from '$lib/components/layout/ScrollLinkedSequential.svelte';
+  import AuthGuard from '$lib/components/auth/AuthGuard.svelte';
   import { products } from '$lib/data/products';
   // import { getListing } from '$lib/firebase/db/listings'; // Temporarily disabled
 
@@ -1184,14 +1185,16 @@
                   </div>
                 {/if}
 
-                <button
-                  type="button"
-                  class="w-full bg-green-400 hover:bg-green-500 text-white font-medium py-3 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  on:click={handleBooking}
-                  disabled={!startDate || !endDate}
-                >
-                  Book Now
-                </button>
+                <AuthGuard message="You must be signed in to rent gear. Create an account to book this item and enjoy secure rentals with verified owners.">
+                  <button
+                    type="button"
+                    class="w-full bg-green-400 hover:bg-green-500 text-white font-medium py-3 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    on:click={handleBooking}
+                    disabled={!startDate || !endDate}
+                  >
+                    Book Now
+                  </button>
+                </AuthGuard>
               </form>
             </div>
           </div>
