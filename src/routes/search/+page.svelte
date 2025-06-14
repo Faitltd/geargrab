@@ -3,9 +3,9 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { searchService, GEAR_CATEGORIES, GEAR_FEATURES, type SearchFilters, type SearchResult } from '$lib/services/search';
-  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
-  import Checkbox from '$lib/components/ui/Checkbox.svelte';
-  import UniverseCard from '$lib/components/cards/UniverseCard.svelte';
+  import VideoBackground from '$lib/components/layout/video-background.svelte';
+  import Checkbox from '$lib/components/ui/checkbox.svelte';
+  import UniverseCard from '$lib/components/cards/universe-card.svelte';
 
   let searchQuery = '';
   let results: SearchResult[] = [];

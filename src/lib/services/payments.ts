@@ -7,19 +7,18 @@ import { get } from 'svelte/store';
 import { firestore } from '$lib/firebase/client';
 import {
   collection,
-  doc,
   addDoc,
   updateDoc,
-  getDoc,
   getDocs,
   query,
   where,
   orderBy,
   serverTimestamp
 } from 'firebase/firestore';
+import type { Stripe } from '@stripe/stripe-js';
 
 // Stripe integration
-let stripe: any = null;
+let stripe: Stripe | null = null;
 
 // Initialize Stripe
 export async function initializeStripe() {
@@ -125,9 +124,9 @@ export async function confirmPayment(
     }
 
     return { success: true, paymentIntent };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error confirming payment:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: (error as Error).message };
   }
 }
 
@@ -201,13 +200,14 @@ export async function createBookingWithPayment(
   deliveryDetails?: {
     address?: string;
     instructions?: string;
+    paymentIntentId?: string;
   }
 ): Promise<{ bookingId: string }> {
   if (!browser) throw new Error('Payment functions can only be called in the browser');
   
   // Get current user
-  const { authUser } = get(userStore);
-  if (!authUser) throw new Error('User must be logged in to create a booking');
+  const { user } = get(userStore);
+  if (!user) throw new Error('User must be logged in to create a booking');
   
   // Calculate fees
   const fees = calculateBookingFees(listing, startDate, endDate, deliveryMethod, insuranceTier);
@@ -224,8 +224,10 @@ export async function createBookingWithPayment(
     listingId: listing.id,
     listingTitle: listing.title,
     listingImage: listing.images[0] || '',
-    ownerUid: listing.ownerUid,
-    renterUid: authUser.uid,
+    ownerId: listing.ownerId,
+    ownerUid: listing.ownerUid || listing.ownerId, // Legacy compatibility
+    renterId: user.uid,
+    renterUid: user.uid, // Legacy compatibility
     startDate: startDate as any, // Will be converted to Timestamp
     endDate: endDate as any, // Will be converted to Timestamp
     status: 'pending',
@@ -502,11 +504,6 @@ export async function getUserPaymentMethods(userId: string): Promise<PaymentMeth
 // Calculate owner payout amount
 export function calculateOwnerPayout(booking: Booking): number {
   // Owner gets 85% of the rental fee (excluding service fee, insurance, etc.)
-  const days = getDaysBetween(
-    booking.startDate.toDate ? booking.startDate.toDate() : new Date(booking.startDate),
-    booking.endDate.toDate ? booking.endDate.toDate() : new Date(booking.endDate)
-  );
-  
   const rentalFee = booking.totalPrice - (booking.insuranceCost || 0);
   return Math.round(rentalFee * 0.85);
 }

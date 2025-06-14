@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { authStore } from '$lib/stores/auth';
-  import StripePaymentForm from '$lib/components/payments/StripePaymentForm.svelte';
+  import StripePaymentForm from '$lib/components/payments/stripe-payment-form.svelte';
   import { firestore } from '$lib/firebase/client';
   import { doc, getDoc } from 'firebase/firestore';
 

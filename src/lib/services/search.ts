@@ -569,32 +569,45 @@ class SearchService {
         id: listing.id,
         title: listing.title,
         description: listing.description,
-        price: listing.dailyPrice,
-        priceUnit: 'day',
         category: listing.category,
+        subcategory: listing.subcategory,
+        dailyPrice: listing.dailyPrice,
+        weeklyPrice: listing.weeklyPrice,
+        monthlyPrice: listing.monthlyPrice,
+        images: listing.images || [],
         location: {
           city: listing.location?.city || '',
           state: listing.location?.state || '',
-          distance: 0 // Would calculate based on user location
+          coordinates: listing.location?.coordinates ? {
+            lat: listing.location.coordinates.lat,
+            lng: listing.location.coordinates.lng
+          } : undefined
         },
-        images: listing.images || [],
-        rating: listing.averageRating || 0,
-        reviewCount: listing.reviewCount || 0,
         owner: {
           id: listing.ownerId,
           name: listing.ownerName || 'Owner',
           avatar: listing.ownerAvatar,
-          verified: listing.ownerVerified || false,
-          rating: listing.ownerRating || 0
+          rating: listing.ownerRating || 0,
+          reviewCount: listing.ownerReviewCount || 0,
+          isVerified: listing.ownerVerified || false
         },
         features: listing.features || [],
         condition: listing.condition || 'good',
-        instantBook: listing.instantBook || false,
-        deliveryOptions: listing.deliveryOptions || ['pickup'],
+        rating: listing.averageRating || 0,
+        reviewCount: listing.reviewCount || 0,
+        distance: 0, // Would calculate based on user location
         availability: {
-          available: true,
+          instantBook: listing.instantBook || false,
+          deliveryOptions: listing.deliveryOptions || ['pickup'],
           nextAvailable: new Date()
-        }
+        },
+        insurance: {
+          required: listing.insuranceRequired || false,
+          tiers: listing.insuranceTiers || ['basic']
+        },
+        createdAt: listing.createdAt ? new Date(listing.createdAt) : new Date(),
+        lastBooked: listing.lastBooked ? new Date(listing.lastBooked) : undefined,
+        isPromoted: listing.isPromoted || false
       }));
 
       return {
@@ -624,24 +637,42 @@ class SearchService {
         id: 'mock-1',
         title: 'Professional DSLR Camera',
         description: 'High-quality camera perfect for outdoor photography',
-        price: 45,
-        priceUnit: 'day',
         category: 'photography',
-        location: { city: 'San Francisco', state: 'CA', distance: 2.5 },
+        subcategory: 'Cameras',
+        dailyPrice: 45,
+        weeklyPrice: 250,
+        monthlyPrice: 800,
         images: ['https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=400'],
-        rating: 4.8,
-        reviewCount: 24,
+        location: {
+          city: 'San Francisco',
+          state: 'CA',
+          coordinates: { lat: 37.7749, lng: -122.4194 }
+        },
         owner: {
           id: 'owner-1',
           name: 'Sarah Johnson',
-          verified: true,
-          rating: 4.9
+          avatar: 'https://randomuser.me/api/portraits/women/32.jpg',
+          rating: 4.9,
+          reviewCount: 45,
+          isVerified: true
         },
         features: ['Weather Resistant', 'Professional Grade'],
         condition: 'excellent',
-        instantBook: true,
-        deliveryOptions: ['pickup', 'delivery'],
-        availability: { available: true, nextAvailable: new Date() }
+        rating: 4.8,
+        reviewCount: 24,
+        distance: 2.5,
+        availability: {
+          instantBook: true,
+          deliveryOptions: ['pickup', 'delivery'],
+          nextAvailable: new Date()
+        },
+        insurance: {
+          required: false,
+          tiers: ['basic', 'standard']
+        },
+        createdAt: new Date('2023-06-15'),
+        lastBooked: new Date('2024-01-10'),
+        isPromoted: false
       }
     ];
 

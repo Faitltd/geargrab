@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { notifications } from '$lib/stores/notifications';
-  import Checkbox from '$lib/components/ui/Checkbox.svelte';
+  import Checkbox from '$lib/components/ui/checkbox.svelte';
 
   let loading = false;
   let settings = {

@@ -6,7 +6,7 @@
 import { json } from '@sveltejs/kit';
 import { finalAdverseNoticeJob } from '$lib/jobs/finalAdverseCron.js';
 
-export async function POST({ request }) {
+export async function POST({ request: _request }) {
   try {
     // In production, add admin authentication here
     // const user = await authenticateAdmin(request);

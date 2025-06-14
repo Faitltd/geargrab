@@ -270,7 +270,7 @@ class InsuranceService {
   // Get user's claims
   async getUserClaims(userId: string): Promise<InsuranceClaim[]> {
     try {
-      const claimsRef = collection(db, 'insuranceClaims');
+      const claimsRef = collection(firestore, 'insuranceClaims');
       const q = query(
         claimsRef,
         where('claimantId', '==', userId),
@@ -304,7 +304,7 @@ class InsuranceService {
   // Add warranty information
   async addWarrantyInfo(warrantyData: WarrantyInfo): Promise<void> {
     try {
-      const warrantyRef = doc(db, 'warranties', warrantyData.listingId);
+      const warrantyRef = doc(firestore, 'warranties', warrantyData.listingId);
       await updateDoc(warrantyRef, {
         ...warrantyData,
         createdAt: serverTimestamp(),
@@ -319,7 +319,7 @@ class InsuranceService {
   // Get warranty information for a listing
   async getWarrantyInfo(listingId: string): Promise<WarrantyInfo | null> {
     try {
-      const warrantyRef = doc(db, 'warranties', listingId);
+      const warrantyRef = doc(firestore, 'warranties', listingId);
       const warrantyDoc = await getDoc(warrantyRef);
       
       if (warrantyDoc.exists()) {
@@ -340,7 +340,7 @@ class InsuranceService {
     resolutionDetails: InsuranceClaim['resolution']
   ): Promise<void> {
     try {
-      const claimRef = doc(db, 'insuranceClaims', claimId);
+      const claimRef = doc(firestore, 'insuranceClaims', claimId);
       
       await updateDoc(claimRef, {
         status: 'settled',

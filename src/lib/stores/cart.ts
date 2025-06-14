@@ -30,10 +30,11 @@ const createCartStore = () => {
     : [];
   
   const { subscribe, update, set } = writable<CartItem[]>(initialCart);
-  
+
   // Save to localStorage whenever the cart changes
+  let localStorageUnsubscribe: (() => void) | null = null;
   if (browser) {
-    subscribe((cart) => {
+    localStorageUnsubscribe = subscribe((cart) => {
       localStorage.setItem('gearGrabCart', JSON.stringify(cart));
     });
   }
@@ -130,6 +131,14 @@ const createCartStore = () => {
     getSecurityDepositTotal: () => {
       const cart = get({ subscribe });
       return cart.reduce((total, item) => total + item.securityDeposit, 0);
+    },
+
+    // Cleanup method for localStorage subscription
+    destroy: () => {
+      if (localStorageUnsubscribe) {
+        localStorageUnsubscribe();
+        localStorageUnsubscribe = null;
+      }
     }
   };
 };

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import HoverCard from '$lib/components/interactive/HoverCard.svelte';
-  import ServiceCard from '$lib/components/interactive/ServiceCard.svelte';
-  import GeometricBackground from '$lib/components/layout/GeometricBackground.svelte';
-  import ContactSection from '$lib/components/forms/ContactSection.svelte';
-  import { smoothScrollWithNavOffset } from '$lib/utils/smoothScroll';
+  import HoverCard from '$lib/components/interactive/hover-card.svelte';
+  import ServiceCard from '$lib/components/interactive/service-card.svelte';
+  import GeometricBackground from '$lib/components/layout/geometric-background.svelte';
+  import ContactSection from '$lib/components/forms/contact-section.svelte';
+  import { smoothScrollWithNavOffset } from '$lib/utils/smooth-scroll';
 
   // Sample gear data for demo
   const sampleGear = [

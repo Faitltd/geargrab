@@ -17,6 +17,8 @@ export const handle: Handle = async ({ event, resolve }) => {
       event.locals.userId = auth.userId;
       event.locals.user = {
         uid: auth.userId,
+        email: '', // TODO: Get from user document
+        emailVerified: false, // TODO: Get from user document
         isAdmin: auth.isAdmin
       };
     }

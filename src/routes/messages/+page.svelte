@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import ConversationList from '$lib/components/chat/ConversationList.svelte';
-  import ChatWindow from '$lib/components/chat/ChatWindow.svelte';
+  import ConversationList from '$lib/components/chat/conversation-list.svelte';
+  import ChatWindow from '$lib/components/chat/chat-window.svelte';
   import { chatService, type ChatConversation } from '$lib/services/chat';
   import { authStore } from '$lib/stores/auth';
   import { goto } from '$app/navigation';

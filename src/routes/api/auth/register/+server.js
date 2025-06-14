@@ -4,8 +4,8 @@
  */
 
 import { json } from '@sveltejs/kit';
-import { createReport, fetchReport, determineAdverseAction, getReportPdfUrl } from '$lib/utils/iProspectCheckClient.js';
-import { fcraNoticeService } from '$lib/utils/fcraNotices.js';
+import { createReport, fetchReport, determineAdverseAction, getReportPdfUrl } from '$lib/utils/i-prospect-check-client.js';
+import { fcraNoticeService } from '$lib/utils/fcra-notices.js';
 import { BackgroundCheckRecord } from '$lib/models/backgroundCheck.js';
 import { adminAuth, adminFirestore } from '$lib/firebase/server';
 
@@ -50,7 +50,7 @@ export async function POST({ request, getClientAddress }) {
     };
 
     const missingFields = Object.entries(requiredFields)
-      .filter(([key, value]) => !value)
+      .filter(([_key, value]) => !value)
       .map(([key]) => key);
 
     if (missingFields.length > 0) {

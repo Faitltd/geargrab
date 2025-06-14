@@ -2,8 +2,8 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
-  import AuthGuard from '$lib/components/auth/AuthGuard.svelte';
-  import StripePaymentForm from '$lib/components/payments/StripePaymentForm.svelte';
+  import AuthGuard from '$lib/components/auth/auth-guard.svelte';
+  import StripePaymentForm from '$lib/components/payments/stripe-payment-form.svelte';
   
   // Payment parameters from URL
   let amount: number = 0;

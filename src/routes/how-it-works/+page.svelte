@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
-  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
+  import VideoBackground from '$lib/components/layout/video-background.svelte';
 
   export const prerender = true;
 

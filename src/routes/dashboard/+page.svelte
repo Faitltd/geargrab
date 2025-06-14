@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
-  import ScrollLinkedSequential from '$lib/components/layout/ScrollLinkedSequential.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
+  import ScrollLinkedSequential from '$lib/components/layout/scroll-linked-sequential.svelte';
 
   // Navigate to create listing
   function goToCreateListing() {

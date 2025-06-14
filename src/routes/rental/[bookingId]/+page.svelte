@@ -7,8 +7,8 @@
   import { onMount } from 'svelte';
   import { authStore } from '$lib/stores/auth';
   import { goto } from '$app/navigation';
-  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
-  import RentalHandoff from '$lib/components/rental/RentalHandoff.svelte';
+  import VideoBackground from '$lib/components/layout/video-background.svelte';
+  import RentalHandoff from '$lib/components/rental/rental-handoff.svelte';
   import type { Booking } from '$lib/types/firestore';
   
   // Get booking ID from URL

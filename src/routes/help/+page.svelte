@@ -1,11 +1,11 @@
 <script lang="ts">
   export const prerender = true;
-  import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
-  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
-  import HelpModal from '$lib/components/help/HelpModal.svelte';
-  import ContactSupportModal from '$lib/components/help/ContactSupportModal.svelte';
-  import ReportIssueModal from '$lib/components/help/ReportIssueModal.svelte';
-  import CommunityGuidelinesModal from '$lib/components/help/CommunityGuidelinesModal.svelte';
+  import ScrollAnimated from '$lib/components/layout/scroll-animated.svelte';
+  import VideoBackground from '$lib/components/layout/video-background.svelte';
+  import HelpModal from '$lib/components/help/help-modal.svelte';
+  import ContactSupportModal from '$lib/components/help/contact-support-modal.svelte';
+  import ReportIssueModal from '$lib/components/help/report-issue-modal.svelte';
+  import CommunityGuidelinesModal from '$lib/components/help/community-guidelines-modal.svelte';
   import { helpContent } from '$lib/data/helpContent';
   import { onMount } from 'svelte';
 

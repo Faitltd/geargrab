@@ -261,10 +261,15 @@ export class AuditLogger {
 
       const snapshot = await query.limit(100).get();
       
-      return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as SecurityEvent[];
+      return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          type: data.type,
+          timestamp: data.timestamp,
+          ...data
+        } as SecurityEvent;
+      });
 
     } catch (error) {
       console.error('Failed to get recent security events:', error);
@@ -288,10 +293,17 @@ export class AuditLogger {
         .limit(100)
         .get();
 
-      return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as UserActivity[];
+      return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          userId: data.userId,
+          action: data.action,
+          timestamp: data.timestamp,
+          success: data.success,
+          ...data
+        } as UserActivity;
+      });
 
     } catch (error) {
       console.error('Failed to get user activity history:', error);
@@ -318,10 +330,16 @@ export class AuditLogger {
 
       const snapshot = await query.limit(100).get();
       
-      return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as AdminAction[];
+      return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          adminUserId: data.adminUserId,
+          action: data.action,
+          timestamp: data.timestamp,
+          ...data
+        } as AdminAction;
+      });
 
     } catch (error) {
       console.error('Failed to get admin action history:', error);

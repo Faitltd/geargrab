@@ -13,13 +13,18 @@ node_modules/
 scripts/env-secrets.sh
 
 # Build output
-/build
-/.svelte-kit
+build/
+.svelte-kit/
 /package
+dist/
+.vercel/
+.netlify/
+.output/
 
 # Firebase
 .firebase/
 firebase-debug.log
+firestore-debug.log
 ui-debug.log
 
 # OS files
@@ -44,3 +49,23 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Development routes (moved to dev-routes/)
+dev-routes/
+
+# Test files and coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# PWA
+sw.js
+workbox-*.js
+
+# TypeScript
+*.tsbuildinfo

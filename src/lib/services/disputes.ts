@@ -347,6 +347,7 @@ class DisputeService {
       
       // Send auto-reply
       await this.addSupportMessage(docRef.id, {
+        id: `msg_${Date.now()}`,
         senderId: 'system',
         senderName: 'GearGrab Support',
         senderRole: 'system',

@@ -373,6 +373,7 @@ interface VerificationEmailData {
   verificationType: string;
   status: string;
   requestId: string;
+  phoneNumber?: string; // Optional for phone verification
 }
 
 // Payment email templates

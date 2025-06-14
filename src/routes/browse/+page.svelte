@@ -1,10 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
-  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
-  import HeroSearch from '$lib/components/forms/HeroSearch.svelte';
-  import FilterBar from '$lib/components/forms/FilterBar.svelte';
-  import GearGrid from '$lib/components/display/GearGrid.svelte';
+  import VideoBackground from '$lib/components/layout/video-background.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
+  import HeroSearch from '$lib/components/forms/hero-search.svelte';
+  import FilterBar from '$lib/components/forms/filter-bar.svelte';
+  import GearGrid from '$lib/components/display/gear-grid.svelte';
   import { products } from '$lib/data/products';
 
   let listings: any[] = [];

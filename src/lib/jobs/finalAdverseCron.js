@@ -4,9 +4,9 @@
  */
 
 import cron from 'node-cron';
-import { fcraNoticeService } from '$lib/utils/fcraNotices.js';
+import { fcraNoticeService } from '$lib/utils/fcra-notices.js';
 import { BackgroundCheckRecord } from '$lib/models/backgroundCheck.js';
-import { fetchReport } from '$lib/utils/iProspectCheckClient.js';
+// import { fetchReport } from '$lib/utils/i-prospect-check-client.js';
 
 class FinalAdverseNoticeJob {
   constructor() {
@@ -32,7 +32,6 @@ class FinalAdverseNoticeJob {
     cron.schedule('0 2 * * *', async () => {
       await this.runJob();
     }, {
-      scheduled: true,
       timezone: 'America/New_York' // Adjust timezone as needed
     });
 

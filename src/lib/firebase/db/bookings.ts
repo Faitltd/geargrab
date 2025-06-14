@@ -193,8 +193,8 @@ export async function checkListingAvailability(
   // Check for overlapping bookings
   for (const doc of querySnapshot.docs) {
     const booking = doc.data() as Booking;
-    const bookingStartTimestamp = booking.startDate.toMillis ? booking.startDate.toMillis() : booking.startDate;
-    
+    const bookingStartTimestamp = booking.startDate.toMillis ? booking.startDate.toMillis() : (booking.startDate as unknown as number);
+
     // If the booking starts before our end date, there's an overlap
     if (bookingStartTimestamp <= endTimestamp) {
       return false; // Not available

@@ -2,10 +2,10 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
-  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
-  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
-  import ScrollLinkedSequential from '$lib/components/layout/ScrollLinkedSequential.svelte';
-  import AuthGuard from '$lib/components/auth/AuthGuard.svelte';
+  import VideoBackground from '$lib/components/layout/video-background.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
+  import ScrollLinkedSequential from '$lib/components/layout/scroll-linked-sequential.svelte';
+  import AuthGuard from '$lib/components/auth/auth-guard.svelte';
   import { products } from '$lib/data/products';
   // import { getListing } from '$lib/firebase/db/listings'; // Temporarily disabled
 

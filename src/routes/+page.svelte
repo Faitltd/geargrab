@@ -1,10 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import HeroSearch from '$lib/components/forms/HeroSearch.svelte';
-  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
-  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
-  import ScrollLinkedSequential from '$lib/components/layout/ScrollLinkedSequential.svelte';
-  import UniverseCard from '$lib/components/cards/UniverseCard.svelte';
+  import HeroSearch from '$lib/components/forms/hero-search.svelte';
+  import VideoBackground from '$lib/components/layout/video-background.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
+  import ScrollLinkedSequential from '$lib/components/layout/scroll-linked-sequential.svelte';
+  import UniverseCard from '$lib/components/cards/universe-card.svelte';
   import { categories } from '$lib/data/products';
 
   // Stats data

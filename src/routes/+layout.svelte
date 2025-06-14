@@ -5,10 +5,10 @@
   import { authStore } from '$lib/stores/auth';
   import { auth } from '$lib/firebase/client';
   import { onAuthStateChanged } from 'firebase/auth';
-  import Navbar from '$lib/components/layout/Navbar.svelte';
-  import Footer from '$lib/components/layout/Footer.svelte';
-  import PageTransition from '$lib/components/layout/PageTransition.svelte';
-  import ToastNotifications from '$lib/components/ui/ToastNotifications.svelte';
+  import Navbar from '$lib/components/layout/navbar.svelte';
+  import Footer from '$lib/components/layout/footer.svelte';
+  import PageTransition from '$lib/components/layout/page-transition.svelte';
+  import ToastNotifications from '$lib/components/ui/toast-notifications.svelte';
   import type { User } from '$lib/stores/auth';
 
   // Initialize auth state listener
@@ -127,10 +127,18 @@
 
 </script>
 
+<!-- Skip navigation link for accessibility -->
+<a
+  href="#main-content"
+  class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-green-600 text-white px-4 py-2 rounded-md z-50 transition-all"
+>
+  Skip to main content
+</a>
+
 <Navbar />
 
 <PageTransition>
-  <main class="relative pt-16 content-container">
+  <main id="main-content" class="relative pt-16 content-container" tabindex="-1">
     <slot />
   </main>
 </PageTransition>

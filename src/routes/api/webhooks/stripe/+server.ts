@@ -3,9 +3,10 @@ import type { RequestHandler } from './$types';
 import { adminFirestore } from '$lib/firebase/server';
 import { sendBookingEmails, sendPaymentEmails } from '$lib/services/email';
 import crypto from 'crypto';
+import type Stripe from 'stripe';
 
 // Stripe integration
-let stripe: any = null;
+let stripe: Stripe | null = null;
 
 async function getStripe() {
   if (!stripe) {
@@ -39,7 +40,7 @@ export const POST: RequestHandler = async ({ request }) => {
     let event;
     try {
       event = stripeInstance.webhooks.constructEvent(body, signature, webhookSecret);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Webhook signature verification failed:', err);
       return json({ error: 'Invalid signature' }, { status: 400 });
     }
@@ -82,7 +83,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     return json({ received: true });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Stripe webhook error:', error);
     return json({ error: 'Webhook processing failed' }, { status: 500 });
   }
@@ -114,7 +115,7 @@ async function handlePaymentSucceeded(paymentIntent: any): Promise<void> {
     // Send confirmation emails
     await sendPaymentConfirmationEmail(metadata.userId, paymentIntent);
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error handling payment success:', error);
   }
 }
@@ -140,7 +141,7 @@ async function handlePaymentFailed(paymentIntent: any): Promise<void> {
     // Send failure notification
     await sendPaymentFailureEmail(metadata.userId, paymentIntent);
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error handling payment failure:', error);
   }
 }
@@ -159,7 +160,7 @@ async function handlePaymentCanceled(paymentIntent: any): Promise<void> {
       await updateBookingStatus(metadata.bookingId, 'canceled');
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error handling payment cancellation:', error);
   }
 }
@@ -168,7 +169,7 @@ async function handlePaymentCanceled(paymentIntent: any): Promise<void> {
 async function handlePaymentRequiresAction(paymentIntent: any): Promise<void> {
   try {
     const { id, metadata } = paymentIntent;
-    
+
     console.log(`Payment requires action: ${id}`);
 
     await updatePaymentStatus(id, 'requires_action');
@@ -176,7 +177,7 @@ async function handlePaymentRequiresAction(paymentIntent: any): Promise<void> {
     // Notify user that action is required
     await sendPaymentActionRequiredEmail(metadata.userId, paymentIntent);
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error handling payment action required:', error);
   }
 }
@@ -202,7 +203,7 @@ async function handleDisputeCreated(charge: any): Promise<void> {
     // Notify admin team
     await sendDisputeNotificationEmail(charge);
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error handling dispute creation:', error);
   }
 }
@@ -211,10 +212,10 @@ async function handleDisputeCreated(charge: any): Promise<void> {
 async function handleInvoicePaymentSucceeded(invoice: any): Promise<void> {
   try {
     console.log(`Invoice payment succeeded: ${invoice.id}`);
-    
+
     // Handle subscription or recurring payment logic here
-    
-  } catch (error) {
+
+  } catch (error: unknown) {
     console.error('Error handling invoice payment:', error);
   }
 }
@@ -223,10 +224,10 @@ async function handleInvoicePaymentSucceeded(invoice: any): Promise<void> {
 async function handleSubscriptionChange(subscription: any, eventType: string): Promise<void> {
   try {
     console.log(`Subscription ${eventType}: ${subscription.id}`);
-    
+
     // Handle subscription logic here if needed for premium features
-    
-  } catch (error) {
+
+  } catch (error: unknown) {
     console.error('Error handling subscription change:', error);
   }
 }
@@ -242,7 +243,7 @@ async function updatePaymentStatus(paymentIntentId: string, status: string, addi
       ...additionalData
     }, { merge: true });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating payment status:', error);
   }
 }
@@ -250,13 +251,13 @@ async function updatePaymentStatus(paymentIntentId: string, status: string, addi
 async function updateBookingStatus(bookingId: string, status: string): Promise<void> {
   try {
     const bookingRef = adminFirestore.collection('bookings').doc(bookingId);
-    
+
     await bookingRef.update({
       status,
       updatedAt: new Date()
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating booking status:', error);
   }
 }
@@ -266,7 +267,7 @@ async function handleBookingPayment(metadata: any, paymentIntent: any): Promise<
     if (metadata.bookingId) {
       // Update booking to confirmed
       await updateBookingStatus(metadata.bookingId, 'confirmed');
-      
+
       // Send booking confirmation emails
       const bookingDoc = await adminFirestore.collection('bookings').doc(metadata.bookingId).get();
       if (bookingDoc.exists) {
@@ -274,7 +275,7 @@ async function handleBookingPayment(metadata: any, paymentIntent: any): Promise<
         await sendBookingEmails.sendBookingConfirmation(bookingData);
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error handling booking payment:', error);
   }
 }
@@ -300,7 +301,7 @@ async function handleBackgroundCheckPayment(metadata: any, paymentIntent: any): 
         });
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error handling background check payment:', error);
   }
 }
@@ -309,7 +310,7 @@ async function handleVerificationPayment(metadata: any, paymentIntent: any): Pro
   try {
     // Handle other verification payments
     console.log('Verification payment processed:', metadata);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error handling verification payment:', error);
   }
 }
@@ -319,7 +320,7 @@ async function sendPaymentConfirmationEmail(userId: string, paymentIntent: any):
   try {
     console.log(`Sending payment confirmation email to user: ${userId}`);
     // Implementation would use the email service
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error sending payment confirmation email:', error);
   }
 }
@@ -328,7 +329,7 @@ async function sendPaymentFailureEmail(userId: string, paymentIntent: any): Prom
   try {
     console.log(`Sending payment failure email to user: ${userId}`);
     // Implementation would use the email service
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error sending payment failure email:', error);
   }
 }
@@ -337,7 +338,7 @@ async function sendPaymentActionRequiredEmail(userId: string, paymentIntent: any
   try {
     console.log(`Sending payment action required email to user: ${userId}`);
     // Implementation would use the email service
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error sending payment action required email:', error);
   }
 }
@@ -346,7 +347,7 @@ async function sendDisputeNotificationEmail(charge: any): Promise<void> {
   try {
     console.log(`Sending dispute notification email for charge: ${charge.id}`);
     // Implementation would notify admin team
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error sending dispute notification email:', error);
   }
 }

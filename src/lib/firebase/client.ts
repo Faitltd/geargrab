@@ -65,3 +65,6 @@ if (browser) {
 
 // Export Firebase services
 export { firebaseApp, auth, firestore, storage };
+
+// Legacy alias for backward compatibility
+export { firestore as db };

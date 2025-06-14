@@ -4,15 +4,15 @@
  */
 
 import { json } from '@sveltejs/kit';
-import { fetchReport, determineAdverseAction, getReportPdfUrl } from '$lib/utils/iProspectCheckClient.js';
-import { fcraNoticeService } from '$lib/utils/fcraNotices.js';
+import { fetchReport, determineAdverseAction, getReportPdfUrl } from '$lib/utils/i-prospect-check-client.js';
+import { fcraNoticeService } from '$lib/utils/fcra-notices.js';
 import { BackgroundCheckRecord } from '$lib/models/backgroundCheck.js';
 import { adminAuth, adminFirestore } from '$lib/firebase/server';
 
 export async function POST({ request }) {
   try {
     const body = await request.text();
-    const signature = request.headers.get('x-iprospect-signature');
+    // const signature = request.headers.get('x-iprospect-signature');
 
     // Note: Add signature verification if iProspectCheck provides webhook signatures
     // For now, we'll process the webhook without signature verification
@@ -267,7 +267,7 @@ function generateTempPassword() {
  * @param {string} email - User email
  * @param {string} firstName - User first name
  */
-async function sendAccountCreationEmail(email, firstName) {
+async function sendAccountCreationEmail(email, _firstName) {
   try {
     // This would integrate with your email service
     // For now, just log that we would send an email

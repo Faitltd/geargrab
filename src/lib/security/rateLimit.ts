@@ -68,6 +68,18 @@ class RateLimitStore {
     };
   }
 
+  get(key: string): RateLimitEntry | undefined {
+    return this.store.get(key);
+  }
+
+  set(key: string, value: RateLimitEntry): void {
+    this.store.set(key, value);
+  }
+
+  delete(key: string): void {
+    this.store.delete(key);
+  }
+
   destroy(): void {
     clearInterval(this.cleanupInterval);
     this.store.clear();
@@ -113,7 +125,7 @@ export class RateLimit {
     violationMultiplier: number = 0.5
   ): Promise<boolean> {
     const violationKey = `violations:${type}:${identifier}`;
-    const violationEntry = rateLimitStore.store.get(violationKey);
+    const violationEntry = rateLimitStore.get(violationKey);
     
     let adjustedMax = baseConfig.max;
     if (violationEntry && violationEntry.count > 0) {
@@ -131,7 +143,7 @@ export class RateLimit {
       const violationResetTime = now + (24 * 60 * 60 * 1000); // 24 hours
       
       if (!violationEntry || now > violationEntry.resetTime) {
-        rateLimitStore.store.set(violationKey, {
+        rateLimitStore.set(violationKey, {
           count: 1,
           resetTime: violationResetTime
         });
@@ -244,7 +256,7 @@ export class RateLimit {
   // Clear rate limit for identifier (admin function)
   async clearLimit(identifier: string, type: string): Promise<void> {
     const key = `${type}:${identifier}`;
-    rateLimitStore.store.delete(key);
+    rateLimitStore.delete(key);
   }
 
   // Get rate limit status

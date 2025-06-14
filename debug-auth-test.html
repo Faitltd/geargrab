@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e9; color: #2e7d32; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>GearGrab Authentication Debug Test</h1>
+    
+    <div>
+        <button onclick="testAuthStatus()">Test Auth Status</button>
+        <button onclick="testPaymentIntent()">Test Payment Intent</button>
+        <button onclick="testNoAuthPayment()">Test Payment (No Auth)</button>
+        <button onclick="testDebugAuth()">Test Debug Auth</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script type="module">
+        // Import Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        // Firebase config (using environment variables that should be available)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBOqKKHJwO-CcYXOjFniy-VQ4a8DmWd4jI",
+            authDomain: "geargrabco.firebaseapp.com",
+            projectId: "geargrabco",
+            storageBucket: "geargrabco.appspot.com",
+            messagingSenderId: "1092492148832",
+            appId: "1:1092492148832:web:4c5c4f8f8f8f8f8f8f8f8f"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        let currentUser = null;
+
+        // Listen for auth state changes
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            addResult(`Auth state changed: ${user ? `Logged in as ${user.email}` : 'Not logged in'}`, user ? 'success' : 'error');
+        });
+
+        // Make functions global
+        window.testAuthStatus = async function() {
+            try {
+                addResult('Testing auth status...', 'info');
+                
+                if (!currentUser) {
+                    addResult('No user logged in', 'error');
+                    return;
+                }
+
+                const token = await currentUser.getIdToken();
+                addResult(`User: ${currentUser.email}`, 'success');
+                addResult(`Token length: ${token.length}`, 'info');
+                addResult(`Token preview: ${token.substring(0, 50)}...`, 'info');
+
+                // Test the auth endpoint
+                const response = await fetch('/api/auth/test', {
+                    method: 'GET'
+                });
+
+                const result = await response.json();
+                addResult(`Auth test result: ${JSON.stringify(result, null, 2)}`, response.ok ? 'success' : 'error');
+
+            } catch (error) {
+                addResult(`Auth status error: ${error.message}`, 'error');
+            }
+        };
+
+        window.testPaymentIntent = async function() {
+            try {
+                addResult('Testing payment intent creation...', 'info');
+
+                if (!currentUser) {
+                    addResult('No user logged in - cannot test payment', 'error');
+                    return;
+                }
+
+                const token = await currentUser.getIdToken();
+                addResult(`Using token: ${token.substring(0, 50)}...`, 'info');
+
+                const response = await fetch('/api/payments/create-intent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        amount: 5000, // $50.00 in cents
+                        currency: 'usd',
+                        metadata: { test: 'debug' }
+                    })
+                });
+
+                const result = await response.json();
+                addResult(`Payment intent result (${response.status}): ${JSON.stringify(result, null, 2)}`, response.ok ? 'success' : 'error');
+
+            } catch (error) {
+                addResult(`Payment intent error: ${error.message}`, 'error');
+            }
+        };
+
+        window.testNoAuthPayment = async function() {
+            try {
+                addResult('Testing payment intent creation (no auth)...', 'info');
+
+                const response = await fetch('/api/payments/test-intent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount: 5000, // $50.00 in cents
+                        currency: 'usd',
+                        metadata: { test: 'no-auth-debug' }
+                    })
+                });
+
+                const result = await response.json();
+                addResult(`No-auth payment result (${response.status}): ${JSON.stringify(result, null, 2)}`, response.ok ? 'success' : 'error');
+
+            } catch (error) {
+                addResult(`No-auth payment error: ${error.message}`, 'error');
+            }
+        };
+
+        window.testDebugAuth = async function() {
+            try {
+                addResult('Testing debug auth endpoint...', 'info');
+                
+                if (!currentUser) {
+                    addResult('No user logged in - testing without auth', 'info');
+                }
+
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+
+                if (currentUser) {
+                    const token = await currentUser.getIdToken();
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+
+                const response = await fetch('/api/debug/auth', {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ test: 'debug' })
+                });
+
+                const result = await response.json();
+                addResult(`Debug auth result (${response.status}): ${JSON.stringify(result, null, 2)}`, response.ok ? 'success' : 'error');
+
+            } catch (error) {
+                addResult(`Debug auth error: ${error.message}`, 'error');
+            }
+        };
+
+        window.clearResults = function() {
+            document.getElementById('results').innerHTML = '';
+        };
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> <pre>${message}</pre>`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        // Initial status
+        addResult('Debug page loaded. Waiting for auth state...', 'info');
+    </script>
+</body>
+</html>

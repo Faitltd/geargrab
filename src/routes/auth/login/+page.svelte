@@ -4,9 +4,9 @@
   import { signInWithEmail } from '$lib/firebase/auth';
   import { notifications } from '$lib/stores/notifications';
   import { isValidEmail } from '$lib/utils/validation';
-  import FormContainer from '$lib/components/forms/FormContainer.svelte';
-  import FormField from '$lib/components/forms/FormField.svelte';
-  import FormButton from '$lib/components/forms/FormButton.svelte';
+  import FormContainer from '$lib/components/forms/form-container.svelte';
+  import FormField from '$lib/components/forms/form-field.svelte';
+  import FormButton from '$lib/components/forms/form-button.svelte';
   import GoogleAuthButton from '$lib/components/auth/GoogleAuthButton.svelte';
   import ErrorAlert from '$lib/components/ui/ErrorAlert.svelte';
 

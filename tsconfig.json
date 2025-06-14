@@ -8,14 +8,51 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "strict": false,
-    "noImplicitAny": false,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "lib": ["esnext", "DOM", "DOM.Iterable"],
+    "moduleResolution": "node",
+    "module": "esnext",
+    "noEmit": true,
+    "target": "esnext",
     "baseUrl": ".",
     "paths": {
       "$lib": ["src/lib"],
       "$lib/*": ["src/lib/*"],
-      "$types/*": ["src/lib/types/*"]
+      "$components": ["src/lib/components"],
+      "$components/*": ["src/lib/components/*"],
+      "$stores": ["src/lib/stores"],
+      "$stores/*": ["src/lib/stores/*"],
+      "$utils": ["src/lib/utils"],
+      "$utils/*": ["src/lib/utils/*"],
+      "$firebase": ["src/lib/firebase"],
+      "$firebase/*": ["src/lib/firebase/*"],
+      "$types": ["src/lib/types"],
+      "$types/*": ["src/lib/types/*"],
+      "$services": ["src/lib/services"],
+      "$services/*": ["src/lib/services/*"],
+      "$constants": ["src/lib/constants"],
+      "$constants/*": ["src/lib/constants/*"]
     }
-  }
+  },
+  "include": [
+    "src/**/*.js",
+    "src/**/*.ts",
+    "src/**/*.svelte",
+    "tests/**/*.js",
+    "tests/**/*.ts",
+    "tests/**/*.svelte"
+  ],
+  "exclude": [
+    "firebase-security-rules.js",
+    "node_modules",
+    "build",
+    ".svelte-kit"
+  ]
 }

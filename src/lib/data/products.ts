@@ -1,7 +1,7 @@
 // Comprehensive product catalog for GearGrab
 //
 // 🚀 NEW LISTINGS: Use the validation utilities to ensure proper display!
-// Import: import { createListing, addNewListing } from '$lib/utils/listingHelpers';
+// Import: import { createListing, addNewListing } from '$lib/utils/listing-helpers';
 // Usage: const newListing = createListing({ title: 'My Gear', category: 'biking', dailyPrice: 40 });
 //
 // The validation system automatically:
@@ -349,7 +349,7 @@ export const products: Product[] = [
     subcategory: 'alpine-skis',
     brand: 'Rossignol',
     model: 'Experience 88',
-    condition: 'Excellent',
+    condition: 'Like New',
     ageInYears: 1,
     dailyPrice: 55,
     weeklyPrice: 330,
@@ -619,7 +619,7 @@ export const products: Product[] = [
     subcategory: 'cameras',
     brand: 'Canon',
     model: 'EOS R5',
-    condition: 'Excellent',
+    condition: 'Like New',
     ageInYears: 1,
     dailyPrice: 85,
     weeklyPrice: 510,
@@ -700,7 +700,7 @@ export const products: Product[] = [
     subcategory: 'kayaking',
     brand: 'Perception',
     model: 'Pescador Pro 12',
-    condition: 'Excellent',
+    condition: 'Like New',
     ageInYears: 1,
     dailyPrice: 55,
     weeklyPrice: 330,
@@ -835,7 +835,7 @@ export const products: Product[] = [
     subcategory: 'backpacks',
     brand: 'Osprey',
     model: 'Atmos AG 65',
-    condition: 'Excellent',
+    condition: 'Like New',
     ageInYears: 1,
     dailyPrice: 25,
     weeklyPrice: 150,
@@ -889,7 +889,7 @@ export const products: Product[] = [
     subcategory: 'surfing',
     brand: 'BOTE',
     model: 'Breeze Aero',
-    condition: 'Excellent',
+    condition: 'Like New',
     ageInYears: 1,
     dailyPrice: 45,
     weeklyPrice: 270,
@@ -970,7 +970,7 @@ export const products: Product[] = [
     subcategory: 'ski-touring',
     brand: 'Dynafit',
     model: 'Radical Pro Complete',
-    condition: 'Excellent',
+    condition: 'Like New',
     ageInYears: 1,
     dailyPrice: 85,
     weeklyPrice: 510,

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
+  import VideoBackground from '$lib/components/layout/video-background.svelte';
 
   // BACKGROUND CHECKS TEMPORARILY DISABLED
   // Redirect users back to verification page with a message

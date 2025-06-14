@@ -3,9 +3,9 @@
   import { authStore } from '$lib/stores/auth';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
-  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
-  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
-  import SequentialAnimator from '$lib/components/layout/SequentialAnimator.svelte';
+  import VideoBackground from '$lib/components/layout/video-background.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
+  import SequentialAnimator from '$lib/components/layout/sequential-animator.svelte';
 
   // Redirect if not logged in
   onMount(() => {

@@ -4,11 +4,11 @@
   import { authStore } from '$lib/stores/auth';
   import { createListing } from '$lib/firebase/db/listings';
   import { toastNotifications } from '$lib/stores/notifications';
-  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
-  import ScrollLinkedAnimator from '$lib/components/layout/ScrollLinkedAnimator.svelte';
-  import FormContainer from '$lib/components/forms/FormContainer.svelte';
-  import FormField from '$lib/components/forms/FormField.svelte';
-  import FormButton from '$lib/components/forms/FormButton.svelte';
+  import VideoBackground from '$lib/components/layout/video-background.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
+  import FormContainer from '$lib/components/forms/form-container.svelte';
+  import FormField from '$lib/components/forms/form-field.svelte';
+  import FormButton from '$lib/components/forms/form-button.svelte';
   import { GEAR_CATEGORIES, SUCCESS_MESSAGES } from '$lib/constants';
 
   let heroVisible = false;

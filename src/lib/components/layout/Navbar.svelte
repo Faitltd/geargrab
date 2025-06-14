@@ -1,7 +1,7 @@
 <script lang="ts">
   // Version: 2.0 - Fixed sign out button text
   import { authStore } from '$lib/stores/auth';
-  import { smoothScrollWithNavOffset } from '$lib/utils/smoothScroll';
+  import { smoothScrollWithNavOffset } from '$lib/utils/smooth-scroll';
   import { signOut } from '$lib/firebase/auth';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';

@@ -1,7 +1,7 @@
 <script lang="ts">
   export const prerender = true;
-  import ScrollAnimated from '$lib/components/layout/ScrollAnimated.svelte';
-  import VideoBackground from '$lib/components/layout/VideoBackground.svelte';
+  import ScrollAnimated from '$lib/components/layout/scroll-animated.svelte';
+  import VideoBackground from '$lib/components/layout/video-background.svelte';
   import { onMount } from 'svelte';
 
   let heroVisible = false;

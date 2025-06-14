@@ -3,8 +3,8 @@
   import { verificationService, VERIFICATION_REQUIREMENTS, type UserVerificationStatus } from '$lib/services/verification';
   import { backgroundCheckService } from '$lib/services/backgroundCheck';
   import { authStore } from '$lib/stores/auth';
-  import BackgroundCheckFlow from '$lib/components/verification/BackgroundCheckFlow.svelte';
-  import BackgroundCheckStatus from '$lib/components/verification/BackgroundCheckStatus.svelte';
+  import BackgroundCheckFlow from '$lib/components/verification/background-check-flow.svelte';
+  import BackgroundCheckStatus from '$lib/components/verification/background-check-status.svelte';
 
   let verificationStatus: UserVerificationStatus | null = null;
   let loading = true;

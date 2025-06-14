@@ -126,9 +126,9 @@ export class SecurityMiddleware {
       await auditLog.logSecurityEvent({
         type: 'rate_limit_exceeded',
         ip: clientId,
-        limitType: type,
         path: event.url.pathname,
-        timestamp: new Date()
+        timestamp: new Date(),
+        details: { limitType: type }
       });
       return json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
@@ -150,8 +150,8 @@ export class SecurityMiddleware {
           type: 'invalid_input',
           ip: event.getClientAddress(),
           path: event.url.pathname,
-          errors: validation.errors,
-          timestamp: new Date()
+          timestamp: new Date(),
+          details: { errors: validation.errors }
         });
         return json({ error: 'Invalid input', details: validation.errors }, { status: 400 });
       }
@@ -175,10 +175,9 @@ export class SecurityMiddleware {
       await auditLog.logSecurityEvent({
         type: 'csrf_attempt',
         ip: event.getClientAddress(),
-        origin,
-        host,
         path: event.url.pathname,
-        timestamp: new Date()
+        timestamp: new Date(),
+        details: { origin, host }
       });
       return json({ error: 'CSRF protection triggered' }, { status: 403 });
     }

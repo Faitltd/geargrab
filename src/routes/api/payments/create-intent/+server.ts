@@ -1,6 +1,12 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { SecurityMiddleware } from '$lib/security/middleware';
+import type {
+  CreatePaymentIntentRequest,
+  CreatePaymentIntentResponse,
+  PaymentIntentErrorResponse
+} from '$lib/types/api';
+import type Stripe from 'stripe';
 
 export const GET: RequestHandler = async ({ url, getClientAddress }) => {
   console.log('🔍 GET request to payment intent endpoint');
@@ -19,9 +25,9 @@ export const GET: RequestHandler = async ({ url, getClientAddress }) => {
 };
 
 // Stripe server-side integration
-let stripe: any = null;
+let stripe: Stripe | null = null;
 
-async function getStripe() {
+async function getStripe(): Promise<Stripe> {
   if (!stripe) {
     const secretKey = process.env.STRIPE_SECRET_KEY;
 
@@ -31,9 +37,9 @@ async function getStripe() {
       throw new Error('Stripe configuration error');
     }
 
-    const Stripe = (await import('stripe')).default;
-    stripe = new Stripe(secretKey, {
-      apiVersion: '2023-10-16',
+    const StripeConstructor = (await import('stripe')).default;
+    stripe = new StripeConstructor(secretKey, {
+      apiVersion: '2024-06-20',
     });
   }
   return stripe;
@@ -47,17 +53,18 @@ export const POST: RequestHandler = async (event) => {
     const userId = 'test_user_123';
     console.log('⚠️ TEMPORARY: Using test user for payment debugging');
 
-    const body = await event.request.json();
+    const body: CreatePaymentIntentRequest = await event.request.json();
     const { amount, currency = 'usd', metadata = {} } = body;
 
     console.log('📝 Payment request:', { amount, currency, metadata, userId });
 
     // Validate required parameters
     if (!amount || amount < 50) {
-      return json({
+      const errorResponse: PaymentIntentErrorResponse = {
         error: 'Invalid amount. Minimum $0.50 required.',
         code: 'INVALID_AMOUNT'
-      }, { status: 400 });
+      };
+      return json(errorResponse, { status: 400 });
     }
 
     // Get Stripe configuration
@@ -65,17 +72,18 @@ export const POST: RequestHandler = async (event) => {
 
     if (!secretKey || !secretKey.startsWith('sk_')) {
       console.error('❌ Stripe secret key not configured');
-      return json({
+      const errorResponse: PaymentIntentErrorResponse = {
         error: 'Payment system not configured. Please contact support.',
         code: 'PAYMENT_CONFIG_ERROR'
-      }, { status: 500 });
+      };
+      return json(errorResponse, { status: 500 });
     }
 
     // Create Stripe payment intent
     try {
       const stripeInstance = await getStripe();
 
-      const paymentIntentData = {
+      const paymentIntentData: Stripe.PaymentIntentCreateParams = {
         amount: Math.round(amount), // Amount in cents
         currency,
         metadata: {
@@ -92,24 +100,38 @@ export const POST: RequestHandler = async (event) => {
       const paymentIntent = await stripeInstance.paymentIntents.create(paymentIntentData);
 
       console.log('✅ Payment intent created successfully:', paymentIntent.id);
-      return json({
+
+      // Ensure client_secret exists before proceeding
+      if (!paymentIntent.client_secret) {
+        console.error('❌ Payment intent missing client secret');
+        const errorResponse: PaymentIntentErrorResponse = {
+          error: 'Payment intent creation failed. Please try again.',
+          code: 'STRIPE_ERROR'
+        };
+        return json(errorResponse, { status: 500 });
+      }
+
+      const successResponse: CreatePaymentIntentResponse = {
         clientSecret: paymentIntent.client_secret,
         paymentIntentId: paymentIntent.id
-      });
+      };
+      return json(successResponse);
 
-    } catch (stripeError) {
+    } catch (stripeError: unknown) {
       console.error('❌ Stripe error:', stripeError);
-      return json({
+      const errorResponse: PaymentIntentErrorResponse = {
         error: 'Failed to create payment intent. Please try again.',
         code: 'STRIPE_ERROR'
-      }, { status: 500 });
+      };
+      return json(errorResponse, { status: 500 });
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Unexpected error in payment endpoint:', error);
-    return json({
+    const errorResponse: PaymentIntentErrorResponse = {
       error: 'Payment system error. Please try again.',
       code: 'INTERNAL_ERROR'
-    }, { status: 500 });
+    };
+    return json(errorResponse, { status: 500 });
   }
 };
