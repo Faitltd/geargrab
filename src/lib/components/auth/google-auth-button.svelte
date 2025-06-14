@@ -36,7 +36,12 @@
     } catch (error: any) {
       console.error('❌ Google sign-in error:', error);
 
-      const errorMessage = error.message || 'An error occurred during Google sign-in';
+      let errorMessage = error.message || 'An error occurred during Google sign-in';
+
+      // Handle domain authorization error specifically
+      if (error.code === 'auth/unauthorized-domain') {
+        errorMessage = 'Google sign-in is temporarily unavailable. Please use email sign-in instead.';
+      }
 
       notifications.add({
         type: 'error',

@@ -1,7 +1,8 @@
 <script lang="ts">
   import { authStore } from '$lib/stores/auth';
   import { goto } from '$app/navigation';
-  
+  import { page } from '$app/stores';
+
   export let redirectTo: string = '/auth/login';
   export let message: string = 'You must be signed in to access this feature.';
   export let showLoginPrompt: boolean = true;
@@ -10,7 +11,11 @@
   $: isLoading = $authStore.loading;
 
   function handleLogin() {
-    goto(redirectTo);
+    // Include current page URL as redirect parameter
+    const currentUrl = $page.url.pathname + $page.url.search;
+    const loginUrl = new URL(redirectTo, window.location.origin);
+    loginUrl.searchParams.set('redirect', currentUrl);
+    goto(loginUrl.toString());
   }
 </script>
 
