@@ -36,7 +36,8 @@ export class SecurityMiddleware {
               const tokenParts = idToken.split('.');
               if (tokenParts.length === 3) {
                 // Decode the payload (this is not secure verification, just parsing)
-                const payload = JSON.parse(atob(tokenParts[1]));
+                // Use Buffer.from for Node.js environment instead of atob
+                const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
                 if (payload.user_id || payload.sub) {
                   const userId = payload.user_id || payload.sub;
                   console.log('✅ Client-side auth token found for user:', userId);
