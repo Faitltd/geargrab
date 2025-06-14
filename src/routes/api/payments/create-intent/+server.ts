@@ -43,28 +43,9 @@ export const POST: RequestHandler = async (event) => {
   console.log('🚀 Payment intent endpoint called');
 
   try {
-    // TEMPORARY: Disable authentication for debugging payment issues
-    // This allows us to test if the payment system itself works
-    console.log('⚠️ TEMPORARY: Authentication disabled for payment debugging');
-
-    const authHeader = event.request.headers.get('Authorization');
-    let userId = 'temp_user_for_testing';
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
-      try {
-        const tokenParts = token.split('.');
-        if (tokenParts.length === 3) {
-          const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
-          userId = payload.user_id || payload.sub || 'authenticated_user';
-          console.log('✅ Found user ID in token:', userId);
-        }
-      } catch (e) {
-        console.log('⚠️ Could not parse token, using default user ID');
-      }
-    } else {
-      console.log('⚠️ No auth token provided, using temporary user ID for testing');
-    }
+    // TEMPORARY: Skip all authentication for testing
+    const userId = 'test_user_123';
+    console.log('⚠️ TEMPORARY: Using test user for payment debugging');
 
     const body = await event.request.json();
     const { amount, currency = 'usd', metadata = {} } = body;
