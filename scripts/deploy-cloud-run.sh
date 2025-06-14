@@ -124,16 +124,16 @@ configure_domain() {
     print_info "Configuring custom domain: ${DOMAIN}"
     
     # Map domain to service
-    gcloud run domain-mappings create \
+    gcloud beta run domain-mappings create \
         --service ${SERVICE_NAME} \
         --domain ${DOMAIN} \
         --region ${REGION} || true
-    
+
     # Get domain mapping details
     print_info "Domain mapping configuration:"
-    gcloud run domain-mappings describe ${DOMAIN} \
+    gcloud beta run domain-mappings describe ${DOMAIN} \
         --region ${REGION} \
-        --format="table(spec.routePolicy.traffic.percent,status.conditions.type,status.conditions.status)"
+        --format="table(spec.routePolicy.traffic.percent,status.conditions.type,status.conditions.status)" || true
     
     print_warning "Make sure to configure DNS records for ${DOMAIN}"
     print_info "Add these DNS records to your domain:"
