@@ -37,7 +37,7 @@
   <label for={id} class="block text-sm font-medium text-white mb-2">
     {label}
     {#if required}
-      <span class="text-red-400 ml-1">*</span>
+      <span class="text-red-400 ml-1" aria-label="required">*</span>
     {/if}
   </label>
 

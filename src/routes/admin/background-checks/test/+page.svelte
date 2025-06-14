@@ -157,8 +157,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Check Type -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Check Type</label>
+            <label for="check-type" class="block text-sm font-medium text-gray-300 mb-2">Check Type</label>
             <select
+              id="check-type"
               bind:value={backgroundCheckTest.checkType}
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             >
@@ -170,8 +171,9 @@
 
           <!-- Provider -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Provider</label>
+            <label for="provider" class="block text-sm font-medium text-gray-300 mb-2">Provider</label>
             <select
+              id="provider"
               bind:value={backgroundCheckTest.provider}
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             >
@@ -183,8 +185,9 @@
 
           <!-- First Name -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">First Name</label>
+            <label for="first-name" class="block text-sm font-medium text-gray-300 mb-2">First Name</label>
             <input
+              id="first-name"
               type="text"
               bind:value={backgroundCheckTest.personalInfo.firstName}
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -194,8 +197,9 @@
 
           <!-- Last Name -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Last Name</label>
+            <label for="last-name" class="block text-sm font-medium text-gray-300 mb-2">Last Name</label>
             <input
+              id="last-name"
               type="text"
               bind:value={backgroundCheckTest.personalInfo.lastName}
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -205,8 +209,9 @@
 
           <!-- Email -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
             <input
+              id="email"
               type="email"
               bind:value={backgroundCheckTest.personalInfo.email}
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -216,8 +221,9 @@
 
           <!-- Phone -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Phone</label>
+            <label for="phone" class="block text-sm font-medium text-gray-300 mb-2">Phone</label>
             <input
+              id="phone"
               type="tel"
               bind:value={backgroundCheckTest.personalInfo.phone}
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -227,8 +233,9 @@
 
           <!-- Date of Birth -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Date of Birth</label>
+            <label for="date-of-birth" class="block text-sm font-medium text-gray-300 mb-2">Date of Birth</label>
             <input
+              id="date-of-birth"
               type="date"
               bind:value={backgroundCheckTest.personalInfo.dateOfBirth}
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -237,8 +244,9 @@
 
           <!-- SSN -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">SSN (Test)</label>
+            <label for="ssn" class="block text-sm font-medium text-gray-300 mb-2">SSN (Test)</label>
             <input
+              id="ssn"
               type="text"
               bind:value={backgroundCheckTest.personalInfo.ssn}
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -248,8 +256,9 @@
 
           <!-- City -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">City</label>
+            <label for="city" class="block text-sm font-medium text-gray-300 mb-2">City</label>
             <input
+              id="city"
               type="text"
               bind:value={backgroundCheckTest.personalInfo.address.city}
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -259,8 +268,9 @@
 
           <!-- State -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">State</label>
+            <label for="state" class="block text-sm font-medium text-gray-300 mb-2">State</label>
             <input
+              id="state"
               type="text"
               bind:value={backgroundCheckTest.personalInfo.address.state}
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -270,8 +280,9 @@
 
           <!-- ZIP Code -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">ZIP Code</label>
+            <label for="zip-code" class="block text-sm font-medium text-gray-300 mb-2">ZIP Code</label>
             <input
+              id="zip-code"
               type="text"
               bind:value={backgroundCheckTest.personalInfo.address.zipCode}
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
