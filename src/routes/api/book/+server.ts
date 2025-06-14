@@ -240,9 +240,10 @@ The GearGrab Team
 // Create a new booking
 export const POST: RequestHandler = createSecureHandler(
   async ({ request }, { auth, body }) => {
-    if (!auth) {
-      return json({ error: 'Authentication required. Please log in and try again.' }, { status: 401 });
-    }
+    try {
+      if (!auth) {
+        return json({ error: 'Authentication required. Please log in and try again.' }, { status: 401 });
+      }
 
     const bookingData = body;
 
@@ -421,44 +422,45 @@ export const POST: RequestHandler = createSecureHandler(
 // Get booking details
 export const GET: RequestHandler = createSecureHandler(
   async ({ url }, { auth }) => {
-    if (!auth) {
-      return json({ error: 'Authentication required. Please log in and try again.' }, { status: 401 });
+    try {
+      if (!auth) {
+        return json({ error: 'Authentication required. Please log in and try again.' }, { status: 401 });
+      }
+
+      const bookingId = url.searchParams.get('bookingId');
+
+      if (!bookingId) {
+        return json({ error: 'Booking ID is required' }, { status: 400 });
+      }
+
+      // In a real application, you would fetch from database
+      // For now, return mock data
+      const booking = {
+        id: bookingId,
+        listingTitle: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
+        listingImage: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+        startDate: '2024-02-15',
+        endDate: '2024-02-18',
+        totalPrice: 165,
+        status: 'pending',
+        owner: {
+          name: 'David Wilson',
+          email: 'david@example.com',
+          phone: '(555) 123-4567'
+        },
+        confirmationNumber: bookingId.replace('booking_', 'GG-'),
+        deliveryMethod: 'pickup',
+        pickupLocation: '2100 S State St, Salt Lake City, UT (REI Store)',
+        createdAt: new Date().toISOString()
+      };
+
+      return json({ booking });
+
+    } catch (error) {
+      console.error('Error fetching booking:', error);
+      return json({ error: 'Failed to fetch booking' }, { status: 500 });
     }
-
-    const bookingId = url.searchParams.get('bookingId');
-
-    if (!bookingId) {
-      return json({ error: 'Booking ID is required' }, { status: 400 });
-    }
-
-    // In a real application, you would fetch from database
-    // For now, return mock data
-    const booking = {
-      id: bookingId,
-      listingTitle: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
-      listingImage: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-      startDate: '2024-02-15',
-      endDate: '2024-02-18',
-      totalPrice: 165,
-      status: 'pending',
-      owner: {
-        name: 'David Wilson',
-        email: 'david@example.com',
-        phone: '(555) 123-4567'
-      },
-      confirmationNumber: bookingId.replace('booking_', 'GG-'),
-      deliveryMethod: 'pickup',
-      pickupLocation: '2100 S State St, Salt Lake City, UT (REI Store)',
-      createdAt: new Date().toISOString()
-    };
-
-    return json({ booking });
-
-  } catch (error) {
-    console.error('Error fetching booking:', error);
-    return json({ error: 'Failed to fetch booking' }, { status: 500 });
-  }
-},
+  },
 {
   requireAuth: true
 }

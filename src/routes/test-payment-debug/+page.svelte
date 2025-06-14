@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { StripePaymentForm } from '$lib/components/payments';
+  import StripePaymentForm from '$lib/components/payments/StripePaymentForm.svelte';
   import { onMount } from 'svelte';
 
   let testAmount = 10; // $10 test payment
