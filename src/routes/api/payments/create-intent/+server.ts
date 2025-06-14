@@ -16,11 +16,21 @@ export const GET: RequestHandler = async ({ url, getClientAddress }) => {
     nodeEnv: process.env.NODE_ENV
   });
 
+  // Debug Stripe configuration
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  const stripePublishableKey = process.env.VITE_STRIPE_PUBLISHABLE_KEY;
+
   return json({
     message: 'Payment intent endpoint is accessible',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'unknown',
-    endpoint: '/api/payments/create-intent'
+    endpoint: '/api/payments/create-intent',
+    debug: {
+      hasStripeSecret: !!stripeSecretKey,
+      stripeSecretPrefix: stripeSecretKey ? stripeSecretKey.substring(0, 8) + '...' : 'missing',
+      hasStripePublishable: !!stripePublishableKey,
+      stripePublishablePrefix: stripePublishableKey ? stripePublishableKey.substring(0, 8) + '...' : 'missing'
+    }
   });
 };
 
@@ -70,8 +80,14 @@ export const POST: RequestHandler = async (event) => {
     // Get Stripe configuration
     const secretKey = process.env.STRIPE_SECRET_KEY;
 
-    if (!secretKey || !secretKey.startsWith('sk_')) {
-      console.error('❌ Stripe secret key not configured');
+    console.log('🔍 Stripe key check:', {
+      hasKey: !!secretKey,
+      keyPrefix: secretKey ? secretKey.substring(0, 8) + '...' : 'missing',
+      keyLength: secretKey ? secretKey.length : 0
+    });
+
+    if (!secretKey || (!secretKey.startsWith('sk_test_') && !secretKey.startsWith('sk_live_'))) {
+      console.error('❌ Stripe secret key not configured or invalid format');
       const errorResponse: PaymentIntentErrorResponse = {
         error: 'Payment system not configured. Please contact support.',
         code: 'PAYMENT_CONFIG_ERROR'

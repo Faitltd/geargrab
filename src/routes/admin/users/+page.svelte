@@ -5,8 +5,8 @@
   import { goto } from '$app/navigation';
   import { collection, getDocs } from 'firebase/firestore';
   import { firestore } from '$lib/firebase/client';
-  import SkeletonCard from '$lib/components/layout/SkeletonCard.svelte';
-  import ProgressiveLoader from '$lib/components/layout/ProgressiveLoader.svelte';
+  import SkeletonCard from '$lib/components/layout/skeleton-card.svelte';
+  import ProgressiveLoader from '$lib/components/layout/progressive-loader.svelte';
 
   let loading = true;
   let isAdmin = false;

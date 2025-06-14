@@ -36,7 +36,11 @@ const importMappings = {
   'FormField': 'form-field',
   'FormButton': 'form-button',
   'SequentialAnimator': 'sequential-animator',
-  'Checkbox': 'checkbox'
+  'Checkbox': 'checkbox',
+  'GoogleAuthButton': 'google-auth-button',
+  'ErrorAlert': 'error-alert',
+  'SkeletonCard': 'skeleton-card',
+  'ProgressiveLoader': 'progressive-loader'
 };
 
 // Colors for console output

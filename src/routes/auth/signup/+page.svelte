@@ -7,8 +7,8 @@
   import FormContainer from '$lib/components/forms/form-container.svelte';
   import FormField from '$lib/components/forms/form-field.svelte';
   import FormButton from '$lib/components/forms/form-button.svelte';
-  import GoogleAuthButton from '$lib/components/auth/GoogleAuthButton.svelte';
-  import ErrorAlert from '$lib/components/ui/ErrorAlert.svelte';
+  import GoogleAuthButton from '$lib/components/auth/google-auth-button.svelte';
+  import ErrorAlert from '$lib/components/ui/error-alert.svelte';
 
   // Simplified form data
   let email = '';
