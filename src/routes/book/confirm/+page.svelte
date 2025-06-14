@@ -422,21 +422,23 @@
           <!-- Payment Form -->
           {#if showPayment}
             <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6 mt-6">
-              <h2 class="text-lg font-semibold text-white mb-4">💳 Secure Payment</h2>
-              <StripePaymentForm
-                amount={calculatedTotal}
-                currency="usd"
-                metadata={{
-                  listingId,
-                  startDate,
-                  endDate,
-                  deliveryMethod,
-                  insuranceTier
-                }}
-                disabled={paymentProcessing}
-                on:success={handlePaymentSuccess}
-                on:error={handlePaymentError}
-              />
+              <h2 class="text-lg font-semibold text-white mb-4 text-center">💳 Secure Payment</h2>
+              <div class="flex justify-center">
+                <StripePaymentForm
+                  amount={calculatedTotal}
+                  currency="usd"
+                  metadata={{
+                    listingId,
+                    startDate,
+                    endDate,
+                    deliveryMethod,
+                    insuranceTier
+                  }}
+                  disabled={paymentProcessing}
+                  on:success={handlePaymentSuccess}
+                  on:error={handlePaymentError}
+                />
+              </div>
             </div>
           {/if}
 

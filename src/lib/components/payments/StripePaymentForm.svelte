@@ -28,27 +28,9 @@
     try {
       console.log('Initializing payment form with amount:', amount);
 
-      // Wait for auth state to be ready
-      console.log('🔄 Waiting for authentication state...');
-      const { authStore } = await import('$lib/stores/auth');
-      const { get } = await import('svelte/store');
-
-      // Wait for auth to finish loading
-      let authState = get(authStore);
-      let attempts = 0;
-      while (authState.loading && attempts < 10) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        authState = get(authStore);
-        attempts++;
-      }
-
       // Temporarily disable authentication requirement for debugging
       console.log('🔧 Authentication temporarily disabled for payment debugging');
-      if (authState.user) {
-        console.log('✅ User authenticated:', authState.user.email);
-      } else {
-        console.log('⚠️ No authenticated user, proceeding with payment debugging');
-      }
+      console.log('🔧 Skipping authentication checks for payment form');
 
       // Initialize Stripe
       stripe = await initializeStripe();
@@ -251,5 +233,6 @@
 <style>
   .payment-form {
     max-width: 500px;
+    margin: 0 auto;
   }
 </style>
