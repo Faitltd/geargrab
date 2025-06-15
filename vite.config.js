@@ -7,6 +7,9 @@ export default defineConfig({
     port: 5173,
     strictPort: false,
   },
+  optimizeDeps: {
+    include: ['@stripe/stripe-js']
+  },
   build: {
     rollupOptions: {
       output: {

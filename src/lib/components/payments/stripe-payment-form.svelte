@@ -23,39 +23,22 @@
   
   onMount(async () => {
     try {
-      console.log('🔧 Initializing payment form:', {
-        amount,
-        amountInCents: Math.round(amount * 100),
-        currency,
-        metadata,
-        isValidAmount: amount >= 0.50
-      });
-
       // Validate amount before proceeding
       if (amount < 0.50) {
         throw new Error('Invalid amount. Minimum $0.50 required.');
       }
 
-      // Temporarily disable authentication requirement for debugging
-      console.log('🔧 Authentication temporarily disabled for payment debugging');
-      console.log('🔧 Skipping authentication checks for payment form');
-
       // Initialize Stripe
       stripe = await initializeStripe();
       if (!stripe) {
-        throw new Error('Failed to initialize Stripe - check publishable key');
+        throw new Error('Failed to initialize Stripe');
       }
-      console.log('Stripe initialized successfully');
 
       // Create payment intent
-      console.log('Creating payment intent...');
       const { clientSecret: secret } = await createPaymentIntent(amount, currency, metadata);
       clientSecret = secret;
-      console.log('Payment intent created successfully');
 
-      // Always use real Stripe payment elements for production
-      console.log('Initializing Stripe payment elements...');
-
+      // Initialize Stripe payment elements
       // Create elements
       elements = stripe.elements({
         clientSecret,
@@ -106,38 +89,27 @@
 
       paymentElement.on('ready', () => {
         paymentReady = true;
-        console.log('Payment element ready');
       });
 
-    } catch (err) {
-      console.error('Error setting up payment:', err);
-      console.error('Error details:', {
-        message: err.message,
-        stack: err.stack,
-        amount,
-        currency,
-        metadata
-      });
-
-      // Provide more specific error messages
-      if (err.message?.includes('Authentication required')) {
+    } catch (err: any) {
+      if (err?.message?.includes('Authentication required')) {
         error = 'Authentication required. Please log in and try again.';
-      } else if (err.message?.includes('payment intent')) {
+      } else if (err?.message?.includes('payment intent')) {
         error = 'Failed to create payment intent. Please check your connection and try again.';
-      } else if (err.message?.includes('Stripe')) {
+      } else if (err?.message?.includes('Stripe')) {
         error = 'Failed to initialize Stripe. Please refresh the page and try again.';
       } else {
-        error = `Failed to initialize payment form: ${err.message}`;
+        error = `Failed to initialize payment form: ${err?.message || 'Unknown error'}`;
       }
     }
   });
-  
+
   async function handleSubmit() {
     processing = true;
     error = '';
 
     try {
-      // Real Stripe payment flow
+      // Stripe payment flow
       if (!stripe || !elements) {
         throw new Error('Payment system not initialized');
       }
@@ -167,7 +139,7 @@
         throw new Error('Payment was not successful');
       }
 
-    } catch (err) {
+    } catch (err: any) {
       console.error('Payment error:', err);
       error = err.message || 'Payment failed. Please try again.';
       dispatch('error', { error: err.message });

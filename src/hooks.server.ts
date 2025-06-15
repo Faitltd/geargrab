@@ -39,7 +39,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   console.log('Request processed', logData);
 
-  return response;
+  // Apply security headers to all responses (not just API endpoints)
+  const secureResponse = SecurityMiddleware.setSecurityHeaders(response);
+
+  return secureResponse;
 };
 
 export function handleError({ error, event }: { error: any, event: any }) {

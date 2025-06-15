@@ -283,42 +283,4 @@ async function sendAccountCreationEmail(email, _firstName) {
   }
 }
 
-// Test endpoint for webhook validation
-export async function GET({ url }) {
-  const reportId = url.searchParams.get('reportId');
-  
-  if (!reportId) {
-    return json({ error: 'reportId parameter is required for testing' }, { status: 400 });
-  }
-
-  try {
-    // Simulate webhook data for testing
-    const mockWebhookData = {
-      type: 'report.completed',
-      data: {
-        id: reportId,
-        status: 'complete',
-        adjudication: Math.random() > 0.8 ? 'engaged' : 'clear', // 20% chance of adverse
-        completed_at: new Date().toISOString(),
-        candidate: {
-          first_name: 'Test',
-          last_name: 'User'
-        }
-      }
-    };
-
-    // Process the mock webhook
-    await handleReportCompletion(mockWebhookData.data);
-
-    return json({
-      success: true,
-      message: `Mock Checkr webhook processed for report ${reportId}`,
-      data: mockWebhookData
-    });
-
-  } catch (error) {
-    return json({
-      error: `Failed to process mock webhook: ${error.message}`
-    }, { status: 500 });
-  }
-}
+// Removed mock webhook test endpoint - production only

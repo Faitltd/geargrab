@@ -28,8 +28,12 @@ export async function initializeStripe() {
     const { loadStripe } = await import('@stripe/stripe-js');
     const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
-    if (!publishableKey) {
-      throw new Error('Stripe publishable key not configured');
+    if (!publishableKey ||
+        !publishableKey.startsWith('pk_') ||
+        publishableKey.includes('REPLACE_WITH') ||
+        publishableKey.includes('YOUR_') ||
+        publishableKey.includes('1234567890')) {
+      throw new Error('Stripe not configured. Please add real Stripe API keys to environment variables.');
     }
 
     stripe = await loadStripe(publishableKey);

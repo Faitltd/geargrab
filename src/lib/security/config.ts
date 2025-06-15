@@ -157,9 +157,16 @@ export const SECURITY_CONFIG = {
       connectSrc: [
         "'self'",
         "https://api.stripe.com",
+        "https://js.stripe.com",
+        "https://m.stripe.com",
         "https://firestore.googleapis.com",
         "https://identitytoolkit.googleapis.com",
-        "https://securetoken.googleapis.com"
+        "https://securetoken.googleapis.com",
+        "https://www.googleapis.com",
+        "https://firebase.googleapis.com",
+        "https://fcm.googleapis.com",
+        "https://storage.googleapis.com",
+        "wss://firestore.googleapis.com"
       ],
       frameSrc: [
         "https://js.stripe.com"

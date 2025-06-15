@@ -312,15 +312,7 @@ class SterlingProvider extends BackgroundCheckProvider {
 
   async initiateBackgroundCheck(request: BackgroundCheckRequest): Promise<string> {
     // Sterling API implementation
-    // This would be similar to Checkr but with Sterling's specific API format
-    
-    // For demo purposes, return a mock external ID
-    const mockId = `sterling_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    // In production, implement actual Sterling API calls here
-    console.log('Sterling background check initiated:', mockId);
-    
-    return mockId;
+    throw new Error('Sterling API integration not yet implemented');
   }
 
   async getBackgroundCheckStatus(externalId: string): Promise<BackgroundCheckResult> {
@@ -346,51 +338,7 @@ class SterlingProvider extends BackgroundCheckProvider {
   }
 }
 
-// Mock Provider for Development
-class MockProvider extends BackgroundCheckProvider {
-  name = 'Mock Provider';
-  id = 'mock';
-
-  async initiateBackgroundCheck(request: BackgroundCheckRequest): Promise<string> {
-    const mockId = `mock_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    console.log('Mock background check initiated:', mockId);
-    return mockId;
-  }
-
-  async getBackgroundCheckStatus(externalId: string): Promise<BackgroundCheckResult> {
-    // Simulate different statuses for demo
-    const statuses = ['pending', 'in_progress', 'completed'] as const;
-    const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-    
-    const result: BackgroundCheckResult = {
-      externalId,
-      status: randomStatus
-    };
-
-    if (randomStatus === 'completed') {
-      result.results = {
-        criminalHistory: { status: 'clear', details: 'No criminal records found' },
-        sexOffenderRegistry: { status: 'clear', details: 'Not found in registry' },
-        globalWatchlist: { status: 'clear', details: 'No matches found' },
-        identityVerification: { status: 'verified', ssnTrace: true, addressHistory: true }
-      };
-      result.riskLevel = 'low';
-      result.overallStatus = 'pass';
-      result.completedAt = new Date();
-      result.expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-    }
-
-    return result;
-  }
-
-  async cancelBackgroundCheck(externalId: string): Promise<void> {
-    console.log('Mock background check cancelled:', externalId);
-  }
-
-  getEstimatedCompletion(checkType: string): string {
-    return '1-2 business days (mock)';
-  }
-}
+// Removed mock provider - production only uses real providers
 
 // Provider Registry
 class BackgroundCheckProviders {
@@ -400,11 +348,6 @@ class BackgroundCheckProviders {
     // Register providers
     this.registerProvider(new CheckrProvider());
     this.registerProvider(new SterlingProvider());
-    
-    // Use mock provider in development
-    if (dev) {
-      this.registerProvider(new MockProvider());
-    }
   }
 
   registerProvider(provider: BackgroundCheckProvider): void {
@@ -420,7 +363,7 @@ class BackgroundCheckProviders {
   }
 
   getDefaultProvider(): BackgroundCheckProvider {
-    return dev ? this.getProvider('mock')! : this.getProvider('checkr')!;
+    return this.getProvider('checkr')!;
   }
 }
 

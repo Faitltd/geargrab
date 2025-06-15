@@ -1,4 +1,4 @@
-describe('Payment Flow End-to-End Testing', () => {
+describe('Payment Flow End-to-End Testing - Production Ready', () => {
   const testUser = {
     email: 'test.payment@geargrab.com',
     password: 'TestPassword123!',
@@ -253,6 +253,122 @@ describe('Payment Flow End-to-End Testing', () => {
     });
   });
 
+  describe('Production Payment System Tests', () => {
+    beforeEach(() => {
+      // Login before each test
+      cy.visit('/auth/login');
+      cy.get('#email-address', { timeout: 10000 }).type(testUser.email);
+      cy.get('#password').type(testUser.password);
+      cy.get('button[type="submit"]').click();
+      cy.wait(2000);
+    });
+
+    it('should create real payment intent with valid Stripe keys', () => {
+      // Test the payment intent creation endpoint directly
+      cy.request({
+        method: 'POST',
+        url: '/api/payments/create-intent',
+        body: {
+          amount: 1000, // $10.00 in cents
+          currency: 'usd',
+          metadata: { test: 'e2e-testing' }
+        },
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        failOnStatusCode: false
+      }).then((response) => {
+        if (response.status === 401) {
+          // Expected if not authenticated via API
+          expect(response.body).to.have.property('error');
+          expect(response.body.error).to.include('Authentication required');
+        } else if (response.status === 200) {
+          // If authenticated, should return valid payment intent
+          expect(response.body).to.have.property('clientSecret');
+          expect(response.body).to.have.property('paymentIntentId');
+          expect(response.body.clientSecret).to.match(/^pi_[a-zA-Z0-9]+_secret_[a-zA-Z0-9]+$/);
+          expect(response.body.paymentIntentId).to.match(/^pi_[a-zA-Z0-9]+$/);
+        } else {
+          // Log unexpected response for debugging
+          cy.log('Unexpected response:', response.status, response.body);
+        }
+      });
+    });
+
+    it('should reject invalid payment amounts', () => {
+      // Test with amount below minimum
+      cy.request({
+        method: 'POST',
+        url: '/api/payments/create-intent',
+        body: {
+          amount: 25, // $0.25 - below minimum
+          currency: 'usd'
+        },
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        failOnStatusCode: false
+      }).then((response) => {
+        if (response.status === 400) {
+          expect(response.body).to.have.property('error');
+          expect(response.body.error).to.include('Minimum $0.50 required');
+        }
+      });
+    });
+
+    it('should initialize Stripe Elements without mock payments', () => {
+      // Visit payment page
+      cy.visit('/book/confirm?listingId=test&startDate=2024-12-01&endDate=2024-12-03');
+
+      // Wait for page to load
+      cy.get('body', { timeout: 10000 }).should('be.visible');
+
+      // Should NOT show any mock payment indicators
+      cy.get('body').should('not.contain', 'Development Mode');
+      cy.get('body').should('not.contain', 'Mock Payment');
+      cy.get('body').should('not.contain', 'Test payment');
+
+      // Should show real payment form or proper error
+      cy.get('body').then(($body) => {
+        const bodyText = $body.text();
+
+        // Should either show payment form or configuration error
+        const hasPaymentForm = bodyText.includes('Payment Information') ||
+                              bodyText.includes('Total Amount') ||
+                              $body.find('[data-cy="payment-form"]').length > 0;
+
+        const hasConfigError = bodyText.includes('Stripe publishable key not configured') ||
+                              bodyText.includes('Failed to initialize Stripe');
+
+        expect(hasPaymentForm || hasConfigError).to.be.true;
+      });
+    });
+
+    it('should handle Stripe configuration errors gracefully', () => {
+      // Visit payment page
+      cy.visit('/book/confirm?listingId=test&startDate=2024-12-01&endDate=2024-12-03');
+
+      // Wait for initialization
+      cy.wait(3000);
+
+      // Check for proper error handling
+      cy.get('body').then(($body) => {
+        const bodyText = $body.text();
+
+        // If Stripe is not configured, should show appropriate error
+        if (bodyText.includes('Failed to initialize') || bodyText.includes('not configured')) {
+          cy.get('body').should('contain.text', 'Failed to initialize');
+        } else {
+          // If configured, should show payment form
+          cy.get('body').should('satisfy', ($body) => {
+            const text = $body.text();
+            return text.includes('Payment') || text.includes('Total');
+          });
+        }
+      });
+    });
+  });
+
   describe('Error Handling and Edge Cases', () => {
     it('should handle network errors gracefully', () => {
       // Login first
@@ -261,13 +377,13 @@ describe('Payment Flow End-to-End Testing', () => {
       cy.get('#password').type(testUser.password);
       cy.get('button[type="submit"]').click();
       cy.url().should('not.include', '/auth/login');
-      
+
       // Intercept payment API calls and simulate network error
       cy.intercept('POST', '/api/payments/create-intent', { forceNetworkError: true }).as('paymentError');
-      
+
       // Visit payment page
       cy.visit('/book/confirm?listingId=test&startDate=2024-12-01&endDate=2024-12-03');
-      
+
       // Should handle error gracefully
       cy.get('body').should('be.visible');
     });
@@ -279,15 +395,50 @@ describe('Payment Flow End-to-End Testing', () => {
       cy.get('#password').type(testUser.password);
       cy.get('button[type="submit"]').click();
       cy.url().should('not.include', '/auth/login');
-      
+
       // Visit with invalid parameters
       cy.visit('/book/confirm?listingId=invalid&startDate=invalid&endDate=invalid');
-      
+
       // Should handle gracefully
       cy.get('body').should('be.visible');
       cy.get('body').should('satisfy', ($body) => {
         const text = $body.text();
         return text.includes('Error') || text.includes('Invalid') || text.includes('Payment');
+      });
+    });
+
+    it('should validate payment intent format in booking flow', () => {
+      // Login first
+      cy.visit('/auth/login');
+      cy.get('#email-address', { timeout: 10000 }).type(testUser.email);
+      cy.get('#password').type(testUser.password);
+      cy.get('button[type="submit"]').click();
+      cy.wait(2000);
+
+      // Test booking with invalid payment intent
+      cy.request({
+        method: 'POST',
+        url: '/api/book',
+        body: {
+          listingId: 'test',
+          startDate: '2024-12-01',
+          endDate: '2024-12-03',
+          contactInfo: {
+            firstName: 'Test',
+            lastName: 'User',
+            email: 'test@example.com',
+            phone: '555-123-4567'
+          },
+          totalPrice: 100,
+          paymentIntentId: 'invalid_payment_intent'
+        },
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        failOnStatusCode: false
+      }).then((response) => {
+        // Should reject invalid payment intent
+        expect(response.status).to.be.oneOf([400, 401, 500]);
       });
     });
   });

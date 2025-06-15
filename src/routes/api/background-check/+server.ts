@@ -9,8 +9,14 @@ let stripe: any = null;
 
 async function getStripe() {
   if (!stripe) {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+
+    if (!secretKey || !secretKey.startsWith('sk_')) {
+      throw new Error('Invalid or missing Stripe secret key');
+    }
+
     const Stripe = (await import('stripe')).default;
-    stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_demo_key', {
+    stripe = new Stripe(secretKey, {
       apiVersion: '2023-10-16',
     });
   }

@@ -74,20 +74,11 @@
       const { clientSecret: secret, paymentIntentId } = await createPaymentIntent(
         amount,
         currency,
-        metadata,
-        !isAuthenticated ? guestEmail : undefined
+        metadata
       );
       
       clientSecret = secret;
       console.log('✅ Payment intent created:', paymentIntentId);
-
-      // Check if this is a mock payment
-      const isMockPayment = secret.includes('mock');
-      if (isMockPayment) {
-        console.log('⚠️ Development mode: Using mock payment');
-        paymentReady = true;
-        return;
-      }
 
       // Create Stripe elements
       elements = stripe.elements({
@@ -145,27 +136,7 @@
     error = '';
 
     try {
-      // Check if this is a mock payment
-      const isMockPayment = clientSecret.includes('mock');
-
-      if (isMockPayment) {
-        console.log('⚠️ Development mode: Simulating payment');
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        dispatch('success', {
-          paymentIntent: {
-            id: clientSecret.split('_secret_')[0],
-            status: 'succeeded',
-            amount: amount * 100,
-            currency
-          },
-          paymentIntentId: clientSecret.split('_secret_')[0],
-          userEmail: guestEmail || $authStore.user?.email
-        });
-        return;
-      }
-
-      // Real Stripe payment
+      // Stripe payment
       if (!stripe || !elements) {
         throw new Error('Payment system not initialized');
       }
@@ -195,7 +166,7 @@
         throw new Error('Payment was not successful');
       }
 
-    } catch (err) {
+    } catch (err: any) {
       console.error('❌ Payment error:', err);
       error = err.message || 'Payment failed. Please try again.';
       dispatch('error', { error: err.message });
@@ -287,23 +258,9 @@
     <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6">
       <h3 class="text-lg font-semibold text-white mb-4">Payment Information</h3>
 
-      <!-- Development Mode Notice -->
-      {#if clientSecret.includes('mock')}
-        <div class="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-4">
-          <p class="text-yellow-200 text-sm">
-            🚧 <strong>Development Mode:</strong> This is a test payment. No real charges will be made.
-          </p>
-        </div>
-      {/if}
-
       <!-- Stripe Payment Element Container -->
       <div bind:this={paymentElementContainer} class="mb-6">
-        {#if clientSecret.includes('mock')}
-          <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-600">
-            <p class="text-gray-300 text-sm mb-2">💳 Mock Payment Form</p>
-            <p class="text-gray-400 text-xs">Development mode - click "Pay Now" to simulate payment</p>
-          </div>
-        {/if}
+        <!-- Stripe Elements will be mounted here -->
       </div>
 
       <!-- Error Display -->

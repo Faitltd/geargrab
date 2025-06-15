@@ -117,17 +117,21 @@ Server-side payment processing:
 ```env
 NODE_ENV=development
 VITE_USE_EMULATORS=true
-VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...
-STRIPE_SECRET_KEY=sk_test_...
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_test_key_here
+STRIPE_SECRET_KEY=sk_test_your_test_key_here
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
 ```
 
 ### Production
 ```env
 NODE_ENV=production
 VITE_USE_EMULATORS=false
-VITE_STRIPE_PUBLISHABLE_KEY=pk_live_...
-STRIPE_SECRET_KEY=sk_live_...
+VITE_STRIPE_PUBLISHABLE_KEY=pk_live_your_live_key_here
+STRIPE_SECRET_KEY=sk_live_your_live_key_here
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
 ```
+
+**Important**: Replace placeholder keys with actual Stripe keys from your dashboard.
 
 ## Error Handling
 

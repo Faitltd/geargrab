@@ -1,21 +1,43 @@
 <script lang="ts">
   import { authStore } from '$lib/stores/auth';
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import LoginModal from '$lib/components/auth/login-modal.svelte';
+  import SignupModal from '$lib/components/auth/signup-modal.svelte';
 
-  export let redirectTo: string = '/auth/login';
   export let message: string = 'You must be signed in to access this feature.';
   export let showLoginPrompt: boolean = true;
 
   $: isAuthenticated = !!$authStore.user;
   $: isLoading = $authStore.loading;
 
+  let showLoginModal = false;
+  let showSignupModal = false;
+
   function handleLogin() {
-    // Include current page URL as redirect parameter
-    const currentUrl = $page.url.pathname + $page.url.search;
-    const loginUrl = new URL(redirectTo, window.location.origin);
-    loginUrl.searchParams.set('redirect', currentUrl);
-    goto(loginUrl.toString());
+    showLoginModal = true;
+  }
+
+  function handleSignup() {
+    showSignupModal = true;
+  }
+
+  function handleLoginSuccess() {
+    showLoginModal = false;
+    // The auth store will automatically update and show the protected content
+  }
+
+  function handleSignupSuccess() {
+    showSignupModal = false;
+    // The auth store will automatically update and show the protected content
+  }
+
+  function switchToSignup() {
+    showLoginModal = false;
+    showSignupModal = true;
+  }
+
+  function switchToLogin() {
+    showSignupModal = false;
+    showLoginModal = true;
   }
 </script>
 
@@ -49,12 +71,16 @@
         >
           Sign In to Continue
         </button>
-        
+
         <p class="text-sm text-gray-400">
-          Don't have an account? 
-          <a href="/auth/signup" class="text-green-400 hover:text-green-300 underline">
+          Don't have an account?
+          <button
+            type="button"
+            on:click={handleSignup}
+            class="text-green-400 hover:text-green-300 underline font-medium"
+          >
             Sign up here
-          </a>
+          </button>
         </p>
       </div>
     {/if}
@@ -70,3 +96,17 @@
     </div>
   </div>
 {/if}
+
+<!-- Login Modal -->
+<LoginModal
+  bind:show={showLoginModal}
+  on:success={handleLoginSuccess}
+  on:switchToSignup={switchToSignup}
+/>
+
+<!-- Signup Modal -->
+<SignupModal
+  bind:show={showSignupModal}
+  on:success={handleSignupSuccess}
+  on:switchToLogin={switchToLogin}
+/>

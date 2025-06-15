@@ -7,8 +7,14 @@ let stripe: any = null;
 
 async function getStripe() {
   if (!stripe) {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+
+    if (!secretKey || !secretKey.startsWith('sk_')) {
+      throw new Error('Invalid or missing Stripe secret key');
+    }
+
     const Stripe = (await import('stripe')).default;
-    stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_demo_key', {
+    stripe = new Stripe(secretKey, {
       apiVersion: '2023-10-16',
     });
   }
@@ -258,26 +264,18 @@ export const POST: RequestHandler = createSecureHandler(
     // Validate payment intent if provided
     if (bookingData.paymentIntentId) {
       try {
-        const isDevelopment = process.env.NODE_ENV !== 'production';
+        // Verify payment with Stripe
+        const stripeInstance = await getStripe();
+        const paymentIntent = await stripeInstance.paymentIntents.retrieve(bookingData.paymentIntentId);
 
-        // Check if this is a mock payment intent (development mode)
-        if (isDevelopment && bookingData.paymentIntentId.startsWith('pi_mock_')) {
-          console.log('Development mode: Accepting mock payment intent:', bookingData.paymentIntentId);
-          // In development, accept mock payment intents without verification
-        } else {
-          // Production mode: verify with Stripe
-          const stripeInstance = await getStripe();
-          const paymentIntent = await stripeInstance.paymentIntents.retrieve(bookingData.paymentIntentId);
+        if (paymentIntent.status !== 'succeeded') {
+          return json({ error: 'Payment not completed' }, { status: 400 });
+        }
 
-          if (paymentIntent.status !== 'succeeded') {
-            return json({ error: 'Payment not completed' }, { status: 400 });
-          }
-
-          // Verify payment amount matches booking total
-          const expectedAmount = Math.round(bookingData.totalPrice * 100); // Convert to cents
-          if (paymentIntent.amount !== expectedAmount) {
-            return json({ error: 'Payment amount mismatch' }, { status: 400 });
-          }
+        // Verify payment amount matches booking total
+        const expectedAmount = Math.round(bookingData.totalPrice * 100); // Convert to cents
+        if (paymentIntent.amount !== expectedAmount) {
+          return json({ error: 'Payment amount mismatch' }, { status: 400 });
         }
       } catch (paymentError) {
         console.error('Payment verification error:', paymentError);

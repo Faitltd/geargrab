@@ -1,55 +1,45 @@
 #!/bin/bash
 
-# Script 1: Fix the nextStep() function validation logic
-echo "🔧 Fixing nextStep() function validation logic..."
+# Update system packages
+sudo apt-get update
 
-# Create a backup of the original file
-cp src/routes/list-gear/+page.svelte src/routes/list-gear/+page.svelte.backup
+# Install Node.js 20 (required for the project)
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
-# Create a temporary script to fix the nextStep function
-cat > fix_nextstep.js << 'EOL'
-const fs = require('fs');
+# Verify Node.js and npm installation
+node --version
+npm --version
 
-// Read the file
-let content = fs.readFileSync('src/routes/list-gear/+page.svelte', 'utf8');
+# Add Node.js to PATH in user profile
+echo 'export PATH="/usr/bin:$PATH"' >> $HOME/.profile
 
-// Find and replace the nextStep function
-const oldNextStep = `  // Navigate to next step with validation
-  function nextStep(): void {
-    if (currentStep < totalSteps) {
-      // Still validate to show errors, but proceed anyway
-      validateStep(currentStep);
-      currentStep++;
-      window.scrollTo(0, 0);
-    }
-  }`;
+# Install project dependencies
+npm ci
 
-const newNextStep = `  // Navigate to next step with validation
-  function nextStep(): void {
-    if (currentStep < totalSteps) {
-      // Validate current step and only proceed if valid
-      const isValid = validateStep(currentStep);
-      if (isValid) {
-        currentStep++;
-        window.scrollTo(0, 0);
-      }
-      // If validation fails, errors will be shown but we stay on current step
-    }
-  }`;
+# Install Cypress dependencies for headless mode
+sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
 
-// Replace the function
-content = content.replace(oldNextStep, newNextStep);
+# Build the SvelteKit application
+npm run build
 
-// Write the file back
-fs.writeFileSync('src/routes/list-gear/+page.svelte', content);
+# Start the development server in background for testing
+npm run dev &
+DEV_PID=$!
 
-console.log('✅ Fixed nextStep() function validation logic');
-EOL
+# Wait for the development server to start
+echo "Waiting for development server to start..."
+sleep 10
 
-# Run the fix script
-node fix_nextstep.js
+# Check if server is running
+curl -f http://localhost:5173 > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    echo "Development server is running on port 5173"
+else
+    echo "Development server failed to start"
+    kill $DEV_PID 2>/dev/null
+    exit 1
+fi
 
-# Clean up
-rm fix_nextstep.js
-
-echo "✅ Script 1 completed: nextStep() function now properly validates before proceeding"
+# Keep the server running for tests
+echo "Setup complete. Development server is running for tests."

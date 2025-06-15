@@ -36,7 +36,7 @@
       }
 
       // Set default values
-      webhookTest.paymentIntentId = `pi_test_${Math.random().toString(36).substring(2, 15)}`;
+      webhookTest.paymentIntentId = 'pi_test_example_payment_intent_id';
       webhookTest.metadata.userId = $authStore.user.uid;
       
     } catch (error) {
@@ -82,7 +82,7 @@
         });
 
         // Generate new payment intent ID for next test
-        webhookTest.paymentIntentId = `pi_test_${Math.random().toString(36).substring(2, 15)}`;
+        webhookTest.paymentIntentId = 'pi_test_example_payment_intent_id';
       } else {
         testResults = [
           {
@@ -118,7 +118,7 @@
   }
 
   function generateNewPaymentIntent() {
-    webhookTest.paymentIntentId = `pi_test_${Math.random().toString(36).substring(2, 15)}`;
+    webhookTest.paymentIntentId = 'pi_test_example_payment_intent_id';
   }
 
   function getStatusBadgeClass(status: string) {

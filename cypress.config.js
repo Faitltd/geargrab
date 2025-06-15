@@ -2,7 +2,7 @@ import { defineConfig } from 'cypress'
 
 export default defineConfig({
   e2e: {
-    baseUrl: 'https://geargrab.co',
+    baseUrl: 'http://localhost:5173',
     specPattern: 'cypress/e2e/**/*.{cy,spec}.{js,ts}',
     supportFile: 'cypress/support/e2e.ts',
     video: false,

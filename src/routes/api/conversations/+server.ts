@@ -16,14 +16,11 @@ export const GET: RequestHandler = createSecureHandler(
       const searchTerm = url.searchParams.get('search');
       const isDevelopment = process.env.NODE_ENV !== 'production';
 
-      // In development mode without Firebase Admin, return mock conversations
-      if (isDevelopment && !adminFirestore) {
-        console.log('Development mode: Returning mock conversations');
+      // Require Firebase Admin for conversations
+      if (!adminFirestore) {
         return json({
-          success: true,
-          conversations: [],
-          totalCount: 0
-        });
+          error: 'Service temporarily unavailable'
+        }, { status: 503 });
       }
 
       // Get conversations where user is a participant
@@ -138,21 +135,11 @@ export const POST: RequestHandler = createSecureHandler(
         return json({ error: 'Cannot create conversation with yourself' }, { status: 400 });
       }
 
-      // In development mode without Firebase Admin, return mock conversation
-      if (isDevelopment && !adminFirestore) {
-        console.log('Development mode: Creating mock conversation');
-        const mockConversationId = `conv_mock_${Date.now()}`;
+      // Require Firebase Admin for conversations
+      if (!adminFirestore) {
         return json({
-          success: true,
-          conversation: {
-            id: mockConversationId,
-            participants: [auth.userId, otherUserId],
-            bookingId: bookingId || null,
-            listingId: listingId || null,
-            listingTitle: listingTitle || null
-          },
-          isNew: true
-        });
+          error: 'Service temporarily unavailable'
+        }, { status: 503 });
       }
 
       // Check if conversation already exists
