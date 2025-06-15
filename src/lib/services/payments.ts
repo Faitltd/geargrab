@@ -45,6 +45,11 @@ export async function createPaymentIntent(
   metadata: Record<string, string> = {}
 ): Promise<{ clientSecret: string; paymentIntentId: string }> {
   try {
+    // Validate minimum amount
+    if (amount < 0.50) {
+      throw new Error('Invalid amount. Minimum $0.50 required.');
+    }
+
     console.log('Creating payment intent:', { amount: amount * 100, currency, metadata });
 
     const headers: Record<string, string> = {

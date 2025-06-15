@@ -136,11 +136,11 @@
   $: days = startDate && endDate ?
     Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) : 0;
 
-  $: basePrice = listing ? listing.dailyPrice * days : 0;
+  $: basePrice = listing ? (listing.dailyPrice || 0) * days : 0;
   $: serviceFee = Math.round(basePrice * 0.1);
   $: deliveryFee = deliveryMethod === 'pickup' ? 0 : 30;
   $: insuranceFee = insuranceTier === 'none' ? 0 : insuranceTier === 'basic' ? 5 : insuranceTier === 'standard' ? 10 : 15;
-  $: calculatedTotal = basePrice + serviceFee + deliveryFee + insuranceFee;
+  $: calculatedTotal = Math.max(0.50, basePrice + serviceFee + deliveryFee + insuranceFee); // Ensure minimum $0.50
 
   // Debug pricing calculation
   $: {
@@ -423,22 +423,32 @@
           {#if showPayment}
             <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6 mt-6">
               <h2 class="text-lg font-semibold text-white mb-4 text-center">💳 Secure Payment</h2>
-              <div class="flex justify-center">
-                <StripePaymentForm
-                  amount={calculatedTotal}
-                  currency="usd"
-                  metadata={{
-                    listingId,
-                    startDate,
-                    endDate,
-                    deliveryMethod,
-                    insuranceTier
-                  }}
-                  disabled={paymentProcessing}
-                  on:success={handlePaymentSuccess}
-                  on:error={handlePaymentError}
-                />
-              </div>
+
+              {#if calculatedTotal < 0.50}
+                <div class="bg-red-500/20 border border-red-500/50 rounded-lg p-4 mb-4">
+                  <p class="text-red-200 text-sm text-center">
+                    ⚠️ Invalid payment amount. The minimum payment is $0.50.
+                    Please check the listing details and try again.
+                  </p>
+                </div>
+              {:else}
+                <div class="flex justify-center">
+                  <StripePaymentForm
+                    amount={calculatedTotal}
+                    currency="usd"
+                    metadata={{
+                      listingId,
+                      startDate,
+                      endDate,
+                      deliveryMethod,
+                      insuranceTier
+                    }}
+                    disabled={paymentProcessing}
+                    on:success={handlePaymentSuccess}
+                    on:error={handlePaymentError}
+                  />
+                </div>
+              {/if}
             </div>
           {/if}
 
