@@ -23,7 +23,18 @@
   
   onMount(async () => {
     try {
-      console.log('Initializing payment form with amount:', amount);
+      console.log('🔧 Initializing payment form:', {
+        amount,
+        amountInCents: Math.round(amount * 100),
+        currency,
+        metadata,
+        isValidAmount: amount >= 0.50
+      });
+
+      // Validate amount before proceeding
+      if (amount < 0.50) {
+        throw new Error('Invalid amount. Minimum $0.50 required.');
+      }
 
       // Temporarily disable authentication requirement for debugging
       console.log('🔧 Authentication temporarily disabled for payment debugging');

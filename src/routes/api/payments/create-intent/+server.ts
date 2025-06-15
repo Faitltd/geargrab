@@ -69,13 +69,19 @@ export const POST: RequestHandler = async (event) => {
     console.log('📝 Payment request:', { amount, currency, metadata, userId });
 
     // Validate required parameters
-    if (!amount || amount < 50) {
+    if (!amount || typeof amount !== 'number' || amount < 50) {
+      console.error('❌ Invalid payment amount:', { amount, type: typeof amount });
       const errorResponse: PaymentIntentErrorResponse = {
-        error: 'Invalid amount. Minimum $0.50 required.',
+        error: `Invalid amount. Minimum $0.50 required. Received: ${amount ? `$${(amount/100).toFixed(2)}` : 'undefined'}`,
         code: 'INVALID_AMOUNT'
       };
       return json(errorResponse, { status: 400 });
     }
+
+    console.log('✅ Payment amount validation passed:', {
+      amountInCents: amount,
+      amountInDollars: (amount/100).toFixed(2)
+    });
 
     // Get Stripe configuration
     const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -112,10 +118,15 @@ export const POST: RequestHandler = async (event) => {
         },
       };
 
-      console.log('🔄 Creating Stripe payment intent...');
+      console.log('🔄 Creating Stripe payment intent with data:', paymentIntentData);
       const paymentIntent = await stripeInstance.paymentIntents.create(paymentIntentData);
 
-      console.log('✅ Payment intent created successfully:', paymentIntent.id);
+      console.log('✅ Payment intent created successfully:', {
+        id: paymentIntent.id,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+        status: paymentIntent.status
+      });
 
       // Ensure client_secret exists before proceeding
       if (!paymentIntent.client_secret) {
@@ -133,11 +144,19 @@ export const POST: RequestHandler = async (event) => {
       };
       return json(successResponse);
 
-    } catch (stripeError: unknown) {
-      console.error('❌ Stripe error:', stripeError);
+    } catch (stripeError: any) {
+      console.error('❌ Stripe API error:', {
+        code: stripeError.code,
+        message: stripeError.message,
+        type: stripeError.type,
+        param: stripeError.param,
+        requestId: stripeError.requestId,
+        fullError: stripeError
+      });
+
       const errorResponse: PaymentIntentErrorResponse = {
-        error: 'Failed to create payment intent. Please try again.',
-        code: 'STRIPE_ERROR'
+        error: stripeError.message || 'Failed to create payment intent. Please try again.',
+        code: stripeError.code || 'STRIPE_ERROR'
       };
       return json(errorResponse, { status: 500 });
     }

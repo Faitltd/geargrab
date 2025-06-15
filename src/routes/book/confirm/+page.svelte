@@ -153,6 +153,8 @@
       deliveryFee,
       insuranceFee,
       calculatedTotal,
+      calculatedTotalInCents: Math.round(calculatedTotal * 100),
+      isValidAmount: calculatedTotal >= 0.50,
       startDate,
       endDate
     });

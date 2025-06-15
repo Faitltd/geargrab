@@ -23,20 +23,32 @@ self.addEventListener('install', (event: ExtendableEvent) => {
   async function addFilesToCache() {
     const cache = await caches.open(CACHE);
 
+    console.log(`🔄 Service Worker: Caching ${ASSETS.length} assets...`);
+
     // Add files individually to handle failures gracefully
     const failedAssets: string[] = [];
+    const successfulAssets: string[] = [];
 
     for (const asset of ASSETS) {
       try {
-        await cache.add(asset);
+        // Verify the asset exists before caching
+        const response = await fetch(asset);
+        if (response.ok) {
+          await cache.put(asset, response);
+          successfulAssets.push(asset);
+        } else {
+          console.warn(`❌ Asset returned ${response.status}: ${asset}`);
+          failedAssets.push(asset);
+        }
       } catch (error) {
-        console.warn(`Failed to cache asset: ${asset}`, error);
+        console.warn(`❌ Failed to cache asset: ${asset}`, error);
         failedAssets.push(asset);
       }
     }
 
+    console.log(`✅ Service Worker: Cached ${successfulAssets.length} assets successfully`);
     if (failedAssets.length > 0) {
-      console.warn(`Failed to cache ${failedAssets.length} assets:`, failedAssets);
+      console.warn(`⚠️ Service Worker: Failed to cache ${failedAssets.length} assets:`, failedAssets);
     }
   }
 
