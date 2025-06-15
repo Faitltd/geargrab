@@ -49,7 +49,7 @@ async function getStripe(): Promise<Stripe> {
 
     const StripeConstructor = (await import('stripe')).default;
     stripe = new StripeConstructor(secretKey, {
-      apiVersion: '2024-06-20',
+      apiVersion: '2023-10-16',
     });
   }
   return stripe;
@@ -59,9 +59,18 @@ export const POST: RequestHandler = async (event) => {
   console.log('🚀 Payment intent endpoint called');
 
   try {
-    // TEMPORARY: Skip all authentication for testing
-    const userId = 'test_user_123';
-    console.log('⚠️ TEMPORARY: Using test user for payment debugging');
+    // Authentication check - required for payments
+    const userId = event.locals.userId;
+    if (!userId) {
+      console.error('❌ Unauthorized payment attempt');
+      const errorResponse: PaymentIntentErrorResponse = {
+        error: 'Authentication required for payments',
+        code: 'UNAUTHORIZED'
+      };
+      return json(errorResponse, { status: 401 });
+    }
+
+    console.log('✅ Authenticated user making payment:', { userId });
 
     const body: CreatePaymentIntentRequest = await event.request.json();
     const { amount, currency = 'usd', metadata = {} } = body;
