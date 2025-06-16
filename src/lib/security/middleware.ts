@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import { adminAuth } from '$firebase/server';
+import { adminAuth } from '$lib/firebase/server';
 import { rateLimit } from '$lib/security/rateLimit';
 import { validateInput } from '$lib/security/validation';
 import { auditLog } from '$lib/security/audit';
@@ -188,22 +188,26 @@ export class SecurityMiddleware {
   // Content Security Policy headers
   static setSecurityHeaders(response: Response): Response {
     const headers = new Headers(response.headers);
-    
+
     headers.set('X-Content-Type-Options', 'nosniff');
     headers.set('X-Frame-Options', 'DENY');
     headers.set('X-XSS-Protection', '1; mode=block');
     headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
     headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+
+    // Cross-Origin-Opener-Policy for authentication popups
+    // Use unsafe-none to allow popup communication for Firebase Auth
+    headers.set('Cross-Origin-Opener-Policy', 'unsafe-none');
     
     // Content Security Policy
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.gstatic.com",
+      "script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.gstatic.com https://apis.google.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
       "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
       "img-src 'self' data: https: blob:",
-      "connect-src 'self' https://api.stripe.com https://js.stripe.com https://m.stripe.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://firebase.googleapis.com https://fcm.googleapis.com https://storage.googleapis.com wss://firestore.googleapis.com",
-      "frame-src https://js.stripe.com",
+      "connect-src 'self' https://api.stripe.com https://js.stripe.com https://m.stripe.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://firebase.googleapis.com https://fcm.googleapis.com https://storage.googleapis.com https://apis.google.com wss://firestore.googleapis.com",
+      "frame-src https://js.stripe.com https://accounts.google.com https://geargrabco.firebaseapp.com",
       "object-src 'none'",
       "base-uri 'self'"
     ].join('; ');

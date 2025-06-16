@@ -196,21 +196,21 @@
           error={errors.description}
         />
 
-        <FormField
-          id="dailyPrice"
-          label="Daily Price"
-          type="number"
-          bind:value={formData.dailyPrice}
-          placeholder="25.00"
-          min={1}
-          step={0.01}
-          required
-          error={errors.dailyPrice}
-          className="pl-8"
-        />
-        <!-- Dollar sign overlay for price field -->
-        <div class="relative -mt-12 mb-6">
-          <span class="absolute left-7 top-3 text-gray-300 pointer-events-none">$</span>
+        <div class="relative">
+          <FormField
+            id="dailyPrice"
+            label="Daily Price"
+            type="number"
+            bind:value={formData.dailyPrice}
+            placeholder="25.00"
+            min={1}
+            step={0.01}
+            required
+            error={errors.dailyPrice}
+            className="pl-8"
+          />
+          <!-- Dollar sign overlay for price field -->
+          <span class="absolute left-7 top-11 text-gray-300 pointer-events-none">$</span>
         </div>
 
         <!-- Location Fields -->

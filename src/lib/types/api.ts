@@ -17,7 +17,8 @@ export interface CreatePaymentIntentResponse {
 
 export interface PaymentIntentErrorResponse {
   error: string;
-  code: 'INVALID_AMOUNT' | 'PAYMENT_CONFIG_ERROR' | 'STRIPE_ERROR' | 'INTERNAL_ERROR';
+  code: 'INVALID_AMOUNT' | 'PAYMENT_CONFIG_ERROR' | 'STRIPE_ERROR' | 'INTERNAL_ERROR' | 'AUTH_REQUIRED';
+  debugInfo?: any;
 }
 
 // ============================================================================

@@ -137,7 +137,8 @@ export const SECURITY_CONFIG = {
         "'self'",
         "'unsafe-inline'", // TODO: Remove and use nonces
         "https://js.stripe.com",
-        "https://www.gstatic.com"
+        "https://www.gstatic.com",
+        "https://apis.google.com"
       ],
       styleSrc: [
         "'self'",
@@ -166,10 +167,13 @@ export const SECURITY_CONFIG = {
         "https://firebase.googleapis.com",
         "https://fcm.googleapis.com",
         "https://storage.googleapis.com",
+        "https://apis.google.com",
         "wss://firestore.googleapis.com"
       ],
       frameSrc: [
-        "https://js.stripe.com"
+        "https://js.stripe.com",
+        "https://accounts.google.com",
+        "https://geargrabco.firebaseapp.com"
       ],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
@@ -182,7 +186,8 @@ export const SECURITY_CONFIG = {
     xXSSProtection: '1; mode=block',
     referrerPolicy: 'strict-origin-when-cross-origin',
     permissionsPolicy: 'camera=(), microphone=(), geolocation=()',
-    strictTransportSecurity: 'max-age=31536000; includeSubDomains; preload'
+    strictTransportSecurity: 'max-age=31536000; includeSubDomains; preload',
+    crossOriginOpenerPolicy: 'unsafe-none'
   },
 
   // Audit logging

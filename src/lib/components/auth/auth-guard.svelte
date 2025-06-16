@@ -1,44 +1,40 @@
 <script lang="ts">
-  import { authStore } from '$lib/stores/auth';
-  import LoginModal from '$lib/components/auth/login-modal.svelte';
-  import SignupModal from '$lib/components/auth/signup-modal.svelte';
+  import { goto } from '$app/navigation';
+  import { clientAuth } from '$lib/auth/client-v2';
 
   export let message: string = 'You must be signed in to access this feature.';
   export let showLoginPrompt: boolean = true;
 
-  $: isAuthenticated = !!$authStore.user;
-  $: isLoading = $authStore.loading;
-
-  let showLoginModal = false;
-  let showSignupModal = false;
+  // Use the new auth system V2
+  $: authState = clientAuth.authState;
+  $: isAuthenticated = $authState.isAuthenticated;
+  $: isLoading = $authState.loading;
 
   function handleLogin() {
-    showLoginModal = true;
+    // Force navigation to login page - multiple fallback methods
+    console.log('🔄 Navigating to login page...');
+
+    // Method 1: SvelteKit goto
+    goto('/auth/login').catch(() => {
+      // Method 2: Direct window location if goto fails
+      console.log('⚠️ goto failed, using window.location');
+      window.location.href = '/auth/login';
+    });
   }
 
   function handleSignup() {
-    showSignupModal = true;
+    // Force navigation to signup page - multiple fallback methods
+    console.log('🔄 Navigating to signup page...');
+
+    // Method 1: SvelteKit goto
+    goto('/auth/signup').catch(() => {
+      // Method 2: Direct window location if goto fails
+      console.log('⚠️ goto failed, using window.location');
+      window.location.href = '/auth/signup';
+    });
   }
 
-  function handleLoginSuccess() {
-    showLoginModal = false;
-    // The auth store will automatically update and show the protected content
-  }
 
-  function handleSignupSuccess() {
-    showSignupModal = false;
-    // The auth store will automatically update and show the protected content
-  }
-
-  function switchToSignup() {
-    showLoginModal = false;
-    showSignupModal = true;
-  }
-
-  function switchToLogin() {
-    showSignupModal = false;
-    showLoginModal = true;
-  }
 </script>
 
 {#if isLoading}
@@ -66,7 +62,8 @@
     {#if showLoginPrompt}
       <div class="space-y-4">
         <button
-          on:click={handleLogin}
+          type="button"
+          on:click|preventDefault={handleLogin}
           class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
         >
           Sign In to Continue
@@ -76,7 +73,7 @@
           Don't have an account?
           <button
             type="button"
-            on:click={handleSignup}
+            on:click|preventDefault={handleSignup}
             class="text-green-400 hover:text-green-300 underline font-medium"
           >
             Sign up here
@@ -97,16 +94,4 @@
   </div>
 {/if}
 
-<!-- Login Modal -->
-<LoginModal
-  bind:show={showLoginModal}
-  on:success={handleLoginSuccess}
-  on:switchToSignup={switchToSignup}
-/>
 
-<!-- Signup Modal -->
-<SignupModal
-  bind:show={showSignupModal}
-  on:success={handleSignupSuccess}
-  on:switchToLogin={switchToLogin}
-/>

@@ -1,13 +1,16 @@
 <script lang="ts">
-  // Version: 2.0 - Fixed sign out button text
-  import { authStore } from '$lib/stores/auth';
+  // Version: 3.0 - Updated to use new auth system V2
+  import { clientAuth } from '$lib/auth/client-v2';
   import { smoothScrollWithNavOffset } from '$lib/utils/smooth-scroll';
   import { signOut } from '$lib/firebase/auth';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   let isMenuOpen = false;
-  
+
+  // Use new auth system V2
+  $: authState = clientAuth.authState;
+
   // Determine if we're on the homepage
   $: isHomepage = $page.url.pathname === '/';
 
@@ -43,16 +46,16 @@
 
   async function handleSignOut() {
     if (isSigningOut) return; // Prevent multiple clicks
-    
+
     isSigningOut = true;
     try {
       await signOut();
-      
+
       // Close mobile menu if open
       if (isMenuOpen) {
         isMenuOpen = false;
       }
-      
+
       // Navigate to home page
       await goto('/');
     } catch (error) {
@@ -111,7 +114,7 @@
         </div>
       </div>
       <div class="hidden sm:ml-6 sm:flex sm:items-center">
-        {#if $authStore.user}
+        {#if $authState.user}
           <a href="/dashboard" class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
             Dashboard
           </a>
@@ -187,17 +190,17 @@
         </a>
       </div>
       <div class="pt-4 pb-3 border-t border-white/20">
-        {#if $authStore.user}
+        {#if $authState.user}
           <div class="flex items-center px-4">
             <div class="flex-shrink-0">
               <span class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-green-600">
                 <span class="text-xl font-medium leading-none text-white">
-                  {$authStore.user.displayName?.[0] || $authStore.user.email?.[0] || 'U'}
+                  {$authState.user.displayName?.[0] || $authState.user.email?.[0] || 'U'}
                 </span>
               </span>
             </div>
             <div class="ml-3">
-              <div class="text-base font-medium text-white">{$authStore.user.displayName || $authStore.user.email}</div>
+              <div class="text-base font-medium text-white">{$authState.user.displayName || $authState.user.email}</div>
             </div>
           </div>
           <div class="mt-3 space-y-1">

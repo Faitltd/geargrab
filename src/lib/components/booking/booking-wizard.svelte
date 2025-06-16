@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { goto } from '$app/navigation';
-  import { authStore } from '$lib/stores/auth';
+  import { clientAuth } from '$lib/auth/client-v2';
   import AuthGuard from '$lib/components/auth/auth-guard.svelte';
   import StepIndicator from '$lib/components/ui/step-indicator.svelte';
   import BookingDetails from './booking-details.svelte';
@@ -41,9 +41,12 @@
     deliveryFee
   );
   
+  // Use new auth system V2
+  $: authState = clientAuth.authState;
+
   // Validate dates
   $: dateValidation = validateBookingDates(startDate, endDate);
-  $: canProceed = dateValidation.valid && !!$authStore.user;
+  $: canProceed = dateValidation.valid && $authState.isAuthenticated;
 
   async function handleProceedToPayment() {
     if (!canProceed) {
@@ -61,7 +64,7 @@
         listing.title,
         listing.images[0] || '',
         listing.ownerUid,
-        $authStore.user!.uid,
+        $authState.user!.uid,
         startDate,
         endDate,
         rentalFees.totalPrice,
@@ -85,14 +88,21 @@
   function handlePaymentSuccess(event: CustomEvent) {
     const { paymentIntent, paymentIntentId } = event.detail;
     console.log('✅ Payment successful:', { paymentIntent, paymentIntentId });
-    
-    // Redirect to success page
+
+    // Redirect to success page with detailed price breakdown
     const successUrl = new URL('/payment/success', window.location.origin);
     successUrl.searchParams.set('paymentId', paymentIntentId);
     successUrl.searchParams.set('amount', rentalFees.totalPrice.toString());
     successUrl.searchParams.set('bookingId', bookingId);
     successUrl.searchParams.set('listingId', listing.id);
-    
+
+    // Add price breakdown details
+    successUrl.searchParams.set('dailyPrice', listing.dailyPrice.toString());
+    successUrl.searchParams.set('days', rentalFees.days.toString());
+    successUrl.searchParams.set('basePrice', rentalFees.rentalFee.toString());
+    successUrl.searchParams.set('serviceFee', rentalFees.serviceFee.toString());
+    successUrl.searchParams.set('deliveryFee', rentalFees.deliveryFee.toString());
+
     goto(successUrl.toString());
   }
 

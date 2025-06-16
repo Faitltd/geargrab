@@ -1,0 +1,71 @@
+{
+  "summary": {
+    "total": 6,
+    "passed": 3,
+    "failed": 3,
+    "duration": "21.64",
+    "successRate": "50.0"
+  },
+  "rateLimitConfig": {
+    "auth": {
+      "windowMs": 900000,
+      "max": 5
+    },
+    "api": {
+      "windowMs": 900000,
+      "max": 100
+    },
+    "upload": {
+      "windowMs": 3600000,
+      "max": 10
+    },
+    "payment": {
+      "windowMs": 3600000,
+      "max": 20
+    },
+    "admin": {
+      "windowMs": 900000,
+      "max": 200
+    }
+  },
+  "details": [
+    {
+      "testName": "Basic Rate Limit Threshold",
+      "passed": true,
+      "details": "Success: 100, Rate Limited: 5, Expected limit: 100",
+      "timestamp": "2025-06-15T11:38:55.455Z"
+    },
+    {
+      "testName": "Rate Limit Boundary Test",
+      "passed": false,
+      "details": "0/10 requests succeeded, extra request status: 429",
+      "timestamp": "2025-06-15T11:38:58.983Z"
+    },
+    {
+      "testName": "Different Endpoint Rate Limits",
+      "passed": false,
+      "details": "Different endpoints show varied rate limiting behavior",
+      "timestamp": "2025-06-15T11:39:06.210Z"
+    },
+    {
+      "testName": "Rate Limit Headers",
+      "passed": false,
+      "details": "Rate limit headers missing (may be by design)",
+      "timestamp": "2025-06-15T11:39:08.213Z"
+    },
+    {
+      "testName": "Concurrent Request Handling",
+      "passed": true,
+      "details": "0 success, 20 rate limited, 0 errors in 29ms",
+      "timestamp": "2025-06-15T11:39:10.243Z"
+    },
+    {
+      "testName": "Rate Limit Bypass Prevention",
+      "passed": true,
+      "details": "Rate limit bypass attempts properly blocked",
+      "timestamp": "2025-06-15T11:39:14.282Z"
+    }
+  ],
+  "timestamp": "2025-06-15T11:39:16.283Z",
+  "baseUrl": "http://localhost:5173"
+}

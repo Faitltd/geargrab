@@ -8,22 +8,40 @@
   let listingId: string = '';
   let bookingId: string = '';
   let userEmail: string = '';
+  let priceBreakdown: any = null;
 
   onMount(() => {
     // Get payment details from URL parameters
     const urlParams = $page.url.searchParams;
-    
+
     paymentId = urlParams.get('paymentId') || '';
     amount = urlParams.get('amount') || '';
     listingId = urlParams.get('listingId') || '';
     bookingId = urlParams.get('bookingId') || '';
-    
+
+    // Get price breakdown if available
+    const dailyPrice = urlParams.get('dailyPrice');
+    const days = urlParams.get('days');
+    const basePrice = urlParams.get('basePrice');
+    const serviceFee = urlParams.get('serviceFee');
+    const deliveryFee = urlParams.get('deliveryFee');
+
+    if (dailyPrice && days && basePrice && serviceFee) {
+      priceBreakdown = {
+        dailyPrice: parseFloat(dailyPrice),
+        days: parseInt(days),
+        basePrice: parseFloat(basePrice),
+        serviceFee: parseFloat(serviceFee),
+        deliveryFee: parseFloat(deliveryFee || '0')
+      };
+    }
+
     // Get user email from auth store
     if ($authStore.user?.email) {
       userEmail = $authStore.user.email;
     }
-    
-    console.log('Payment success page loaded:', { paymentId, amount, listingId, bookingId });
+
+    console.log('Payment success page loaded:', { paymentId, amount, listingId, bookingId, priceBreakdown });
   });
 
   function formatCurrency(amount: string): string {
@@ -68,10 +86,32 @@
                 <span class="text-white font-mono text-xs">{paymentId}</span>
               </div>
             {/if}
+
+            {#if priceBreakdown}
+              <!-- Detailed Price Breakdown -->
+              <div class="border-t border-white/20 pt-2 mt-2">
+                <div class="flex justify-between">
+                  <span class="text-gray-400">{formatCurrency(priceBreakdown.dailyPrice)} × {priceBreakdown.days} days:</span>
+                  <span class="text-white">{formatCurrency(priceBreakdown.basePrice)}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-400">Service fee:</span>
+                  <span class="text-white">{formatCurrency(priceBreakdown.serviceFee)}</span>
+                </div>
+                {#if priceBreakdown.deliveryFee > 0}
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Delivery fee:</span>
+                    <span class="text-white">{formatCurrency(priceBreakdown.deliveryFee)}</span>
+                  </div>
+                {/if}
+                <hr class="border-white/20 my-1" />
+              </div>
+            {/if}
+
             {#if amount}
-              <div class="flex justify-between">
-                <span class="text-gray-400">Amount:</span>
-                <span class="text-white font-semibold">{formatCurrency(amount)}</span>
+              <div class="flex justify-between font-semibold">
+                <span class="text-gray-400">Total Amount:</span>
+                <span class="text-white">{formatCurrency(amount)}</span>
               </div>
             {/if}
             {#if userEmail}

@@ -10,7 +10,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   const start = Date.now();
 
   // Check if Firebase Admin is available
-  if (await isFirebaseAdminAvailable()) {
+  if (isFirebaseAdminAvailable()) {
     // Authenticate user if Firebase Admin is available
     const auth = await SecurityMiddleware.authenticateUser(event);
     if (auth) {

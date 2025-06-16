@@ -42,11 +42,12 @@ export async function initializeStripe() {
   return stripe;
 }
 
-// Create payment intent for authenticated users only
+// Create payment intent for authenticated users or test mode
 export async function createPaymentIntent(
   amount: number,
   currency: string = 'usd',
-  metadata: Record<string, string> = {}
+  metadata: Record<string, string> = {},
+  testMode: boolean = false
 ): Promise<{ clientSecret: string; paymentIntentId: string }> {
   try {
     // Validate minimum amount
@@ -54,36 +55,67 @@ export async function createPaymentIntent(
       throw new Error('Invalid amount. Minimum $0.50 required.');
     }
 
-    console.log('Creating payment intent:', { amount: amount * 100, currency, metadata });
+    console.log('Creating payment intent:', { amount: amount * 100, currency, metadata, testMode });
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
-    // Get Firebase auth token for authenticated requests
+    // Add test mode header if enabled
+    if (testMode) {
+      headers['X-Test-Mode'] = 'true';
+    }
+
+    // Use new authentication service for token handling
     if (browser) {
-      const { auth } = await import('$lib/firebase/client');
-      const user = auth.currentUser;
-      if (user) {
-        const idToken = await user.getIdToken();
-        headers['Authorization'] = `Bearer ${idToken}`;
-        console.log('✅ Added Firebase auth token to payment request');
-      } else {
+      const { clientAuth } = await import('$lib/auth/client-v2');
+
+      if (!clientAuth.isAuthenticated) {
         console.error('❌ User not authenticated - cannot create payment intent');
         throw new Error('Authentication required. Please log in and try again.');
       }
+
+      try {
+        const idToken = await clientAuth.getIdToken();
+        if (idToken) {
+          headers['Authorization'] = `Bearer ${idToken}`;
+          console.log('✅ Added Firebase auth token to payment request');
+        } else {
+          throw new Error('Failed to get authentication token');
+        }
+      } catch (error: any) {
+        console.error('❌ Failed to get auth token:', error);
+        throw new Error('Authentication token error. Please try logging in again.');
+      }
     }
 
-    // Create payment intent with authentication
-    const response = await fetch('/api/payments/create-intent', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        amount: Math.round(amount * 100), // Convert to cents
-        currency,
-        metadata
-      }),
-    });
+    // Create payment intent with enhanced authentication
+    let response: Response;
+
+    if (browser) {
+      const { clientAuth } = await import('$lib/auth/client-v2');
+
+      // Use the new authenticated request method
+      response = await clientAuth.makeAuthenticatedRequest('/api/payments/create-intent', {
+        method: 'POST',
+        body: JSON.stringify({
+          amount: Math.round(amount * 100), // Convert to cents
+          currency,
+          metadata
+        })
+      });
+    } else {
+      // Fallback for server-side (shouldn't happen for payments)
+      response = await fetch('/api/payments/create-intent', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          amount: Math.round(amount * 100), // Convert to cents
+          currency,
+          metadata
+        }),
+      });
+    }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));

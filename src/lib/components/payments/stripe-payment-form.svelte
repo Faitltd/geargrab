@@ -7,6 +7,7 @@
   export let currency: string = 'usd';
   export let metadata: Record<string, string> = {};
   export let disabled: boolean = false;
+  export let testMode: boolean = false;
 
   const dispatch = createEventDispatcher();
 
@@ -35,7 +36,7 @@
       }
 
       // Create payment intent
-      const { clientSecret: secret } = await createPaymentIntent(amount, currency, metadata);
+      const { clientSecret: secret } = await createPaymentIntent(amount, currency, metadata, testMode);
       clientSecret = secret;
 
       // Initialize Stripe payment elements

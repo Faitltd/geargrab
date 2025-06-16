@@ -10,32 +10,53 @@
   let currency: string = 'usd';
   let metadata: Record<string, string> = {};
   let listingTitle: string = '';
+  let priceBreakdown: any = null;
   let error: string = '';
 
   onMount(() => {
     // Get payment details from URL parameters
     const urlParams = $page.url.searchParams;
-    
+
     const amountParam = urlParams.get('amount');
     if (amountParam) {
       amount = parseFloat(amountParam);
     }
-    
+
     currency = urlParams.get('currency') || 'usd';
     listingTitle = urlParams.get('title') || 'Gear Rental';
-    
+
     // Parse metadata
     const listingId = urlParams.get('listingId');
     const bookingId = urlParams.get('bookingId');
-    
+
     if (listingId) metadata.listingId = listingId;
     if (bookingId) metadata.bookingId = bookingId;
-    
+
+    // Get price breakdown if available
+    const dailyPrice = urlParams.get('dailyPrice');
+    const days = urlParams.get('days');
+    const basePrice = urlParams.get('basePrice');
+    const serviceFee = urlParams.get('serviceFee');
+    const deliveryFee = urlParams.get('deliveryFee');
+    const insuranceFee = urlParams.get('insuranceFee');
+
+    // Store breakdown for display
+    if (dailyPrice && days && basePrice && serviceFee) {
+      priceBreakdown = {
+        dailyPrice: parseFloat(dailyPrice),
+        days: parseInt(days),
+        basePrice: parseFloat(basePrice),
+        serviceFee: parseFloat(serviceFee),
+        deliveryFee: parseFloat(deliveryFee || '0'),
+        insuranceFee: parseFloat(insuranceFee || '0')
+      };
+    }
+
     // Validate required parameters
     if (!amount || amount <= 0) {
       error = 'Invalid payment amount. Please return to the listing page.';
     }
-    
+
     console.log('Payment page loaded:', { amount, currency, metadata, listingTitle });
   });
 
@@ -106,6 +127,34 @@
                 <span class="text-gray-300">Item:</span>
                 <span class="text-white font-medium">{listingTitle}</span>
               </div>
+
+              {#if priceBreakdown}
+                <!-- Detailed Price Breakdown -->
+                <div class="border-t border-white/20 pt-3 mt-3">
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-300">{formatCurrency(priceBreakdown.dailyPrice)} × {priceBreakdown.days} days</span>
+                    <span class="text-white">{formatCurrency(priceBreakdown.basePrice)}</span>
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-300">Service fee</span>
+                    <span class="text-white">{formatCurrency(priceBreakdown.serviceFee)}</span>
+                  </div>
+                  {#if priceBreakdown.deliveryFee > 0}
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-300">Delivery fee</span>
+                      <span class="text-white">{formatCurrency(priceBreakdown.deliveryFee)}</span>
+                    </div>
+                  {/if}
+                  {#if priceBreakdown.insuranceFee > 0}
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-300">Insurance</span>
+                      <span class="text-white">{formatCurrency(priceBreakdown.insuranceFee)}</span>
+                    </div>
+                  {/if}
+                  <hr class="border-white/20 my-2" />
+                </div>
+              {/if}
+
               <div class="flex justify-between">
                 <span class="text-gray-300">Total Amount:</span>
                 <span class="text-white font-bold text-xl">{formatCurrency(amount)}</span>

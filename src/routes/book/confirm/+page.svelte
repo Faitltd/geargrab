@@ -170,12 +170,39 @@
   }
 
   function formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    try {
+      // Handle different date formats
+      let date;
+      if (typeof dateString === 'string') {
+        // If it's an ISO string, parse it
+        date = new Date(dateString);
+      } else if (dateString && typeof dateString === 'object' && dateString.toDate) {
+        // If it's a Firestore Timestamp
+        date = dateString.toDate();
+      } else if (dateString && typeof dateString === 'object' && dateString.seconds) {
+        // If it's a Firestore Timestamp object
+        date = new Date(dateString.seconds * 1000);
+      } else {
+        // Assume it's already a Date object
+        date = new Date(dateString);
+      }
+
+      // Validate the date
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date:', dateString);
+        return 'Invalid Date';
+      }
+
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error, dateString);
+      return 'Invalid Date';
+    }
   }
 
   // Payment state
@@ -223,6 +250,14 @@
         deliveryMethod,
         insuranceTier,
         totalPrice: calculatedTotal,
+        priceBreakdown: {
+          dailyPrice: listing?.dailyPrice || 0,
+          days,
+          basePrice,
+          serviceFee,
+          deliveryFee,
+          insuranceFee
+        },
         contactInfo,
         specialRequests,
         paymentIntentId: event.detail.paymentIntentId

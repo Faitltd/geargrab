@@ -320,6 +320,14 @@ export const POST: RequestHandler = createSecureHandler(
       deliveryMethod: bookingData.deliveryMethod || 'pickup',
       insuranceTier: bookingData.insuranceTier || 'standard',
       totalPrice: bookingData.totalPrice,
+      priceBreakdown: bookingData.priceBreakdown || {
+        dailyPrice: 0,
+        days: 1,
+        basePrice: 0,
+        serviceFee: 0,
+        deliveryFee: 0,
+        insuranceFee: 0
+      },
       contactInfo: bookingData.contactInfo,
       specialRequests: bookingData.specialRequests || '',
       status: 'pending',
@@ -409,6 +417,7 @@ export const POST: RequestHandler = createSecureHandler(
     endDate: { required: true, type: 'string' as const },
     contactInfo: { required: true, type: 'object' as const },
     totalPrice: { required: true, type: 'number' as const, min: 0 },
+    priceBreakdown: { required: false, type: 'object' as const },
     deliveryMethod: { required: false, type: 'string' as const },
     insuranceTier: { required: false, type: 'string' as const },
     specialRequests: { required: false, type: 'string' as const },
