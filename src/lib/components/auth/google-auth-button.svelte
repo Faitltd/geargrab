@@ -1,12 +1,13 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { signInWithGoogle } from '$lib/firebase/auth';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import { notifications } from '$lib/stores/notifications';
 
   export let loading: boolean = false;
   export let text: string = 'Continue with Google';
   export let loadingText: string = 'Signing in...';
   export let className: string = '';
+  export let usePopup: boolean = true; // Use popup by default
 
   const dispatch = createEventDispatcher<{
     success: { user: any };
@@ -22,24 +23,30 @@
 
     try {
       console.log('🔐 Starting Google sign-in process...');
-      const result = await signInWithGoogle();
+      const result = await simpleAuth.signInWithGoogle();
 
-      console.log('✅ Google sign-in successful:', result.user.email);
+      if (result.success) {
+        console.log('✅ Google sign-in successful');
 
-      notifications.add({
-        type: 'success',
-        message: `Successfully signed in with Google! Welcome, ${result.user.displayName || result.user.email}`,
-        timeout: 5000
-      });
+        notifications.add({
+          type: 'success',
+          message: 'Successfully signed in with Google!',
+          timeout: 5000
+        });
 
-      dispatch('success', { user: result.user });
+        // Get the current user from simpleAuth
+        const user = simpleAuth.user;
+        dispatch('success', { user });
+      } else {
+        throw new Error(result.error || 'Google sign-in failed');
+      }
     } catch (error: any) {
       console.error('❌ Google sign-in error:', error);
 
       let errorMessage = error.message || 'An error occurred during Google sign-in';
 
       // Handle domain authorization error specifically
-      if (error.code === 'auth/unauthorized-domain') {
+      if (error.message?.includes('unauthorized-domain')) {
         errorMessage = 'Google sign-in is temporarily unavailable. Please use email sign-in instead.';
       }
 

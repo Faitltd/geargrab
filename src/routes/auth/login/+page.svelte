@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { signInWithEmail } from '$lib/firebase/auth';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import { notifications } from '$lib/stores/notifications';
   import { isValidEmail } from '$lib/utils/validation';
   import FormContainer from '$lib/components/forms/form-container.svelte';
@@ -9,6 +9,7 @@
   import FormButton from '$lib/components/forms/form-button.svelte';
   import GoogleAuthButton from '$lib/components/auth/google-auth-button.svelte';
   import ErrorAlert from '$lib/components/ui/error-alert.svelte';
+  import { onMount } from 'svelte';
 
   let email = '';
   let password = '';
@@ -17,6 +18,25 @@
 
   // Get redirect URL from query parameters
   $: redirectTo = $page.url.searchParams.get('redirectTo') || '/';
+
+  // Get auth state
+  $: authState = simpleAuth.authState;
+
+  // Check if user is already authenticated on mount
+  onMount(async () => {
+    console.log('🔐 Login page mounted, checking auth state...');
+
+    // Force refresh auth state to get latest
+    await simpleAuth.refreshAuth();
+
+    // Small delay to ensure auth state is loaded
+    setTimeout(() => {
+      if ($authState.isAuthenticated && $authState.user) {
+        console.log('✅ User already authenticated, redirecting to:', redirectTo);
+        goto(redirectTo);
+      }
+    }, 500);
+  });
 
   // Validate form
   function validateForm() {
@@ -47,30 +67,61 @@
     errors = {};
 
     try {
-      await signInWithEmail(email, password);
+      console.log('🔐 Login: Starting email/password sign-in...');
+      const result = await simpleAuth.signInWithEmailPassword(email, password);
 
-      notifications.add({
-        type: 'success',
-        message: 'Successfully logged in!',
-        timeout: 5000
-      });
+      if (result.success) {
+        notifications.add({
+          type: 'success',
+          message: 'Successfully logged in!',
+          timeout: 5000
+        });
 
-      // Wait for auth state to propagate
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Navigate to redirect URL
-      await goto(redirectTo);
-    } catch (error: any) {
-      console.error('Login error:', error);
+        // Wait for auth state to propagate
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Handle specific Firebase auth errors
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        errors.auth = 'Invalid email or password';
-      } else if (error.code === 'auth/too-many-requests') {
-        errors.auth = 'Too many failed login attempts. Please try again later or reset your password.';
+        console.log('🔐 Login: Redirecting to:', redirectTo);
+
+        // Force navigation using multiple methods for reliability
+        try {
+          await goto(redirectTo);
+        } catch (gotoError) {
+          console.warn('🔄 goto failed, using window.location:', gotoError);
+          window.location.href = redirectTo;
+        }
       } else {
-        errors.auth = error.message || 'An error occurred during login';
+        throw new Error(result.error || 'Login failed');
       }
+    } catch (error: any) {
+      console.error('🔐 Login: Email/password sign-in failed:', error);
+
+      // Enhanced error message handling
+      let errorMessage = 'An error occurred during login';
+
+      if (error.message) {
+        if (error.message.includes('invalid-login-credentials') ||
+            error.message.includes('user-not-found') ||
+            error.message.includes('wrong-password')) {
+          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        } else if (error.message.includes('too-many-requests')) {
+          errorMessage = 'Too many failed attempts. Please try again later or reset your password.';
+        } else if (error.message.includes('network')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        } else if (error.message.includes('popup-blocked')) {
+          errorMessage = 'Popup was blocked. Please allow popups for this site and try again.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      errors.auth = errorMessage;
+
+      // Show notification for better visibility
+      notifications.add({
+        type: 'error',
+        message: errorMessage,
+        timeout: 8000
+      });
     } finally {
       loading = false;
     }
@@ -78,11 +129,20 @@
 
   // Handle Google sign-in success
   async function handleGoogleSuccess() {
-    // Wait for auth state to propagate
-    await new Promise(resolve => setTimeout(resolve, 500));
+    console.log('🔐 Login: Google sign-in successful, redirecting...');
 
-    // Navigate to redirect URL
-    await goto(redirectTo);
+    // Wait for auth state to propagate
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    console.log('🔐 Login: Redirecting to:', redirectTo);
+
+    // Force navigation using multiple methods for reliability
+    try {
+      await goto(redirectTo);
+    } catch (gotoError) {
+      console.warn('🔄 goto failed, using window.location:', gotoError);
+      window.location.href = redirectTo;
+    }
   }
 
   // Handle Google sign-in error

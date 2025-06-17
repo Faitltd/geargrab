@@ -40,7 +40,18 @@ export const handle: Handle = async ({ event, resolve }) => {
   console.log('Request processed', logData);
 
   // Apply security headers to all responses (not just API endpoints)
-  const secureResponse = SecurityMiddleware.setSecurityHeaders(response);
+  // Skip COOP header for auth-related routes to prevent popup communication issues
+  const isAuthRoute = event.url.pathname.includes('/auth') ||
+                      event.url.pathname.includes('/login') ||
+                      event.url.pathname.includes('/signup') ||
+                      event.url.pathname.includes('/test-auth') ||
+                      event.url.pathname.includes('/book') || // Booking pages may trigger auth
+                      event.url.pathname.includes('/dashboard') || // Dashboard may trigger auth
+                      event.url.pathname === '/' || // Homepage has auth components
+                      event.url.searchParams.has('redirectTo'); // Any page with auth redirect
+
+  console.log(`🔒 Security headers for ${event.url.pathname}: skipCOOP=${isAuthRoute}`);
+  const secureResponse = SecurityMiddleware.setSecurityHeaders(response, isAuthRoute);
 
   return secureResponse;
 };

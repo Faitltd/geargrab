@@ -25,7 +25,7 @@ steps:
       - '--min-instances'
       - '0'
       - '--max-instances'
-      - '10'
+      - '5'
       - '--set-env-vars'
       - 'NODE_ENV=production'
 images:

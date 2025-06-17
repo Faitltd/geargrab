@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { adminFirestore } from '$firebase/server';
 import type { Booking } from '$types/firestore';
+import { BookingStatus } from '$lib/types/booking-status';
 
 // Get bookings for the current user
 export const GET: RequestHandler = async ({ url, locals }) => {
@@ -79,13 +80,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return json({ error: 'Listing is not active' }, { status: 400 });
     }
     
-    // Add timestamps
+    // Add timestamps and set initial status for two-stage payment
     const now = adminFirestore.Timestamp.now();
     const bookingWithTimestamps = {
       ...bookingData,
+      ownerUid: listing.ownerUid, // Add owner UID for notifications
       createdAt: now,
       updatedAt: now,
-      status: 'pending'
+      status: BookingStatus.PENDING_OWNER_APPROVAL, // Initial status for two-stage payment
+      paymentStage: bookingData.paymentStage || 'upfront', // Track payment stage
+      upfrontPaymentId: bookingData.paymentIntentId, // Store upfront payment ID
+      rentalPaymentId: null // Will be set when rental fee is charged
     };
     
     // Create booking

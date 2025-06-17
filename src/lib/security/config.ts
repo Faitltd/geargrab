@@ -138,7 +138,8 @@ export const SECURITY_CONFIG = {
         "'unsafe-inline'", // TODO: Remove and use nonces
         "https://js.stripe.com",
         "https://www.gstatic.com",
-        "https://apis.google.com"
+        "https://apis.google.com",
+        "https://accounts.google.com"
       ],
       styleSrc: [
         "'self'",
@@ -168,12 +169,14 @@ export const SECURITY_CONFIG = {
         "https://fcm.googleapis.com",
         "https://storage.googleapis.com",
         "https://apis.google.com",
+        "https://accounts.google.com",
         "wss://firestore.googleapis.com"
       ],
       frameSrc: [
         "https://js.stripe.com",
         "https://accounts.google.com",
-        "https://geargrabco.firebaseapp.com"
+        "https://geargrabco.firebaseapp.com",
+        "https://geargrab.co"
       ],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
@@ -182,12 +185,12 @@ export const SECURITY_CONFIG = {
     
     // Other security headers
     xContentTypeOptions: 'nosniff',
-    xFrameOptions: 'DENY',
+    xFrameOptions: 'SAMEORIGIN', // Changed from DENY to allow Google auth frames
     xXSSProtection: '1; mode=block',
     referrerPolicy: 'strict-origin-when-cross-origin',
     permissionsPolicy: 'camera=(), microphone=(), geolocation=()',
-    strictTransportSecurity: 'max-age=31536000; includeSubDomains; preload',
-    crossOriginOpenerPolicy: 'unsafe-none'
+    strictTransportSecurity: 'max-age=31536000; includeSubDomains; preload'
+    // crossOriginOpenerPolicy removed - handled dynamically in middleware
   },
 
   // Audit logging

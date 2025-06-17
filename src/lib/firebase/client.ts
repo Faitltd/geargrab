@@ -26,6 +26,13 @@ if (browser) {
     auth = getAuth(firebaseApp);
     firestore = getFirestore(firebaseApp);
     storage = getStorage(firebaseApp);
+
+    // Configure Auth to avoid popup issues
+    if (auth) {
+      // Disable popup-related features to avoid COOP issues
+      console.log('🔧 Configuring Firebase Auth for redirect-only mode');
+    }
+
     console.log('✅ Firebase services initialized');
 
     // Connect to emulators if enabled

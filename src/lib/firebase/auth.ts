@@ -1,7 +1,7 @@
 import { browser } from '$app/environment';
 import { auth } from './client';
-import { 
-  signInWithEmailAndPassword, 
+import {
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   sendPasswordResetEmail,
@@ -12,6 +12,8 @@ import {
   EmailAuthProvider,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   type UserCredential,
   type User
 } from 'firebase/auth';
@@ -19,14 +21,28 @@ import { firestore } from './client';
 import { doc, setDoc, getDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import type { User as FirestoreUser } from '$types/firestore';
 
+// Handle redirect result (call this on app initialization)
+export async function handleGoogleRedirectResult(): Promise<UserCredential | null> {
+  if (!browser) return null;
+
+  try {
+    // Use the redirect-only implementation
+    const { initializeRedirectAuth } = await import('./auth-redirect-only');
+    return await initializeRedirectAuth();
+  } catch (error: any) {
+    console.error('❌ Google redirect sign-in error:', error);
+    throw error;
+  }
+}
+
 // Sign in with email and password
 export async function signInWithEmail(email: string, password: string): Promise<UserCredential> {
   if (!browser) throw new Error('Auth functions can only be called in the browser');
   return signInWithEmailAndPassword(auth, email, password);
 }
 
-// Sign in with Google
-export async function signInWithGoogle(): Promise<UserCredential> {
+// Sign in with Google - supports both popup and redirect methods
+export async function signInWithGoogle(usePopup: boolean = true): Promise<UserCredential> {
   if (!browser) throw new Error('Auth functions can only be called in the browser');
 
   const provider = new GoogleAuthProvider();
@@ -41,16 +57,38 @@ export async function signInWithGoogle(): Promise<UserCredential> {
   });
 
   try {
-    console.log('🔐 Attempting Google sign-in...');
-    const result = await signInWithPopup(auth, provider);
-    console.log('✅ Google sign-in successful:', result.user.email);
+    console.log(`🔐 Attempting Google sign-in with ${usePopup ? 'popup' : 'redirect'} method...`);
+    console.log('🔍 Firebase Auth object:', auth);
+    console.log('🔍 Google Auth Provider:', provider);
 
-    // Create or update user document in Firestore
-    await createUserDocument(result.user);
+    if (usePopup) {
+      // Try popup method first
+      console.log('🔄 Starting popup sign-in...');
+      const result = await signInWithPopup(auth, provider);
+      console.log('✅ Google popup sign-in successful:', {
+        email: result.user.email,
+        uid: result.user.uid,
+        displayName: result.user.displayName
+      });
 
-    return result;
+      console.log('🔄 Creating user document...');
+      await createUserDocument(result.user);
+      console.log('✅ User document created successfully');
+
+      return result;
+    } else {
+      // Use redirect method
+      console.log('🔄 Using redirect method...');
+      const { signInWithGoogleRedirectOnly } = await import('./auth-redirect-only');
+      await signInWithGoogleRedirectOnly();
+      throw new Error('Redirecting to Google sign-in...');
+    }
   } catch (error: any) {
-    console.error('❌ Google sign-in error:', error);
+    console.error('❌ Google sign-in error:', {
+      code: error.code,
+      message: error.message,
+      stack: error.stack
+    });
 
     // Handle specific Google auth errors
     if (error.code === 'auth/popup-closed-by-user') {

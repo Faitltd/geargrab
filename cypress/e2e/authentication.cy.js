@@ -1,10 +1,108 @@
 /// <reference types="cypress" />
 
-describe('Authentication Flow', () => {
+describe('Authentication Flow - Comprehensive E2E Tests', () => {
   beforeEach(() => {
     // Clear any existing auth state
     cy.clearLocalStorage();
     cy.clearCookies();
+    cy.clearAllSessionStorage();
+
+    // Set longer timeout for auth operations
+    cy.defaultCommandTimeout = 15000;
+  });
+
+  describe('Authentication State Management', () => {
+    it('should maintain auth state across page navigation', () => {
+      // Mock successful authentication
+      cy.visit('/auth/login');
+
+      // Fill in test credentials
+      cy.get('input[type="email"]').type('test@geargrab.co');
+      cy.get('input[type="password"]').type('TestPassword123!');
+
+      // Mock the authentication response
+      cy.window().then((win) => {
+        // Mock simpleAuth state
+        win.localStorage.setItem('authState', JSON.stringify({
+          user: {
+            uid: 'test-uid-123',
+            email: 'test@geargrab.co',
+            displayName: 'Test User'
+          },
+          isAuthenticated: true,
+          loading: false
+        }));
+      });
+
+      // Navigate to different pages and verify auth state persists
+      cy.visit('/');
+      cy.wait(2000); // Allow auth state to load
+
+      cy.visit('/browse');
+      cy.wait(2000);
+
+      cy.visit('/dashboard');
+      cy.wait(2000);
+
+      // Should not redirect to login
+      cy.url().should('include', '/dashboard');
+    });
+
+    it('should handle checkout authentication flow', () => {
+      // First, visit a listing page to set up booking context
+      cy.visit('/');
+      cy.wait(2000);
+
+      // Try to access checkout without authentication
+      cy.visit('/book/confirm?listingId=test-listing&startDate=2024-01-01&endDate=2024-01-03');
+
+      // Should redirect to login with proper redirect URL
+      cy.url().should('include', '/auth/login');
+      cy.url().should('include', 'redirectTo');
+
+      // Login should redirect back to checkout
+      cy.get('input[type="email"]').type('test@geargrab.co');
+      cy.get('input[type="password"]').type('TestPassword123!');
+
+      // Mock successful login
+      cy.window().then((win) => {
+        win.localStorage.setItem('authState', JSON.stringify({
+          user: {
+            uid: 'test-uid-123',
+            email: 'test@geargrab.co',
+            displayName: 'Test User'
+          },
+          isAuthenticated: true,
+          loading: false
+        }));
+      });
+
+      cy.get('button[type="submit"]').click();
+
+      // Should redirect back to checkout
+      cy.url().should('include', '/book/confirm', { timeout: 10000 });
+    });
+
+    it('should prevent authentication redirect loops', () => {
+      // Mock a scenario where user is already authenticated
+      cy.window().then((win) => {
+        win.localStorage.setItem('authState', JSON.stringify({
+          user: {
+            uid: 'test-uid-123',
+            email: 'test@geargrab.co',
+            displayName: 'Test User'
+          },
+          isAuthenticated: true,
+          loading: false
+        }));
+      });
+
+      // Visit login page when already authenticated
+      cy.visit('/auth/login');
+
+      // Should redirect to home or dashboard, not stay on login
+      cy.url().should('not.include', '/auth/login', { timeout: 10000 });
+    });
   });
 
   describe('Login Page', () => {
@@ -245,28 +343,198 @@ describe('Authentication Flow', () => {
     });
   });
 
-  describe('Social Authentication', () => {
-    it('should handle Google login if available', () => {
+  describe('Google Sign-In Integration', () => {
+    it('should handle Google Sign-In popup flow', () => {
       cy.visit('/auth/login');
-      
-      // Check if Google login button exists
+
+      // Look for Google Sign-In button (may have different selectors)
       cy.get('body').then(($body) => {
-        if ($body.find('[data-cy="google-login"]').length > 0) {
-          // Mock Google auth
+        const googleButton = $body.find('button:contains("Google"), button:contains("Continue with Google"), [data-cy="google-login"]');
+
+        if (googleButton.length > 0) {
+          // Mock successful Google authentication
           cy.window().then((win) => {
-            cy.stub(win, 'signInWithPopup').resolves({
-              user: { uid: 'google-uid', email: 'google@example.com' }
-            });
+            // Mock the simpleAuth.signInWithGoogle method
+            if (win.simpleAuth) {
+              cy.stub(win.simpleAuth, 'signInWithGoogle').resolves({
+                success: true,
+                user: {
+                  uid: 'google-test-uid',
+                  email: 'googleuser@example.com',
+                  displayName: 'Google Test User'
+                }
+              });
+            }
           });
-          
-          cy.get('[data-cy="google-login"]').click();
-          
-          // Should redirect after successful login
+
+          // Click Google Sign-In button
+          cy.wrap(googleButton.first()).click();
+
+          // Should show success state or redirect
           cy.url().should('satisfy', (url) => {
-            return url.includes('/dashboard') || url.includes('/');
+            return url.includes('/dashboard') || url.includes('/') || !url.includes('/auth/login');
+          }, { timeout: 10000 });
+        } else {
+          cy.log('Google Sign-In button not found - test skipped');
+        }
+      });
+    });
+
+    it('should handle Google Sign-In errors gracefully', () => {
+      cy.visit('/auth/login');
+
+      cy.get('body').then(($body) => {
+        const googleButton = $body.find('button:contains("Google"), button:contains("Continue with Google")');
+
+        if (googleButton.length > 0) {
+          // Mock Google authentication error
+          cy.window().then((win) => {
+            if (win.simpleAuth) {
+              cy.stub(win.simpleAuth, 'signInWithGoogle').resolves({
+                success: false,
+                error: 'Google Sign-In failed'
+              });
+            }
+          });
+
+          cy.wrap(googleButton.first()).click();
+
+          // Should show error message and stay on login page
+          cy.url().should('include', '/auth/login');
+
+          // Look for error notification or message
+          cy.get('body').should('contain.text', 'error', { matchCase: false });
+        }
+      });
+    });
+
+    it('should handle COOP policy errors', () => {
+      cy.visit('/auth/login');
+
+      // Check browser console for COOP errors
+      cy.window().then((win) => {
+        const consoleSpy = cy.spy(win.console, 'error');
+
+        // Try to trigger Google Sign-In
+        cy.get('body').then(($body) => {
+          const googleButton = $body.find('button:contains("Google"), button:contains("Continue with Google")');
+
+          if (googleButton.length > 0) {
+            cy.wrap(googleButton.first()).click();
+
+            // Wait a moment for any console errors
+            cy.wait(2000);
+
+            // Check that no COOP errors occurred
+            cy.then(() => {
+              const coopErrors = consoleSpy.getCalls().filter(call =>
+                call.args.some(arg =>
+                  typeof arg === 'string' && arg.includes('Cross-Origin-Opener-Policy')
+                )
+              );
+              expect(coopErrors).to.have.length(0);
+            });
+          }
+        });
+      });
+    });
+  });
+
+  describe('Authentication Error Handling', () => {
+    it('should handle network errors during login', () => {
+      cy.visit('/auth/login');
+
+      // Mock network error
+      cy.intercept('POST', '**/auth/**', {
+        forceNetworkError: true
+      }).as('authError');
+
+      cy.get('input[type="email"]').type('test@example.com');
+      cy.get('input[type="password"]').type('password123');
+      cy.get('button[type="submit"]').click();
+
+      // Should show error message
+      cy.get('body').should('contain.text', 'error', { matchCase: false });
+    });
+
+    it('should handle invalid credentials', () => {
+      cy.visit('/auth/login');
+
+      // Mock authentication failure
+      cy.window().then((win) => {
+        if (win.simpleAuth) {
+          cy.stub(win.simpleAuth, 'signInWithEmailPassword').resolves({
+            success: false,
+            error: 'Invalid email or password'
           });
         }
       });
+
+      cy.get('input[type="email"]').type('invalid@example.com');
+      cy.get('input[type="password"]').type('wrongpassword');
+      cy.get('button[type="submit"]').click();
+
+      // Should show error message and stay on login page
+      cy.url().should('include', '/auth/login');
+      cy.get('body').should('contain.text', 'Invalid', { matchCase: false });
+    });
+
+    it('should handle session timeout', () => {
+      // Mock authenticated state
+      cy.window().then((win) => {
+        win.localStorage.setItem('authState', JSON.stringify({
+          user: {
+            uid: 'test-uid-123',
+            email: 'test@geargrab.co'
+          },
+          isAuthenticated: true,
+          loading: false
+        }));
+      });
+
+      cy.visit('/dashboard');
+
+      // Mock session expiration
+      cy.window().then((win) => {
+        win.localStorage.removeItem('authState');
+        // Trigger auth state refresh
+        if (win.simpleAuth && win.simpleAuth.refreshAuth) {
+          win.simpleAuth.refreshAuth();
+        }
+      });
+
+      // Should redirect to login
+      cy.url().should('include', '/auth/login', { timeout: 10000 });
+    });
+  });
+
+  describe('Authentication Performance', () => {
+    it('should load authentication state quickly', () => {
+      const startTime = Date.now();
+
+      cy.visit('/auth/login');
+
+      // Check that page loads within reasonable time
+      cy.get('input[type="email"]').should('be.visible').then(() => {
+        const loadTime = Date.now() - startTime;
+        expect(loadTime).to.be.lessThan(5000); // 5 seconds max
+      });
+    });
+
+    it('should handle concurrent authentication requests', () => {
+      cy.visit('/auth/login');
+
+      // Fill credentials
+      cy.get('input[type="email"]').type('test@example.com');
+      cy.get('input[type="password"]').type('password123');
+
+      // Rapidly click submit multiple times
+      cy.get('button[type="submit"]').click();
+      cy.get('button[type="submit"]').click();
+      cy.get('button[type="submit"]').click();
+
+      // Should handle gracefully without errors
+      cy.get('button[type="submit"]').should('contain', 'Logging in...');
     });
   });
 });

@@ -186,28 +186,32 @@ export class SecurityMiddleware {
   }
 
   // Content Security Policy headers
-  static setSecurityHeaders(response: Response): Response {
+  static setSecurityHeaders(response: Response, skipCOOP: boolean = false): Response {
     const headers = new Headers(response.headers);
 
     headers.set('X-Content-Type-Options', 'nosniff');
-    headers.set('X-Frame-Options', 'DENY');
+    headers.set('X-Frame-Options', 'SAMEORIGIN'); // Changed from DENY to allow Google auth frames
     headers.set('X-XSS-Protection', '1; mode=block');
     headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
     headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
     // Cross-Origin-Opener-Policy for authentication popups
-    // Use unsafe-none to allow popup communication for Firebase Auth
-    headers.set('Cross-Origin-Opener-Policy', 'unsafe-none');
+    // Firebase authentication requires cross-origin popup communication
+    // Completely remove COOP header for ALL pages to prevent popup blocking
+    headers.delete('Cross-Origin-Opener-Policy');
+    headers.delete('cross-origin-opener-policy');
+    headers.delete('Cross-origin-opener-policy');
+    console.log('🔒 Completely removing COOP header for Firebase auth compatibility');
     
-    // Content Security Policy
+    // Content Security Policy - Updated for Google Authentication
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.gstatic.com https://apis.google.com",
+      "script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.gstatic.com https://apis.google.com https://accounts.google.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
       "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
       "img-src 'self' data: https: blob:",
-      "connect-src 'self' https://api.stripe.com https://js.stripe.com https://m.stripe.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://firebase.googleapis.com https://fcm.googleapis.com https://storage.googleapis.com https://apis.google.com wss://firestore.googleapis.com",
-      "frame-src https://js.stripe.com https://accounts.google.com https://geargrabco.firebaseapp.com",
+      "connect-src 'self' https://api.stripe.com https://js.stripe.com https://m.stripe.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://firebase.googleapis.com https://fcm.googleapis.com https://storage.googleapis.com https://apis.google.com https://accounts.google.com wss://firestore.googleapis.com",
+      "frame-src https://js.stripe.com https://accounts.google.com https://geargrabco.firebaseapp.com https://geargrab.co",
       "object-src 'none'",
       "base-uri 'self'"
     ].join('; ');

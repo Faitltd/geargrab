@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { clientAuth } from '$lib/auth/client-v2';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import { initializeStripe } from '$lib/services/payments';
 
   let stripeStatus = 'Checking...';
@@ -8,8 +8,8 @@
   let authStatus = 'Checking...';
   let testResults: string[] = [];
 
-  // Get auth state from new auth system
-  $: authState = clientAuth.authState;
+  // Get auth state from simple auth system
+  $: authState = simpleAuth.authState;
 
   onMount(async () => {
     // Check authentication status
@@ -38,7 +38,7 @@
       try {
         testResults.push('🧪 Testing payment intent creation...');
 
-        const token = await clientAuth.getIdToken();
+        const token = await simpleAuth.getIdToken();
         const response = await fetch('/api/payments/create-intent', {
           method: 'POST',
           headers: {

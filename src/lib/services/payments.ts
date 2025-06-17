@@ -66,17 +66,27 @@ export async function createPaymentIntent(
       headers['X-Test-Mode'] = 'true';
     }
 
-    // Use new authentication service for token handling
+    // Use simple authentication service for token handling
     if (browser) {
-      const { clientAuth } = await import('$lib/auth/client-v2');
+      const { simpleAuth } = await import('$lib/auth/simple-auth');
 
-      if (!clientAuth.isAuthenticated) {
-        console.error('❌ User not authenticated - cannot create payment intent');
+      // Get the current auth state
+      let authState: any;
+      const unsubscribe = simpleAuth.authState.subscribe(state => {
+        authState = state;
+      });
+      unsubscribe(); // Immediately unsubscribe after getting current value
+
+      if (!authState.user || authState.loading) {
+        console.error('❌ User not authenticated - cannot create payment intent', {
+          hasUser: !!authState.user,
+          loading: authState.loading
+        });
         throw new Error('Authentication required. Please log in and try again.');
       }
 
       try {
-        const idToken = await clientAuth.getIdToken();
+        const idToken = await simpleAuth.getIdToken();
         if (idToken) {
           headers['Authorization'] = `Bearer ${idToken}`;
           console.log('✅ Added Firebase auth token to payment request');
@@ -93,11 +103,34 @@ export async function createPaymentIntent(
     let response: Response;
 
     if (browser) {
-      const { clientAuth } = await import('$lib/auth/client-v2');
+      const { simpleAuth } = await import('$lib/auth/simple-auth');
 
-      // Use the new authenticated request method
-      response = await clientAuth.makeAuthenticatedRequest('/api/payments/create-intent', {
+      // Get the current auth state first
+      let authState: any;
+      const unsubscribe = simpleAuth.authState.subscribe(state => {
+        authState = state;
+      });
+      unsubscribe(); // Immediately unsubscribe after getting current value
+
+      if (!authState.user || authState.loading) {
+        console.error('❌ User not authenticated for payment', {
+          hasUser: !!authState.user,
+          loading: authState.loading
+        });
+        throw new Error('Authentication required. Please log in and try again.');
+      }
+
+      // Get auth token and make authenticated request
+      const token = await simpleAuth.getIdToken();
+      if (!token) {
+        throw new Error('Failed to get authentication token');
+      }
+
+      headers['Authorization'] = `Bearer ${token}`;
+
+      response = await fetch('/api/payments/create-intent', {
         method: 'POST',
+        headers,
         body: JSON.stringify({
           amount: Math.round(amount * 100), // Convert to cents
           currency,

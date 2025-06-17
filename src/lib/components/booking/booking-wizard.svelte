@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { goto } from '$app/navigation';
-  import { clientAuth } from '$lib/auth/client-v2';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import AuthGuard from '$lib/components/auth/auth-guard.svelte';
   import StepIndicator from '$lib/components/ui/step-indicator.svelte';
   import BookingDetails from './booking-details.svelte';
@@ -41,8 +41,8 @@
     deliveryFee
   );
   
-  // Use new auth system V2
-  $: authState = clientAuth.authState;
+  // Use simple auth system
+  $: authState = simpleAuth.authState;
 
   // Validate dates
   $: dateValidation = validateBookingDates(startDate, endDate);

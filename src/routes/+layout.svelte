@@ -1,14 +1,22 @@
 <script lang="ts">
   import '../app.css';
-  import { clientAuth } from '$lib/auth/client-v2';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import Navbar from '$lib/components/layout/navbar.svelte';
   import Footer from '$lib/components/layout/footer.svelte';
   import PageTransition from '$lib/components/layout/page-transition.svelte';
   import ToastNotifications from '$lib/components/ui/toast-notifications.svelte';
 
-  // Use the new auth system V2 - no manual initialization needed
-  // The clientAuth service automatically handles auth state
-  $: authState = clientAuth.authState;
+  // Use the simple auth system for testing
+  $: authState = simpleAuth.authState;
+
+  // Debug: Log auth state changes
+  $: {
+    console.log('🔍 Layout: Simple Auth state changed:', {
+      isAuthenticated: $authState.isAuthenticated,
+      user: $authState.user?.email || 'null',
+      loading: $authState.loading
+    });
+  }
 
 
 </script>

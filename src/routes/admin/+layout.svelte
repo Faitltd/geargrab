@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { authStore } from '$lib/stores/auth';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { isCurrentUserAdmin } from '$lib/firebase/auth';
@@ -8,6 +8,9 @@
 
   let loading = true;
   let isAdmin = false;
+
+  // Get auth state
+  $: authState = simpleAuth.authState;
 
   // Admin navigation items
   const adminNavItems = [
@@ -34,7 +37,10 @@
   // Check admin status on mount
   onMount(async () => {
     try {
-      if (!$authStore.user) {
+      // Force refresh auth state
+      await simpleAuth.refreshAuth();
+
+      if (!$authState.user || !$authState.isAuthenticated) {
         notifications.add({
           type: 'error',
           message: 'Please log in to access admin features.',
@@ -97,7 +103,7 @@
             <span class="text-white">{activeNavItem ? adminNavItems.find(item => item.id === activeNavItem)?.label : 'Dashboard'}</span>
           </div>
           <div class="flex items-center space-x-4">
-            <span class="text-gray-300">Welcome, {$authStore.user?.displayName || $authStore.user?.email}</span>
+            <span class="text-gray-300">Welcome, {$authState.user?.displayName || $authState.user?.email}</span>
             <a href="/dashboard" class="text-gray-400 hover:text-white transition-colors">
               ← Back to Dashboard
             </a>

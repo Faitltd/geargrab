@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
-  import { authStore } from '$lib/stores/auth';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import StripePaymentForm from '$lib/components/payments/stripe-payment-form.svelte';
   import { firestore } from '$lib/firebase/client';
   import { doc, getDoc } from 'firebase/firestore';
@@ -34,8 +34,11 @@
   let specialRequests = '';
   let agreeToTerms = false;
 
+  // Get auth state from simpleAuth
+  $: authState = simpleAuth.authState;
+
   // Reactive statement to populate user info when auth state changes
-  $: if ($authStore.user && !contactInfo.email) {
+  $: if ($authState.user && !contactInfo.email) {
     populateUserInfo();
   }
 
@@ -49,21 +52,61 @@
     insuranceTier = urlParams.get('insuranceTier') || 'standard';
     totalPrice = parseFloat(urlParams.get('totalPrice') || '0');
 
-    // Temporarily disable authentication check for payment testing
-    console.log('🔧 Authentication check temporarily disabled for payment testing');
-
-    // Pre-populate form with user information if available
-    if ($authStore.user) {
-      populateUserInfo();
-    }
-
     // Load listing data (in a real app, this would fetch from API)
     loadListingData();
   });
 
+  // Track authentication state and redirects
+  let hasRedirected = false;
+  let authCheckComplete = false;
+  let authCheckAttempts = 0;
+  const MAX_AUTH_ATTEMPTS = 5;
+
+  // Force refresh auth state and check authentication
+  onMount(async () => {
+    console.log('🔧 Checkout page mounted, checking authentication...');
+
+    // Force refresh the auth state to ensure we have the latest
+    await simpleAuth.refreshAuth();
+
+    // Start checking auth state with retries
+    checkAuthWithRetry();
+  });
+
+  async function checkAuthWithRetry() {
+    authCheckAttempts++;
+    console.log(`🔧 Auth check attempt ${authCheckAttempts}/${MAX_AUTH_ATTEMPTS}:`, {
+      loading: $authState.loading,
+      hasUser: !!$authState.user,
+      userEmail: $authState.user?.email,
+      isAuthenticated: $authState.isAuthenticated
+    });
+
+    // If still loading and we haven't exceeded max attempts, wait and retry
+    if ($authState.loading && authCheckAttempts < MAX_AUTH_ATTEMPTS) {
+      setTimeout(checkAuthWithRetry, 500);
+      return;
+    }
+
+    // If we have a user, we're authenticated
+    if ($authState.user && $authState.isAuthenticated) {
+      console.log('✅ User authenticated:', $authState.user.email);
+      authCheckComplete = true;
+      populateUserInfo();
+      return;
+    }
+
+    // If no user after all attempts, redirect to login
+    if (!hasRedirected) {
+      console.log('❌ User not authenticated after all attempts, redirecting to login');
+      hasRedirected = true;
+      goto(`/auth/login?redirectTo=${encodeURIComponent($page.url.pathname + $page.url.search)}`);
+    }
+  }
+
   async function populateUserInfo() {
-    if ($authStore.user) {
-      const user = $authStore.user;
+    if ($authState.user) {
+      const user = $authState.user;
 
       try {
         // Fetch complete user profile from Firestore
@@ -136,15 +179,21 @@
   $: days = startDate && endDate ?
     Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) : 0;
 
+  // Two-stage payment calculation
   $: basePrice = listing ? (listing.dailyPrice || 0) * days : 0;
   $: serviceFee = Math.round(basePrice * 0.1);
   $: deliveryFee = deliveryMethod === 'pickup' ? 0 : 30;
   $: insuranceFee = insuranceTier === 'none' ? 0 : insuranceTier === 'basic' ? 5 : insuranceTier === 'standard' ? 10 : 15;
-  $: calculatedTotal = Math.max(0.50, basePrice + serviceFee + deliveryFee + insuranceFee); // Ensure minimum $0.50
+
+  // Full payment: Charge complete booking cost
+  $: upfrontFees = serviceFee + insuranceFee;
+  $: laterFees = basePrice + deliveryFee;
+  $: totalBookingCost = upfrontFees + laterFees;
+  $: calculatedTotal = Math.max(0.50, totalBookingCost); // Charge full amount
 
   // Debug pricing calculation
   $: {
-    console.log('🔧 Pricing Debug:', {
+    console.log('🔧 Full Payment Pricing Debug:', {
       listing: listing ? 'loaded' : 'null',
       dailyPrice: listing?.dailyPrice || 0,
       days,
@@ -152,6 +201,9 @@
       serviceFee,
       deliveryFee,
       insuranceFee,
+      upfrontFees,
+      laterFees,
+      totalBookingCost,
       calculatedTotal,
       calculatedTotalInCents: Math.round(calculatedTotal * 100),
       isValidAmount: calculatedTotal >= 0.50,
@@ -249,18 +301,22 @@
         endDate,
         deliveryMethod,
         insuranceTier,
-        totalPrice: calculatedTotal,
+        totalPrice: calculatedTotal, // Only the upfront amount
+        totalBookingCost, // Full booking cost for reference
         priceBreakdown: {
           dailyPrice: listing?.dailyPrice || 0,
           days,
           basePrice,
           serviceFee,
           deliveryFee,
-          insuranceFee
+          insuranceFee,
+          upfrontFees,
+          laterFees
         },
         contactInfo,
         specialRequests,
-        paymentIntentId: event.detail.paymentIntentId
+        paymentIntentId: event.detail.paymentIntentId,
+        paymentStage: 'upfront' // Indicates this is the first payment
       };
 
       console.log('Sending booking data with payment:', bookingData);
@@ -539,38 +595,66 @@
             <!-- Price Breakdown -->
             <div class="space-y-3 mb-6">
               <h4 class="font-semibold text-white">Price Breakdown</h4>
+
+              <!-- Total Booking Cost -->
+              <div class="bg-white/5 rounded-lg p-3 mb-3">
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-gray-300">{formatCurrency(listing?.dailyPrice || 0)} × {days} days</span>
+                    <span class="text-white">{formatCurrency(basePrice)}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-300">Service fee</span>
+                    <span class="text-white">{formatCurrency(serviceFee)}</span>
+                  </div>
+                  {#if deliveryFee > 0}
+                    <div class="flex justify-between">
+                      <span class="text-gray-300">Delivery fee</span>
+                      <span class="text-white">{formatCurrency(deliveryFee)}</span>
+                    </div>
+                  {/if}
+                  {#if insuranceFee > 0}
+                    <div class="flex justify-between">
+                      <span class="text-gray-300">Insurance</span>
+                      <span class="text-white">{formatCurrency(insuranceFee)}</span>
+                    </div>
+                  {/if}
+                  <hr class="border-white/20" />
+                  <div class="flex justify-between font-semibold">
+                    <span class="text-white">Total Booking Cost</span>
+                    <span class="text-white">{formatCurrency(totalBookingCost)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Payment Schedule -->
               <div class="space-y-2 text-sm">
-                <div class="flex justify-between">
-                  <span class="text-gray-300">{formatCurrency(listing?.dailyPrice || 0)} × {days} days</span>
-                  <span class="text-white">{formatCurrency(basePrice)}</span>
+                <h5 class="font-medium text-white">Payment Schedule:</h5>
+                <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+                  <div class="flex justify-between items-center">
+                    <span class="text-green-300">💳 Pay now (booking request)</span>
+                    <span class="text-green-300 font-semibold">{formatCurrency(calculatedTotal)}</span>
+                  </div>
+                  <p class="text-green-200 text-xs mt-1">Service fee + Insurance</p>
                 </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-300">Service fee</span>
-                  <span class="text-white">{formatCurrency(serviceFee)}</span>
-                </div>
-                {#if deliveryFee > 0}
-                  <div class="flex justify-between">
-                    <span class="text-gray-300">Delivery fee</span>
-                    <span class="text-white">{formatCurrency(deliveryFee)}</span>
+
+                {#if laterFees > 0}
+                  <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+                    <div class="flex justify-between items-center">
+                      <span class="text-blue-300">⏳ Pay after owner approval</span>
+                      <span class="text-blue-300 font-semibold">{formatCurrency(laterFees)}</span>
+                    </div>
+                    <p class="text-blue-200 text-xs mt-1">Rental fee + Delivery fee</p>
                   </div>
                 {/if}
-                {#if insuranceFee > 0}
-                  <div class="flex justify-between">
-                    <span class="text-gray-300">Insurance</span>
-                    <span class="text-white">{formatCurrency(insuranceFee)}</span>
-                  </div>
-                {/if}
-                <hr class="border-white/20" />
-                <div class="flex justify-between font-semibold">
-                  <span class="text-white">Total</span>
-                  <span class="text-white">{formatCurrency(calculatedTotal)}</span>
-                </div>
               </div>
             </div>
 
-            <p class="text-xs text-gray-400 mt-3 text-center">
-              You won't be charged until your booking is confirmed by the owner.
-            </p>
+            <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+              <p class="text-xs text-yellow-200 text-center">
+                ℹ️ You'll only be charged the booking fee now. The rental amount will be charged after the owner confirms your request.
+              </p>
+            </div>
 
           </div>
         </div>

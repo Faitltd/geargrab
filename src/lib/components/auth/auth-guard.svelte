@@ -1,12 +1,12 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { clientAuth } from '$lib/auth/client-v2';
+  import { simpleAuth } from '$lib/auth/simple-auth';
 
   export let message: string = 'You must be signed in to access this feature.';
   export let showLoginPrompt: boolean = true;
 
-  // Use the new auth system V2
-  $: authState = clientAuth.authState;
+  // Use the simple auth system
+  $: authState = simpleAuth.authState;
   $: isAuthenticated = $authState.isAuthenticated;
   $: isLoading = $authState.loading;
 

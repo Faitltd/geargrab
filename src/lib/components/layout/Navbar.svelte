@@ -1,21 +1,40 @@
 <script lang="ts">
-  // Version: 3.0 - Updated to use new auth system V2
-  import { clientAuth } from '$lib/auth/client-v2';
+  // Version: 4.0 - Updated to use popup-based authentication
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import { smoothScrollWithNavOffset } from '$lib/utils/smooth-scroll';
   import { signOut } from '$lib/firebase/auth';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import AuthPopupManager from '$lib/components/auth/auth-popup-manager.svelte';
 
   let isMenuOpen = false;
+  let isDropdownOpen = false;
+  let authPopupManager: AuthPopupManager;
 
-  // Use new auth system V2
-  $: authState = clientAuth.authState;
+  // Use simple auth system for testing
+  $: authState = simpleAuth.authState;
 
   // Determine if we're on the homepage
   $: isHomepage = $page.url.pathname === '/';
 
   function toggleMenu() {
     isMenuOpen = !isMenuOpen;
+  }
+
+  function toggleDropdown() {
+    isDropdownOpen = !isDropdownOpen;
+  }
+
+  function closeDropdown() {
+    isDropdownOpen = false;
+  }
+
+  // Close dropdown when clicking outside
+  function handleClickOutside(event: MouseEvent) {
+    const target = event.target as Element;
+    if (!target.closest('.dropdown-container')) {
+      isDropdownOpen = false;
+    }
   }
 
   function handleSmoothScroll(elementId: string) {
@@ -38,6 +57,31 @@
       event.preventDefault();
       const elementId = href.substring(1);
       handleSmoothScroll(elementId);
+    }
+  }
+
+  // Handle authentication popups
+  function openLoginPopup() {
+    authPopupManager?.openLogin();
+    // Close mobile menu if open
+    if (isMenuOpen) {
+      isMenuOpen = false;
+    }
+  }
+
+  function openSignupPopup() {
+    authPopupManager?.openSignup();
+    // Close mobile menu if open
+    if (isMenuOpen) {
+      isMenuOpen = false;
+    }
+  }
+
+  function handleAuthSuccess() {
+    // Auth success is handled automatically by the auth system
+    // Just close mobile menu if open
+    if (isMenuOpen) {
+      isMenuOpen = false;
     }
   }
 
@@ -67,6 +111,8 @@
   }
 </script>
 
+<svelte:window on:click={handleClickOutside} />
+
 <nav class="bg-black/20 backdrop-blur-md fixed top-0 left-0 right-0 w-full z-50 shadow-lg" aria-label="Main">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between h-16">
@@ -83,34 +129,56 @@
             <span class="ml-3 text-xl font-bold text-white">GearGrab</span>
           </a>
         </div>
-        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-          <a href="/" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-            Home
-          </a>
-          <a href="/browse" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-            Browse
-          </a>
-          <a href="/list-gear" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-            List Gear
-          </a>
-          <a href="/how-it-works" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-            How It Works
-          </a>
-          <a href="/blog" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-            Blog
-          </a>
-          <a href="/about" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-            About
-          </a>
-          <a href="/contact" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-            Contact
-          </a>
-          <a href="/help" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-            Help
-          </a>
-          <a href="/faq" class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-            FAQ
-          </a>
+        <!-- Desktop Navigation Dropdown -->
+        <div class="hidden sm:ml-6 sm:flex sm:items-center relative dropdown-container">
+          <button
+            on:click={toggleDropdown}
+            class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors"
+            aria-expanded={isDropdownOpen}
+            aria-haspopup="true"
+          >
+            Menu
+            <svg class="ml-1 h-4 w-4 transition-transform {isDropdownOpen ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {#if isDropdownOpen}
+            <!-- Dropdown Menu -->
+            <div class="absolute top-full left-0 mt-2 w-48 bg-black/90 backdrop-blur-md rounded-lg shadow-lg border border-white/20 z-50">
+              <div class="py-2">
+                <a href="/" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  Home
+                </a>
+                <a href="/browse" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  Browse
+                </a>
+                <a href="/list-gear" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  List Gear
+                </a>
+                <a href="/how-it-works" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  How It Works
+                </a>
+                <div class="border-t border-white/20 my-1"></div>
+                <a href="/blog" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  Blog
+                </a>
+                <a href="/about" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  About
+                </a>
+                <a href="/contact" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  Contact
+                </a>
+                <div class="border-t border-white/20 my-1"></div>
+                <a href="/help" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  Help
+                </a>
+                <a href="/faq" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  FAQ
+                </a>
+              </div>
+            </div>
+          {/if}
         </div>
       </div>
       <div class="hidden sm:ml-6 sm:flex sm:items-center">
@@ -127,17 +195,29 @@
             {isSigningOut ? 'Signing out...' : 'Sign Out'}
           </button>
         {:else}
-          <a href="/auth/login" class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+          <button
+            on:click={openLoginPopup}
+            class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+          >
             Log In
-          </a>
-          <a href="/auth/signup" class="bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-md text-sm font-medium ml-2">
+          </button>
+          <button
+            on:click={openSignupPopup}
+            class="bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-md text-sm font-medium ml-2 transition-colors"
+          >
             Sign Up
-          </a>
+          </button>
           <!-- Debug link for development -->
           {#if import.meta.env.DEV}
             <a href="/debug/auth" class="text-yellow-400 hover:text-yellow-300 px-3 py-2 rounded-md text-xs font-medium ml-2">
               🔍 Debug
             </a>
+            <button
+              on:click={() => simpleAuth.refreshAuth()}
+              class="text-orange-400 hover:text-orange-300 px-3 py-2 rounded-md text-xs font-medium ml-2"
+            >
+              🔄 Refresh Auth
+            </button>
           {/if}
         {/if}
       </div>
@@ -218,17 +298,29 @@
           </div>
         {:else}
           <div class="mt-3 space-y-1">
-            <a href="/auth/login" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
+            <button
+              on:click={openLoginPopup}
+              class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors"
+            >
               Log In
-            </a>
-            <a href="/auth/signup" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
+            </button>
+            <button
+              on:click={openSignupPopup}
+              class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors"
+            >
               Sign Up
-            </a>
+            </button>
             <!-- Debug link for development -->
             {#if import.meta.env.DEV}
               <a href="/debug/auth" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-yellow-400 hover:text-yellow-300 hover:bg-white/10">
                 🔍 Debug Auth
               </a>
+              <button
+                on:click={() => { simpleAuth.refreshAuth(); isMenuOpen = false; }}
+                class="block w-full text-left px-4 py-2 text-base font-medium text-orange-400 hover:text-orange-300 hover:bg-white/10 transition-colors"
+              >
+                🔄 Refresh Auth
+              </button>
             {/if}
           </div>
         {/if}
@@ -236,6 +328,13 @@
     </div>
   {/if}
 </nav>
+
+<!-- Auth Popup Manager -->
+<AuthPopupManager
+  bind:this={authPopupManager}
+  on:loginSuccess={handleAuthSuccess}
+  on:signupSuccess={handleAuthSuccess}
+/>
 
 <style>
   .navbar-glass {

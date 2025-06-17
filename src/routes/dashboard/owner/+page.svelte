@@ -1,6 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
+  import { simpleAuth } from '$lib/auth/simple-auth';
+  import { BookingStatus, getStatusDisplay } from '$lib/types/booking-status';
+  import { notifications } from '$lib/stores/notifications';
 
   // Sample listings data - in a real app, this would come from Firebase
   let listings = [
@@ -44,12 +47,78 @@
   let totalBookings = 0;
   let totalViews = 0;
 
-  onMount(() => {
+  // Pending bookings functionality
+  let pendingBookings: any[] = [];
+  let bookingsLoading = false;
+  let bookingsError = '';
+
+  $: authState = simpleAuth.authState;
+
+  onMount(async () => {
     // Calculate totals
     totalEarnings = listings.reduce((sum, listing) => sum + listing.earnings, 0);
     totalBookings = listings.reduce((sum, listing) => sum + listing.bookings, 0);
     totalViews = listings.reduce((sum, listing) => sum + listing.views, 0);
+
+    // Load pending bookings if authenticated
+    if ($authState.isAuthenticated) {
+      await loadPendingBookings();
+    }
   });
+
+  async function loadPendingBookings() {
+    try {
+      bookingsLoading = true;
+      bookingsError = '';
+      const response = await fetch('/api/bookings?role=owner&status=pending_owner_approval');
+
+      if (!response.ok) {
+        throw new Error('Failed to load bookings');
+      }
+
+      const data = await response.json();
+      pendingBookings = data.bookings || [];
+    } catch (err: any) {
+      bookingsError = err.message || 'Failed to load pending bookings';
+      console.error('Error loading pending bookings:', err);
+    } finally {
+      bookingsLoading = false;
+    }
+  }
+
+  async function handleBookingAction(bookingId: string, action: 'approve' | 'deny', reason?: string) {
+    try {
+      const response = await fetch(`/api/bookings/${bookingId}/approve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action, reason })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to process booking');
+      }
+
+      const result = await response.json();
+
+      notifications.add({
+        type: 'success',
+        message: result.message || `Booking ${action}d successfully`,
+        timeout: 5000
+      });
+
+      // Reload pending bookings
+      await loadPendingBookings();
+    } catch (err: any) {
+      notifications.add({
+        type: 'error',
+        message: err.message || `Failed to ${action} booking`,
+        timeout: 5000
+      });
+    }
+  }
 
   function editListing(listingId: string) {
     goto(`/list-gear?edit=${listingId}`);
@@ -74,6 +143,33 @@
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  }
+
+  function formatDate(timestamp: any): string {
+    if (!timestamp) return 'N/A';
+
+    let date: Date;
+    if (timestamp.toDate) {
+      date = timestamp.toDate();
+    } else if (timestamp.seconds) {
+      date = new Date(timestamp.seconds * 1000);
+    } else {
+      date = new Date(timestamp);
+    }
+
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  function formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
   }
 </script>
 
@@ -179,6 +275,117 @@
       </div>
     </div>
   </div>
+
+  <!-- Pending Booking Requests -->
+  {#if $authState.isAuthenticated}
+    <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 mb-8">
+      <div class="px-6 py-4 border-b border-white/20">
+        <h2 class="text-lg font-medium text-white flex items-center">
+          Pending Booking Requests
+          {#if pendingBookings.length > 0}
+            <span class="bg-yellow-500 text-yellow-900 text-sm font-medium px-2 py-1 rounded-full ml-2">
+              {pendingBookings.length}
+            </span>
+          {/if}
+        </h2>
+      </div>
+
+      {#if bookingsLoading}
+        <div class="flex justify-center items-center py-8">
+          <div class="animate-spin h-6 w-6 border-4 border-green-500 border-t-transparent rounded-full mr-3"></div>
+          <span class="text-white">Loading pending bookings...</span>
+        </div>
+      {:else if bookingsError}
+        <div class="p-6">
+          <div class="bg-red-500/20 border border-red-500/50 rounded-lg p-4">
+            <p class="text-red-200">{bookingsError}</p>
+            <button
+              on:click={loadPendingBookings}
+              class="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      {:else if pendingBookings.length === 0}
+        <div class="text-center py-8">
+          <div class="text-gray-400 text-4xl mb-3">📋</div>
+          <p class="text-gray-300">No pending booking requests</p>
+          <p class="text-gray-400 text-sm mt-1">New booking requests will appear here for your approval</p>
+        </div>
+      {:else}
+        <div class="p-6 space-y-4">
+          {#each pendingBookings as booking}
+            <div class="bg-white/5 rounded-lg border border-white/10 p-4">
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+                <!-- Booking Info -->
+                <div class="lg:col-span-2">
+                  <div class="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 class="text-white font-medium">
+                        Booking #{booking.id.slice(-6)}
+                      </h3>
+                      <p class="text-gray-300 text-sm">
+                        {booking.contactInfo?.firstName} {booking.contactInfo?.lastName}
+                      </p>
+                    </div>
+                    <span class="bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded text-xs">
+                      {getStatusDisplay(booking.status)}
+                    </span>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span class="text-gray-300">Dates:</span>
+                      <span class="text-white ml-2">{formatDate(booking.startDate)} - {formatDate(booking.endDate)}</span>
+                    </div>
+                    <div>
+                      <span class="text-gray-300">Delivery:</span>
+                      <span class="text-white ml-2">{booking.deliveryMethod === 'pickup' ? 'Pickup' : 'Delivery'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Payment & Actions -->
+                <div class="lg:col-span-1">
+                  <div class="bg-white/5 rounded p-3 mb-3">
+                    <div class="text-sm space-y-1">
+                      <div class="flex justify-between">
+                        <span class="text-green-300">✅ Paid:</span>
+                        <span class="text-green-300">{formatCurrency(booking.totalPrice)}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-blue-300">⏳ After approval:</span>
+                        <span class="text-blue-300">{formatCurrency(booking.priceBreakdown?.laterFees || 0)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="space-y-2">
+                    <button
+                      on:click={() => handleBookingAction(booking.id, 'approve')}
+                      class="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 px-3 rounded transition-colors"
+                    >
+                      ✅ Approve
+                    </button>
+
+                    <button
+                      on:click={() => handleBookingAction(booking.id, 'deny', 'Owner declined the booking request')}
+                      class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-3 rounded transition-colors"
+                    >
+                      ❌ Decline
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          {/each}
+        </div>
+      {/if}
+    </div>
+  {/if}
 
   <!-- Listings Grid -->
   <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">

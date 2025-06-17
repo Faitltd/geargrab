@@ -5,7 +5,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
-  import { authStore } from '$lib/stores/auth';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import { goto } from '$app/navigation';
   import VideoBackground from '$lib/components/layout/video-background.svelte';
   import RentalHandoff from '$lib/components/rental/rental-handoff.svelte';
@@ -13,7 +13,10 @@
   
   // Get booking ID from URL
   $: bookingId = $page.params.bookingId;
-  
+
+  // Get auth state from simpleAuth
+  $: authState = simpleAuth.authState;
+
   // State
   let booking: Booking | null = null;
   let loading = true;
@@ -28,13 +31,24 @@
   $: showPostRental = canAccessPostRental && handoffStatus?.preRental?.completed;
   
   onMount(() => {
-    if (!$authStore.user) {
-      goto('/auth/login?redirect=' + encodeURIComponent($page.url.pathname));
-      return;
-    }
-    
     loadBookingData();
   });
+
+  // Track if we've already redirected to avoid loops
+  let hasRedirected = false;
+
+  // Reactive authentication check - wait for loading to complete
+  $: {
+    if (!$authState.loading && !hasRedirected) {
+      if (!$authState.user) {
+        console.log('❌ User not authenticated, redirecting to login');
+        hasRedirected = true;
+        goto('/auth/login?redirectTo=' + encodeURIComponent($page.url.pathname));
+      } else {
+        console.log('✅ User authenticated:', $authState.user.email);
+      }
+    }
+  }
   
   async function loadBookingData() {
     if (!bookingId) {
@@ -54,9 +68,9 @@
       booking = bookingData.booking;
       
       // Determine user role
-      if (booking.ownerUid === $authStore.user?.uid) {
+      if (booking.ownerUid === $authState.user?.uid) {
         userRole = 'owner';
-      } else if (booking.renterUid === $authStore.user?.uid) {
+      } else if (booking.renterUid === $authState.user?.uid) {
         userRole = 'renter';
       } else {
         throw new Error('Unauthorized access to booking');

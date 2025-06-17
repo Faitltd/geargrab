@@ -1,24 +1,63 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { clientAuth } from '$lib/auth/client-v2';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import VideoBackground from '$lib/components/layout/video-background.svelte';
   import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
   import SequentialAnimator from '$lib/components/layout/sequential-animator.svelte';
 
-  // Get auth state from the new auth system
-  $: authState = clientAuth.authState;
+  // Get auth state from the simple auth system
+  $: authState = simpleAuth.authState;
 
-  // Redirect if not logged in
-  onMount(() => {
-    // Add a small delay to ensure store is initialized
-    setTimeout(() => {
-      if (!$authState.loading && !$authState.user) {
-        goto('/auth/login?redirectTo=/dashboard');
-      }
-    }, 100);
+  let authCheckComplete = false;
+  let authCheckAttempts = 0;
+  const MAX_AUTH_ATTEMPTS = 10;
+
+  // Enhanced authentication check with retries
+  onMount(async () => {
+    console.log('🔐 Dashboard: Starting authentication check...');
+
+    // Force refresh auth state
+    await simpleAuth.refreshAuth();
+
+    // Start checking auth with retries
+    checkAuthWithRetry();
   });
+
+  async function checkAuthWithRetry() {
+    authCheckAttempts++;
+    console.log(`🔐 Dashboard: Auth check attempt ${authCheckAttempts}/${MAX_AUTH_ATTEMPTS}:`, {
+      loading: $authState.loading,
+      hasUser: !!$authState.user,
+      isAuthenticated: $authState.isAuthenticated
+    });
+
+    // If still loading and haven't exceeded max attempts, wait and retry
+    if ($authState.loading && authCheckAttempts < MAX_AUTH_ATTEMPTS) {
+      setTimeout(checkAuthWithRetry, 300);
+      return;
+    }
+
+    // If we have a user, we're authenticated
+    if ($authState.user && $authState.isAuthenticated) {
+      console.log('✅ Dashboard: User authenticated:', $authState.user.email);
+      authCheckComplete = true;
+      return;
+    }
+
+    // If no user after all attempts, redirect to login
+    console.log('❌ Dashboard: User not authenticated, redirecting to login');
+    const currentPath = window.location.pathname + window.location.search;
+    const redirectUrl = `/auth/login?redirectTo=${encodeURIComponent(currentPath)}`;
+
+    try {
+      await goto(redirectUrl);
+    } catch (gotoError) {
+      console.warn('🔄 goto failed, using window.location:', gotoError);
+      window.location.href = redirectUrl;
+    }
+  }
 
   // Dashboard tabs
   const tabs = [
@@ -46,14 +85,17 @@
 <div class="min-h-screen relative z-10">
 
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    {#if $authState && $authState.loading}
+    {#if $authState.loading || !authCheckComplete}
       <div class="flex justify-center items-center h-64">
-        <svg class="animate-spin h-8 w-8 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8 text-center shadow-lg">
+          <svg class="animate-spin h-8 w-8 text-green-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p class="text-white">Checking authentication...</p>
+        </div>
       </div>
-    {:else if $authState && $authState.user}
+    {:else if $authState.user && $authState.isAuthenticated && authCheckComplete}
       <!-- Dashboard Header -->
       <ScrollLinkedAnimator animation="fade-up" startOffset={0} endOffset={0.4}>
         <div class="mb-8">
