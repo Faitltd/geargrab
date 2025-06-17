@@ -1,24 +1,50 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
   import { simpleAuth } from '$lib/auth/simple-auth';
+  import { onMount } from 'svelte';
 
   export let message: string = 'You must be signed in to access this feature.';
   export let showLoginPrompt: boolean = true;
+  export let redirectAfterLogin: boolean = true;
 
   // Use the simple auth system
   $: authState = simpleAuth.authState;
   $: isAuthenticated = $authState.isAuthenticated;
   $: isLoading = $authState.loading;
 
+  // Get current page URL for redirect
+  $: currentUrl = $page.url.pathname + $page.url.search;
+
+  onMount(async () => {
+    console.log('🔐 Auth Guard: Mounted, checking auth state...');
+
+    // Force refresh auth state to ensure we have the latest
+    await simpleAuth.refreshAuth();
+
+    // Wait for auth to be ready
+    await simpleAuth.waitForAuthReady();
+
+    console.log('🔐 Auth Guard: Auth state ready:', {
+      isAuthenticated: $authState.isAuthenticated,
+      hasUser: !!$authState.user,
+      userEmail: $authState.user?.email
+    });
+  });
+
   function handleLogin() {
     // Force navigation to login page - multiple fallback methods
     console.log('🔄 Navigating to login page...');
 
+    const loginUrl = redirectAfterLogin
+      ? `/auth/login?redirectTo=${encodeURIComponent(currentUrl)}`
+      : '/auth/login';
+
     // Method 1: SvelteKit goto
-    goto('/auth/login').catch(() => {
+    goto(loginUrl).catch(() => {
       // Method 2: Direct window location if goto fails
       console.log('⚠️ goto failed, using window.location');
-      window.location.href = '/auth/login';
+      window.location.href = loginUrl;
     });
   }
 
@@ -26,15 +52,17 @@
     // Force navigation to signup page - multiple fallback methods
     console.log('🔄 Navigating to signup page...');
 
+    const signupUrl = redirectAfterLogin
+      ? `/auth/signup?redirectTo=${encodeURIComponent(currentUrl)}`
+      : '/auth/signup';
+
     // Method 1: SvelteKit goto
-    goto('/auth/signup').catch(() => {
+    goto(signupUrl).catch(() => {
       // Method 2: Direct window location if goto fails
       console.log('⚠️ goto failed, using window.location');
-      window.location.href = '/auth/signup';
+      window.location.href = signupUrl;
     });
   }
-
-
 </script>
 
 {#if isLoading}

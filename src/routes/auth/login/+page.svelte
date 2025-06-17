@@ -77,17 +77,45 @@
           timeout: 5000
         });
 
-        // Wait for auth state to propagate
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Wait for auth state to be confirmed
+        let attempts = 0;
+        const maxAttempts = 10;
 
-        console.log('🔐 Login: Redirecting to:', redirectTo);
+        while (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 200));
 
-        // Force navigation using multiple methods for reliability
-        try {
-          await goto(redirectTo);
-        } catch (gotoError) {
-          console.warn('🔄 goto failed, using window.location:', gotoError);
-          window.location.href = redirectTo;
+          if ($authState.isAuthenticated && $authState.user) {
+            console.log('✅ Auth state confirmed, redirecting to:', redirectTo);
+
+            // Force navigation using multiple methods for reliability
+            try {
+              await goto(redirectTo);
+              return;
+            } catch (gotoError) {
+              console.warn('🔄 goto failed, using window.location:', gotoError);
+              window.location.href = redirectTo;
+              return;
+            }
+          }
+
+          attempts++;
+        }
+
+        // If we get here, auth state didn't update properly
+        console.warn('⚠️ Auth state not confirmed after email login, forcing refresh...');
+        await simpleAuth.refreshAuth();
+
+        // Try one more time
+        if ($authState.isAuthenticated && $authState.user) {
+          console.log('✅ Auth state confirmed after refresh, redirecting to:', redirectTo);
+          try {
+            await goto(redirectTo);
+          } catch (gotoError) {
+            console.warn('🔄 goto failed, using window.location:', gotoError);
+            window.location.href = redirectTo;
+          }
+        } else {
+          console.error('❌ Auth state still not confirmed, staying on login page');
         }
       } else {
         throw new Error(result.error || 'Login failed');
@@ -129,19 +157,47 @@
 
   // Handle Google sign-in success
   async function handleGoogleSuccess() {
-    console.log('🔐 Login: Google sign-in successful, redirecting...');
+    console.log('🔐 Login: Google sign-in successful, checking auth state...');
 
-    // Wait for auth state to propagate
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Wait for auth state to be confirmed
+    let attempts = 0;
+    const maxAttempts = 10;
 
-    console.log('🔐 Login: Redirecting to:', redirectTo);
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 200));
 
-    // Force navigation using multiple methods for reliability
-    try {
-      await goto(redirectTo);
-    } catch (gotoError) {
-      console.warn('🔄 goto failed, using window.location:', gotoError);
-      window.location.href = redirectTo;
+      if ($authState.isAuthenticated && $authState.user) {
+        console.log('✅ Auth state confirmed, redirecting to:', redirectTo);
+
+        // Force navigation using multiple methods for reliability
+        try {
+          await goto(redirectTo);
+          return;
+        } catch (gotoError) {
+          console.warn('🔄 goto failed, using window.location:', gotoError);
+          window.location.href = redirectTo;
+          return;
+        }
+      }
+
+      attempts++;
+    }
+
+    // If we get here, auth state didn't update properly
+    console.warn('⚠️ Auth state not confirmed after Google login, forcing refresh...');
+    await simpleAuth.refreshAuth();
+
+    // Try one more time
+    if ($authState.isAuthenticated && $authState.user) {
+      console.log('✅ Auth state confirmed after refresh, redirecting to:', redirectTo);
+      try {
+        await goto(redirectTo);
+      } catch (gotoError) {
+        console.warn('🔄 goto failed, using window.location:', gotoError);
+        window.location.href = redirectTo;
+      }
+    } else {
+      console.error('❌ Auth state still not confirmed, staying on login page');
     }
   }
 

@@ -125,6 +125,43 @@ class SimpleAuthService {
     }
   }
 
+  async waitForAuthReady(timeoutMs: number = 5000): Promise<boolean> {
+    return new Promise((resolve) => {
+      const startTime = Date.now();
+
+      const checkAuth = () => {
+        if (!this.authStore) {
+          resolve(false);
+          return;
+        }
+
+        let currentState: SimpleAuthState;
+        this.authStore.subscribe(state => {
+          currentState = state;
+        })();
+
+        // If not loading and we have a definitive state, we're ready
+        if (!currentState.loading) {
+          console.log('✅ Auth ready:', currentState.isAuthenticated ? 'authenticated' : 'not authenticated');
+          resolve(true);
+          return;
+        }
+
+        // If we've exceeded timeout, give up
+        if (Date.now() - startTime > timeoutMs) {
+          console.warn('⚠️ Auth ready timeout exceeded');
+          resolve(false);
+          return;
+        }
+
+        // Check again in 100ms
+        setTimeout(checkAuth, 100);
+      };
+
+      checkAuth();
+    });
+  }
+
   async signInWithGoogle(): Promise<{ success: boolean; error?: string }> {
     try {
       console.log('🔄 Simple Auth: Starting Google sign-in...');
@@ -143,6 +180,17 @@ class SimpleAuthService {
       const result = await signInWithPopup(auth, provider);
 
       console.log('✅ Simple Auth: Google sign-in successful:', result.user.email);
+
+      // Immediately update our auth state
+      this.currentUser = result.user;
+      this.authStore.set({
+        user: result.user,
+        loading: false,
+        isAuthenticated: true
+      });
+
+      // Wait a moment for state to propagate
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       return { success: true };
     } catch (error: any) {
@@ -165,6 +213,17 @@ class SimpleAuthService {
       const result = await signInWithEmailAndPassword(auth, email, password);
 
       console.log('✅ Simple Auth: Email sign-in successful:', result.user.email);
+
+      // Immediately update our auth state
+      this.currentUser = result.user;
+      this.authStore.set({
+        user: result.user,
+        loading: false,
+        isAuthenticated: true
+      });
+
+      // Wait a moment for state to propagate
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       return { success: true };
     } catch (error: any) {
