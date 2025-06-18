@@ -3,7 +3,11 @@
 # Update system packages
 sudo apt-get update
 
+<<<<<<< HEAD
 # Install Node.js 20 (LTS)
+=======
+# Install Node.js 20 (required for the project)
+>>>>>>> beb3d1682105fb60c57c754c76bfdd353748209a
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
@@ -11,6 +15,7 @@ sudo apt-get install -y nodejs
 node --version
 npm --version
 
+<<<<<<< HEAD
 # Install dependencies for Cypress (GUI dependencies)
 sudo apt-get install -y \
     libgtk2.0-0 \
@@ -67,10 +72,21 @@ rm -f cypress.config.ts
 
 # Update Cypress support file to use .js extension
 mv cypress/support/e2e.ts cypress/support/e2e.js 2>/dev/null || true
+=======
+# Add Node.js to PATH in user profile
+echo 'export PATH="/usr/bin:$PATH"' >> $HOME/.profile
+
+# Install project dependencies
+npm ci
+
+# Install Cypress dependencies for headless mode
+sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
+>>>>>>> beb3d1682105fb60c57c754c76bfdd353748209a
 
 # Build the SvelteKit application
 npm run build
 
+<<<<<<< HEAD
 # Add Node.js and npm to PATH in user profile
 echo 'export PATH="/usr/bin:$PATH"' >> $HOME/.profile
 
@@ -83,3 +99,25 @@ Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
 # Wait for Xvfb to start
 sleep 3
+=======
+# Start the development server in background for testing
+npm run dev &
+DEV_PID=$!
+
+# Wait for the development server to start
+echo "Waiting for development server to start..."
+sleep 10
+
+# Check if server is running
+curl -f http://localhost:5173 > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    echo "Development server is running on port 5173"
+else
+    echo "Development server failed to start"
+    kill $DEV_PID 2>/dev/null
+    exit 1
+fi
+
+# Keep the server running for tests
+echo "Setup complete. Development server is running for tests."
+>>>>>>> beb3d1682105fb60c57c754c76bfdd353748209a

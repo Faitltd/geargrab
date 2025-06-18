@@ -1,228 +1,309 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import HeroSearch from '$lib/components/forms/hero-search.svelte';
+  import VideoBackground from '$lib/components/layout/video-background.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
+  import ScrollLinkedSequential from '$lib/components/layout/scroll-linked-sequential.svelte';
+  import UniverseCard from '$lib/components/cards/universe-card.svelte';
+  import { categories } from '$lib/data/products';
 
-  // Featured categories
-  const categories = [
+  // Stats data
+  const stats = [
+    { number: '500+', label: 'Gear Items' },
+    { number: '150+', label: 'Happy Renters' },
+    { number: '25+', label: 'Cities' },
+    { number: '4.8★', label: 'Average Rating' }
+  ];
+
+  // Why choose us features
+  const features = [
     {
-      id: 'camping',
-      name: 'Camping',
-      image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-      description: 'Tents, sleeping bags, cooking equipment, and more'
+      title: 'Quality Guarantee',
+      description: 'Every piece of gear is verified and quality-checked before rental.',
+      icon: '🛡️'
     },
     {
-      id: 'hiking',
-      name: 'Hiking',
-      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-      description: 'Backpacks, footwear, navigation tools, and clothing'
+      title: '$5 to Try',
+      description: 'Start your adventure with our affordable trial pricing.',
+      icon: '💰'
     },
     {
-      id: 'water-sports',
-      name: 'Water Sports',
-      image: 'https://images.unsplash.com/photo-1604537466158-719b1972feb8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80',
-      description: 'Kayaks, paddleboards, surfboards, and life vests'
-    },
-    {
-      id: 'biking',
-      name: 'Biking',
-      image: 'https://images.unsplash.com/photo-1511994298241-608e28f14fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-      description: 'Mountain bikes, road bikes, helmets, and accessories'
+      title: 'Local Community',
+      description: 'Connect with fellow outdoor enthusiasts in your area.',
+      icon: '👥'
     }
   ];
 
-  // Testimonials
-  const testimonials = [
-    {
-      id: 1,
-      name: 'Sarah Johnson',
-      location: 'Denver, CO',
-      image: 'https://randomuser.me/api/portraits/women/32.jpg',
-      quote: 'GearGrab saved me hundreds of dollars on camping equipment for our family trip. The gear was in perfect condition and the owner was super helpful!'
-    },
-    {
-      id: 2,
-      name: 'Michael Chen',
-      location: 'Boulder, CO',
-      image: 'https://randomuser.me/api/portraits/men/44.jpg',
-      quote: 'As someone who only goes skiing once a year, renting through GearGrab is perfect. I got high-quality equipment for a fraction of the retail price.'
-    },
-    {
-      id: 3,
-      name: 'Emily Rodriguez',
-      location: 'Fort Collins, CO',
-      image: 'https://randomuser.me/api/portraits/women/68.jpg',
-      quote: 'I love being able to try different kayaks before committing to buying one. GearGrab makes it easy and affordable to test out gear.'
+  // Featured listings for homepage - simplified and consolidated
+  let featuredListings = [];
+
+  // Handle image loading errors
+  function handleImageError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.src = 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+  }
+
+  // Handle card clicks
+  function handleCardClick(listing: any) {
+    window.location.href = `/listing/${listing.id}`;
+  }
+
+  onMount(async () => {
+    try {
+      // Import products and take first 6 as featured
+      const { products } = await import('$lib/data/products');
+      console.log('Loaded products:', products.length);
+      featuredListings = products.slice(0, 6).map(product => ({
+        id: product.id,
+        title: product.title,
+        description: product.description,
+        category: product.category,
+        dailyPrice: product.dailyPrice,
+        images: product.images || [],
+        primaryImage: product.images?.[0] || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+        location: product.location,
+        averageRating: product.reviews.length > 0
+          ? product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length
+          : 4.5,
+        reviewCount: product.reviews.length || 12,
+        price: `$${product.dailyPrice}/day`
+      }));
+      console.log('Featured listings created:', featuredListings.length);
+    } catch (error) {
+      console.error('Error loading featured listings:', error);
+      // Fallback to empty array if loading fails
+      featuredListings = [];
     }
-  ];
-
-  // How it works steps
-  const steps = [
-    {
-      id: 1,
-      title: 'Find Gear',
-      icon: 'search',
-      description: 'Browse thousands of outdoor gear listings from local owners in your area.'
-    },
-    {
-      id: 2,
-      title: 'Book & Pay',
-      icon: 'calendar',
-      description: 'Reserve the gear for your dates and pay securely through our platform.'
-    },
-    {
-      id: 3,
-      title: 'Enjoy Outdoors',
-      icon: 'mountain',
-      description: 'Pick up the gear and enjoy your adventure without the cost of buying.'
-    },
-    {
-      id: 4,
-      title: 'Return & Review',
-      icon: 'star',
-      description: 'Return the gear and share your experience with the community.'
-    }
-  ];
-
-  // Parallax effect
-  let scrollY: number = 0;
-
-  // Initialize parallax effect
-  onMount(() => {
-    const updateParallax = () => {
-      scrollY = window.scrollY;
-      requestAnimationFrame(updateParallax);
-    };
-    updateParallax();
   });
 </script>
 
-<svelte:head>
-  <title>GearGrab - Rent Outdoor Gear from Local Owners</title>
-  <meta name="description" content="GearGrab is a peer-to-peer marketplace for outdoor gear rentals. Rent camping, hiking, biking, and water sports equipment from local owners." />
-</svelte:head>
+<!-- Full Page Video Background with Performance Optimization -->
+<VideoBackground
+  videoSrc="/1877846-hd_1920_1080_30fps.mp4"
+  imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
+  overlayOpacity={0.4}
+/>
 
-<svelte:window bind:scrollY={scrollY} />
-
-<!-- Hero Section with Parallax -->
-<div class="relative h-screen overflow-hidden">
-  <div
-    class="absolute inset-0 bg-cover bg-center"
-    style="background-image: url('https://images.unsplash.com/photo-1465310477141-6fb93167a273?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'); transform: translateY({scrollY * 0.5}px);"
-  ></div>
-  <div class="absolute inset-0 bg-black opacity-50"></div>
-
-  <div class="relative h-full flex flex-col items-center justify-center text-center text-white px-4">
-    <h1 class="text-4xl md:text-6xl font-bold mb-4 animate-fade-in" style="animation-delay: 0.2s; opacity: 0;">Adventure Awaits</h1>
-    <p class="text-xl md:text-2xl mb-8 max-w-3xl animate-fade-in" style="animation-delay: 0.4s; opacity: 0;">Rent outdoor gear from local owners and save money while exploring the great outdoors.</p>
-    <div class="flex flex-col sm:flex-row gap-4 animate-fade-in" style="animation-delay: 0.6s; opacity: 0;">
-      <a href="/browse" class="btn btn-primary text-lg px-8 py-3">Browse Gear</a>
-      <a href="/list-gear" class="btn btn-secondary text-lg px-8 py-3">List Your Gear</a>
+<!-- Page Content with Video Background -->
+<div class="relative z-10 min-h-screen">
+  <!-- Hero Content -->
+  <div class="relative min-h-[60vh] flex flex-col text-center text-white px-4 pt-20">
+    <!-- Brand Name at Top - Positioned between navbar and main content -->
+    <div class="flex justify-center pt-24 pb-0">
+      <h1 class="text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-white drop-shadow-lg mb-0">
+        GearGrab
+      </h1>
     </div>
+
+    <!-- Main Hero Content - Centered in remaining space -->
+    <div class="flex-1 flex items-center justify-center pt-4">
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 max-w-4xl mx-auto shadow-lg">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
+          Meet Up. Gear Up. Get Out.
+        </h2>
+        <p class="text-xl md:text-2xl mb-6 max-w-2xl mx-auto drop-shadow-lg">
+          Rent Local Outdoor Gear, Save Space, Make Money, and Explore More.
+        </p>
+
+        <!-- Search Form -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto border border-white/20 shadow-lg">
+          <HeroSearch />
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <ScrollLinkedSequential animation="scale-in" startOffset={0.1} endOffset={0.5} incrementDelay={0.1}>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mt-8">
+        {#each stats as stat}
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 shadow-lg">
+            <div class="text-3xl md:text-4xl font-bold text-green-400 mb-2 drop-shadow-lg">{stat.number}</div>
+            <div class="text-gray-200 drop-shadow-lg">{stat.label}</div>
+          </div>
+        {/each}
+      </div>
+    </ScrollLinkedSequential>
   </div>
 
-  <div
-    class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"
-  ></div>
-</div>
+  <!-- Content Section -->
+  <div class="relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-<!-- Featured Categories -->
-<section class="py-16 bg-white">
-  <div class="container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-12 animate-fade-in" style="animation-delay: 0.2s; opacity: 0;">Explore Gear Categories</h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      {#each categories as category}
-        <a href="/browse?category={category.id}" class="group">
-          <div class="relative h-64 rounded-lg overflow-hidden shadow-md transition-transform transform group-hover:scale-105">
-            <img src={category.image} alt={category.name} class="w-full h-full object-cover" />
-            <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-70"></div>
-            <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
-              <h3 class="text-xl font-bold mb-1">{category.name}</h3>
-              <p class="text-sm opacity-90">{category.description}</p>
-            </div>
+      <!-- Featured Listings with Clean Cards -->
+      <div class="text-center mb-20">
+        <ScrollLinkedAnimator animation="fade-up" startOffset={0.2} endOffset={0.6}>
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
+            <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Featured Listings</h2>
+            <p class="text-xl text-gray-200 drop-shadow-lg">
+              Discover premium outdoor gear from trusted local owners.
+            </p>
           </div>
+        </ScrollLinkedAnimator>
+
+        <ScrollLinkedSequential animation="scale-in" startOffset={0.3} endOffset={0.8} incrementDelay={0.1}>
+          <div class="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto mb-12">
+            {#if featuredListings.length > 0}
+              {#each featuredListings as listing}
+                <UniverseCard {listing} onClick={() => handleCardClick(listing)} width="220px" height="280px" />
+              {/each}
+            {:else}
+            <div class="text-white text-center p-8">
+              <p class="text-lg mb-4">Loading featured listings...</p>
+              <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-4 border border-white/20">
+                <p class="text-sm text-gray-300">Debug Info:</p>
+                <p class="text-sm text-gray-300">Featured listings count: {featuredListings.length}</p>
+                <p class="text-sm text-gray-300">Page loaded: {typeof window !== 'undefined' ? 'Yes' : 'No'}</p>
+              </div>
+              <!-- Test card to verify UniverseCard works -->
+              <div class="mt-6">
+                <p class="text-sm text-gray-300 mb-4">Test UniverseCard:</p>
+                <UniverseCard
+                  listing={{
+                    id: 'test-1',
+                    title: 'Mountain Bike',
+                    category: 'biking',
+                    dailyPrice: 35,
+                    images: ['https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+                    location: { city: 'Denver', state: 'CO' },
+                    averageRating: 4.8,
+                    reviewCount: 15
+                  }}
+                  onClick={() => console.log('Test card clicked')}
+                  width="220px"
+                  height="280px"
+                />
+              </div>
+            </div>
+          {/if}
+          </div>
+        </ScrollLinkedSequential>
+
+        <a href="/browse" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
+          View All Listings
         </a>
-      {/each}
-    </div>
-  </div>
-</section>
+      </div>
 
-<!-- How It Works -->
-<section class="py-16 bg-gray-50">
-  <div class="container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-12 animate-fade-in" style="animation-delay: 0.2s; opacity: 0;">How GearGrab Works</h2>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      {#each steps as step}
-        <div class="bg-white rounded-lg p-6 shadow-md text-center">
-          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            {#if step.icon === 'search'}
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            {:else if step.icon === 'calendar'}
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            {:else if step.icon === 'mountain'}
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
-            {:else if step.icon === 'star'}
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-              </svg>
-            {/if}
+      <!-- Explore Categories -->
+      <div class="text-center mb-20">
+        <ScrollLinkedAnimator animation="fade-up" startOffset={0.4} endOffset={0.8}>
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
+            <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Explore Categories</h2>
+            <p class="text-xl text-gray-200 drop-shadow-lg">
+              Find the perfect gear for your outdoor adventure.
+            </p>
           </div>
-          <h3 class="text-xl font-bold mb-2">{step.title}</h3>
-          <p class="text-gray-600">{step.description}</p>
-        </div>
-      {/each}
-    </div>
-  </div>
-</section>
+        </ScrollLinkedAnimator>
 
-<!-- Parallax Banner -->
-<div
-  class="relative h-80 bg-cover bg-center bg-fixed flex items-center justify-center"
-  style="background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80');"
->
-  <div class="absolute inset-0 bg-black opacity-60"></div>
-  <div class="relative text-center text-white px-4">
-    <h2 class="text-3xl md:text-4xl font-bold mb-4">Save Money. Reduce Waste. Explore More.</h2>
-    <p class="text-xl max-w-3xl mx-auto">Renting gear is better for your wallet and the planet.</p>
+        <ScrollLinkedSequential animation="scale-in" startOffset={0.5} endOffset={0.9} incrementDelay={0.05}>
+          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 max-w-6xl mx-auto">
+            {#each categories as category}
+              <a href="/browse?category={category.id}" class="group">
+                <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 hover:border-green-500 transition-all duration-300 hover:transform hover:scale-105 shadow-lg hover:shadow-xl">
+                  <div class="relative h-24 overflow-hidden">
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      loading="lazy"
+                      on:error={handleImageError}
+                    >
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  <div class="p-3">
+                    <h3 class="text-white font-semibold text-sm group-hover:text-green-400 transition-colors drop-shadow-lg text-center">{category.name}</h3>
+                  </div>
+                </div>
+              </a>
+            {/each}
+          </div>
+        </ScrollLinkedSequential>
+      </div>
+
+      <!-- Why Choose GearGrab -->
+      <div class="text-center mb-20">
+        <ScrollLinkedAnimator animation="fade-up" startOffset={0.2} endOffset={0.8}>
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
+            <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Why Choose GearGrab?</h2>
+            <p class="text-xl text-gray-200 drop-shadow-lg">
+              Experience the future of outdoor gear access with our trusted platform.
+            </p>
+          </div>
+        </ScrollLinkedAnimator>
+
+        <ScrollLinkedSequential animation="fade-up" startOffset={0.3} endOffset={0.9} incrementDelay={0.15}>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {#each features as feature}
+              <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 hover:border-green-500 transition-all duration-300 shadow-lg">
+                <div class="text-4xl mb-4">{feature.icon}</div>
+                <h3 class="text-xl font-bold text-white mb-4 drop-shadow-lg">{feature.title}</h3>
+                <p class="text-gray-200 drop-shadow-lg">{feature.description}</p>
+              </div>
+            {/each}
+          </div>
+        </ScrollLinkedSequential>
+      </div>
+
+      <!-- Call to Action -->
+      <div class="text-center">
+        <ScrollLinkedAnimator animation="scale-in" startOffset={0.8} endOffset={1.0}>
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 max-w-3xl mx-auto border border-white/20 shadow-lg">
+            <h2 class="text-4xl font-bold text-white mb-6 drop-shadow-lg">Ready to Start Your Adventure?</h2>
+            <p class="text-xl text-gray-200 mb-8 drop-shadow-lg">
+              Join thousands of outdoor enthusiasts who are saving money and exploring more with GearGrab.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/browse" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
+                Start Browsing
+              </a>
+              <a href="/list-gear" class="border-2 border-white text-white hover:bg-white hover:text-gray-900 font-bold py-3 px-8 rounded-lg transition-all shadow-lg">
+                List Your Gear
+              </a>
+            </div>
+          </div>
+        </ScrollLinkedAnimator>
+      </div>
+
+    </div>
   </div>
 </div>
 
-<!-- Testimonials -->
-<section class="py-16 bg-white">
-  <div class="container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-12 animate-fade-in" style="animation-delay: 0.2s; opacity: 0;">What Our Users Say</h2>
+<style>
+  /* Ensure scrolling works properly */
+  :global(html) {
+    scroll-behavior: smooth;
+    overflow-y: auto;
+  }
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {#each testimonials as testimonial}
-        <div class="bg-gray-50 rounded-lg p-6 shadow-sm">
-          <div class="flex items-center mb-4">
-            <img src={testimonial.image} alt={testimonial.name} class="w-12 h-12 rounded-full mr-4" />
-            <div>
-              <h3 class="font-bold">{testimonial.name}</h3>
-              <p class="text-sm text-gray-600">{testimonial.location}</p>
-            </div>
-          </div>
-          <p class="text-gray-700 italic">"{testimonial.quote}"</p>
-        </div>
-      {/each}
-    </div>
-  </div>
-</section>
+  :global(body) {
+    overflow-y: auto;
+    height: auto;
+  }
 
-<!-- CTA Section -->
-<section class="py-16 bg-green-600 text-white">
-  <div class="container mx-auto px-4 text-center">
-    <h2 class="text-3xl font-bold mb-6">Ready to Start Your Adventure?</h2>
-    <p class="text-xl mb-8 max-w-3xl mx-auto">Join thousands of outdoor enthusiasts who are saving money and exploring more with GearGrab.</p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="/browse" class="btn bg-white text-green-600 hover:bg-gray-100 text-lg px-8 py-3">Browse Gear</a>
-      <a href="/list-gear" class="btn border-2 border-white text-white hover:bg-green-700 text-lg px-8 py-3">List Your Gear</a>
-    </div>
-  </div>
-</section>
+  /* Ensure the page content can scroll */
+  .relative.z-10 {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Line clamp utility */
+  :global(.line-clamp-1) {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+
+  /* Force blue hue styling for homepage search inputs */
+  :global(.bg-white\/10 input[type="text"]) {
+    background-color: rgba(31, 41, 55, 0.7) !important;
+    border-color: rgb(75, 85, 99) !important;
+    color: white !important;
+  }
+
+  :global(.bg-white\/10 input[type="text"]::placeholder) {
+    color: rgb(209, 213, 219) !important;
+  }
+</style>

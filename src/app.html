@@ -1,14 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" href="%sveltekit.assets%/favicon.ico" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>GearGrab - Rent Outdoor Gear from Local Owners</title>
-		<meta name="description" content="GearGrab is a peer-to-peer marketplace for renting outdoor gear. Find camping, hiking, skiing, and other outdoor equipment from local owners." />
-		%sveltekit.head%
-	</head>
-	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents">%sveltekit.body%</div>
-	</body>
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" href="%sveltekit.assets%/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>GearGrab - Meet Up. Gear Up. Get Out.</title>
+        <meta name="description" content="Rent Local Outdoor Gear, Save Space, Make Money, and Explore More. Connect with local gear owners for camping, hiking, skiing, and outdoor adventures." />
+
+        <!-- PWA Meta Tags -->
+        <link rel="manifest" href="%sveltekit.assets%/manifest.json" />
+        <meta name="theme-color" content="#10b981" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="GearGrab" />
+        <link rel="apple-touch-icon" href="%sveltekit.assets%/geargrab-logo.png" />
+
+        <!-- Cache busting -->
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+
+        <!-- COOP header removed for development to avoid popup issues -->
+
+        <!-- Version 2.0.3 - Fixed Google authentication COOP issues -->
+
+        <!-- Font Awesome for icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+        <style>
+            /* Global smooth scrolling */
+            html {
+                scroll-behavior: smooth;
+            }
+
+            /* Mobile responsive fixes */
+            @media (max-width: 768px) {
+                /* Ensure all form containers are centered */
+                .form-container, .max-w-md, .max-w-lg, .max-w-xl, .max-w-2xl {
+                    margin-left: auto !important;
+                    margin-right: auto !important;
+                    padding-left: 1rem !important;
+                    padding-right: 1rem !important;
+                }
+
+                /* Ensure text inputs and buttons are properly sized */
+                input, select, textarea, button {
+                    min-height: 44px;
+                }
+
+                /* Fix flex layouts on mobile */
+                .flex {
+                    flex-wrap: wrap;
+                }
+
+                /* Specific fix for hero search form centering */
+                .bg-white\/10 {
+                    margin-left: 1rem !important;
+                    margin-right: 1rem !important;
+                }
+
+                /* Ensure full width on mobile for form elements */
+                form {
+                    width: 100% !important;
+                }
+
+                /* Center content within containers */
+                .text-center > div {
+                    margin-left: auto !important;
+                    margin-right: auto !important;
+                }
+            }
+        </style>
+
+        %sveltekit.head%
+    </head>
+    <body data-sveltekit-preload-data="hover">
+        <div style="display: contents">%sveltekit.body%</div>
+    </body>
 </html>

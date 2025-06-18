@@ -39,14 +39,14 @@ service firebase.storage {
     match /bookings/{bookingId}/{fileName} {
       allow read: if isAuthenticated() && (
         // Check if user is involved in the booking
-        let booking = firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data;
-        request.auth.uid == booking.renterUid || request.auth.uid == booking.ownerUid
+        request.auth.uid == firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.renterUid ||
+        request.auth.uid == firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.ownerUid
       ) || isAdmin();
-      
+
       allow write: if isAuthenticated() && (
         // Check if user is involved in the booking
-        let booking = firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data;
-        request.auth.uid == booking.renterUid || request.auth.uid == booking.ownerUid
+        request.auth.uid == firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.renterUid ||
+        request.auth.uid == firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.ownerUid
       ) || isAdmin();
     }
   }

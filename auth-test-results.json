@@ -1,0 +1,49 @@
+{
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "duration": "8.21",
+    "successRate": "100.0"
+  },
+  "details": [
+    {
+      "testName": "Server Running",
+      "passed": true,
+      "details": "Server responding on http://localhost:5173",
+      "timestamp": "2025-06-15T11:31:44.512Z"
+    },
+    {
+      "testName": "Auth Test Endpoint",
+      "passed": true,
+      "details": "Auth endpoint working. Environment: development",
+      "timestamp": "2025-06-15T11:31:45.525Z"
+    },
+    {
+      "testName": "Protected API Endpoints",
+      "passed": true,
+      "details": "All protected endpoints correctly return 401/403",
+      "timestamp": "2025-06-15T11:31:47.563Z"
+    },
+    {
+      "testName": "Invalid JWT Handling",
+      "passed": true,
+      "details": "Invalid tokens are properly rejected",
+      "timestamp": "2025-06-15T11:31:48.576Z"
+    },
+    {
+      "testName": "Session Endpoint Protection",
+      "passed": true,
+      "details": "Session endpoint properly protected (status: 401)",
+      "timestamp": "2025-06-15T11:31:49.594Z"
+    },
+    {
+      "testName": "Server Hooks Authentication",
+      "passed": true,
+      "details": "Server hooks authentication middleware is working",
+      "timestamp": "2025-06-15T11:31:50.603Z"
+    }
+  ],
+  "timestamp": "2025-06-15T11:31:50.603Z",
+  "baseUrl": "http://localhost:5173"
+}

@@ -1,0 +1,60 @@
+{
+  "summary": {
+    "total": 6,
+    "passed": 1,
+    "failed": 5,
+    "duration": "0.26",
+    "successRate": "16.7"
+  },
+  "security": {
+    "authentication": false,
+    "inputValidation": true,
+    "errorSanitization": true,
+    "webhookSecurity": false,
+    "rateLimiting": false
+  },
+  "userExperience": {
+    "clearValidation": false,
+    "helpfulGuidance": false
+  },
+  "details": [
+    {
+      "testName": "Unauthenticated Payment Security",
+      "passed": false,
+      "details": "Status: 500, Message: \"none\"",
+      "timestamp": "2025-06-15T12:05:33.722Z"
+    },
+    {
+      "testName": "Invalid Payment Amount Handling",
+      "passed": false,
+      "details": "All invalid amounts properly rejected with user-friendly messages",
+      "timestamp": "2025-06-15T12:05:33.733Z"
+    },
+    {
+      "testName": "Malformed Request Data Handling",
+      "passed": false,
+      "details": "All malformed requests properly rejected with user-friendly messages",
+      "timestamp": "2025-06-15T12:05:33.745Z"
+    },
+    {
+      "testName": "Webhook Security Validation",
+      "passed": false,
+      "details": "All invalid webhook requests properly rejected",
+      "timestamp": "2025-06-15T12:05:33.755Z"
+    },
+    {
+      "testName": "Error Message Sanitization",
+      "passed": true,
+      "details": "No sensitive information leaked in error messages",
+      "timestamp": "2025-06-15T12:05:33.760Z"
+    },
+    {
+      "testName": "Payment Endpoint Rate Limiting",
+      "passed": false,
+      "details": "No rate limiting detected",
+      "timestamp": "2025-06-15T12:05:33.774Z"
+    }
+  ],
+  "timestamp": "2025-06-15T12:05:33.774Z",
+  "baseUrl": "http://localhost:5173"
+}

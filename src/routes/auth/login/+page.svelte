@@ -1,24 +1,48 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { signInWithEmail, signInWithGoogle } from '$firebase/auth';
-  import { notificationsStore } from '$stores/notifications';
-  import { isValidEmail } from '$utils/validation';
-  
+  import { simpleAuth } from '$lib/auth/simple-auth';
+  import { notifications } from '$lib/stores/notifications';
+  import { isValidEmail } from '$lib/utils/validation';
+  import FormContainer from '$lib/components/forms/form-container.svelte';
+  import FormField from '$lib/components/forms/form-field.svelte';
+  import FormButton from '$lib/components/forms/form-button.svelte';
+  import GoogleAuthButton from '$lib/components/auth/google-auth-button.svelte';
+  import ErrorAlert from '$lib/components/ui/error-alert.svelte';
+  import { onMount } from 'svelte';
+
   let email = '';
   let password = '';
-  let rememberMe = false;
   let loading = false;
   let errors: Record<string, string> = {};
-  
+
   // Get redirect URL from query parameters
-  $: redirectTo = $page.url.searchParams.get('redirectTo') || '/dashboard';
-  
+  $: redirectTo = $page.url.searchParams.get('redirectTo') || '/';
+
+  // Get auth state
+  $: authState = simpleAuth.authState;
+
+  // Check if user is already authenticated on mount
+  onMount(async () => {
+    console.log('🔐 Login page mounted, checking auth state...');
+
+    // Force refresh auth state to get latest
+    await simpleAuth.refreshAuth();
+
+    // Small delay to ensure auth state is loaded
+    setTimeout(() => {
+      if ($authState.isAuthenticated && $authState.user) {
+        console.log('✅ User already authenticated, redirecting to:', redirectTo);
+        goto(redirectTo);
+      }
+    }, 500);
+  });
+
   // Validate form
   function validateForm() {
     errors = {};
     let isValid = true;
-    
+
     if (!email) {
       errors.email = 'Email is required';
       isValid = false;
@@ -26,203 +50,253 @@
       errors.email = 'Please enter a valid email address';
       isValid = false;
     }
-    
+
     if (!password) {
       errors.password = 'Password is required';
       isValid = false;
     }
-    
+
     return isValid;
   }
-  
+
   // Handle form submission
   async function handleSubmit() {
     if (!validateForm()) return;
-    
+
     loading = true;
     errors = {};
-    
+
     try {
-      await signInWithEmail(email, password);
-      notificationsStore.success('Successfully logged in!');
-      goto(redirectTo);
-    } catch (error: any) {
-      console.error('Login error:', error);
-      
-      // Handle specific Firebase auth errors
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        errors.auth = 'Invalid email or password';
-      } else if (error.code === 'auth/too-many-requests') {
-        errors.auth = 'Too many failed login attempts. Please try again later or reset your password.';
+      console.log('🔐 Login: Starting email/password sign-in...');
+      const result = await simpleAuth.signInWithEmailPassword(email, password);
+
+      if (result.success) {
+        notifications.add({
+          type: 'success',
+          message: 'Successfully logged in!',
+          timeout: 5000
+        });
+
+        // Wait for auth state to be confirmed
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        while (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 200));
+
+          if ($authState.isAuthenticated && $authState.user) {
+            console.log('✅ Auth state confirmed, redirecting to:', redirectTo);
+
+            // Force navigation using multiple methods for reliability
+            try {
+              await goto(redirectTo);
+              return;
+            } catch (gotoError) {
+              console.warn('🔄 goto failed, using window.location:', gotoError);
+              window.location.href = redirectTo;
+              return;
+            }
+          }
+
+          attempts++;
+        }
+
+        // If we get here, auth state didn't update properly
+        console.warn('⚠️ Auth state not confirmed after email login, forcing refresh...');
+        await simpleAuth.refreshAuth();
+
+        // Try one more time
+        if ($authState.isAuthenticated && $authState.user) {
+          console.log('✅ Auth state confirmed after refresh, redirecting to:', redirectTo);
+          try {
+            await goto(redirectTo);
+          } catch (gotoError) {
+            console.warn('🔄 goto failed, using window.location:', gotoError);
+            window.location.href = redirectTo;
+          }
+        } else {
+          console.error('❌ Auth state still not confirmed, staying on login page');
+        }
       } else {
-        errors.auth = error.message || 'An error occurred during login';
+        throw new Error(result.error || 'Login failed');
       }
+    } catch (error: any) {
+      console.error('🔐 Login: Email/password sign-in failed:', error);
+
+      // Enhanced error message handling
+      let errorMessage = 'An error occurred during login';
+
+      if (error.message) {
+        if (error.message.includes('invalid-login-credentials') ||
+            error.message.includes('user-not-found') ||
+            error.message.includes('wrong-password')) {
+          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        } else if (error.message.includes('too-many-requests')) {
+          errorMessage = 'Too many failed attempts. Please try again later or reset your password.';
+        } else if (error.message.includes('network')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        } else if (error.message.includes('popup-blocked')) {
+          errorMessage = 'Popup was blocked. Please allow popups for this site and try again.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      errors.auth = errorMessage;
+
+      // Show notification for better visibility
+      notifications.add({
+        type: 'error',
+        message: errorMessage,
+        timeout: 8000
+      });
     } finally {
       loading = false;
     }
   }
-  
-  // Handle Google sign-in
-  async function handleGoogleSignIn() {
-    loading = true;
-    errors = {};
-    
-    try {
-      await signInWithGoogle();
-      notificationsStore.success('Successfully logged in with Google!');
-      goto(redirectTo);
-    } catch (error: any) {
-      console.error('Google sign-in error:', error);
-      errors.auth = error.message || 'An error occurred during Google sign-in';
-    } finally {
-      loading = false;
+
+  // Handle Google sign-in success
+  async function handleGoogleSuccess() {
+    console.log('🔐 Login: Google sign-in successful, checking auth state...');
+
+    // Wait for auth state to be confirmed
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      if ($authState.isAuthenticated && $authState.user) {
+        console.log('✅ Auth state confirmed, redirecting to:', redirectTo);
+
+        // Force navigation using multiple methods for reliability
+        try {
+          await goto(redirectTo);
+          return;
+        } catch (gotoError) {
+          console.warn('🔄 goto failed, using window.location:', gotoError);
+          window.location.href = redirectTo;
+          return;
+        }
+      }
+
+      attempts++;
     }
+
+    // If we get here, auth state didn't update properly
+    console.warn('⚠️ Auth state not confirmed after Google login, forcing refresh...');
+    await simpleAuth.refreshAuth();
+
+    // Try one more time
+    if ($authState.isAuthenticated && $authState.user) {
+      console.log('✅ Auth state confirmed after refresh, redirecting to:', redirectTo);
+      try {
+        await goto(redirectTo);
+      } catch (gotoError) {
+        console.warn('🔄 goto failed, using window.location:', gotoError);
+        window.location.href = redirectTo;
+      }
+    } else {
+      console.error('❌ Auth state still not confirmed, staying on login page');
+    }
+  }
+
+  // Handle Google sign-in error
+  function handleGoogleError(event: CustomEvent) {
+    errors.auth = event.detail.error.message || 'An error occurred during Google sign-in';
   }
 </script>
 
 <svelte:head>
   <title>Log In - GearGrab</title>
+  <meta name="description" content="Log in to your GearGrab account to rent outdoor gear or list your equipment for others to enjoy." />
 </svelte:head>
 
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-md w-full space-y-8">
-    <div>
-      <h1 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-        Log in to your account
-      </h1>
-      <p class="mt-2 text-center text-sm text-gray-600">
+<!-- Full Page Background -->
+<div class="fixed inset-0 z-0">
+  <div class="absolute inset-0">
+    <img
+      src="/pexels-bianca-gasparoto-834990-1752951.jpg"
+      alt="Mountain landscape"
+      class="w-full h-full object-cover"
+    >
+  </div>
+  <div class="absolute inset-0 bg-black opacity-40"></div>
+</div>
+
+<!-- Page Content -->
+<div class="relative z-30 min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-32">
+  <FormContainer title="Welcome back" maxWidth="md">
+    <div class="space-y-6">
+      <p class="text-center text-gray-400">
         Or
-        <a href="/auth/signup" class="font-medium text-green-600 hover:text-green-500">
+        <a href="/auth/signup" class="font-medium text-green-400 hover:text-green-300">
           create a new account
         </a>
       </p>
-    </div>
-    
-    {#if errors.auth}
-      <div class="rounded-md bg-red-50 p-4">
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-            </svg>
+
+      <!-- Google Sign-in Option -->
+      <div class="text-center">
+        <p class="text-sm text-gray-300 mb-4">Quick login with Google</p>
+        <GoogleAuthButton
+          on:success={handleGoogleSuccess}
+          on:error={handleGoogleError}
+          {loading}
+        />
+        <div class="mt-4 relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-white/20"></div>
           </div>
-          <div class="ml-3">
-            <h3 class="text-sm font-medium text-red-800">
-              {errors.auth}
-            </h3>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-transparent text-gray-300">Or continue with email</span>
           </div>
         </div>
       </div>
-    {/if}
-    
-    <form class="mt-8 space-y-6" on:submit|preventDefault={handleSubmit}>
-      <div class="rounded-md shadow-sm -space-y-px">
-        <div>
-          <label for="email-address" class="sr-only">Email address</label>
-          <input 
-            id="email-address" 
-            name="email" 
-            type="email" 
-            autocomplete="email" 
-            required 
-            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" 
-            placeholder="Email address"
-            bind:value={email}
-          />
-          {#if errors.email}
-            <p class="mt-1 text-sm text-red-600">{errors.email}</p>
-          {/if}
-        </div>
-        <div>
-          <label for="password" class="sr-only">Password</label>
-          <input 
-            id="password" 
-            name="password" 
-            type="password" 
-            autocomplete="current-password" 
-            required 
-            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" 
-            placeholder="Password"
-            bind:value={password}
-          />
-          {#if errors.password}
-            <p class="mt-1 text-sm text-red-600">{errors.password}</p>
-          {/if}
-        </div>
-      </div>
 
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <input 
-            id="remember-me" 
-            name="remember-me" 
-            type="checkbox" 
-            class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-            bind:checked={rememberMe}
-          />
-          <label for="remember-me" class="ml-2 block text-sm text-gray-900">
-            Remember me
-          </label>
-        </div>
+      <ErrorAlert error={errors.auth} />
 
-        <div class="text-sm">
-          <a href="/auth/reset-password" class="font-medium text-green-600 hover:text-green-500">
+      <!-- Login Form -->
+      <form on:submit|preventDefault={handleSubmit}>
+        <FormField
+          id="email-address"
+          label="Email Address"
+          type="email"
+          bind:value={email}
+          placeholder="Email address"
+          autocomplete="email"
+          required
+          error={errors.email}
+        />
+
+        <FormField
+          id="password"
+          label="Password"
+          type="password"
+          bind:value={password}
+          placeholder="Password"
+          autocomplete="current-password"
+          required
+          error={errors.password}
+        />
+
+        <!-- Forgot Password Link -->
+        <div class="text-right mb-6">
+          <a href="/auth/reset-password" class="text-sm text-green-400 hover:text-green-300 underline">
             Forgot your password?
           </a>
         </div>
-      </div>
 
-      <div>
-        <button 
-          type="submit" 
-          class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        <FormButton
+          type="submit"
+          variant="primary"
+          size="lg"
+          fullWidth
+          {loading}
           disabled={loading}
         >
-          {#if loading}
-            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            </span>
-            Logging in...
-          {:else}
-            Log in
-          {/if}
-        </button>
-      </div>
-    </form>
-    
-    <div class="mt-6">
-      <div class="relative">
-        <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-300"></div>
-        </div>
-        <div class="relative flex justify-center text-sm">
-          <span class="px-2 bg-gray-50 text-gray-500">
-            Or continue with
-          </span>
-        </div>
-      </div>
-
-      <div class="mt-6">
-        <button 
-          type="button" 
-          class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          on:click={handleGoogleSignIn}
-          disabled={loading}
-        >
-          <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-            <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
-              <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"/>
-              <path fill="#34A853" d="M -14.754 63.239 C -11.514 63.239 -8.804 62.159 -6.824 60.329 L -10.684 57.329 C -11.764 58.049 -13.134 58.489 -14.754 58.489 C -17.884 58.489 -20.534 56.379 -21.484 53.529 L -25.464 53.529 L -25.464 56.619 C -23.494 60.539 -19.444 63.239 -14.754 63.239 Z"/>
-              <path fill="#FBBC05" d="M -21.484 53.529 C -21.734 52.809 -21.864 52.039 -21.864 51.239 C -21.864 50.439 -21.724 49.669 -21.484 48.949 L -21.484 45.859 L -25.464 45.859 C -26.284 47.479 -26.754 49.299 -26.754 51.239 C -26.754 53.179 -26.284 54.999 -25.464 56.619 L -21.484 53.529 Z"/>
-              <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z"/>
-            </g>
-          </svg>
-          Google
-        </button>
-      </div>
+          {loading ? 'Logging in...' : 'Log in'}
+        </FormButton>
+      </form>
     </div>
-  </div>
+  </FormContainer>
 </div>

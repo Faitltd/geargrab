@@ -1,10 +1,10 @@
 import type { Handle } from '@sveltejs/kit';
-import { adminAuth } from '$lib/firebase/server';
+import { adminAuth, isFirebaseAdminAvailable } from '$lib/firebase/server';
+import { SecurityMiddleware } from '$lib/security/middleware';
 import { dev } from '$app/environment';
 
 export const handle: Handle = async ({ event, resolve }) => {
   const start = Date.now();
-
   // Initialize locals
   event.locals.user = null;
   event.locals.userId = null;
@@ -12,28 +12,47 @@ export const handle: Handle = async ({ event, resolve }) => {
   // Extract session cookie
   const sessionCookie = event.cookies.get('__session');
 
-  if (sessionCookie) {
-    try {
-      // Verify the session cookie
-      const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
+  // Check if Firebase Admin is available
+  if (isFirebaseAdminAvailable()) {
+    if (sessionCookie) {
+      try {
+        // Verify the session cookie
+        const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
 
-      // Set user information in locals
-      event.locals.userId = decodedClaims.uid;
-      event.locals.user = {
-        uid: decodedClaims.uid,
-        email: decodedClaims.email,
-        emailVerified: decodedClaims.email_verified,
-        displayName: decodedClaims.name,
-        photoURL: decodedClaims.picture
-      };
+        // Set user information in locals
+        event.locals.userId = decodedClaims.uid;
+        event.locals.user = {
+          uid: decodedClaims.uid,
+          email: decodedClaims.email,
+          emailVerified: decodedClaims.email_verified,
+          displayName: decodedClaims.name,
+          photoURL: decodedClaims.picture
+        };
 
-    } catch (error) {
-      // Invalid session cookie - clear it
-      if (!dev) {
-        console.warn('Invalid session cookie:', error.message);
+      } catch (error) {
+        // Invalid session cookie - clear it
+        if (!dev) {
+          console.warn('Invalid session cookie:', error.message);
+        }
+        event.cookies.delete('__session', { path: '/' });
       }
-      event.cookies.delete('__session', { path: '/' });
     }
+
+    // Try alternative authentication method if session cookie failed
+    if (!event.locals.user) {
+      const auth = await SecurityMiddleware.authenticateUser(event);
+      if (auth) {
+        event.locals.userId = auth.userId;
+        event.locals.user = {
+          uid: auth.userId,
+          email: '', // TODO: Get from user document
+          emailVerified: false, // TODO: Get from user document
+          isAdmin: auth.isAdmin
+        };
+      }
+    }
+  } else {
+    console.log('⚠️ Firebase Admin not available, skipping authentication');
   }
 
   // Add security headers
@@ -68,13 +87,27 @@ export const handle: Handle = async ({ event, resolve }) => {
     console.log('Request processed', logData);
   }
 
-  return response;
+  // Apply security headers to all responses (not just API endpoints)
+  // Skip COOP header for auth-related routes to prevent popup communication issues
+  const isAuthRoute = event.url.pathname.includes('/auth') ||
+                      event.url.pathname.includes('/login') ||
+                      event.url.pathname.includes('/signup') ||
+                      event.url.pathname.includes('/test-auth') ||
+                      event.url.pathname.includes('/book') || // Booking pages may trigger auth
+                      event.url.pathname.includes('/dashboard') || // Dashboard may trigger auth
+                      event.url.pathname === '/' || // Homepage has auth components
+                      event.url.searchParams.has('redirectTo'); // Any page with auth redirect
+
+  console.log(`🔒 Security headers for ${event.url.pathname}: skipCOOP=${isAuthRoute}`);
+  const secureResponse = SecurityMiddleware.setSecurityHeaders(response, isAuthRoute);
+
+  return secureResponse;
 };
 
-export function handleError({ error, event }) {
+export function handleError({ error, event }: { error: any, event: any }) {
   const errorReport = {
-    message: error.message,
-    stack: dev ? error.stack : undefined,
+    message: error?.message || 'Unknown error',
+    stack: dev ? error?.stack : undefined,
     path: event.url.pathname,
     method: event.request.method,
     userId: event.locals.userId || 'anonymous',
@@ -92,7 +125,7 @@ export function handleError({ error, event }) {
 
   // Return sanitized error for client
   return {
-    message: dev ? error.message : 'An unexpected error occurred',
-    code: error.code || 'UNKNOWN_ERROR'
+    message: dev ? error?.message || 'An unexpected error occurred' : 'An unexpected error occurred',
+    code: error?.code || 'UNKNOWN_ERROR'
   };
 }

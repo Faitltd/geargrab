@@ -1,0 +1,80 @@
+{
+  "timestamp": "2025-06-15T11:45:46.523Z",
+  "baseUrl": "http://localhost:5173",
+  "cspHeader": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.stripe.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self'",
+  "parsedDirectives": {
+    "default-src": [
+      "'self'"
+    ],
+    "script-src": [
+      "'self'",
+      "'unsafe-inline'",
+      "https://js.stripe.com",
+      "https://www.gstatic.com"
+    ],
+    "style-src": [
+      "'self'",
+      "'unsafe-inline'",
+      "https://fonts.googleapis.com"
+    ],
+    "font-src": [
+      "'self'",
+      "https://fonts.gstatic.com"
+    ],
+    "img-src": [
+      "'self'",
+      "data:",
+      "https:",
+      "blob:"
+    ],
+    "connect-src": [
+      "'self'",
+      "https://api.stripe.com",
+      "https://firestore.googleapis.com",
+      "https://identitytoolkit.googleapis.com"
+    ],
+    "frame-src": [
+      "https://js.stripe.com"
+    ],
+    "object-src": [
+      "'none'"
+    ],
+    "base-uri": [
+      "'self'"
+    ]
+  },
+  "securityAnalysis": {
+    "strengths": [
+      "default-src restricts to same origin",
+      "script-src allows specific trusted domains: https://js.stripe.com, https://www.gstatic.com",
+      "object-src properly disabled",
+      "base-uri restricted to same origin"
+    ],
+    "weaknesses": [
+      "script-src allows unsafe-inline",
+      "style-src allows unsafe-inline",
+      "img-src allows data: URIs (potential XSS vector)",
+      "img-src allows all HTTPS sources"
+    ],
+    "recommendations": [
+      "Replace 'unsafe-inline' with nonces or hashes",
+      "Consider using nonces for inline styles",
+      "Consider restricting data: URIs if not needed",
+      "Consider restricting to specific domains"
+    ],
+    "riskLevel": "medium"
+  },
+  "missingDirectives": [
+    "frame-ancestors"
+  ],
+  "externalDomains": [
+    "js.stripe.com",
+    "www.gstatic.com",
+    "fonts.googleapis.com",
+    "fonts.gstatic.com",
+    "api.stripe.com",
+    "firestore.googleapis.com",
+    "identitytoolkit.googleapis.com"
+  ],
+  "riskLevel": "medium"
+}

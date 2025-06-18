@@ -16,6 +16,11 @@ export function isValidPhoneNumber(phoneNumber: string): boolean {
   return phoneRegex.test(phoneNumber);
 }
 
+// Alias for consistency with other validation functions
+export function isValidPhone(phone: string): boolean {
+  return isValidPhoneNumber(phone);
+}
+
 // ZIP code validation
 export function isValidZipCode(zipCode: string): boolean {
   const zipRegex = /^\d{5}(-\d{4})?$/;
@@ -75,6 +80,16 @@ export function isRequired(value: any): boolean {
   if (value === null || value === undefined) return false;
   if (typeof value === 'string') return value.trim().length > 0;
   return true;
+}
+
+// Text not empty validation (alias for consistency)
+export function isNotEmpty(text: string): boolean {
+  return text.trim().length > 0;
+}
+
+// Positive number validation
+export function isPositiveNumber(num: number): boolean {
+  return !isNaN(num) && num > 0;
 }
 
 // Min/max length validation

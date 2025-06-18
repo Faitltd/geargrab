@@ -3,89 +3,56 @@ import type { Timestamp } from 'firebase/firestore';
 export interface User {
   uid: string;
   email: string;
-  displayName: string;
+  displayName?: string;
   photoURL?: string;
   phoneNumber?: string;
   createdAt: Timestamp;
-  isVerified: boolean;
+  lastLoginAt?: Timestamp;
+  isOwner?: boolean;
+  isRenter?: boolean;
+  isVerified?: boolean;
+  completedBookings?: number;
+  listingsCount?: number;
   bio?: string;
-  location?: {
-    city: string;
-    state: string;
-    zipCode: string;
-    coordinates?: {
-      latitude: number;
-      longitude: number;
-    }
-  };
+  location?: string;
   ratings?: {
     asOwner: number;
     asRenter: number;
-  };
-  responseTime?: number; // Average response time in minutes
-}
-
-export interface UserPrivate {
-  uid: string;
-  stripeCustomerId?: string;
-  stripeConnectAccountId?: string;
-  paymentMethods?: string[];
-  notifications: {
-    email: boolean;
-    sms: boolean;
-    push: boolean;
-  };
-  verificationDetails?: {
-    idVerified: boolean;
-    addressVerified: boolean;
-    phoneVerified: boolean;
-    verifiedAt?: Timestamp;
   };
 }
 
 export interface Listing {
   id: string;
-  ownerUid: string;
+  ownerId: string;
+  ownerUid: string; // Legacy compatibility
   title: string;
   description: string;
   category: string;
-  subcategory?: string;
+  condition: string;
   brand?: string;
   model?: string;
-  condition: 'New' | 'Like New' | 'Good' | 'Fair' | 'Poor';
-  ageInYears?: number;
   dailyPrice: number;
   weeklyPrice?: number;
   monthlyPrice?: number;
   securityDeposit: number;
-  location: {
-    city: string;
-    state: string;
-    zipCode: string;
-    coordinates?: {
-      latitude: number;
-      longitude: number;
-    }
+  location: string;
+  coordinates?: {
+    latitude: number;
+    longitude: number;
   };
-  deliveryOptions: {
-    pickup: boolean;
-    dropoff: boolean;
-    shipping: boolean;
-    pickupLocation?: string;
+  deliveryOptions?: {
     dropoffDistance?: number;
     shippingFee?: number;
   };
   images: string[];
   features: string[];
-  specifications?: Record<string, string>;
-  includesInsurance: boolean;
-  insuranceDetails?: string;
-  availabilityCalendar: Record<string, boolean>;
+  unavailableDates: Timestamp[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
-  status: 'active' | 'inactive' | 'pending' | 'rejected';
-  averageRating?: number;
-  reviewCount?: number;
+  isActive: boolean;
+  views?: number;
+  bookingsCount?: number;
+  avgRating?: number;
 }
 
 export interface Booking {
@@ -93,107 +60,76 @@ export interface Booking {
   listingId: string;
   listingTitle: string;
   listingImage: string;
-  ownerUid: string;
-  renterUid: string;
+  ownerId: string;
+  ownerUid: string; // Legacy compatibility
+  renterId: string;
+  renterUid: string; // Legacy compatibility
   startDate: Timestamp;
   endDate: Timestamp;
-  status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled' | 'disputed';
+  status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
   totalPrice: number;
-  securityDeposit: number;
-  paymentStatus: 'pending' | 'paid' | 'refunded' | 'partially_refunded' | 'failed';
+  depositAmount?: number;
+  securityDeposit?: number;
+  paymentStatus: 'pending' | 'paid' | 'refunded';
   paymentIntentId?: string;
-  deliveryMethod: 'pickup' | 'dropoff' | 'shipping';
-  deliveryDetails?: {
-    address?: string;
-    trackingNumber?: string;
-    instructions?: string;
-  };
+  deliveryMethod?: 'pickup' | 'delivery' | 'dropoff' | 'shipping';
+  deliveryDetails?: any;
   insuranceTier?: 'basic' | 'standard' | 'premium' | 'none';
   insuranceCost?: number;
-  cancellationPolicy: 'flexible' | 'moderate' | 'strict';
-  cancellationDetails?: {
-    cancelledBy: string;
-    cancelledAt: Timestamp;
-    reason?: string;
-    refundAmount?: number;
-  };
+  cancellationPolicy?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
-  checkoutCondition?: string;
-  returnCondition?: string;
-  ownerNotes?: string;
-  renterNotes?: string;
+  paidAt?: Timestamp;
+  ownerReviewed?: boolean;
+  renterReviewed?: boolean;
 }
 
 export interface Review {
   id: string;
   bookingId: string;
   listingId: string;
-  reviewerUid: string;
-  revieweeUid: string;
+  reviewerId: string;
+  revieweeId: string;
   rating: number;
   comment: string;
-  reviewType: 'owner' | 'renter';
   createdAt: Timestamp;
-  updatedAt?: Timestamp;
-  response?: {
-    comment: string;
-    createdAt: Timestamp;
-  };
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: 'booking' | 'message' | 'system' | 'payment';
+  read: boolean;
+  relatedId?: string;
+  createdAt: Timestamp;
 }
 
 export interface Message {
   id: string;
-  senderUid: string;
-  recipientUid: string;
+  conversationId: string;
+  senderId: string;
+  senderName: string;
+  senderAvatar?: string;
   content: string;
-  createdAt: Timestamp;
+  timestamp: Timestamp;
   read: boolean;
-  readAt?: Timestamp;
-  bookingId?: string;
-  listingId?: string;
+  type: 'text' | 'image' | 'system';
   attachments?: string[];
 }
 
 export interface Conversation {
   id: string;
   participants: string[];
-  lastMessage: {
-    content: string;
-    senderUid: string;
-    createdAt: Timestamp;
-  };
+  participantNames: Record<string, string>;
+  participantAvatars?: Record<string, string>;
+  lastMessage?: string;
+  lastMessageTimestamp?: Timestamp;
+  lastMessageSenderId?: string;
   unreadCount: Record<string, number>;
   bookingId?: string;
   listingId?: string;
-}
-
-export interface VerificationSession {
-  id: string;
-  userId: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'failed';
-  idVerification: {
-    status: 'pending' | 'verified' | 'rejected';
-    documentType?: 'drivers_license' | 'passport' | 'state_id';
-    documentImageUrl?: string;
-    selfieImageUrl?: string;
-    verifiedAt?: Timestamp;
-    rejectionReason?: string;
-  };
-  addressVerification: {
-    status: 'pending' | 'verified' | 'rejected';
-    documentImageUrl?: string;
-    verifiedAt?: Timestamp;
-    rejectionReason?: string;
-  };
-  phoneVerification: {
-    status: 'pending' | 'verified' | 'rejected';
-    phoneNumber?: string;
-    verificationCode?: string;
-    verifiedAt?: Timestamp;
-    rejectionReason?: string;
-  };
   createdAt: Timestamp;
   updatedAt: Timestamp;
-  completedAt?: Timestamp;
 }

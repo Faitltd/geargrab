@@ -1,5 +1,6 @@
 import adapter from '@sveltejs/adapter-node';
 import { vitePreprocess } from '@sveltejs/kit/vite';
+import { resolve } from 'path';
 
 const alias = {
   $lib: 'src/lib',
@@ -17,7 +18,10 @@ const config = {
   preprocess: vitePreprocess(),
 
   kit: {
-    adapter: adapter(),
+    adapter: adapter({
+      precompress: false,
+      envPrefix: ''
+    }),
     alias
   }
 };

@@ -1,0 +1,43 @@
+{
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "duration": "17.24",
+    "successRate": "100.0"
+  },
+  "details": [
+    {
+      "testName": "Exact Threshold Boundary",
+      "passed": true,
+      "details": "0 success, 101 rate limited, limit: 100",
+      "timestamp": "2025-06-15T11:40:25.634Z"
+    },
+    {
+      "testName": "Rate Limit Window Behavior",
+      "passed": true,
+      "details": "Initial: 0 success, 5 rate limited",
+      "timestamp": "2025-06-15T11:40:28.640Z"
+    },
+    {
+      "testName": "Different Rate Limit Types",
+      "passed": true,
+      "details": "Rate limiting behavior varies appropriately by endpoint type",
+      "timestamp": "2025-06-15T11:40:32.155Z"
+    },
+    {
+      "testName": "Concurrent Under Rate Limit",
+      "passed": true,
+      "details": "0 success, 15 rate limited, 0 errors in 22ms",
+      "timestamp": "2025-06-15T11:40:34.178Z"
+    },
+    {
+      "testName": "Rate Limit Recovery",
+      "passed": true,
+      "details": "After trigger (20 rate limited) and 5s wait: 429",
+      "timestamp": "2025-06-15T11:40:41.205Z"
+    }
+  ],
+  "timestamp": "2025-06-15T11:40:41.205Z",
+  "baseUrl": "http://localhost:5173"
+}

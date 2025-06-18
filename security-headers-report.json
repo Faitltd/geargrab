@@ -1,0 +1,187 @@
+{
+  "summary": {
+    "total": 6,
+    "passed": 5,
+    "failed": 1,
+    "duration": "0.04",
+    "successRate": "83.3"
+  },
+  "results": {
+    "mainPage": {
+      "headers": {
+        "access-control-allow-origin": "*",
+        "content-length": "145701",
+        "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.stripe.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self'",
+        "content-type": "text/html",
+        "etag": "\"e7lctb\"",
+        "permissions-policy": "camera=(), microphone=(), geolocation=()",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "x-sveltekit-page": "true",
+        "x-xss-protection": "1; mode=block",
+        "date": "Sun, 15 Jun 2025 11:44:40 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5"
+      },
+      "headerCount": 6,
+      "missingHeaders": []
+    },
+    "apiEndpoints": [
+      {
+        "endpoint": "/api/auth/test",
+        "headerCount": 6,
+        "missingHeaders": [],
+        "isSecure": true,
+        "status": 429
+      },
+      {
+        "endpoint": "/api/auth/session",
+        "headerCount": 6,
+        "missingHeaders": [],
+        "isSecure": true,
+        "status": 429
+      }
+    ],
+    "cspSyntax": {
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.stripe.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self'",
+      "parsedDirectives": {
+        "default-src": [
+          "'self'"
+        ],
+        "script-src": [
+          "'self'",
+          "'unsafe-inline'",
+          "https://js.stripe.com",
+          "https://www.gstatic.com"
+        ],
+        "style-src": [
+          "'self'",
+          "'unsafe-inline'",
+          "https://fonts.googleapis.com"
+        ],
+        "font-src": [
+          "'self'",
+          "https://fonts.gstatic.com"
+        ],
+        "img-src": [
+          "'self'",
+          "data:",
+          "https:",
+          "blob:"
+        ],
+        "connect-src": [
+          "'self'",
+          "https://api.stripe.com",
+          "https://firestore.googleapis.com",
+          "https://identitytoolkit.googleapis.com"
+        ],
+        "frame-src": [
+          "https://js.stripe.com"
+        ],
+        "object-src": [
+          "'none'"
+        ],
+        "base-uri": [
+          "'self'"
+        ]
+      },
+      "missingDirectives": []
+    },
+    "cspSecurity": {
+      "securityIssues": [
+        {
+          "severity": "low",
+          "description": "data: URIs can be used for XSS"
+        },
+        {
+          "severity": "medium",
+          "description": "unsafe-inline allows inline scripts/styles"
+        }
+      ],
+      "isSecure": true
+    },
+    "otherHeaders": [
+      {
+        "name": "X-Frame-Options",
+        "value": "DENY",
+        "isValid": true,
+        "validValues": [
+          "DENY",
+          "SAMEORIGIN"
+        ]
+      },
+      {
+        "name": "X-Content-Type-Options",
+        "value": "nosniff",
+        "isValid": true,
+        "validValues": [
+          "nosniff"
+        ]
+      },
+      {
+        "name": "X-XSS-Protection",
+        "value": "1; mode=block",
+        "isValid": true,
+        "validValues": [
+          "1; mode=block",
+          "0"
+        ]
+      },
+      {
+        "name": "Referrer-Policy",
+        "value": "strict-origin-when-cross-origin",
+        "isValid": true,
+        "validValues": [
+          "strict-origin-when-cross-origin",
+          "strict-origin",
+          "no-referrer"
+        ]
+      }
+    ],
+    "cors": {
+      "corsHeader": "*",
+      "isTooPermissive": true
+    }
+  },
+  "details": [
+    {
+      "testName": "Main Page Security Headers",
+      "passed": true,
+      "details": "6 security headers present",
+      "timestamp": "2025-06-15T11:44:40.815Z"
+    },
+    {
+      "testName": "API Endpoint Security Headers",
+      "passed": true,
+      "details": "All API endpoints have proper security headers",
+      "timestamp": "2025-06-15T11:44:40.819Z"
+    },
+    {
+      "testName": "CSP Syntax Validation",
+      "passed": true,
+      "details": "CSP has 9 directives",
+      "timestamp": "2025-06-15T11:44:40.822Z"
+    },
+    {
+      "testName": "CSP Security Check",
+      "passed": true,
+      "details": "CSP is secure (2 minor issues)",
+      "timestamp": "2025-06-15T11:44:40.823Z"
+    },
+    {
+      "testName": "Security Headers Configuration",
+      "passed": true,
+      "details": "4/4 headers properly configured",
+      "timestamp": "2025-06-15T11:44:40.826Z"
+    },
+    {
+      "testName": "CORS Configuration",
+      "passed": false,
+      "details": "CORS allows all origins (*) - acceptable for development",
+      "timestamp": "2025-06-15T11:44:40.827Z"
+    }
+  ],
+  "timestamp": "2025-06-15T11:44:40.827Z",
+  "baseUrl": "http://localhost:5173"
+}

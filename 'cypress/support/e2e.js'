@@ -1,0 +1,5 @@
+# Make sure your dev server is running
+npm run dev
+
+# In another terminal, run Cypress
+npx cypress run

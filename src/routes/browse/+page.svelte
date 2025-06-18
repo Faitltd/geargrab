@@ -1,356 +1,202 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import VideoBackground from '$lib/components/layout/video-background.svelte';
+  import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
+  import HeroSearch from '$lib/components/forms/hero-search.svelte';
+  import FilterBar from '$lib/components/forms/filter-bar.svelte';
+  import GearGrid from '$lib/components/display/gear-grid.svelte';
+  import { products } from '$lib/data/products';
 
-  // Dummy listings data
-  const dummyListings = [
-    {
-      id: '1',
-      title: 'Premium Camping Tent (4-Person)',
-      description: 'Spacious 4-person tent, perfect for family camping trips.',
-      category: 'camping',
-      dailyPrice: 35,
-      images: [
-        'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
-      ],
-      location: {
-        city: 'Denver',
-        state: 'CO'
-      },
-      condition: 'Like New',
-      averageRating: 4.8,
-      reviewCount: 12
-    },
-    {
-      id: '2',
-      title: 'Mountain Bike - Trek X-Caliber 8',
-      description: 'High-quality mountain bike for trail riding.',
-      category: 'biking',
-      dailyPrice: 45,
-      images: [
-        'https://images.unsplash.com/photo-1511994298241-608e28f14fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
-      ],
-      location: {
-        city: 'Boulder',
-        state: 'CO'
-      },
-      condition: 'Good',
-      averageRating: 4.6,
-      reviewCount: 8
-    },
-    {
-      id: '3',
-      title: 'Kayak - Wilderness Systems Pungo 120',
-      description: 'Stable and comfortable kayak for lake adventures.',
-      category: 'water-sports',
-      dailyPrice: 50,
-      images: [
-        'https://images.unsplash.com/photo-1604537466158-719b1972feb8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80'
-      ],
-      location: {
-        city: 'Fort Collins',
-        state: 'CO'
-      },
-      condition: 'Good',
-      averageRating: 4.9,
-      reviewCount: 15
-    },
-    {
-      id: '4',
-      title: 'Backpacking Set - Complete Kit',
-      description: 'Complete backpacking kit including tent, sleeping bag, pad, and cooking equipment.',
-      category: 'hiking',
-      dailyPrice: 65,
-      images: [
-        'https://images.unsplash.com/photo-1501554728187-ce583db33af7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
-      ],
-      location: {
-        city: 'Denver',
-        state: 'CO'
-      },
-      condition: 'Good',
-      averageRating: 4.7,
-      reviewCount: 9
-    },
-    {
-      id: '5',
-      title: 'Snowboard Package - Burton Custom',
-      description: 'Complete snowboard package including board, bindings, and boots.',
-      category: 'skiing',
-      dailyPrice: 55,
-      images: [
-        'https://images.unsplash.com/photo-1522056615691-da7b8106c665?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
-      ],
-      location: {
-        city: 'Breckenridge',
-        state: 'CO'
-      },
-      condition: 'Like New',
-      averageRating: 4.9,
-      reviewCount: 7
-    },
-    {
-      id: '6',
-      title: 'Climbing Gear Set - Harness, Shoes, Rope',
-      description: 'Complete climbing gear set for indoor or outdoor climbing.',
-      category: 'climbing',
-      dailyPrice: 40,
-      images: [
-        'https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1103&q=80'
-      ],
-      location: {
-        city: 'Boulder',
-        state: 'CO'
-      },
-      condition: 'Good',
-      averageRating: 4.8,
-      reviewCount: 11
-    }
-  ];
+  let listings: any[] = [];
+  let loading = false;
+  let category = 'all';
+  let location = '';
+  let sort = 'recommended';
+  let query = '';
 
-  // Categories
-  const categories = [
-    { id: '', name: 'All Categories' },
-    { id: 'camping', name: 'Camping' },
-    { id: 'hiking', name: 'Hiking' },
-    { id: 'skiing', name: 'Skiing' },
-    { id: 'water-sports', name: 'Water Sports' },
-    { id: 'climbing', name: 'Climbing' },
-    { id: 'biking', name: 'Biking' }
-  ];
+  onMount(async () => {
+    // Read URL parameters and set initial state
+    const urlParams = new URLSearchParams(window.location.search);
+    query = urlParams.get('q') || '';
+    category = urlParams.get('category') || 'all';
+    location = urlParams.get('location') || '';
+    sort = urlParams.get('sort') || 'recommended';
 
-  // Filter state for form inputs
-  let query = $page.url.searchParams.get('q') || '';
-  let category = $page.url.searchParams.get('category') || '';
-  let location = $page.url.searchParams.get('location') || '';
-  let minPrice = $page.url.searchParams.get('minPrice') || '';
-  let maxPrice = $page.url.searchParams.get('maxPrice') || '';
-
-  // Filter listings based on URL parameters
-  $: listings = dummyListings.filter(listing => {
-    // Filter by category
-    if (category && listing.category !== category) {
-      return false;
-    }
-
-    // Filter by location
-    if (location) {
-      const locationLower = location.toLowerCase();
-      const cityState = `${listing.location.city}, ${listing.location.state}`.toLowerCase();
-      if (!cityState.includes(locationLower)) {
-        return false;
-      }
-    }
-
-    // Filter by price range
-    if (minPrice && listing.dailyPrice < parseInt(minPrice)) {
-      return false;
-    }
-
-    if (maxPrice && listing.dailyPrice > parseInt(maxPrice)) {
-      return false;
-    }
-
-    // Filter by search query
-    if (query) {
-      const queryLower = query.toLowerCase();
-      return listing.title.toLowerCase().includes(queryLower) ||
-             listing.description.toLowerCase().includes(queryLower) ||
-             listing.category.toLowerCase().includes(queryLower);
-    }
-
-    return true;
+    await performSearch();
   });
 
-  // Handle search form submission
-  function handleSearch() {
-    // Build query parameters
-    const params = new URLSearchParams();
-
-    if (query) params.set('q', query);
-    if (category) params.set('category', category);
-    if (location) params.set('location', location);
-    if (minPrice) params.set('minPrice', minPrice);
-    if (maxPrice) params.set('maxPrice', maxPrice);
-
-    // Navigate with updated parameters
-    goto(`/browse?${params.toString()}`);
+  async function performSearch() {
+    loading = true;
+    try {
+      listings = filterListings(products);
+    } catch (error) {
+      console.error('Search error:', error);
+      listings = [];
+    } finally {
+      loading = false;
+    }
   }
 
-  // No longer needed since we're using <a> tags
+  function filterListings(allProducts: any[]): any[] {
+    let filtered = [...allProducts];
 
-  // Format currency
-  function formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    }).format(amount);
+    if (category && category !== 'all') {
+      filtered = filtered.filter(product =>
+        product.category.toLowerCase() === category.toLowerCase()
+      );
+    }
+
+    if (query && query.trim()) {
+      const searchTerm = query.toLowerCase();
+      filtered = filtered.filter(product =>
+        product.title.toLowerCase().includes(searchTerm) ||
+        product.description.toLowerCase().includes(searchTerm) ||
+        product.category.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    if (location && location.trim()) {
+      filtered = filtered.filter(product =>
+        product.location?.city?.toLowerCase().includes(location.toLowerCase()) ||
+        product.location?.state?.toLowerCase().includes(location.toLowerCase())
+      );
+    }
+
+    switch (sort) {
+      case 'price-low':
+        filtered.sort((a, b) => a.dailyPrice - b.dailyPrice);
+        break;
+      case 'price-high':
+        filtered.sort((a, b) => b.dailyPrice - a.dailyPrice);
+        break;
+      case 'rating':
+        filtered.sort((a, b) => (b.rating || 4.5) - (a.rating || 4.5));
+        break;
+      case 'newest':
+        filtered.sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime());
+        break;
+      default:
+        break;
+    }
+
+    return filtered;
+  }
+
+  function handleSearch(event: CustomEvent) {
+    const { query: newQuery, location: newLocation, category: newCategory } = event.detail;
+
+    query = newQuery || '';
+    location = newLocation || '';
+    category = newCategory || 'all';
+
+    performSearch();
+
+    // Scroll to results section after search
+    setTimeout(() => {
+      const resultsSection = document.querySelector('.results-section');
+      if (resultsSection) {
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  }
+
+  function handleFilterChange(event: CustomEvent) {
+    const { category: newCategory, sort: newSort } = event.detail;
+
+    if (newCategory !== undefined) category = newCategory;
+    if (newSort !== undefined) sort = newSort;
+
+    performSearch();
   }
 </script>
 
 <svelte:head>
   <title>Browse Gear - GearGrab</title>
+  <meta name="description" content="Browse and rent outdoor gear from trusted local owners. Find camping, hiking, skiing, and adventure equipment near you." />
 </svelte:head>
 
-<div class="bg-gray-50 min-h-screen">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Search and Filters -->
-    <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div>
-          <label for="search-query" class="form-label">What gear do you need?</label>
-          <input
-            type="text"
-            id="search-query"
-            class="form-input"
-            placeholder="Tent, kayak, bike..."
-            bind:value={query}
-          />
-        </div>
-        <div>
-          <label for="category" class="form-label">Category</label>
-          <select id="category" class="form-input" bind:value={category}>
-            {#each categories as cat}
-              <option value={cat.id}>{cat.name}</option>
-            {/each}
-          </select>
-        </div>
-        <div>
-          <label for="location" class="form-label">Location</label>
-          <input
-            type="text"
-            id="location"
-            class="form-input"
-            placeholder="City, state, or zip"
-            bind:value={location}
-          />
-        </div>
-        <div class="flex items-end">
-          <button class="btn btn-primary w-full" on:click={handleSearch}>
-            Search
-          </button>
-        </div>
-      </div>
+<!-- Test: VideoBackground Component -->
+<VideoBackground
+  videoSrc="/Stars.mp4"
+  imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
+  overlayOpacity={0.5}
+/>
 
-      <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="flex items-center space-x-2">
-          <div class="w-1/2">
-            <label for="min-price" class="form-label">Min Price</label>
-            <input
-              type="number"
-              id="min-price"
-              class="form-input"
-              placeholder="Min"
-              bind:value={minPrice}
-            />
-          </div>
-          <div class="w-1/2">
-            <label for="max-price" class="form-label">Max Price</label>
-            <input
-              type="number"
-              id="max-price"
-              class="form-input"
-              placeholder="Max"
-              bind:value={maxPrice}
-            />
-          </div>
-        </div>
-        <div></div>
-        <div class="flex items-end">
-          <button class="btn btn-secondary w-full" on:click={() => {
-            query = '';
-            category = '';
-            location = '';
-            minPrice = '';
-            maxPrice = '';
-            handleSearch();
-          }}>
-            Clear Filters
-          </button>
+<!-- Page Content -->
+<div class="relative z-10 min-h-screen">
+  <!-- Hero Section -->
+  <div class="relative min-h-[50vh] flex flex-col text-center text-white px-2 pt-20">
+    <div class="flex-1 flex items-center justify-center relative z-30">
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 max-w-4xl mx-auto shadow-lg">
+        <ScrollLinkedAnimator animation="scale-in" startOffset={0} endOffset={0.4}>
+          <h1 class="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
+            Find Your Perfect Gear
+          </h1>
+          <p class="text-xl mb-6 max-w-2xl mx-auto drop-shadow-lg">
+            Discover amazing outdoor equipment from trusted local owners.
+          </p>
+        </ScrollLinkedAnimator>
+
+        <!-- Search Form -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto border border-white/20 shadow-lg relative z-40">
+          <HeroSearch on:search={handleSearch} />
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="results-section relative z-20 bg-gradient-to-b from-transparent to-gray-900/80 px-2 py-8">
+    <!-- Filter Bar -->
+    <div class="mb-8 relative z-10">
+      <FilterBar
+        selectedCategory={category}
+        selectedSort={sort}
+        on:filter={handleFilterChange}
+      />
     </div>
 
     <!-- Results Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-      <div>
-        <h1 class="text-2xl font-bold">
-          {#if listings.length === 0}
-            No gear found
+    <ScrollLinkedAnimator animation="scale-in" startOffset={0.25} endOffset={0.65}>
+      <div class="text-center mb-4">
+        <h1 class="text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-lg">
+          {#if query}
+            Search Results for "{query}"
           {:else}
-            {listings.length} {listings.length === 1 ? 'item' : 'items'} found
+            {category === 'all' ? 'All Outdoor Gear' :
+              category.charAt(0).toUpperCase() + category.slice(1) + ' Gear'}
           {/if}
-
-          {#if query || category || location}
-            <span class="font-normal text-gray-500">
-              {#if query}for "{query}"{/if}
-              {#if category}in {categories.find(c => c.id === category)?.name}{/if}
-              {#if location}near {location}{/if}
-            </span>
-          {/if}
+          {location ? ` in ${location}` : ''}
         </h1>
+        <p class="text-gray-200 text-lg drop-shadow-lg">
+          {listings.length} items available
+          {#if query && listings.length === 0}
+            - Try adjusting your search terms
+          {/if}
+        </p>
       </div>
+    </ScrollLinkedAnimator>
+
+
+
+    <!-- Gear Listings -->
+    <div class="mb-16 relative z-50">
+      <GearGrid {listings} {loading} />
     </div>
 
-    <!-- Results Grid -->
-    {#if listings.length === 0}
-      <div class="bg-white rounded-lg shadow-sm p-8 text-center">
-        <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <h3 class="mt-2 text-lg font-medium text-gray-900">No results found</h3>
-        <p class="mt-1 text-gray-500">Try adjusting your search filters or browse all available gear.</p>
-        <div class="mt-6">
-          <button class="btn btn-primary" on:click={() => {
-            query = '';
-            category = '';
-            location = '';
-            minPrice = '';
-            maxPrice = '';
-            handleSearch();
-          }}>
-            View All Gear
-          </button>
+    <!-- Adventure Call-to-Action -->
+    <ScrollLinkedAnimator animation="scale-in" startOffset={0.4} endOffset={0.8}>
+      <div class="text-center py-16">
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 max-w-3xl mx-auto border border-white/20 shadow-lg">
+          <h2 class="text-4xl font-bold text-white mb-6 drop-shadow-lg">Ready for Your Next Adventure?</h2>
+          <p class="text-xl text-gray-200 mb-8 drop-shadow-lg">
+            Join thousands of outdoor enthusiasts who trust GearGrab for their gear needs.
+          </p>
+          <a href="/list-gear" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
+            List Your Gear
+          </a>
         </div>
       </div>
-    {:else}
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {#each listings as listing}
-          <a href="/listing/{listing.id}" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow block">
-            <div class="aspect-w-16 aspect-h-9 bg-gray-200">
-              <img src={listing.images[0]} alt={listing.title} class="object-cover w-full h-48" />
-            </div>
-            <div class="p-4">
-              <h3 class="font-medium text-lg mb-1">{listing.title}</h3>
-              <p class="text-gray-500 text-sm mb-2">{listing.location.city}, {listing.location.state}</p>
-              <div class="flex justify-between items-center">
-                <p class="font-bold text-green-600">{formatCurrency(listing.dailyPrice)}/day</p>
-                <div class="flex items-center">
-                  <span class="text-yellow-400 mr-1">★</span>
-                  <span>{listing.averageRating || 'New'}</span>
-                  {#if listing.reviewCount}
-                    <span class="text-gray-500 ml-1">({listing.reviewCount})</span>
-                  {/if}
-                </div>
-              </div>
-              <div class="mt-2 flex flex-wrap gap-1">
-                {#if listing.category}
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    {listing.category}
-                  </span>
-                {/if}
-                {#if listing.condition}
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                    {listing.condition}
-                  </span>
-                {/if}
-              </div>
-            </div>
-          </a>
-        {/each}
-      </div>
-    {/if}
+    </ScrollLinkedAnimator>
   </div>
 </div>

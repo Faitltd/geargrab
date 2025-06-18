@@ -64,22 +64,40 @@ export function getDatesBetween(startDate: Date, endDate: Date): Date[] {
 // Convert a Firestore timestamp to a JavaScript Date
 export function timestampToDate(timestamp: any): Date {
   if (!timestamp) return new Date();
-  
+
   // Handle Firestore Timestamp objects
   if (timestamp.toDate && typeof timestamp.toDate === 'function') {
     return timestamp.toDate();
   }
-  
+
   // Handle timestamp numbers
   if (typeof timestamp === 'number') {
     return new Date(timestamp);
   }
-  
+
   // Handle date strings
   if (typeof timestamp === 'string') {
     return new Date(timestamp);
   }
-  
+
   // Default fallback
   return new Date();
+}
+
+// Check if a date is in the past
+export function isPastDate(date: Date): boolean {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return date < today;
+}
+
+// Convert a JavaScript Date to a date string in YYYY-MM-DD format
+export function dateToString(date: Date): string {
+  return format(date, 'yyyy-MM-dd');
+}
+
+// Parse a date string in YYYY-MM-DD format to a JavaScript Date
+export function stringToDate(dateString: string): Date {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
 }
