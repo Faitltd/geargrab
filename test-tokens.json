@@ -1,0 +1,51 @@
+{
+  "generated": "2025-06-18T03:30:02.055Z",
+  "baseUrl": "http://localhost:5173",
+  "tokens": {
+    "admin": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbl91c2VyXzEyMyIsImVtYWlsIjoiYWRtaW5AZ2VhcmdyYWIuY28iLCJyb2xlcyI6WyJhZG1pbiJdLCJpYXQiOjE3NTAyMTc0MDIsImV4cCI6MTc1MDIyMTAwMn0.Qr8NnQ2RnaOmhSJ37yTDYoa3SWzJLPmQjqztRIocgsw",
+    "editor": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlZGl0b3JfdXNlcl80NTYiLCJlbWFpbCI6ImVkaXRvckBnZWFyZ3JhYi5jbyIsInJvbGVzIjpbImVkaXRvciJdLCJpYXQiOjE3NTAyMTc0MDIsImV4cCI6MTc1MDIyMTAwMn0.b3_RotuSBZ9bqYy_Ao9QZq4iOKHNBxvKrGtfnRt6HaQ",
+    "adminEditor": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdXBlcl91c2VyXzc4OSIsImVtYWlsIjoic3VwZXJAZ2VhcmdyYWIuY28iLCJyb2xlcyI6WyJhZG1pbiIsImVkaXRvciJdLCJpYXQiOjE3NTAyMTc0MDIsImV4cCI6MTc1MDIyMTAwMn0.EHQCimsmeJY7LD3Pn1NeYvPH4tZMCtKH-2qIKsbGbTQ",
+    "regularUser": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWd1bGFyX3VzZXJfMTAxIiwiZW1haWwiOiJ1c2VyQGdlYXJncmFiLmNvIiwicm9sZXMiOlsidXNlciJdLCJpYXQiOjE3NTAyMTc0MDIsImV4cCI6MTc1MDIyMTAwMn0.1DiSsielTz8gqFr77Aq_fHGu3ccow-wk6flDb1IJJww",
+    "noRoles": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJub19yb2xlc191c2VyXzIwMiIsImVtYWlsIjoibm9yb2xlc0BnZWFyZ3JhYi5jbyIsImlhdCI6MTc1MDIxNzQwMiwiZXhwIjoxNzUwMjIxMDAyfQ.gmvdgoE2c8PsDsWaqkIdufSFfHkCXj87wWQyh6snnts"
+  },
+  "users": {
+    "admin": {
+      "sub": "admin_user_123",
+      "email": "admin@geargrab.co",
+      "roles": [
+        "admin"
+      ],
+      "iat": 1750217402
+    },
+    "editor": {
+      "sub": "editor_user_456",
+      "email": "editor@geargrab.co",
+      "roles": [
+        "editor"
+      ],
+      "iat": 1750217402
+    },
+    "adminEditor": {
+      "sub": "super_user_789",
+      "email": "super@geargrab.co",
+      "roles": [
+        "admin",
+        "editor"
+      ],
+      "iat": 1750217402
+    },
+    "regularUser": {
+      "sub": "regular_user_101",
+      "email": "user@geargrab.co",
+      "roles": [
+        "user"
+      ],
+      "iat": 1750217402
+    },
+    "noRoles": {
+      "sub": "no_roles_user_202",
+      "email": "noroles@geargrab.co",
+      "iat": 1750217402
+    }
+  }
+}

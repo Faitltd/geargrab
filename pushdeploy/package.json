@@ -1,0 +1,26 @@
+{
+  "name": "pushdeploy",
+  "version": "1.0.0",
+  "description": "Automated deployment CLI for GearGrab",
+  "main": "src/index.js",
+  "bin": {
+    "pushdeploy": "./src/index.js"
+  },
+  "scripts": {
+    "test": "node test.sh",
+    "start": "node src/index.js"
+  },
+  "keywords": ["deployment", "cli", "docker", "cloud-run", "github-actions"],
+  "author": "GearGrab Team",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "inquirer": "^8.2.6",
+    "axios": "^1.6.2",
+    "simple-git": "^3.20.0",
+    "node-fetch": "^2.7.0",
+    "dotenv": "^16.3.1"
+  }
+}

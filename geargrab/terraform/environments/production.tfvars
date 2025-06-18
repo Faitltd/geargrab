@@ -1,0 +1,5 @@
+environment = "production"
+project_id  = "geargrabco"
+region      = "us-central1"
+service_name = "geargrab-app"
+domain_name  = "geargrab.co"

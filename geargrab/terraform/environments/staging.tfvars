@@ -1,0 +1,5 @@
+environment = "staging"
+project_id  = "geargrabco-staging"
+region      = "us-central1"
+service_name = "geargrab-app"
+domain_name  = ""

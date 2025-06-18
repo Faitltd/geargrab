@@ -1,0 +1,33 @@
+{
+  "github": {
+    "token": "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",
+    "owner": "Faitltd",
+    "repo": "geargrab",
+    "workflow": "deploy.yml"
+  },
+  "gcp": {
+    "projectId": "geargrabco",
+    "projectNumber": "227444442028",
+    "region": "us-central1",
+    "registry": "gcr.io"
+  },
+  "services": [
+    {
+      "name": "geargrab-app",
+      "dockerfile": "Dockerfile",
+      "context": ".",
+      "port": 3000,
+      "memory": "2Gi",
+      "cpu": "1000m",
+      "minInstances": 0,
+      "maxInstances": 10
+    }
+  ],
+  "domains": [
+    "geargrab.co",
+    "www.geargrab.co"
+  ],
+  "docker": {
+    "imagePrefix": "geargrab"
+  }
+}
