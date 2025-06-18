@@ -105,12 +105,23 @@ export async function createPaymentIntent(
     if (browser) {
       const { simpleAuth } = await import('$lib/auth/simple-auth');
 
-      // Check if user is authenticated using simpleAuth directly
-      if (!simpleAuth.isAuthenticated || !simpleAuth.user) {
+      // Wait for auth to be ready and check authentication
+      await simpleAuth.waitForAuth();
+
+      // Get current auth state from the store
+      let authState: any;
+      const unsubscribe = simpleAuth.authState.subscribe(state => {
+        authState = state;
+      });
+      unsubscribe();
+
+      // Check if user is authenticated
+      if (!authState.user || !authState.isAuthenticated) {
         console.error('❌ User not authenticated for payment', {
-          isAuthenticated: simpleAuth.isAuthenticated,
-          hasUser: !!simpleAuth.user,
-          userEmail: simpleAuth.user?.email
+          hasUser: !!authState.user,
+          isAuthenticated: authState.isAuthenticated,
+          loading: authState.loading,
+          userEmail: authState.user?.email
         });
         throw new Error('Authentication required. Please log in and try again.');
       }
@@ -119,14 +130,14 @@ export async function createPaymentIntent(
       const token = await simpleAuth.getIdToken();
       if (!token) {
         console.error('❌ Failed to get authentication token', {
-          user: simpleAuth.user?.email,
-          isAuthenticated: simpleAuth.isAuthenticated
+          user: authState.user?.email,
+          isAuthenticated: authState.isAuthenticated
         });
         throw new Error('Failed to get authentication token');
       }
 
       console.log('✅ Payment authentication successful', {
-        userEmail: simpleAuth.user?.email,
+        userEmail: authState.user?.email,
         hasToken: !!token
       });
 
