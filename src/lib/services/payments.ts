@@ -105,17 +105,12 @@ export async function createPaymentIntent(
     if (browser) {
       const { simpleAuth } = await import('$lib/auth/simple-auth');
 
-      // Get the current auth state first
-      let authState: any;
-      const unsubscribe = simpleAuth.authState.subscribe(state => {
-        authState = state;
-      });
-      unsubscribe(); // Immediately unsubscribe after getting current value
-
-      if (!authState.user || authState.loading) {
+      // Check if user is authenticated using simpleAuth directly
+      if (!simpleAuth.isAuthenticated || !simpleAuth.user) {
         console.error('❌ User not authenticated for payment', {
-          hasUser: !!authState.user,
-          loading: authState.loading
+          isAuthenticated: simpleAuth.isAuthenticated,
+          hasUser: !!simpleAuth.user,
+          userEmail: simpleAuth.user?.email
         });
         throw new Error('Authentication required. Please log in and try again.');
       }
@@ -123,8 +118,17 @@ export async function createPaymentIntent(
       // Get auth token and make authenticated request
       const token = await simpleAuth.getIdToken();
       if (!token) {
+        console.error('❌ Failed to get authentication token', {
+          user: simpleAuth.user?.email,
+          isAuthenticated: simpleAuth.isAuthenticated
+        });
         throw new Error('Failed to get authentication token');
       }
+
+      console.log('✅ Payment authentication successful', {
+        userEmail: simpleAuth.user?.email,
+        hasToken: !!token
+      });
 
       headers['Authorization'] = `Bearer ${token}`;
 

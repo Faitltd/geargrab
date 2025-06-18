@@ -3,6 +3,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { simpleAuth } from '$lib/auth/simple-auth';
+  import { authStore } from '$lib/stores/auth';
   import { BookingContextManager } from '$lib/utils/booking-context';
   import StripePaymentForm from '$lib/components/payments/stripe-payment-form.svelte';
   import LoginModal from '$lib/components/auth/login-modal.svelte';
@@ -41,6 +42,26 @@
 
   // Get auth state from simpleAuth
   $: authState = simpleAuth.authState;
+
+  // Synchronize authStore with simpleAuth to ensure payment components work
+  $: if ($authState.user) {
+    authStore.set({
+      user: {
+        uid: $authState.user.uid,
+        email: $authState.user.email || '',
+        displayName: $authState.user.displayName || undefined,
+        photoURL: $authState.user.photoURL || undefined
+      },
+      loading: $authState.loading,
+      error: null
+    });
+  } else if (!$authState.loading) {
+    authStore.set({
+      user: null,
+      loading: false,
+      error: null
+    });
+  }
 
   // Reactive statement to populate user info when auth state changes
   $: if ($authState.user && !contactInfo.email && authCheckComplete) {
