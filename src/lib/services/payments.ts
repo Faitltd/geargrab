@@ -105,43 +105,24 @@ export async function createPaymentIntent(
     if (browser) {
       const { simpleAuth } = await import('$lib/auth/simple-auth');
 
-      // Wait for auth to be ready and check authentication
-      await simpleAuth.waitForAuth();
+      try {
+        // Wait for auth to be ready
+        await simpleAuth.waitForAuth();
 
-      // Get current auth state from the store
-      let authState: any;
-      const unsubscribe = simpleAuth.authState.subscribe(state => {
-        authState = state;
-      });
-      unsubscribe();
+        // Get auth token - this will throw if not authenticated
+        const token = await simpleAuth.getIdToken();
 
-      // Check if user is authenticated
-      if (!authState.user || !authState.isAuthenticated) {
-        console.error('❌ User not authenticated for payment', {
-          hasUser: !!authState.user,
-          isAuthenticated: authState.isAuthenticated,
-          loading: authState.loading,
-          userEmail: authState.user?.email
-        });
+        if (token) {
+          console.log('✅ Payment authentication successful');
+          headers['Authorization'] = `Bearer ${token}`;
+        } else {
+          console.error('❌ No authentication token available');
+          throw new Error('Authentication required. Please log in and try again.');
+        }
+      } catch (authError) {
+        console.error('❌ Authentication failed for payment:', authError);
         throw new Error('Authentication required. Please log in and try again.');
       }
-
-      // Get auth token and make authenticated request
-      const token = await simpleAuth.getIdToken();
-      if (!token) {
-        console.error('❌ Failed to get authentication token', {
-          user: authState.user?.email,
-          isAuthenticated: authState.isAuthenticated
-        });
-        throw new Error('Failed to get authentication token');
-      }
-
-      console.log('✅ Payment authentication successful', {
-        userEmail: authState.user?.email,
-        hasToken: !!token
-      });
-
-      headers['Authorization'] = `Bearer ${token}`;
 
       response = await fetch('/api/payments/create-intent', {
         method: 'POST',
