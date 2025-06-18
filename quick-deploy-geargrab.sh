@@ -38,28 +38,29 @@ git push origin main
 
 # Step 3: Deploy to Cloud Run
 echo "☁️ Deploying to Cloud Run..."
-gcloud config set project $PROJECT_ID
-gcloud services enable cloudbuild.googleapis.com run.googleapis.com
+export PATH="/home/augment-agent/google-cloud-sdk/bin:$PATH"
+/home/augment-agent/google-cloud-sdk/bin/gcloud config set project $PROJECT_ID
+/home/augment-agent/google-cloud-sdk/bin/gcloud services enable cloudbuild.googleapis.com run.googleapis.com
 
 DATABASE_URL="postgresql://postgres:$SUPABASE_PASSWORD@db.absmquyhavntfoojvskl.supabase.co:5432/postgres"
 
-gcloud builds submit --config cloudbuild.yaml \
+/home/augment-agent/google-cloud-sdk/bin/gcloud builds submit --config cloudbuild.yaml \
     --substitutions=_DATABASE_URL="$DATABASE_URL"
 
 # Step 4: Set up domains
 echo "🌐 Setting up domain mappings..."
-gcloud beta run domain-mappings create \
+/home/augment-agent/google-cloud-sdk/bin/gcloud beta run domain-mappings create \
     --service=$SERVICE_NAME \
     --domain=geargrab.co \
     --region=$REGION || echo "Domain mapping may already exist"
 
-gcloud beta run domain-mappings create \
+/home/augment-agent/google-cloud-sdk/bin/gcloud beta run domain-mappings create \
     --service=$SERVICE_NAME \
     --domain=www.geargrab.co \
     --region=$REGION || echo "Domain mapping may already exist"
 
 # Step 5: Get service URL and DNS info
-SERVICE_URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format="value(status.url)")
+SERVICE_URL=$(/home/augment-agent/google-cloud-sdk/bin/gcloud run services describe $SERVICE_NAME --region=$REGION --format="value(status.url)")
 
 echo ""
 echo "🎉 DEPLOYMENT COMPLETE!"
@@ -71,9 +72,9 @@ echo "🧪 Test now: $SERVICE_URL/api/comments?articleId=article_001"
 echo ""
 echo "🌐 Configure these DNS records:"
 echo "A Record for geargrab.co:"
-gcloud beta run domain-mappings describe --domain=geargrab.co --region=$REGION --format="value(status.resourceRecords[0].rrdata)" 2>/dev/null || echo "Check Cloud Console"
+/home/augment-agent/google-cloud-sdk/bin/gcloud beta run domain-mappings describe --domain=geargrab.co --region=$REGION --format="value(status.resourceRecords[0].rrdata)" 2>/dev/null || echo "Check Cloud Console"
 echo ""
 echo "CNAME Record for www.geargrab.co:"
-gcloud beta run domain-mappings describe --domain=www.geargrab.co --region=$REGION --format="value(status.resourceRecords[0].rrdata)" 2>/dev/null || echo "Check Cloud Console"
+/home/augment-agent/google-cloud-sdk/bin/gcloud beta run domain-mappings describe --domain=www.geargrab.co --region=$REGION --format="value(status.resourceRecords[0].rrdata)" 2>/dev/null || echo "Check Cloud Console"
 echo ""
 echo "🎊 Your complete GearGrab platform is now live! 🎊"
