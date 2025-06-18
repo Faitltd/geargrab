@@ -13,7 +13,11 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "test": "cypress run"
+    "test": "cypress run",
+    "security:test": "node scripts/security-test.js",
+    "security:audit": "npm audit && npm audit fix",
+    "lint:security": "npm audit --audit-level moderate",
+    "build:secure": "npm run security:audit && npm run build"
   },
   "devDependencies": {
     "@sveltejs/adapter-node": "^1.0.0",
@@ -30,9 +34,15 @@
     "vite": "^4.4.2"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
     "date-fns": "^2.30.0",
+    "express-rate-limit": "^7.5.0",
     "firebase": "^9.22.0",
     "firebase-admin": "^11.8.0",
+    "helmet": "^8.1.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
     "svelte-dnd-action": "^0.9.61"
   }
 }
