@@ -164,10 +164,10 @@ class SimpleAuthService {
 
   async signInWithGoogle(): Promise<{ success: boolean; error?: string }> {
     try {
-      console.log('🔄 Simple Auth: Starting Google sign-in...');
+      console.log('🔄 Simple Auth: Starting Google sign-in with redirect...');
 
       const { auth } = await import('$lib/firebase/client');
-      const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
+      const { GoogleAuthProvider, signInWithRedirect } = await import('firebase/auth');
 
       if (!auth) {
         throw new Error('Firebase auth not available');
@@ -177,24 +177,51 @@ class SimpleAuthService {
       provider.addScope('email');
       provider.addScope('profile');
 
-      const result = await signInWithPopup(auth, provider);
+      // Use redirect instead of popup to avoid browser blocking
+      await signInWithRedirect(auth, provider);
 
-      console.log('✅ Simple Auth: Google sign-in successful:', result.user.email);
-
-      // Immediately update our auth state
-      this.currentUser = result.user;
-      this.authStore.set({
-        user: result.user,
-        loading: false,
-        isAuthenticated: true
-      });
-
-      // Wait a moment for state to propagate
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Note: signInWithRedirect doesn't return a result immediately
+      // The result will be handled by getRedirectResult in the app initialization
+      console.log('🔄 Simple Auth: Google redirect initiated...');
 
       return { success: true };
     } catch (error: any) {
       console.error('❌ Simple Auth: Google sign-in failed:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async handleRedirectResult(): Promise<{ success: boolean; user?: any; error?: string }> {
+    try {
+      console.log('🔄 Simple Auth: Checking for redirect result...');
+
+      const { auth } = await import('$lib/firebase/client');
+      const { getRedirectResult } = await import('firebase/auth');
+
+      if (!auth) {
+        return { success: false, error: 'Firebase auth not available' };
+      }
+
+      const result = await getRedirectResult(auth);
+
+      if (result && result.user) {
+        console.log('✅ Simple Auth: Google redirect sign-in successful:', result.user.email);
+
+        // Update our auth state
+        this.currentUser = result.user;
+        this.authStore.set({
+          user: result.user,
+          loading: false,
+          isAuthenticated: true
+        });
+
+        return { success: true, user: result.user };
+      } else {
+        console.log('🔄 Simple Auth: No redirect result found');
+        return { success: true }; // No redirect result is not an error
+      }
+    } catch (error: any) {
+      console.error('❌ Simple Auth: Redirect result handling failed:', error);
       return { success: false, error: error.message };
     }
   }

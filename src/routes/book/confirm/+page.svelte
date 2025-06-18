@@ -3,7 +3,9 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { simpleAuth } from '$lib/auth/simple-auth';
+  import { BookingContextManager } from '$lib/utils/booking-context';
   import StripePaymentForm from '$lib/components/payments/stripe-payment-form.svelte';
+  import LoginModal from '$lib/components/auth/login-modal.svelte';
   import { firestore } from '$lib/firebase/client';
   import { doc, getDoc } from 'firebase/firestore';
 
@@ -34,11 +36,14 @@
   let specialRequests = '';
   let agreeToTerms = false;
 
+  // Login modal state
+  let showLoginModal = false;
+
   // Get auth state from simpleAuth
   $: authState = simpleAuth.authState;
 
   // Reactive statement to populate user info when auth state changes
-  $: if ($authState.user && !contactInfo.email) {
+  $: if ($authState.user && !contactInfo.email && authCheckComplete) {
     populateUserInfo();
   }
 
@@ -56,8 +61,7 @@
     loadListingData();
   });
 
-  // Track authentication state and redirects
-  let hasRedirected = false;
+  // Track authentication state
   let authCheckComplete = false;
   let authCheckAttempts = 0;
   const MAX_AUTH_ATTEMPTS = 5;
@@ -68,6 +72,15 @@
 
     // Force refresh the auth state to ensure we have the latest
     await simpleAuth.refreshAuth();
+
+    // Check if we're returning from Google auth and restore context
+    if (BookingContextManager.isReturningFromAuth()) {
+      console.log('🔄 Returning from Google auth, restoring booking context...');
+      restoreBookingContext();
+    } else {
+      // Normal page load - restore any existing form data
+      restoreFormData();
+    }
 
     // Start checking auth state with retries
     checkAuthWithRetry();
@@ -96,12 +109,78 @@
       return;
     }
 
-    // If no user after all attempts, redirect to login
-    if (!hasRedirected) {
-      console.log('❌ User not authenticated after all attempts, redirecting to login');
-      hasRedirected = true;
-      goto(`/auth/login?redirectTo=${encodeURIComponent($page.url.pathname + $page.url.search)}`);
+    // Authentication check complete - user can proceed with or without auth
+    authCheckComplete = true;
+    console.log('🔧 Auth check complete - user can proceed');
+  }
+
+  function saveBookingContext() {
+    const context = {
+      listingId,
+      startDate,
+      endDate,
+      deliveryMethod,
+      insuranceTier,
+      totalPrice,
+      contactInfo,
+      specialRequests,
+      agreeToTerms,
+      currentStep: (showPayment ? 'payment' : 'details') as 'details' | 'payment'
+    };
+
+    BookingContextManager.saveContext(context);
+  }
+
+  function restoreBookingContext() {
+    const context = BookingContextManager.restoreContext();
+    if (context) {
+      // Restore URL parameters
+      listingId = context.listingId || listingId;
+      startDate = context.startDate || startDate;
+      endDate = context.endDate || endDate;
+      deliveryMethod = context.deliveryMethod || deliveryMethod;
+      insuranceTier = context.insuranceTier || insuranceTier;
+      totalPrice = context.totalPrice || totalPrice;
+
+      // Restore form data
+      contactInfo = context.contactInfo || contactInfo;
+      specialRequests = context.specialRequests || '';
+      agreeToTerms = context.agreeToTerms || false;
+
+      // Restore step
+      if (context.currentStep === 'payment') {
+        showPayment = true;
+      }
+
+      console.log('📥 Booking context restored');
     }
+  }
+
+  function restoreFormData() {
+    // Fallback to old localStorage method for backward compatibility
+    try {
+      const savedData = localStorage.getItem('geargrab_booking_form_data');
+      if (savedData) {
+        const formData = JSON.parse(savedData);
+
+        // Only restore if data is less than 1 hour old
+        if (Date.now() - formData.timestamp < 60 * 60 * 1000) {
+          contactInfo = formData.contactInfo || contactInfo;
+          specialRequests = formData.specialRequests || '';
+          agreeToTerms = formData.agreeToTerms || false;
+          console.log('📥 Legacy form data restored');
+        } else {
+          // Clear old data
+          localStorage.removeItem('geargrab_booking_form_data');
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to restore legacy form data:', error);
+    }
+  }
+
+  function clearBookingContext() {
+    BookingContextManager.clearContext();
   }
 
   async function populateUserInfo() {
@@ -274,9 +353,30 @@
       return;
     }
 
-    // Show payment form
+    // Check if user is authenticated
+    if (!$authState.user || !$authState.isAuthenticated) {
+      console.log('🔐 User not authenticated, saving context and showing login modal');
+
+      // Save complete booking context before authentication
+      saveBookingContext();
+
+      // Show login modal
+      showLoginModal = true;
+      error = '';
+      return;
+    }
+
+    // User is authenticated, proceed to payment
+    proceedToPayment();
+  }
+
+  function proceedToPayment() {
+    console.log('✅ Proceeding to payment');
     showPayment = true;
     error = '';
+
+    // Update context to reflect payment step
+    saveBookingContext();
   }
 
   async function handlePaymentSuccess(event) {
@@ -337,6 +437,9 @@
         throw new Error(result.error || 'Failed to create booking');
       }
 
+      // Clear booking context since booking is complete
+      clearBookingContext();
+
       // Navigate to success page with booking ID
       console.log('Navigating to success page with booking ID:', result.bookingId);
       goto(`/book/success?bookingId=${result.bookingId}`);
@@ -351,6 +454,24 @@
     console.error('Payment error:', event.detail);
     error = event.detail.error || 'Payment failed. Please try again.';
     paymentProcessing = false;
+  }
+
+  // Login modal event handlers
+  function handleLoginSuccess() {
+    console.log('✅ Login successful, proceeding to payment');
+    showLoginModal = false;
+
+    // Populate user info after successful login
+    populateUserInfo();
+
+    // Proceed to payment
+    proceedToPayment();
+  }
+
+  function handleLoginClose() {
+    console.log('🔐 Login modal closed');
+    showLoginModal = false;
+    error = '';
   }
 </script>
 
@@ -506,7 +627,7 @@
                     Processing...
                   </div>
                 {:else}
-                  {showPayment ? 'Complete Payment Below' : 'Continue to Payment'}
+                  {showPayment ? 'Complete Payment Below' : ($authState.user ? 'Continue to Payment' : 'Sign In to Continue')}
                 {/if}
               </button>
             </div>
@@ -664,3 +785,11 @@
 
   </div>
 </div>
+
+<!-- Login Modal -->
+<LoginModal
+  bind:show={showLoginModal}
+  redirectAfterLogin={false}
+  on:success={handleLoginSuccess}
+  on:close={handleLoginClose}
+/>
