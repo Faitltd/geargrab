@@ -2,13 +2,13 @@
 
 /**
  * Security Testing Script for GearGrab
- * 
+ *
  * This script performs basic security tests on the application
  * Run with: node scripts/security-test.js
  */
 
-const https = require('https');
-const http = require('http');
+import https from 'https';
+import http from 'http';
 
 // Configuration
 const config = {
@@ -273,11 +273,11 @@ async function runSecurityTests() {
 }
 
 // Run tests if called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   runSecurityTests().catch(error => {
     console.error('❌ Security test suite failed:', error.message);
     process.exit(1);
   });
 }
 
-module.exports = { runSecurityTests };
+export { runSecurityTests };

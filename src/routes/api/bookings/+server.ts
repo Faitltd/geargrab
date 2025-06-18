@@ -89,7 +89,7 @@ export const GET: RequestHandler = asyncHandler(async ({ url, locals, ...event }
   } catch (error) {
     throw mapFirebaseError(error);
   }
-};
+});
 
 // Create a new booking
 export const POST: RequestHandler = asyncHandler(async ({ request, locals, ...event }) => {
