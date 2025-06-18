@@ -6,14 +6,19 @@
   "main": "build/index.js",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "prisma generate && vite build",
     "preview": "vite preview",
     "start": "node build/index.js",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "test": "cypress run"
+    "test": "cypress run",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio"
   },
   "devDependencies": {
     "@sveltejs/adapter-node": "^1.0.0",
@@ -30,9 +35,13 @@
     "vite": "^4.4.2"
   },
   "dependencies": {
+    "@prisma/client": "^6.10.0",
     "date-fns": "^2.30.0",
     "firebase": "^9.22.0",
     "firebase-admin": "^11.8.0",
-    "svelte-dnd-action": "^0.9.61"
+    "ioredis": "^5.6.1",
+    "prisma": "^6.10.0",
+    "svelte-dnd-action": "^0.9.61",
+    "winston": "^3.17.0"
   }
 }
