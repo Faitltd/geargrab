@@ -8,11 +8,16 @@ set -e  # Exit on any error
 echo "🚀 Starting GearGrab deployment process..."
 
 # Configuration
-PROJECT_ID="geargrabco"  # Update with your actual project ID
+PROJECT_ID="geargrabco"
 REGION="us-central1"
 SERVICE_NAME="geargrab-app"
 DOMAIN="geargrab.co"
 WWW_DOMAIN="www.geargrab.co"
+
+# Database Configuration (Supabase)
+DATABASE_HOST="db.absmquyhavntfoojvskl.supabase.co"
+DATABASE_NAME="postgres"
+DATABASE_PORT="5432"
 
 # Colors for output
 RED='\033[0;31m'
@@ -55,6 +60,19 @@ gcloud services enable cloudbuild.googleapis.com
 gcloud services enable run.googleapis.com
 gcloud services enable sql-component.googleapis.com
 gcloud services enable sqladmin.googleapis.com
+
+# Check for required environment variables
+if [ -z "$SUPABASE_PASSWORD" ]; then
+    print_error "SUPABASE_PASSWORD environment variable is required"
+    echo "Get your password from: https://supabase.com/dashboard/project/absmquyhavntfoojvskl/settings/database"
+    exit 1
+fi
+
+# Construct DATABASE_URL
+DATABASE_URL="postgresql://postgres:$SUPABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/$DATABASE_NAME"
+
+print_status "Using database: $DATABASE_HOST"
+print_status "Database URL configured (password hidden)"
 
 # Build and deploy using Cloud Build
 print_status "Starting Cloud Build deployment..."
