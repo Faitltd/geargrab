@@ -413,7 +413,16 @@ export const POST: RequestHandler = createSecureHandler(
     listingId: { required: true, type: 'string' as const, minLength: 1 },
     startDate: { required: true, type: 'string' as const },
     endDate: { required: true, type: 'string' as const },
-    contactInfo: { required: true, type: 'object' as const },
+    contactInfo: {
+      required: true,
+      type: 'object' as const,
+      properties: {
+        firstName: { required: true, type: 'string' as const, minLength: 1 },
+        lastName: { required: true, type: 'string' as const, minLength: 1 },
+        email: { required: true, type: 'email' as const },
+        phone: { required: true, type: 'string' as const, minLength: 1 }
+      }
+    },
     totalPrice: { required: true, type: 'number' as const, min: 0 },
     priceBreakdown: { required: false, type: 'object' as const },
     deliveryMethod: { required: false, type: 'string' as const },
