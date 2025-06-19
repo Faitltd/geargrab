@@ -2,8 +2,13 @@ FROM node:18-alpine as build
 
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
-RUN npm ci
+
+# Install dependencies with clean cache and ignore optional dependencies
+RUN npm cache clean --force && \
+    npm ci --only=production --ignore-scripts && \
+    npm ci --ignore-scripts
 
 COPY . .
 
@@ -24,7 +29,8 @@ ENV VITE_FIREBASE_APP_ID=1:227444442028:web:6eeaed1e136d07f5b73009
 ENV VITE_STRIPE_PUBLISHABLE_KEY=pk_live_51RZXbxBfCDZxMJmHHUzHwNJq1gNdpcMjp4kAJK28n8d5kTXPhI4pnptDiLJmyHybfhJzY7vIVZOaNrzJClCkY3vS00tMlh4lyZ
 ENV STRIPE_SECRET_KEY=sk_live_placeholder_will_be_overridden_by_cloud_run
 
-RUN npm run build
+# Build with error handling
+RUN npm run build || (echo "Build failed, checking for missing dependencies..." && npm install --save-dev mini-svg-data-uri lodash.castarray && npm run build)
 
 # Production stage
 FROM node:18-alpine
