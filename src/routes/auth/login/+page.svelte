@@ -5,7 +5,10 @@
     signInWithGoogle,
     signInWithFacebook,
     signInWithGitHub,
-    signInWithApple
+    signInWithApple,
+    signInWithTwitter,
+    signInWithMicrosoft,
+    signInWithYahoo
   } from '$firebase/auth';
   import { notificationsStore } from '$stores/notifications';
 
@@ -78,6 +81,57 @@
     } catch (error: any) {
       console.error('Apple sign-in error:', error);
       errors.apple = error.message || 'An error occurred during Apple sign-in';
+    } finally {
+      loading = false;
+    }
+  }
+
+  // Handle Twitter sign-in
+  async function handleTwitterSignIn() {
+    loading = true;
+    errors = {};
+
+    try {
+      await signInWithTwitter();
+      notificationsStore.success('Successfully logged in with Twitter!');
+      goto(redirectTo);
+    } catch (error: any) {
+      console.error('Twitter sign-in error:', error);
+      errors.twitter = error.message || 'An error occurred during Twitter sign-in';
+    } finally {
+      loading = false;
+    }
+  }
+
+  // Handle Microsoft sign-in
+  async function handleMicrosoftSignIn() {
+    loading = true;
+    errors = {};
+
+    try {
+      await signInWithMicrosoft();
+      notificationsStore.success('Successfully logged in with Microsoft!');
+      goto(redirectTo);
+    } catch (error: any) {
+      console.error('Microsoft sign-in error:', error);
+      errors.microsoft = error.message || 'An error occurred during Microsoft sign-in';
+    } finally {
+      loading = false;
+    }
+  }
+
+  // Handle Yahoo sign-in
+  async function handleYahooSignIn() {
+    loading = true;
+    errors = {};
+
+    try {
+      await signInWithYahoo();
+      notificationsStore.success('Successfully logged in with Yahoo!');
+      goto(redirectTo);
+    } catch (error: any) {
+      console.error('Yahoo sign-in error:', error);
+      errors.yahoo = error.message || 'An error occurred during Yahoo sign-in';
     } finally {
       loading = false;
     }
@@ -171,6 +225,57 @@
       </div>
     {/if}
 
+    {#if errors.twitter}
+      <div class="rounded-md bg-red-50 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">
+              Twitter: {errors.twitter}
+            </h3>
+          </div>
+        </div>
+      </div>
+    {/if}
+
+    {#if errors.microsoft}
+      <div class="rounded-md bg-red-50 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">
+              Microsoft: {errors.microsoft}
+            </h3>
+          </div>
+        </div>
+      </div>
+    {/if}
+
+    {#if errors.yahoo}
+      <div class="rounded-md bg-red-50 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">
+              Yahoo: {errors.yahoo}
+            </h3>
+          </div>
+        </div>
+      </div>
+    {/if}
+
     <!-- Social Sign-in Buttons -->
     <div class="mt-8 space-y-4">
       <!-- Google Sign-in -->
@@ -228,6 +333,45 @@
           <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
         </svg>
         Continue with Apple
+      </button>
+
+      <!-- Twitter Sign-in -->
+      <button
+        type="button"
+        class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+        on:click={handleTwitterSignIn}
+        disabled={loading}
+      >
+        <svg class="h-5 w-5 mr-3" fill="#1DA1F2" viewBox="0 0 24 24">
+          <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+        </svg>
+        Continue with Twitter
+      </button>
+
+      <!-- Microsoft Sign-in -->
+      <button
+        type="button"
+        class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+        on:click={handleMicrosoftSignIn}
+        disabled={loading}
+      >
+        <svg class="h-5 w-5 mr-3" fill="#00A4EF" viewBox="0 0 24 24">
+          <path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z"/>
+        </svg>
+        Continue with Microsoft
+      </button>
+
+      <!-- Yahoo Sign-in -->
+      <button
+        type="button"
+        class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+        on:click={handleYahooSignIn}
+        disabled={loading}
+      >
+        <svg class="h-5 w-5 mr-3" fill="#6001D2" viewBox="0 0 24 24">
+          <path d="M12 0C5.383 0 0 5.383 0 12s5.383 12 12 12 12-5.383 12-12S18.617 0 12 0zm5.5 18.5h-3l-2.5-4-2.5 4h-3l4-6.5-3.5-6h3l2 3.5 2-3.5h3l-3.5 6 4 6.5z"/>
+        </svg>
+        Continue with Yahoo
       </button>
     </div>
   </div>

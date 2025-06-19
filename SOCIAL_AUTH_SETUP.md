@@ -4,19 +4,19 @@
 
 ### 1. Updated Authentication Functions
 - **Removed**: Email/password authentication functions
-- **Added**: Social sign-in functions for Google, Facebook, GitHub, and Apple
+- **Added**: Social sign-in functions for Google, Facebook, GitHub, Apple, Twitter, Microsoft, and Yahoo
 - **Updated**: User document creation to work with all social providers
 - **Cleaned up**: Removed password reset, email update, and reauthentication functions
 
 ### 2. Updated Login Page (`/auth/login`)
 - **Removed**: Email/password form
-- **Added**: Social sign-in buttons for all 4 providers
+- **Added**: Social sign-in buttons for all 7 providers (Google, Facebook, GitHub, Apple, Twitter, Microsoft, Yahoo)
 - **Updated**: Error handling for each provider separately
 - **Improved**: UI with better spacing and consistent styling
 
 ### 3. Updated Signup Page (`/auth/signup`)
 - **Removed**: Email/password form
-- **Added**: Social sign-in buttons for all 4 providers
+- **Added**: Social sign-in buttons for all 7 providers (Google, Facebook, GitHub, Apple, Twitter, Microsoft, Yahoo)
 - **Kept**: Terms and conditions agreement (required before social sign-in)
 - **Updated**: Error handling for each provider separately
 
