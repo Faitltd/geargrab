@@ -67,8 +67,11 @@ export async function createPaymentIntent(
     }
 
     // Use simple authentication service for token handling
-    if (browser) {
+    if (browser && !testMode) {
       const { simpleAuth } = await import('$lib/auth/simple-auth');
+
+      // Wait for auth to be ready
+      await simpleAuth.waitForAuth();
 
       // Get the current auth state
       let authState: any;
@@ -86,7 +89,8 @@ export async function createPaymentIntent(
       }
 
       try {
-        const idToken = await simpleAuth.getIdToken();
+        // Force refresh the token to ensure it's valid
+        const idToken = await simpleAuth.getIdToken(true);
         if (idToken) {
           headers['Authorization'] = `Bearer ${idToken}`;
           console.log('✅ Added Firebase auth token to payment request');

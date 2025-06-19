@@ -58,11 +58,19 @@ export const POST: RequestHandler = async (event) => {
       console.log('🧪 Test mode enabled - bypassing authentication for user:', userId);
     } else {
       // Production mode - require authentication
+      console.log('🔍 Checking authentication for payment intent...');
+
       const authResult = await AuthMiddlewareV2.requireAuth(event);
 
       // If authResult is a Response, it means authentication failed
       if (authResult instanceof Response) {
-        console.log('❌ Payment authentication failed');
+        console.log('❌ Payment authentication failed - returning 401');
+
+        // Add additional debugging info
+        const authHeader = event.request.headers.get('Authorization');
+        console.log('🔍 Auth header present:', !!authHeader);
+        console.log('🔍 Auth header format:', authHeader ? authHeader.substring(0, 20) + '...' : 'none');
+
         return authResult;
       }
 

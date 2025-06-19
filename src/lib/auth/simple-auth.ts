@@ -162,6 +162,13 @@ class SimpleAuthService {
     });
   }
 
+  async waitForAuth(timeoutMs: number = 5000): Promise<void> {
+    const isReady = await this.waitForAuthReady(timeoutMs);
+    if (!isReady) {
+      throw new Error('Authentication timeout - please refresh the page and try again');
+    }
+  }
+
   async signInWithGoogle(): Promise<{ success: boolean; error?: string }> {
     try {
       console.log('🔄 Simple Auth: Starting Google sign-in with redirect...');
