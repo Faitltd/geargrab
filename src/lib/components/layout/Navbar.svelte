@@ -1,16 +1,22 @@
 <script lang="ts">
-  // Mock auth store for development
-  const authStore = {
-    subscribe: (callback: (value: { user: null | { displayName?: string; email?: string } }) => void) => {
-      callback({ user: null });
-      return () => {};
-    }
-  };
+  import { authStore } from '$stores/auth';
+  import { signOut } from '$firebase/auth';
+  import { notificationsStore } from '$stores/notifications';
 
   let isMenuOpen = false;
 
   function toggleMenu() {
     isMenuOpen = !isMenuOpen;
+  }
+
+  async function handleSignOut() {
+    try {
+      await signOut();
+      notificationsStore.success('Successfully logged out!');
+    } catch (error: any) {
+      console.error('Sign out error:', error);
+      notificationsStore.error('Failed to log out');
+    }
   }
 </script>
 
@@ -38,7 +44,10 @@
           <a href="/dashboard" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
             Dashboard
           </a>
-          <button class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+          <button
+            class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+            on:click={handleSignOut}
+          >
             Sign Out
           </button>
         {:else}
@@ -98,7 +107,10 @@
             <a href="/dashboard" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
               Dashboard
             </a>
-            <button class="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+            <button
+              class="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+              on:click={handleSignOut}
+            >
               Sign out
             </button>
           </div>
