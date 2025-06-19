@@ -5,7 +5,6 @@ import {
   updateProfile,
   GoogleAuthProvider,
   FacebookAuthProvider,
-  GithubAuthProvider,
   TwitterAuthProvider,
   OAuthProvider,
   signInWithPopup,
@@ -44,25 +43,11 @@ export async function signInWithFacebook(): Promise<UserCredential> {
   return result;
 }
 
-// Sign in with GitHub
-export async function signInWithGitHub(): Promise<UserCredential> {
+// Sign in with Instagram
+export async function signInWithInstagram(): Promise<UserCredential> {
   if (!browser) throw new Error('Auth functions can only be called in the browser');
-  const provider = new GithubAuthProvider();
-  provider.addScope('user:email');
-  const result = await signInWithPopup(auth, provider);
-
-  // Create user document if it doesn't exist
-  await createUserDocument(result.user);
-
-  return result;
-}
-
-// Sign in with Apple
-export async function signInWithApple(): Promise<UserCredential> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  const provider = new OAuthProvider('apple.com');
+  const provider = new OAuthProvider('instagram.com');
   provider.addScope('email');
-  provider.addScope('name');
   const result = await signInWithPopup(auth, provider);
 
   // Create user document if it doesn't exist
@@ -71,38 +56,10 @@ export async function signInWithApple(): Promise<UserCredential> {
   return result;
 }
 
-// Sign in with Twitter
-export async function signInWithTwitter(): Promise<UserCredential> {
+// Sign in with X (Twitter)
+export async function signInWithX(): Promise<UserCredential> {
   if (!browser) throw new Error('Auth functions can only be called in the browser');
   const provider = new TwitterAuthProvider();
-  const result = await signInWithPopup(auth, provider);
-
-  // Create user document if it doesn't exist
-  await createUserDocument(result.user);
-
-  return result;
-}
-
-// Sign in with Microsoft
-export async function signInWithMicrosoft(): Promise<UserCredential> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  const provider = new OAuthProvider('microsoft.com');
-  provider.addScope('email');
-  provider.addScope('profile');
-  const result = await signInWithPopup(auth, provider);
-
-  // Create user document if it doesn't exist
-  await createUserDocument(result.user);
-
-  return result;
-}
-
-// Sign in with Yahoo
-export async function signInWithYahoo(): Promise<UserCredential> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  const provider = new OAuthProvider('yahoo.com');
-  provider.addScope('email');
-  provider.addScope('profile');
   const result = await signInWithPopup(auth, provider);
 
   // Create user document if it doesn't exist

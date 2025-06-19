@@ -131,35 +131,10 @@ export { adminApp, adminAuth, adminFirestore, adminStorage };`
     path: 'src/lib/firebase/auth.ts',
     content: `import { browser } from '$app/environment';
 import { auth } from './client';
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
+import {
   signOut as firebaseSignOut,
   type UserCredential
 } from 'firebase/auth';
-
-// Sign in with email and password
-export async function signInWithEmail(email: string, password: string): Promise<UserCredential> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  return signInWithEmailAndPassword(auth, email, password);
-}
-
-// Sign up with email and password
-export async function signUpWithEmail(
-  email: string, 
-  password: string, 
-  displayName: string
-): Promise<UserCredential> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  
-  // Create the user in Firebase Auth
-  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  
-  // Update the user profile with display name
-  await userCredential.user.updateProfile({ displayName });
-  
-  return userCredential;
-}
 
 // Sign out
 export async function signOut(): Promise<void> {

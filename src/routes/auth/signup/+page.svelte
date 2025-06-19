@@ -4,11 +4,8 @@
   import {
     signInWithGoogle,
     signInWithFacebook,
-    signInWithGitHub,
-    signInWithApple,
-    signInWithTwitter,
-    signInWithMicrosoft,
-    signInWithYahoo
+    signInWithInstagram,
+    signInWithX
   } from '$firebase/auth';
   import { notificationsStore } from '$stores/notifications';
 
@@ -63,8 +60,8 @@
     }
   }
 
-  // Handle GitHub sign-in
-  async function handleGitHubSignIn() {
+  // Handle Instagram sign-in
+  async function handleInstagramSignIn() {
     if (!agreeTerms) {
       errors.agreeTerms = 'You must agree to the terms and conditions';
       return;
@@ -74,19 +71,19 @@
     errors = {};
 
     try {
-      await signInWithGitHub();
-      notificationsStore.success('Account created successfully with GitHub!');
+      await signInWithInstagram();
+      notificationsStore.success('Account created successfully with Instagram!');
       goto(redirectTo);
     } catch (error: any) {
-      console.error('GitHub sign-in error:', error);
-      errors.github = error.message || 'An error occurred during GitHub sign-in';
+      console.error('Instagram sign-in error:', error);
+      errors.instagram = error.message || 'An error occurred during Instagram sign-in';
     } finally {
       loading = false;
     }
   }
 
-  // Handle Apple sign-in
-  async function handleAppleSignIn() {
+  // Handle X sign-in
+  async function handleXSignIn() {
     if (!agreeTerms) {
       errors.agreeTerms = 'You must agree to the terms and conditions';
       return;
@@ -96,78 +93,12 @@
     errors = {};
 
     try {
-      await signInWithApple();
-      notificationsStore.success('Account created successfully with Apple!');
+      await signInWithX();
+      notificationsStore.success('Account created successfully with X!');
       goto(redirectTo);
     } catch (error: any) {
-      console.error('Apple sign-in error:', error);
-      errors.apple = error.message || 'An error occurred during Apple sign-in';
-    } finally {
-      loading = false;
-    }
-  }
-
-  // Handle Twitter sign-in
-  async function handleTwitterSignIn() {
-    if (!agreeTerms) {
-      errors.agreeTerms = 'You must agree to the terms and conditions';
-      return;
-    }
-
-    loading = true;
-    errors = {};
-
-    try {
-      await signInWithTwitter();
-      notificationsStore.success('Account created successfully with Twitter!');
-      goto(redirectTo);
-    } catch (error: any) {
-      console.error('Twitter sign-in error:', error);
-      errors.twitter = error.message || 'An error occurred during Twitter sign-in';
-    } finally {
-      loading = false;
-    }
-  }
-
-  // Handle Microsoft sign-in
-  async function handleMicrosoftSignIn() {
-    if (!agreeTerms) {
-      errors.agreeTerms = 'You must agree to the terms and conditions';
-      return;
-    }
-
-    loading = true;
-    errors = {};
-
-    try {
-      await signInWithMicrosoft();
-      notificationsStore.success('Account created successfully with Microsoft!');
-      goto(redirectTo);
-    } catch (error: any) {
-      console.error('Microsoft sign-in error:', error);
-      errors.microsoft = error.message || 'An error occurred during Microsoft sign-in';
-    } finally {
-      loading = false;
-    }
-  }
-
-  // Handle Yahoo sign-in
-  async function handleYahooSignIn() {
-    if (!agreeTerms) {
-      errors.agreeTerms = 'You must agree to the terms and conditions';
-      return;
-    }
-
-    loading = true;
-    errors = {};
-
-    try {
-      await signInWithYahoo();
-      notificationsStore.success('Account created successfully with Yahoo!');
-      goto(redirectTo);
-    } catch (error: any) {
-      console.error('Yahoo sign-in error:', error);
-      errors.yahoo = error.message || 'An error occurred during Yahoo sign-in';
+      console.error('X sign-in error:', error);
+      errors.x = error.message || 'An error occurred during X sign-in';
     } finally {
       loading = false;
     }
@@ -210,6 +141,23 @@
       </div>
     {/if}
 
+    {#if errors.instagram}
+      <div class="rounded-md bg-red-50 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">
+              Instagram: {errors.instagram}
+            </h3>
+          </div>
+        </div>
+      </div>
+    {/if}
+
     {#if errors.facebook}
       <div class="rounded-md bg-red-50 p-4">
         <div class="flex">
@@ -227,7 +175,9 @@
       </div>
     {/if}
 
-    {#if errors.github}
+
+
+    {#if errors.x}
       <div class="rounded-md bg-red-50 p-4">
         <div class="flex">
           <div class="flex-shrink-0">
@@ -237,80 +187,14 @@
           </div>
           <div class="ml-3">
             <h3 class="text-sm font-medium text-red-800">
-              GitHub: {errors.github}
+              X: {errors.x}
             </h3>
           </div>
         </div>
       </div>
     {/if}
 
-    {#if errors.apple}
-      <div class="rounded-md bg-red-50 p-4">
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <h3 class="text-sm font-medium text-red-800">
-              Apple: {errors.apple}
-            </h3>
-          </div>
-        </div>
-      </div>
-    {/if}
 
-    {#if errors.twitter}
-      <div class="rounded-md bg-red-50 p-4">
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <h3 class="text-sm font-medium text-red-800">
-              Twitter: {errors.twitter}
-            </h3>
-          </div>
-        </div>
-      </div>
-    {/if}
-
-    {#if errors.microsoft}
-      <div class="rounded-md bg-red-50 p-4">
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <h3 class="text-sm font-medium text-red-800">
-              Microsoft: {errors.microsoft}
-            </h3>
-          </div>
-        </div>
-      </div>
-    {/if}
-
-    {#if errors.yahoo}
-      <div class="rounded-md bg-red-50 p-4">
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <h3 class="text-sm font-medium text-red-800">
-              Yahoo: {errors.yahoo}
-            </h3>
-          </div>
-        </div>
-      </div>
-    {/if}
 
     <!-- Terms Agreement -->
     <div class="mt-8">
@@ -367,69 +251,30 @@
         Continue with Facebook
       </button>
 
-      <!-- GitHub Sign-in -->
+      <!-- Instagram Sign-in -->
       <button
         type="button"
         class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-        on:click={handleGitHubSignIn}
+        on:click={handleInstagramSignIn}
         disabled={loading}
       >
-        <svg class="h-5 w-5 mr-3" fill="#181717" viewBox="0 0 24 24">
-          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        <svg class="h-5 w-5 mr-3" fill="#E1306C" viewBox="0 0 24 24">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.336 3.608 1.311.975.975 1.249 2.242 1.31 3.608.059 1.266.071 1.645.071 4.848 0 3.204-.012 3.584-.07 4.85-.062 1.366-.336 2.633-1.311 3.608-.975.975-2.242 1.249-3.608 1.31-1.266.059-1.645.071-4.85.071-3.204 0-3.584-.012-4.85-.07-1.366-.062-2.633-.336-3.608-1.311-.975-.975-1.249-2.242-1.31-3.608C2.175 15.584 2.163 15.204 2.163 12c0-3.204.012-3.584.07-4.85.062-1.366.336-2.633 1.311-3.608C4.519 2.499 5.786 2.225 7.152 2.163 8.418 2.104 8.798 2.092 12 2.092zm0-2.163C8.741 0 8.332.014 7.052.072 5.782.13 4.63.443 3.677 1.396 2.724 2.349 2.411 3.501 2.353 4.771 2.295 6.051 2.281 6.459 2.281 12c0 5.541.014 5.949.072 7.229.058 1.27.371 2.422 1.324 3.375.953.953 2.105 1.266 3.375 1.324 1.28.058 1.689.072 7.229.072s5.949-.014 7.229-.072c1.27-.058 2.422-.371 3.375-1.324.953-.953 1.266-2.105 1.324-3.375.058-1.28.072-1.689.072-7.229s-.014-5.949-.072-7.229c-.058-1.27-.371-2.422-1.324-3.375C20.422.443 19.27.13 18 .072 16.72.014 16.311 0 12 0z"/>
         </svg>
-        Continue with GitHub
+        Continue with Instagram
       </button>
 
-      <!-- Apple Sign-in -->
+      <!-- X Sign-in -->
       <button
         type="button"
         class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-        on:click={handleAppleSignIn}
+        on:click={handleXSignIn}
         disabled={loading}
       >
         <svg class="h-5 w-5 mr-3" fill="#000000" viewBox="0 0 24 24">
-          <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
+          <path d="M22.46 0h-3.64L9.29 14.73 7.82 12.1V0H3.54v24h3.64l9.63-14.73 1.47 2.63V24h3.63z" />
         </svg>
-        Continue with Apple
-      </button>
-
-      <!-- Twitter Sign-in -->
-      <button
-        type="button"
-        class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-        on:click={handleTwitterSignIn}
-        disabled={loading}
-      >
-        <svg class="h-5 w-5 mr-3" fill="#1DA1F2" viewBox="0 0 24 24">
-          <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-        </svg>
-        Continue with Twitter
-      </button>
-
-      <!-- Microsoft Sign-in -->
-      <button
-        type="button"
-        class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-        on:click={handleMicrosoftSignIn}
-        disabled={loading}
-      >
-        <svg class="h-5 w-5 mr-3" fill="#00A4EF" viewBox="0 0 24 24">
-          <path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z"/>
-        </svg>
-        Continue with Microsoft
-      </button>
-
-      <!-- Yahoo Sign-in -->
-      <button
-        type="button"
-        class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-        on:click={handleYahooSignIn}
-        disabled={loading}
-      >
-        <svg class="h-5 w-5 mr-3" fill="#6001D2" viewBox="0 0 24 24">
-          <path d="M12 0C5.383 0 0 5.383 0 12s5.383 12 12 12 12-5.383 12-12S18.617 0 12 0zm5.5 18.5h-3l-2.5-4-2.5 4h-3l4-6.5-3.5-6h3l2 3.5 2-3.5h3l-3.5 6 4 6.5z"/>
-        </svg>
-        Continue with Yahoo
+        Continue with X
       </button>
     </div>
   </div>

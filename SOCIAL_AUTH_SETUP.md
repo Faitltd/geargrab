@@ -4,19 +4,19 @@
 
 ### 1. Updated Authentication Functions
 - **Removed**: Email/password authentication functions
-- **Added**: Social sign-in functions for Google, Facebook, GitHub, Apple, Twitter, Microsoft, and Yahoo
+- **Added**: Social sign-in functions for Google, Facebook, Instagram, and X
 - **Updated**: User document creation to work with all social providers
 - **Cleaned up**: Removed password reset, email update, and reauthentication functions
 
 ### 2. Updated Login Page (`/auth/login`)
 - **Removed**: Email/password form
-- **Added**: Social sign-in buttons for all 7 providers (Google, Facebook, GitHub, Apple, Twitter, Microsoft, Yahoo)
+- **Added**: Social sign-in buttons for Google, Facebook, Instagram, and X
 - **Updated**: Error handling for each provider separately
 - **Improved**: UI with better spacing and consistent styling
 
 ### 3. Updated Signup Page (`/auth/signup`)
 - **Removed**: Email/password form
-- **Added**: Social sign-in buttons for all 7 providers (Google, Facebook, GitHub, Apple, Twitter, Microsoft, Yahoo)
+- **Added**: Social sign-in buttons for Google, Facebook, Instagram, and X
 - **Kept**: Terms and conditions agreement (required before social sign-in)
 - **Updated**: Error handling for each provider separately
 
@@ -42,24 +42,6 @@ To enable the social sign-in providers, you need to configure them in the Fireba
 4. Create Facebook App at https://developers.facebook.com/
 5. Add your domain to Facebook App settings
 
-### 3. GitHub Authentication
-1. Go to Firebase Console > Authentication > Sign-in method
-2. Enable GitHub provider
-3. You'll need:
-   - GitHub Client ID
-   - GitHub Client Secret
-4. Create GitHub OAuth App at https://github.com/settings/applications/new
-5. Set Authorization callback URL to: `https://geargrab-co.firebaseapp.com/__/auth/handler`
-
-### 4. Apple Authentication
-1. Go to Firebase Console > Authentication > Sign-in method
-2. Enable Apple provider
-3. You'll need:
-   - Apple Services ID
-   - Apple Team ID
-   - Apple Key ID
-   - Apple Private Key
-4. Configure at https://developer.apple.com/account/resources/identifiers/list/serviceId
 
 ## 🚀 Next Steps
 
@@ -69,8 +51,8 @@ To enable the social sign-in providers, you need to configure them in the Fireba
 # Visit http://localhost:5173/auth/login
 ```
 
-### 2. Configure Additional Providers
-- Set up Facebook, GitHub, and Apple in Firebase Console
+### 2. Configure Providers
+- Set up Google, Facebook, Instagram, and X in Firebase Console
 - Test each provider individually
 - Handle any provider-specific errors
 
@@ -83,8 +65,8 @@ To enable the social sign-in providers, you need to configure them in the Fireba
 
 - [ ] Google sign-in works
 - [ ] Facebook sign-in works (after configuration)
-- [ ] GitHub sign-in works (after configuration)
-- [ ] Apple sign-in works (after configuration)
+- [ ] Instagram sign-in works (after configuration)
+- [ ] X sign-in works (after configuration)
 - [ ] User documents are created properly for all providers
 - [ ] Navigation shows correct auth state
 - [ ] Sign-out functionality works
