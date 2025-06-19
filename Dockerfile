@@ -5,10 +5,9 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies with clean cache and ignore optional dependencies
+# Install ALL dependencies (including dev dependencies needed for build)
 RUN npm cache clean --force && \
-    npm ci --only=production --ignore-scripts && \
-    npm ci --ignore-scripts
+    npm ci --include=dev
 
 COPY . .
 
@@ -29,8 +28,8 @@ ENV VITE_FIREBASE_APP_ID=1:227444442028:web:6eeaed1e136d07f5b73009
 ENV VITE_STRIPE_PUBLISHABLE_KEY=pk_live_51RZXbxBfCDZxMJmHHUzHwNJq1gNdpcMjp4kAJK28n8d5kTXPhI4pnptDiLJmyHybfhJzY7vIVZOaNrzJClCkY3vS00tMlh4lyZ
 ENV STRIPE_SECRET_KEY=sk_live_placeholder_will_be_overridden_by_cloud_run
 
-# Build with error handling
-RUN npm run build || (echo "Build failed, checking for missing dependencies..." && npm install --save-dev mini-svg-data-uri lodash.castarray && npm run build)
+# Build the application
+RUN npm run build
 
 # Production stage
 FROM node:18-alpine
