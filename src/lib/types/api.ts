@@ -26,7 +26,8 @@ export interface CreateBookingRequest {
   startDate: string; // ISO date string
   endDate: string; // ISO date string
   contactInfo: {
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
     phone: string;
   };
