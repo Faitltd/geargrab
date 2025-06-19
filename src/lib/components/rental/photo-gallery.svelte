@@ -87,14 +87,14 @@
         <div 
           class="photo-thumbnail"
           on:click={() => openPhotoModal(photo)}
-          on:keydown={(e) => handleKeydown(e, photo)}
+          on:keydown="{(e)" => handleKeydown(e, photo)}
           tabindex="0"
           role="button"
           aria-label="View photo: {photo.description || 'Rental documentation photo'}"
         >
           <img
-            src={photo.url}
-            alt={photo.description || 'Rental documentation photo'}
+            src="{photo.url}"
+            alt="{photo.description" || 'Rental documentation photo'}
             class="w-full h-full object-cover"
             loading="lazy"
           />
@@ -112,7 +112,7 @@
             <div class="photo-actions">
               <button
                 type="button"
-                on:click|stopPropagation={() => deletePhoto(photo)}
+                on:click|stopPropagation="{()" => deletePhoto(photo)}
                 class="delete-btn"
                 aria-label="Delete photo"
               >
@@ -127,7 +127,7 @@
         <!-- Photo Info -->
         <div class="photo-info">
           {#if photo.description}
-            <p class="text-sm text-white font-medium truncate" title={photo.description}>
+            <p class="text-sm text-white font-medium truncate" title="{photo.description}">
               {photo.description}
             </p>
           {/if}
@@ -151,8 +151,8 @@
 {#if showModal && selectedPhoto}
   <div 
     class="photo-modal"
-    on:click={closePhotoModal}
-    on:keydown={handleModalKeydown}
+    on:click="{closePhotoModal}"
+    on:keydown="{handleModalKeydown}"
     tabindex="0"
     role="dialog"
     aria-modal="true"
@@ -172,7 +172,7 @@
         </div>
         <button
           type="button"
-          on:click={closePhotoModal}
+          on:click="{closePhotoModal}"
           class="close-btn"
           aria-label="Close photo viewer"
         >
@@ -185,8 +185,8 @@
       <!-- Modal Image -->
       <div class="modal-image">
         <img
-          src={selectedPhoto.url}
-          alt={selectedPhoto.description || 'Rental documentation photo'}
+          src="{selectedPhoto.url}"
+          alt="{selectedPhoto.description" || 'Rental documentation photo'}
           class="max-w-full max-h-full object-contain"
         />
       </div>

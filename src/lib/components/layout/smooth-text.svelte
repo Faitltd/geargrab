@@ -35,7 +35,7 @@
 </script>
 
 <div
-  bind:this={textElement}
+  bind:this="{textElement}"
   class="smooth-text {className}"
 >
   <slot />

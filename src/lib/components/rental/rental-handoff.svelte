@@ -117,12 +117,12 @@
   {#if showConditionReport}
     <!-- Condition Report Interface -->
     <ConditionReport
-      bookingId={booking.id}
-      listingId={booking.listingId}
-      reportType={phase}
+      bookingId="{booking.id}"
+      listingId="{booking.listingId}"
+      reportType="{phase}"
       {userRole}
-      existingReportId={currentReport?.id}
-      on:confirmed={handleReportConfirmed}
+      existingReportId="{currentReport?.id}"
+      on:confirmed="{handleReportConfirmed}"
     />
   {:else}
     <!-- Status Overview -->
@@ -183,7 +183,7 @@
             {#if otherPartyReport}
               <button
                 type="button"
-                on:click={viewOtherPartyReport}
+                on:click="{viewOtherPartyReport}"
                 class="mt-3 text-blue-400 hover:text-blue-300 text-sm underline"
               >
                 View their report
@@ -218,7 +218,7 @@
         <div class="flex justify-end space-x-3 pt-4 border-t border-white/10">
           <button
             type="button"
-            on:click={startConditionReport}
+            on:click="{startConditionReport}"
             class="bg-green-600/80 hover:bg-green-600/90 text-white px-6 py-2 rounded-lg backdrop-blur-sm border border-green-500/50 transition-all duration-200"
           >
             {#if hasReport}

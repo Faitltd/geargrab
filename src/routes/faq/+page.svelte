@@ -146,7 +146,7 @@
 <VideoBackground
   videoSrc="/1877846-hd_1920_1080_30fps.mp4"
   imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
-  overlayOpacity={0.4}
+  overlayOpacity="{0.4}"
 />
 
 <!-- Page Content with Video Background -->
@@ -164,7 +164,7 @@
       <!-- FAQ Content -->
       <div class="max-w-4xl mx-auto">
         <!-- Category Navigation -->
-        <ScrollAnimated animation="fade-up" delay={400}>
+        <ScrollAnimated animation="fade-up" delay="{400}">
           <div class="flex flex-wrap justify-center gap-2 mb-12">
             {#each categories as category}
               <button
@@ -178,7 +178,7 @@
         </ScrollAnimated>
 
         <!-- FAQ Items -->
-        <ScrollAnimated animation="fade-up" delay={600}>
+        <ScrollAnimated animation="fade-up" delay="{600}">
           <div class="space-y-4">
             {#each faqs[activeCategory] as faq, index}
               <ScrollAnimated animation="fade-up" delay={800 + (index * 100)}>

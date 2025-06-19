@@ -184,10 +184,10 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Search -->
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Search Requests</label>
-          <input
+          <label for="search-requests" class="block text-sm font-medium text-gray-300 mb-2">Search Requests</label>
+          <input id="search-requests"
             type="text"
-            bind:value={searchQuery}
+            bind:value="{searchQuery}"
             placeholder="Search by email, user ID, or type..."
             class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
           />
@@ -195,13 +195,13 @@
 
         <!-- Status Filter -->
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Status Filter</label>
-          <select
-            bind:value={statusFilter}
+          <label for="status-filter" class="block text-sm font-medium text-gray-300 mb-2">Status Filter</label>
+          <select id="status-filter"
+            bind:value="{statusFilter}"
             class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
           >
             {#each statusOptions as option}
-              <option value={option.value}>{option.label}</option>
+              <option value="{option.value}">{option.label}</option>
             {/each}
           </select>
         </div>
@@ -310,7 +310,7 @@
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-bold text-white">Verification Request Details</h2>
         <button
-          on:click={closeDetailsModal}
+          on:click="{closeDetailsModal}"
           class="text-gray-400 hover:text-white"
         >
           ✕
@@ -375,7 +375,7 @@
       <!-- Actions -->
       <div class="flex justify-end space-x-4 mt-6 pt-6 border-t border-white/20">
         <button
-          on:click={closeDetailsModal}
+          on:click="{closeDetailsModal}"
           class="px-4 py-2 text-gray-400 hover:text-white transition-colors"
         >
           Close

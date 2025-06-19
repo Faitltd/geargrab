@@ -51,10 +51,10 @@
         <div class="photo-item">
           <div class="photo-container">
             <img
-              src={photo.url}
-              alt={photo.caption || 'Condition photo'}
+              src="{photo.url}"
+              alt="{photo.caption" || 'Condition photo'}
               class="photo-image"
-              on:click={() => openPhoto(photo)}
+              on:click={() " = /> openPhoto(photo)}
               loading="lazy"
             />
             
@@ -78,7 +78,7 @@
               {#if allowDelete}
                 <button
                   type="button"
-                  on:click|stopPropagation={() => deletePhoto(photo)}
+                  on:click|stopPropagation="{()" => deletePhoto(photo)}
                   class="delete-button"
                   title="Delete photo"
                 >
@@ -104,7 +104,7 @@
 
 <!-- Photo Modal -->
 {#if showModal && selectedPhoto}
-  <div class="modal-backdrop" on:click={closeModal}>
+  <div class="modal-backdrop" on:click="{closeModal}">
     <div class="modal-content" on:click|stopPropagation>
       <div class="modal-header">
         <div class="modal-title">
@@ -115,7 +115,7 @@
         </div>
         <button
           type="button"
-          on:click={closeModal}
+          on:click="{closeModal}"
           class="modal-close"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,8 +126,8 @@
 
       <div class="modal-body">
         <img
-          src={selectedPhoto.url}
-          alt={selectedPhoto.caption || 'Condition photo'}
+          src="{selectedPhoto.url}"
+          alt="{selectedPhoto.caption" || 'Condition photo'}
           class="modal-image"
         />
         

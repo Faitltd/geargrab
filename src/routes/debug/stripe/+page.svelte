@@ -120,7 +120,7 @@
           <h2 class="text-xl font-semibent text-white mb-4">Manual Payment Test</h2>
           <p class="text-gray-300 mb-4">Test the actual payment form with a small amount:</p>
           <a 
-            href="/payment?amount=1.00&currency=usd&title=Debug Test&listingId=debug" 
+            href="/payment?amount=1.00&currency=usd&title=Debug Test&listingId=debug"
             class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg inline-block"
           >
             Test $1.00 Payment Form

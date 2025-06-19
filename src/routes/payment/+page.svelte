@@ -167,8 +167,8 @@
             {amount}
             {currency}
             {metadata}
-            on:success={handlePaymentSuccess}
-            on:error={handlePaymentError}
+            on:success="{handlePaymentSuccess}"
+            on:error="{handlePaymentError}"
           />
 
           <!-- Security Notice -->

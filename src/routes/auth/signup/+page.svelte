@@ -111,8 +111,7 @@
     <img
       src="/pexels-bianca-gasparoto-834990-1752951.jpg"
       alt="Mountain landscape"
-      class="w-full h-full object-cover"
-    >
+      class="w-full h-full object-cover" />
   </div>
   <div class="absolute inset-0 bg-black opacity-40"></div>
 </div>
@@ -134,8 +133,8 @@
         <GoogleAuthButton
           text="Continue with Google"
           loadingText="Signing up..."
-          on:success={handleGoogleSuccess}
-          on:error={handleGoogleError}
+          on:success="{handleGoogleSuccess}"
+          on:error="{handleGoogleError}"
           {loading}
         />
         <div class="mt-4 relative">
@@ -148,41 +147,41 @@
         </div>
       </div>
 
-      <ErrorAlert error={errors.auth} />
+      <ErrorAlert error="{errors.auth}" />
 
       <!-- Registration Form -->
-      <form on:submit|preventDefault={handleSubmit}>
+      <form on:submit|preventDefault="{handleSubmit}">
         <FormField
           id="email-address"
           label="Email Address"
           type="email"
-          bind:value={email}
+          bind:value="{email}"
           placeholder="Email address"
           autocomplete="email"
           required
-          error={errors.email}
+          error="{errors.email}"
         />
 
         <FormField
           id="password"
           label="Password"
           type="password"
-          bind:value={password}
+          bind:value="{password}"
           placeholder="Password"
           autocomplete="new-password"
           required
-          error={errors.password}
+          error="{errors.password}"
         />
 
         <FormField
           id="confirm-password"
           label="Confirm Password"
           type="password"
-          bind:value={confirmPassword}
+          bind:value="{confirmPassword}"
           placeholder="Confirm password"
           autocomplete="new-password"
           required
-          error={errors.confirmPassword}
+          error="{errors.confirmPassword}"
         />
 
         <!-- Terms Agreement -->
@@ -192,7 +191,7 @@
             name="agreeTerms"
             type="checkbox"
             class="h-4 w-4 text-green-600 focus:ring-green-500 border-white/20 bg-white/10 rounded mt-1"
-            bind:checked={agreeTerms}
+            bind:checked="{agreeTerms}"
           />
           <label for="agree-terms" class="ml-3 block text-sm text-gray-300">
             I agree to the
@@ -211,7 +210,7 @@
           size="lg"
           fullWidth
           {loading}
-          disabled={loading}
+          disabled="{loading}"
         >
           {loading ? 'Creating Account...' : 'Create Account'}
         </FormButton>

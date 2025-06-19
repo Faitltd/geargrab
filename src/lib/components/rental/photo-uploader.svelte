@@ -138,15 +138,15 @@
 <div class="space-y-4">
   <!-- Photo Type Selection -->
   <div>
-    <label class="block text-sm font-medium text-white mb-2">
+    <label for="photo-type" class="block text-sm font-medium text-white mb-2">
       Photo Type *
     </label>
-    <select
-      bind:value={selectedPhotoType}
+    <select id="photo-type"
+      bind:value="{selectedPhotoType}"
       class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-transparent"
     >
       {#each photoTypes as type}
-        <option value={type.value} class="bg-gray-800 text-white">
+        <option value="{type.value}" class="bg-gray-800 text-white">
           {type.label}
         </option>
       {/each}
@@ -158,12 +158,12 @@
 
   <!-- Photo Description -->
   <div>
-    <label class="block text-sm font-medium text-white mb-2">
+    <label for="description-optional" class="block text-sm font-medium text-white mb-2">
       Description (Optional)
     </label>
-    <input
+    <input id="description-optional"
       type="text"
-      bind:value={photoDescription}
+      bind:value="{photoDescription}"
       placeholder="Add a description for this photo..."
       class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-transparent"
     />
@@ -172,22 +172,22 @@
   <!-- Upload Area -->
   <div
     class="upload-area {dragActive ? 'active' : ''} {uploading ? 'uploading' : ''}"
-    on:dragenter={handleDragEnter}
-    on:dragover={handleDragOver}
-    on:dragleave={handleDragLeave}
-    on:drop={handleDrop}
-    on:click={openFileDialog}
-    on:keydown={handleKeydown}
+    on:dragenter="{handleDragEnter}"
+    on:dragover="{handleDragOver}"
+    on:dragleave="{handleDragLeave}"
+    on:drop="{handleDrop}"
+    on:click="{openFileDialog}"
+    on:keydown="{handleKeydown}"
     tabindex="0"
     role="button"
-    aria-disabled={uploading}
+    aria-disabled="{uploading}"
   >
     <input
-      bind:this={fileInput}
+      bind:this="{fileInput}"
       type="file"
       accept="image/*"
-      on:change={handleFileSelect}
-      disabled={uploading}
+      on:change="{handleFileSelect}"
+      disabled="{uploading}"
       class="hidden"
     />
     

@@ -57,7 +57,7 @@
 </script>
 
 <input
-  bind:this={inputElement}
+  bind:this="{inputElement}"
   bind:value
   type="text"
   {placeholder}
@@ -68,8 +68,8 @@
   role="searchbox"
   aria-label="Search for outdoor gear"
   aria-autocomplete="list"
-  on:input={handleInput}
-  on:focus={handleFocus}
-  on:blur={handleBlur}
-  on:keydown={handleKeydown}
+  on:input="{handleInput}"
+  on:focus="{handleFocus}"
+  on:blur="{handleBlur}"
+  on:keydown="{handleKeydown}"
 />

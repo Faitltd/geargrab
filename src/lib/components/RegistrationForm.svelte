@@ -167,7 +167,7 @@
       <p>{submitMessage}</p>
     </div>
   {:else}
-    <form on:submit|preventDefault={handleSubmit}>
+    <form on:submit|preventDefault="{handleSubmit}">
       <!-- Step 1: Basic Information -->
       <fieldset>
         <legend>Basic Information</legend>
@@ -177,8 +177,8 @@
           <input
             id="email"
             type="email"
-            bind:value={formData.email}
-            class:error={errors.email}
+            bind:value="{formData.email}"
+            class:error="{errors.email}"
             required
           />
           {#if errors.email}
@@ -195,8 +195,8 @@
           <input
             id="password"
             type="password"
-            bind:value={formData.password}
-            class:error={errors.password}
+            bind:value="{formData.password}"
+            class:error="{errors.password}"
             required
           />
           
@@ -236,8 +236,8 @@
           <input
             id="confirmPassword"
             type="password"
-            bind:value={formData.confirmPassword}
-            class:error={errors.confirmPassword}
+            bind:value="{formData.confirmPassword}"
+            class:error="{errors.confirmPassword}"
             required
           />
           {#if errors.confirmPassword}
@@ -260,8 +260,8 @@
             <input
               id="firstName"
               type="text"
-              bind:value={formData.firstName}
-              class:error={errors.firstName}
+              bind:value="{formData.firstName}"
+              class:error="{errors.firstName}"
               required
             />
             {#if errors.firstName}
@@ -278,8 +278,8 @@
             <input
               id="lastName"
               type="text"
-              bind:value={formData.lastName}
-              class:error={errors.lastName}
+              bind:value="{formData.lastName}"
+              class:error="{errors.lastName}"
               required
             />
             {#if errors.lastName}
@@ -297,8 +297,8 @@
           <input
             id="username"
             type="text"
-            bind:value={formData.username}
-            class:error={errors.username}
+            bind:value="{formData.username}"
+            class:error="{errors.username}"
             placeholder="3-30 characters, letters, numbers, _, -"
           />
           {#if errors.username}
@@ -320,8 +320,8 @@
           <input
             id="phoneNumber"
             type="tel"
-            bind:value={formData.phoneNumber}
-            class:error={errors.phoneNumber}
+            bind:value="{formData.phoneNumber}"
+            class:error="{errors.phoneNumber}"
             placeholder="(555) 123-4567"
           />
           {#if errors.phoneNumber}
@@ -339,8 +339,8 @@
             <input
               id="age"
               type="number"
-              bind:value={formData.age}
-              class:error={errors.age}
+              bind:value="{formData.age}"
+              class:error="{errors.age}"
               min="13"
               max="120"
             />
@@ -348,7 +348,7 @@
 
           <div class="form-group">
             <label for="gender">Gender</label>
-            <select id="gender" bind:value={formData.gender}>
+            <select id="gender" bind:value="{formData.gender}">
               <option value="">Select...</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
@@ -368,8 +368,8 @@
           <label class="checkbox-label">
             <input
               type="checkbox"
-              bind:checked={formData.agreeToTerms}
-              class:error={errors.agreeToTerms}
+              bind:checked="{formData.agreeToTerms}"
+              class:error="{errors.agreeToTerms}"
               required
             />
             I agree to the <a href="/terms" target="_blank">Terms and Conditions</a> *
@@ -387,8 +387,8 @@
           <label class="checkbox-label">
             <input
               type="checkbox"
-              bind:checked={formData.agreeToPrivacy}
-              class:error={errors.agreeToPrivacy}
+              bind:checked="{formData.agreeToPrivacy}"
+              class:error="{errors.agreeToPrivacy}"
               required
             />
             I agree to the <a href="/privacy" target="_blank">Privacy Policy</a> *
@@ -406,7 +406,7 @@
           <label class="checkbox-label">
             <input
               type="checkbox"
-              bind:checked={formData.marketingConsent}
+              bind:checked="{formData.marketingConsent}"
             />
             I would like to receive marketing emails and updates
           </label>
@@ -417,7 +417,7 @@
       <div class="form-actions">
         <button 
           type="submit" 
-          disabled={isSubmitting}
+          disabled="{isSubmitting}"
           class="submit-button"
         >
           {#if isSubmitting}

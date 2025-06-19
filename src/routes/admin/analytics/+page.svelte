@@ -94,11 +94,11 @@
     </div>
     <div>
       <select
-        bind:value={timeRange}
+        bind:value="{timeRange}"
         class="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
       >
         {#each timeRangeOptions as option}
-          <option value={option.value}>{option.label}</option>
+          <option value="{option.value}">{option.label}</option>
         {/each}
       </select>
     </div>

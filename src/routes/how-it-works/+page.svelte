@@ -90,7 +90,7 @@
 <VideoBackground
   videoSrc="/857134-hd_1280_720_24fps.mp4"
   imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
-  overlayOpacity={0.3}
+  overlayOpacity="{0.3}"
 />
 
 <!-- Page Content with Video Background -->
@@ -106,7 +106,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
 
       <!-- Tab Navigation -->
-      <ScrollLinkedAnimator animation="scale-in" startOffset={0} endOffset={0.4}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset="{0}" endOffset="{0.4}">
         <div class="flex justify-center mb-12">
           <div class="bg-gray-800/70 backdrop-blur-sm p-1 rounded-lg border border-gray-600/50 shadow-lg">
             <button
@@ -175,12 +175,12 @@
       </div>
 
       <!-- Safety & Trust Section -->
-      <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.7}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset="{0.2}" endOffset="{0.7}">
         <div class="mb-16">
           <h2 class="text-3xl font-bold text-center mb-12 text-white drop-shadow-lg">Safety & Trust</h2>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <ScrollLinkedAnimator animation="scale-in" startOffset={0.3} endOffset={0.8}>
+            <ScrollLinkedAnimator animation="scale-in" startOffset="{0.3}" endOffset="{0.8}">
               <div class="text-center">
                 <div class="w-16 h-16 bg-green-600/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30 shadow-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -192,7 +192,7 @@
               </div>
             </ScrollLinkedAnimator>
 
-            <ScrollLinkedAnimator animation="scale-in" startOffset={0.35} endOffset={0.85}>
+            <ScrollLinkedAnimator animation="scale-in" startOffset="{0.35}" endOffset="{0.85}">
               <div class="text-center">
                 <div class="w-16 h-16 bg-green-600/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30 shadow-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -204,7 +204,7 @@
               </div>
             </ScrollLinkedAnimator>
 
-            <ScrollLinkedAnimator animation="scale-in" startOffset={0.4} endOffset={0.9}>
+            <ScrollLinkedAnimator animation="scale-in" startOffset="{0.4}" endOffset="{0.9}">
               <div class="text-center">
                 <div class="w-16 h-16 bg-green-600/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30 shadow-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -220,7 +220,7 @@
       </ScrollLinkedAnimator>
 
       <!-- Call to Action Section -->
-      <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.7}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset="{0.2}" endOffset="{0.7}">
         <div class="text-center mb-16">
           <h2 class="text-3xl font-bold mb-4 text-white drop-shadow-lg">Ready to Start Your Adventure?</h2>
           <p class="text-lg mb-6 text-gray-200 drop-shadow-lg">Join thousands of outdoor enthusiasts sharing and renting gear.</p>
@@ -236,12 +236,12 @@
       </ScrollLinkedAnimator>
 
       <!-- FAQ Section -->
-      <ScrollLinkedAnimator animation="scale-in" startOffset={0.2} endOffset={0.7}>
+      <ScrollLinkedAnimator animation="scale-in" startOffset="{0.2}" endOffset="{0.7}">
         <div class="mb-16">
           <h2 class="text-3xl font-bold text-center mb-12 text-white drop-shadow-lg">Frequently Asked Questions</h2>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <ScrollLinkedAnimator animation="scale-in" startOffset={0.3} endOffset={0.8}>
+            <ScrollLinkedAnimator animation="scale-in" startOffset="{0.3}" endOffset="{0.8}">
               <div>
                 <h3 class="text-lg font-bold mb-2 text-white drop-shadow-lg">How do I know the gear is in good condition?</h3>
                 <p class="text-gray-200 mb-4 drop-shadow-lg">All gear owners provide detailed condition reports and photos. You can also message owners directly with questions before booking.</p>
@@ -254,7 +254,7 @@
               </div>
             </ScrollLinkedAnimator>
 
-            <ScrollLinkedAnimator animation="scale-in" startOffset={0.35} endOffset={0.85}>
+            <ScrollLinkedAnimator animation="scale-in" startOffset="{0.35}" endOffset="{0.85}">
               <div>
                 <h3 class="text-lg font-bold mb-2 text-white drop-shadow-lg">How much can I earn renting out my gear?</h3>
                 <p class="text-gray-200 mb-4 drop-shadow-lg">Earnings vary by gear type and demand, but many owners earn $100-500+ per month from gear that would otherwise sit unused.</p>

@@ -116,7 +116,7 @@
             Remember your password?
             <button
               type="button"
-              on:click={goToLogin}
+              on:click="{goToLogin}"
               class="font-medium text-green-600 hover:text-green-500"
             >
               Back to login
@@ -146,7 +146,7 @@
             <button
               type="button"
               class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              on:click={goToLogin}
+              on:click="{goToLogin}"
             >
               Back to Login
             </button>
@@ -157,13 +157,13 @@
               type="button"
               class="w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
               on:click={() => handleSubmit()}
-              disabled={loading}
+              disabled="{loading}"
             >
               Resend email
             </button>
           </div>
         {:else}
-          <form class="mt-8 space-y-6" on:submit|preventDefault={handleSubmit}>
+          <form class="mt-8 space-y-6" on:submit|preventDefault="{handleSubmit}">
             <div>
               <label for="email-address" class="sr-only">Email address</label>
               <input
@@ -174,7 +174,7 @@
                 required
                 class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
-                bind:value={email}
+                bind:value="{email}"
               />
               {#if errors.email}
                 <p class="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -185,7 +185,7 @@
               <button
                 type="submit"
                 class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                disabled={loading}
+                disabled="{loading}"
               >
                 {#if loading}
                   <span class="absolute left-0 inset-y-0 flex items-center pl-3">

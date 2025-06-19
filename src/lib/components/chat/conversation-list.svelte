@@ -112,8 +112,8 @@
           <div class="flex items-center space-x-3">
             <!-- Avatar -->
             <div class="relative">
-              <img 
-                src={otherUser?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'} 
+              <img
+                src={otherUser?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'}
                 alt={otherUser?.name || 'User'}
                 class="w-12 h-12 rounded-full object-cover"
               />

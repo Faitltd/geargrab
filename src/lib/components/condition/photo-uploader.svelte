@@ -122,21 +122,21 @@
 <div class="photo-uploader">
   <!-- Hidden file input -->
   <input
-    bind:this={fileInput}
+    bind:this="{fileInput}"
     type="file"
     multiple
-    accept={acceptedTypes}
-    on:change={handleFileSelect}
+    accept="{acceptedTypes}"
+    on:change="{handleFileSelect}"
     class="hidden"
   />
 
   <!-- Drop zone -->
   <div
     class="drop-zone {dragOver ? 'drag-over' : ''} {disabled ? 'disabled' : ''}"
-    on:click={triggerFileSelect}
-    on:drop={handleDrop}
-    on:dragover={handleDragOver}
-    on:dragleave={handleDragLeave}
+    on:click="{triggerFileSelect}"
+    on:drop="{handleDrop}"
+    on:dragover="{handleDragOver}"
+    on:dragleave="{handleDragLeave}"
     role="button"
     tabindex="0"
   >

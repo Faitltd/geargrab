@@ -104,7 +104,7 @@
 <VideoBackground
   videoSrc="/1877846-hd_1920_1080_30fps.mp4"
   imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
-  overlayOpacity={0.4}
+  overlayOpacity="{0.4}"
 />
 
 <!-- Page Content with Video Background -->
@@ -122,7 +122,7 @@
       <!-- Blog Content -->
       <div class="mb-20">
         <!-- Category Filter -->
-        <ScrollAnimated animation="fade-up" delay={400}>
+        <ScrollAnimated animation="fade-up" delay="{400}">
           <div class="flex flex-wrap justify-center gap-4 mb-12">
             {#each categories as category}
               <button
@@ -138,17 +138,16 @@
         </ScrollAnimated>
 
         <!-- Blog Posts Grid -->
-        <ScrollAnimated animation="fade-up" delay={600}>
+        <ScrollAnimated animation="fade-up" delay="{600}">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {#each filteredPosts as post, index}
               <ScrollAnimated animation="fade-up" delay={800 + (index * 100)}>
                 <article class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 hover:bg-white/20 transition-all group shadow-lg">
                   <div class="relative overflow-hidden">
                     <img
-                      src={post.image}
-                      alt={post.title}
-                      class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    >
+                      src="{post.image}"
+                      alt="{post.title}"
+                      class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
                     <div class="absolute top-4 left-4">
                       <span class="bg-green-600/80 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium border border-green-500/30 shadow-lg">
                         {post.category}
@@ -196,7 +195,7 @@
     </div>
 
       <!-- Newsletter Signup -->
-      <ScrollAnimated animation="scale-in" delay={1200}>
+      <ScrollAnimated animation="scale-in" delay="{1200}">
         <div class="text-center">
           <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Stay Updated</h2>
           <p class="text-xl text-gray-200 mb-8 max-w-2xl mx-auto drop-shadow-lg">
@@ -208,8 +207,7 @@
               <input
                 type="email"
                 placeholder="Enter your email"
-                class="flex-1 px-4 py-3 rounded-lg bg-gray-800/70 backdrop-blur-sm border border-gray-600/50 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 shadow-lg"
-              >
+                class="flex-1 px-4 py-3 rounded-lg bg-gray-800/70 backdrop-blur-sm border border-gray-600/50 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 shadow-lg" />
               <button class="bg-green-600/80 backdrop-blur-sm hover:bg-green-700/80 text-white font-bold px-6 py-3 rounded-lg transition-colors border border-green-500/30 shadow-lg whitespace-nowrap">
                 Subscribe
               </button>

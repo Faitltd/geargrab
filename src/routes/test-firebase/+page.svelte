@@ -118,14 +118,14 @@
       <h2 class="text-xl font-semibold text-white mb-4">Test Actions</h2>
       <div class="flex flex-wrap gap-4">
         <button
-          on:click={testGoogleSignIn}
+          on:click="{testGoogleSignIn}"
           class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
         >
           Test Google Sign-In
         </button>
         
         <button
-          on:click={testRefreshAuth}
+          on:click="{testRefreshAuth}"
           class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
         >
           Refresh Auth State
@@ -134,7 +134,7 @@
 
         
         <button
-          on:click={clearResults}
+          on:click="{clearResults}"
           class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
         >
           Clear Results

@@ -78,12 +78,12 @@
       <!-- Desktop category selector -->
       <div class="hidden md:block">
         <select
-          bind:value={selectedCategory}
-          on:change={handleCategoryChange}
+          bind:value="{selectedCategory}"
+          on:change="{handleCategoryChange}"
           class="form-select rounded-lg border-gray-600 bg-gray-800/70 backdrop-blur-sm py-3 pl-4 pr-8 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
         >
           {#each categories as category}
-            <option value={category.id} class="bg-gray-800 text-white">{category.name}</option>
+            <option value="{category.id}" class="bg-gray-800 text-white">{category.name}</option>
           {/each}
         </select>
       </div>
@@ -91,13 +91,13 @@
       <!-- Sort selector -->
       <div>
         <select
-          bind:value={selectedSort}
-          on:change={handleSortChange}
+          bind:value="{selectedSort}"
+          on:change="{handleSortChange}"
           class="form-select rounded-lg border-gray-600 bg-gray-800/70 backdrop-blur-sm py-3 pl-4 pr-8 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
           data-cy="sort-select"
         >
           {#each sortOptions as option}
-            <option value={option.id} class="bg-gray-800 text-white">{option.name}</option>
+            <option value="{option.id}" class="bg-gray-800 text-white">{option.name}</option>
           {/each}
         </select>
       </div>
@@ -133,7 +133,7 @@
                 min="0"
                 max="500"
                 step="10"
-                bind:value={priceRange[1]}
+                bind:value="{priceRange[1]}"
                 class="w-full accent-green-500"
               />
               <div class="flex justify-between text-sm text-gray-300">
@@ -146,13 +146,13 @@
           <div class="flex space-x-3 mt-6">
             <button
               class="flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700"
-              on:click={applyFilters}
+              on:click="{applyFilters}"
             >
               Apply Filters
             </button>
             <button
               class="flex-1 bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700"
-              on:click={resetFilters}
+              on:click="{resetFilters}"
             >
               Reset
             </button>

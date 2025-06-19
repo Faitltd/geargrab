@@ -25,7 +25,7 @@
   onMount(async () => {
     try {
       if (!$authStore.user) {
-        goto('/auth/login?redirectTo=/admin/webhooks');
+          goto("/auth/login?redirectTo=/admin/webhooks");
         return;
       }
 
@@ -158,9 +158,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Event Type -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Event Type</label>
-            <select
-              bind:value={webhookTest.eventType}
+            <label for="event-type" class="block text-sm font-medium text-gray-300 mb-2">Event Type</label>
+            <select id="event-type"
+              bind:value="{webhookTest.eventType}"
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="payment_intent.succeeded">Payment Succeeded</option>
@@ -172,16 +172,16 @@
 
           <!-- Payment Intent ID -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Payment Intent ID</label>
+            <label for="payment-intent-id" class="block text-sm font-medium text-gray-300 mb-2">Payment Intent ID</label>
             <div class="flex space-x-2">
-              <input
+              <input id="payment-intent-id"
                 type="text"
-                bind:value={webhookTest.paymentIntentId}
+                bind:value="{webhookTest.paymentIntentId}"
                 class="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="pi_test_..."
               />
               <button
-                on:click={generateNewPaymentIntent}
+                on:click="{generateNewPaymentIntent}"
                 class="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
                 title="Generate new ID"
               >
@@ -192,9 +192,9 @@
 
           <!-- Service Type -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Service Type</label>
-            <select
-              bind:value={webhookTest.metadata.service}
+            <label for="service-type" class="block text-sm font-medium text-gray-300 mb-2">Service Type</label>
+            <select id="service-type"
+              bind:value="{webhookTest.metadata.service}"
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="booking">Booking Payment</option>
@@ -205,10 +205,10 @@
 
           <!-- Amount -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Amount (cents)</label>
-            <input
+            <label for="amount-cents" class="block text-sm font-medium text-gray-300 mb-2">Amount (cents)</label>
+            <input id="amount-cents"
               type="number"
-              bind:value={webhookTest.metadata.amount}
+              bind:value="{webhookTest.metadata.amount}"
               min="50"
               step="1"
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -218,10 +218,10 @@
 
           <!-- User ID -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
-            <input
+            <label for="user-id" class="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+            <input id="user-id"
               type="text"
-              bind:value={webhookTest.metadata.userId}
+              bind:value="{webhookTest.metadata.userId}"
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="User ID"
             />
@@ -229,10 +229,10 @@
 
           <!-- Booking ID (optional) -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Booking ID (optional)</label>
-            <input
+            <label for="booking-id-optional" class="block text-sm font-medium text-gray-300 mb-2">Booking ID (optional)</label>
+            <input id="booking-id-optional"
               type="text"
-              bind:value={webhookTest.metadata.bookingId}
+              bind:value="{webhookTest.metadata.bookingId}"
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="booking_123"
             />
@@ -242,7 +242,7 @@
         <!-- Test Button -->
         <div class="mt-6 flex items-center space-x-4">
           <button
-            on:click={testStripeWebhook}
+            on:click="{testStripeWebhook}"
             disabled={testing || !webhookTest.paymentIntentId || !webhookTest.metadata.userId}
             class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-2 px-6 rounded-lg transition-colors inline-flex items-center"
           >
@@ -256,7 +256,7 @@
 
           {#if testResults.length > 0}
             <button
-              on:click={clearResults}
+              on:click="{clearResults}"
               class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
               Clear Results

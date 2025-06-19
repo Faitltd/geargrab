@@ -30,7 +30,7 @@
   </div>
   <button 
     class="bg-green-600 text-white font-semibold px-6 py-2 rounded-xl hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-    disabled={!available || !startDate || !endDate}
+    disabled="{!available" || !startDate || !endDate}
     on:click={() => dispatch('book')}
   >
     {startDate && endDate ? 'Book Now' : 'Select Dates'}

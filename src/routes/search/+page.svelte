@@ -104,7 +104,7 @@
 <VideoBackground
   videoSrc="/Milky Way.mp4"
   imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
-  overlayOpacity={0.4}
+  overlayOpacity="{0.4}"
 />
 
 <!-- Page Content -->
@@ -117,17 +117,17 @@
         
         <!-- Search Bar -->
         <div class="flex-1 max-w-2xl">
-          <form on:submit|preventDefault={handleSearchSubmit} class="flex">
+          <form on:submit|preventDefault="{handleSearchSubmit}" class="flex">
             <input
               type="text"
-              bind:value={searchQuery}
+              bind:value="{searchQuery}"
               placeholder="Search for camping gear, hiking equipment, bikes..."
               class="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-l-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
             <button
               type="submit"
               class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-r-lg transition-colors"
-              disabled={loading}
+              disabled="{loading}"
             >
               {#if loading}
                 <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -165,40 +165,40 @@
           
           <!-- Category Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Category</label>
-            <select
-              bind:value={filters.category}
+            <label for="category" class="block text-sm font-medium text-gray-300 mb-2">Category</label>
+            <select id="category"
+              bind:value="{filters.category}"
               class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="">All Categories</option>
               {#each Object.entries(GEAR_CATEGORIES) as [key, category]}
-                <option value={key}>{category.icon} {category.name}</option>
+                <option value="{key}">{category.icon} {category.name}</option>
               {/each}
             </select>
           </div>
 
           <!-- Price Range -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
+            <label for="price-range-filterspricerangeperiod-day" class="block text-sm font-medium text-gray-300 mb-2">
               Price Range ({filters.priceRange?.period || 'day'})
             </label>
             <div class="space-y-2">
               <div class="flex space-x-2">
-                <input
+                <input id="price-range-filterspricerangeperiod-day"
                   type="number"
-                  bind:value={filters.priceRange.min}
+                  bind:value="{filters.priceRange.min}"
                   placeholder="Min"
                   class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
                 <input
                   type="number"
-                  bind:value={filters.priceRange.max}
+                  bind:value="{filters.priceRange.max}"
                   placeholder="Max"
                   class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
               <select
-                bind:value={filters.priceRange.period}
+                bind:value="{filters.priceRange.period}"
                 class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 <option value="day">Per Day</option>
@@ -210,23 +210,23 @@
 
           <!-- Rating Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Minimum Rating</label>
-            <select
-              bind:value={filters.minRating}
+            <label for="minimum-rating" class="block text-sm font-medium text-gray-300 mb-2">Minimum Rating</label>
+            <select id="minimum-rating"
+              bind:value="{filters.minRating}"
               class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             >
-              <option value={0}>Any Rating</option>
-              <option value={3}>3+ Stars</option>
-              <option value={4}>4+ Stars</option>
-              <option value={4.5}>4.5+ Stars</option>
+              <option value="{0}">Any Rating</option>
+              <option value="{3}">3+ Stars</option>
+              <option value="{4}">4+ Stars</option>
+              <option value="{4.5}">4.5+ Stars</option>
             </select>
           </div>
 
           <!-- Sort By -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Sort By</label>
-            <select
-              bind:value={filters.sortBy}
+            <label for="sort-by" class="block text-sm font-medium text-gray-300 mb-2">Sort By</label>
+            <select id="sort-by"
+              bind:value="{filters.sortBy}"
               class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="relevance">Relevance</option>

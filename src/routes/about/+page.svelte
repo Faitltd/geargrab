@@ -22,7 +22,7 @@
 <VideoBackground
   videoSrc="/1877846-hd_1920_1080_30fps.mp4"
   imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
-  overlayOpacity={0.4}
+  overlayOpacity="{0.4}"
 />
 
 <!-- Page Content with Video Background -->
@@ -38,7 +38,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
 
       <!-- Main Content -->
-      <ScrollAnimated animation="fade-up" delay={400}>
+      <ScrollAnimated animation="fade-up" delay="{400}">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
         <div>
           <h2 class="text-3xl font-bold text-white mb-6 drop-shadow-lg">Our Mission</h2>
@@ -61,9 +61,9 @@
         </div>
       </ScrollAnimated>
 
-      <ScrollAnimated animation="fade-up" delay={600}>
+      <ScrollAnimated animation="fade-up" delay="{600}">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <ScrollAnimated animation="fade-left" delay={800}>
+          <ScrollAnimated animation="fade-left" delay="{800}">
             <div class="text-center">
               <div class="w-16 h-16 bg-green-600/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30 shadow-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -75,7 +75,7 @@
             </div>
           </ScrollAnimated>
 
-          <ScrollAnimated animation="fade-up" delay={950}>
+          <ScrollAnimated animation="fade-up" delay="{950}">
             <div class="text-center">
               <div class="w-16 h-16 bg-green-600/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30 shadow-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -87,7 +87,7 @@
             </div>
           </ScrollAnimated>
 
-          <ScrollAnimated animation="fade-right" delay={1100}>
+          <ScrollAnimated animation="fade-right" delay="{1100}">
             <div class="text-center">
               <div class="w-16 h-16 bg-green-600/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30 shadow-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -102,7 +102,7 @@
       </ScrollAnimated>
 
       <!-- Call to Action -->
-      <ScrollAnimated animation="scale-in" delay={1300}>
+      <ScrollAnimated animation="scale-in" delay="{1300}">
         <div class="text-center text-white">
           <h2 class="text-3xl md:text-4xl font-bold mb-6 drop-shadow-lg">Ready to Join Our Community?</h2>
           <p class="text-xl max-w-2xl mx-auto mb-8 text-gray-200 drop-shadow-lg">Start sharing gear and connecting with fellow adventurers today.</p>

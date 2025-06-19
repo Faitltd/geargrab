@@ -120,7 +120,7 @@
             {#each adminNavItems as item}
               <li>
                 <a
-                  href={item.href}
+                  href="{item.href}"
                   class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors {
                     activeNavItem === item.id
                       ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'

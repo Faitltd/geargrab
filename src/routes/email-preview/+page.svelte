@@ -6,7 +6,7 @@
     bookingId: 'booking_1705123456789',
     confirmationNumber: 'GG-123456',
     listingTitle: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
-    listingImage: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+    listingImage: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
     startDate: 'Friday, February 15, 2024',
     endDate: 'Monday, February 18, 2024',
     totalPrice: 165,
@@ -35,8 +35,7 @@
     <img
       src="/pexels-bianca-gasparoto-834990-1752951.jpg"
       alt="Mountain landscape"
-      class="w-full h-full object-cover"
-    >
+      class="w-full h-full object-cover" />
   </div>
   <div class="absolute inset-0 bg-black opacity-40"></div>
 </div>
@@ -152,7 +151,7 @@
           <!-- Email Content -->
           <div class="h-[800px] overflow-auto">
             <iframe 
-              srcdoc={currentTemplate.html}
+              srcdoc="{currentTemplate.html}"
               class="w-full h-full border-0"
               title="Email Preview"
             ></iframe>

@@ -65,10 +65,10 @@
   </div>
 {:else if authState.isAuthenticated && authState.checkComplete}
   <!-- Authenticated - Show Content -->
-  <slot user={authState.user} />
+  <slot user="{authState.user}" />
 {:else if !requireAuth}
   <!-- Auth not required - Show Content -->
-  <slot user={authState.user} />
+  <slot user="{authState.user}" />
 {:else}
   <!-- Not Authenticated - Show Error -->
   <div class="min-h-screen flex items-center justify-center">

@@ -262,7 +262,7 @@
           <button
             type="button"
             on:click={() => currentStep = 'assessment'}
-            disabled={!canProceedToAssessment()}
+            disabled="{!canProceedToAssessment()}"
             class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors"
           >
             Continue to Assessment
@@ -281,8 +281,8 @@
               <label class="condition-option">
                 <input
                   type="radio"
-                  bind:group={overallCondition}
-                  value={condition}
+                  bind:group="{overallCondition}"
+                  value="{condition}"
                   class="sr-only"
                 />
                 <div class="condition-card {overallCondition === condition ? 'selected' : ''}">
@@ -298,7 +298,7 @@
             </label>
             <textarea
               id="condition-notes"
-              bind:value={conditionNotes}
+              bind:value="{conditionNotes}"
               rows="4"
               placeholder="Describe the overall condition, any notable wear, or specific observations..."
               class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -308,8 +308,8 @@
 
         <!-- Damage Reporter -->
         <!-- <DamageReporter
-          reportId={report.id}
-          on:damageAdded={() => loadOrCreateReport()}
+          reportId="{report.id}"
+          on:damageAdded="{()" => loadOrCreateReport()}
         /> -->
 
         <!-- Navigation -->
@@ -324,8 +324,8 @@
           
           <button
             type="button"
-            on:click={saveConditionAssessment}
-            disabled={saving}
+            on:click="{saveConditionAssessment}"
+            disabled="{saving}"
             class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-colors"
           >
             {#if saving}
@@ -383,7 +383,7 @@
               <input
                 id="signature"
                 type="text"
-                bind:value={confirmationSignature}
+                bind:value="{confirmationSignature}"
                 placeholder="Your full name"
                 class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                 required
@@ -396,7 +396,7 @@
               </label>
               <textarea
                 id="confirmation-notes"
-                bind:value={confirmationNotes}
+                bind:value="{confirmationNotes}"
                 rows="3"
                 placeholder="Any additional comments or concerns..."
                 class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -417,7 +417,7 @@
           
           <button
             type="button"
-            on:click={confirmReport}
+            on:click="{confirmReport}"
             disabled={saving || !confirmationSignature}
             class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-colors"
           >

@@ -35,7 +35,7 @@
 <button
   {type}
   {disabled}
-  class={buttonClasses}
+  class="{buttonClasses}"
   on:click
   on:focus
   on:blur

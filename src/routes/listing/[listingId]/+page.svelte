@@ -130,11 +130,11 @@
         dropoffDistance: 30
       },
       images: [
-        'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-        'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-        'https://images.unsplash.com/photo-1487730116645-74489c95b41b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-        'https://images.unsplash.com/photo-1571863533956-01c88e79957e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-        'https://images.unsplash.com/photo-1445308394109-4ec2920981b1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
+          "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+          "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+          "https://images.unsplash.com/photo-1487730116645-74489c95b41b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+          "https://images.unsplash.com/photo-1571863533956-01c88e79957e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+          "https://images.unsplash.com/photo-1445308394109-4ec2920981b1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
       ],
       features: [
         'Waterproof (1,500mm coating)',
@@ -272,8 +272,8 @@
         pickupLocation: 'North Boulder'
       },
       images: [
-        'https://images.unsplash.com/photo-1511994298241-608e28f14fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-        'https://images.unsplash.com/photo-1575585269294-7d28dd912db8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
+        "https://images.unsplash.com/photo-1511994298241-608e28f14fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+        "https://images.unsplash.com/photo-1575585269294-7d28dd912db8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
       ],
       features: [
         'Hydraulic disc brakes',
@@ -365,8 +365,8 @@
         dropoffDistance: 20
       },
       images: [
-        'https://images.unsplash.com/photo-1604537466158-719b1972feb8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80',
-        'https://images.unsplash.com/photo-1542834291-c514e77b215f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80'
+        "https://images.unsplash.com/photo-1604537466158-719b1972feb8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80",
+        "https://images.unsplash.com/photo-1542834291-c514e77b215f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80"
       ],
       features: [
         'Comfortable seat',
@@ -590,7 +590,7 @@
     <VideoBackground
       videoSrc="/Milky Way.mp4"
       imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
-      overlayOpacity={0.4}
+      overlayOpacity="{0.4}"
     />
 
     <div class="relative z-10 min-h-screen pt-24 pb-16">
@@ -626,7 +626,7 @@
   <VideoBackground
     videoSrc="/Milky Way.mp4"
     imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
-    overlayOpacity={0.4}
+    overlayOpacity="{0.4}"
   />
 
   <!-- Listing Page Content -->
@@ -636,7 +636,7 @@
         <!-- Main Content: Images and Details -->
         <div class="space-y-16 w-full">
           <!-- Listing Title & Info - Floating Blur Box -->
-          <ScrollLinkedAnimator animation="fade-up" startOffset={0} endOffset={0.6}>
+          <ScrollLinkedAnimator animation="fade-up" startOffset="{0}" endOffset="{0.6}">
             <div class="bg-white/20 backdrop-blur-xl rounded-2xl border border-white/30 p-8 shadow-2xl max-w-4xl mx-auto hover:bg-white/25 transition-all duration-300 text-center">
             <h1 class="text-3xl font-bold mb-4 text-white drop-shadow-lg">
               {#if listing}
@@ -657,7 +657,7 @@
 
             <!-- Debug Info -->
             <div class="text-xs text-white/50 mb-4">
-              Debug: Loading={loading}, Error={error}, ListingID={listingId}, HasListing={!!listing}
+              Debug: Loading="{loading}," Error="{error}," ListingID="{listingId}," HasListing="{!!listing}"
               {#if listing}
                 , Title={listing.title?.substring(0, 30)}...
               {/if}
@@ -686,12 +686,12 @@
           </ScrollLinkedAnimator>
 
           <!-- Image Gallery - Floating Blur Box -->
-          <ScrollLinkedAnimator animation="scale-in" startOffset={0.1} endOffset={0.7}>
+          <ScrollLinkedAnimator animation="scale-in" startOffset="{0.1}" endOffset="{0.7}">
             <div class="bg-white/20 backdrop-blur-xl rounded-2xl border border-white/30 p-8 shadow-2xl max-w-4xl mx-auto hover:bg-white/25 transition-all duration-300">
             <div class="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg overflow-hidden mb-4">
               <img
-                src={listing.images[activeImageIndex]}
-                alt={listing.title}
+                src="{listing.images[activeImageIndex]}"
+                alt="{listing.title}"
                 class="object-cover w-full h-full"
               />
             </div>
@@ -711,7 +711,7 @@
           </ScrollLinkedAnimator>
 
           <!-- Tabs - Floating Blur Box -->
-          <ScrollLinkedAnimator animation="fade-left" startOffset={0.2} endOffset={0.8} className="mt-16">
+          <ScrollLinkedAnimator animation="fade-left" startOffset="{0.2}" endOffset="{0.8}" className="mt-16">
             <div class="bg-white/20 backdrop-blur-xl rounded-2xl border border-white/30 p-8 shadow-2xl max-w-4xl mx-auto hover:bg-white/25 transition-all duration-300">
             <div class="border-b border-white/20">
               <nav class="flex -mb-px space-x-8 justify-center">
@@ -874,7 +874,7 @@
                         {#each (showAllReviews ? listing.reviews : listing.reviews.slice(0, 3)) as review}
                           <div class="border-b border-white/20 pb-6 last:border-b-0 last:pb-0">
                             <div class="flex items-start">
-                              <img src={review.userImage} alt={review.userName} class="h-10 w-10 rounded-full mr-4" />
+                              <img src="{review.userImage}" alt="{review.userName}" class="h-10 w-10 rounded-full mr-4" />
                               <div>
                                 <div class="flex items-center">
                                   <h4 class="font-medium text-white">{review.userName}</h4>
@@ -910,7 +910,7 @@
                 <div>
                   {#if listing.owner}
                     <div class="flex items-start">
-                      <img src={listing.owner.image} alt={listing.owner.name} class="h-16 w-16 rounded-full mr-4" />
+                      <img src="{listing.owner.image}" alt="{listing.owner.name}" class="h-16 w-16 rounded-full mr-4" />
                       <div>
                         <h3 class="text-lg font-medium text-white">{listing.owner.name}</h3>
                         <p class="text-white/70 text-sm">Member since {listing.owner.joinedDate}</p>
@@ -942,7 +942,7 @@
 
                         <button
                           class="mt-4 bg-white/10 hover:bg-white/20 text-white font-medium py-2 px-4 rounded-md border border-white/20 transition-colors"
-                          on:click={handleMessageOwner}
+                          on:click="{handleMessageOwner}"
                         >
                           Message {listing.owner.name}
                         </button>
@@ -958,7 +958,7 @@
           </ScrollLinkedAnimator>
 
         <!-- Booking Form -->
-        <ScrollLinkedAnimator animation="fade-right" startOffset={0.3} endOffset={0.9}>
+        <ScrollLinkedAnimator animation="fade-right" startOffset="{0.3}" endOffset="{0.9}">
           <div class="bg-white/20 backdrop-blur-xl rounded-2xl border border-white/30 shadow-2xl max-w-2xl mx-auto hover:bg-white/25 transition-all duration-300">
             <div class="p-6">
               <div class="flex items-center justify-between mb-6">
@@ -972,7 +972,7 @@
                 </div>
                 {#if listing.securityDeposit > 0}
                   <div class="text-sm text-white/70 text-right">
-                    {formatCurrency(listing.securityDeposit)} <br>security deposit
+                    {formatCurrency(listing.securityDeposit)} <br />security deposit
                   </div>
                 {/if}
               </div>
@@ -1048,7 +1048,7 @@
                           name="delivery"
                           value="pickup"
                           class="h-4 w-4 text-green-400 bg-white/10 border-white/20 focus:ring-green-400"
-                          bind:group={deliveryMethod}
+                          bind:group="{deliveryMethod}"
                         />
                         <label for="pickup" class="ml-3 block text-sm text-white">Pickup ({listing.deliveryOptions.pickupLocation})</label>
                       </div>
@@ -1062,7 +1062,7 @@
                           name="delivery"
                           value="dropoff"
                           class="h-4 w-4 text-green-400 bg-white/10 border-white/20 focus:ring-green-400"
-                          bind:group={deliveryMethod}
+                          bind:group="{deliveryMethod}"
                         />
                         <label for="dropoff" class="ml-3 block text-sm text-white">Delivery (within {listing.deliveryOptions.dropoffDistance} miles)</label>
                       </div>
@@ -1076,7 +1076,7 @@
                           name="delivery"
                           value="shipping"
                           class="h-4 w-4 text-green-400 bg-white/10 border-white/20 focus:ring-green-400"
-                          bind:group={deliveryMethod}
+                          bind:group="{deliveryMethod}"
                         />
                         <label for="shipping" class="ml-3 block text-sm text-white">Shipping</label>
                       </div>
@@ -1095,7 +1095,7 @@
                         name="insurance"
                         value="none"
                         class="h-4 w-4 text-green-400 bg-white/10 border-white/20 focus:ring-green-400"
-                        bind:group={insuranceTier}
+                        bind:group="{insuranceTier}"
                       />
                       <label for="insurance-none" class="ml-3 block text-sm text-white">No additional insurance</label>
                     </div>
@@ -1107,7 +1107,7 @@
                         name="insurance"
                         value="basic"
                         class="h-4 w-4 text-green-400 bg-white/10 border-white/20 focus:ring-green-400"
-                        bind:group={insuranceTier}
+                        bind:group="{insuranceTier}"
                       />
                       <label for="insurance-basic" class="ml-3 block text-sm text-white">Basic ($5/day)</label>
                     </div>
@@ -1119,7 +1119,7 @@
                         name="insurance"
                         value="standard"
                         class="h-4 w-4 text-green-400 bg-white/10 border-white/20 focus:ring-green-400"
-                        bind:group={insuranceTier}
+                        bind:group="{insuranceTier}"
                       />
                       <label for="insurance-standard" class="ml-3 block text-sm text-white">Standard ($10/day)</label>
                     </div>
@@ -1131,7 +1131,7 @@
                         name="insurance"
                         value="premium"
                         class="h-4 w-4 text-green-400 bg-white/10 border-white/20 focus:ring-green-400"
-                        bind:group={insuranceTier}
+                        bind:group="{insuranceTier}"
                       />
                       <label for="insurance-premium" class="ml-3 block text-sm text-white">Premium ($15/day)</label>
                     </div>
@@ -1206,16 +1206,16 @@
     <!-- Similar Products -->
     {#if similarListings && similarListings.length > 0}
       <div class="mt-16 text-center max-w-6xl mx-auto px-8 sm:px-12 lg:px-16">
-        <ScrollLinkedAnimator animation="fade-up" startOffset={0.4} endOffset={1.0}>
+        <ScrollLinkedAnimator animation="fade-up" startOffset="{0.4}" endOffset="{1.0}">
           <h2 class="text-2xl font-bold mb-6 text-white drop-shadow-lg">Similar Products</h2>
         </ScrollLinkedAnimator>
 
-        <ScrollLinkedSequential animation="scale-in" startOffset={0.5} endOffset={1.0} incrementDelay={0.1}>
+        <ScrollLinkedSequential animation="scale-in" startOffset="{0.5}" endOffset="{1.0}" incrementDelay="{0.1}">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 justify-center max-w-4xl mx-auto">
             {#each similarListings as item}
               <a href="/listing/{item.id}" class="bg-white/10 backdrop-blur-md rounded-lg border border-white/20 shadow-lg overflow-hidden hover:bg-white/20 transition-all">
                 <div class="aspect-w-16 aspect-h-9 bg-gray-200">
-                  <img src={item.images[0]} alt={item.title} class="object-cover w-full h-48" />
+                  <img src="{item.images[0]}" alt="{item.title}" class="object-cover w-full h-48" />
                 </div>
                 <div class="p-4">
                   <h3 class="font-medium text-lg mb-1 text-white">{item.title}</h3>

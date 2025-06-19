@@ -19,5 +19,5 @@
   {query}
   {category}
   {location}
-  on:search={handleSearch}
+  on:search="{handleSearch}"
 />

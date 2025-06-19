@@ -151,12 +151,12 @@
       <!-- Desktop category selector -->
       <div class="hidden md:block">
         <select
-          bind:value={selectedCategory}
-          on:change={handleCategoryChange}
+          bind:value="{selectedCategory}"
+          on:change="{handleCategoryChange}"
           class="form-select rounded-md border-gray-600 bg-gray-800/70 backdrop-blur-sm py-2 pl-3 pr-8 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
         >
           {#each categories as category}
-            <option value={category.id} class="bg-gray-800 text-white">
+            <option value="{category.id}" class="bg-gray-800 text-white">
               {category.icon ? `${category.icon} ` : ''}{category.name}
             </option>
           {/each}
@@ -166,12 +166,12 @@
       <!-- Sort selector -->
       <div>
         <select
-          bind:value={selectedSort}
-          on:change={handleSortChange}
+          bind:value="{selectedSort}"
+          on:change="{handleSortChange}"
           class="form-select rounded-md border-gray-600 bg-gray-800/70 backdrop-blur-sm py-2 pl-3 pr-8 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
         >
           {#each sortOptions as option}
-            <option value={option.id} class="bg-gray-800 text-white">{option.name}</option>
+            <option value="{option.id}" class="bg-gray-800 text-white">{option.name}</option>
           {/each}
         </select>
       </div>
@@ -198,7 +198,7 @@
           <span>{activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} active</span>
           <button
             class="ml-2 text-gray-400 hover:text-white"
-            on:click={resetFilters}
+            on:click="{resetFilters}"
             title="Clear all filters"
           >
             ✕
@@ -221,7 +221,7 @@
               <button
                 class="py-2 px-3 text-sm rounded-md border transition-colors {selectedCategory === category.id ? 'bg-green-600/80 border-green-500 text-white' : 'border-gray-600 bg-gray-700/50 text-gray-200 hover:border-gray-500'}"
                 on:click={() => { selectedCategory = category.id; applyFilters(); }}
-                aria-pressed={selectedCategory === category.id}
+                aria-pressed="{selectedCategory" === category.id}
               >
                 {category.icon} {category.name}
               </button>
@@ -243,22 +243,22 @@
                 min="0"
                 max="500"
                 step="5"
-                bind:value={priceRange[0]}
-                on:change={applyFilters}
+                bind:value="{priceRange[0]}"
+                on:change="{applyFilters}"
                 class="w-full accent-green-500"
                 aria-label="Minimum price"
               />
             </div>
             <div>
               <label for="price-max" class="text-xs text-gray-400">Max: ${priceRange[1]}</label>
-              <input
+              </input
                 id="price-max"
                 type="range"
                 min="0"
                 max="500"
                 step="5"
-                bind:value={priceRange[1]}
-                on:change={applyFilters}
+                bind:value="{priceRange[1]}"
+                on:change="{applyFilters}"
                 class="w-full accent-green-500"
                 aria-label="Maximum price"
               />
@@ -274,9 +274,9 @@
               <button
                 class="py-2 px-3 text-sm rounded-md border transition-colors {selectedConditions.includes(condition.id) ? 'bg-green-600/80 border-green-500 text-white' : 'border-gray-600 bg-gray-700/50 text-gray-200 hover:border-gray-500'}"
                 on:click={() => toggleCondition(condition.id)}
-                aria-pressed={selectedConditions.includes(condition.id)}
+                aria-pressed="{selectedConditions.includes(condition.id)}"
               >
-                <span class={condition.color}>●</span> {condition.name}
+                <span class="{condition.color}">●</span> {condition.name}
               </button>
             {/each}
           </div>
@@ -288,9 +288,9 @@
           <div class="space-y-2">
             {#each deliveryOptions as option}
               <Checkbox
-                checked={selectedDeliveryOptions.includes(option.id)}
+                checked="{selectedDeliveryOptions.includes(option.id)}"
                 label="{option.icon} {option.name}"
-                on:change={() => toggleDeliveryOption(option.id)}
+                on:change="{()" => toggleDeliveryOption(option.id)}
               />
             {/each}
           </div>
@@ -301,14 +301,14 @@
           <div class="block text-sm font-medium text-white mb-3">Quick Options</div>
           <div class="space-y-3">
             <Checkbox
-              bind:checked={verifiedOwners}
+              bind:checked="{verifiedOwners}"
               label="✓ Verified Owners Only"
-              on:change={applyFilters}
+              on:change="{applyFilters}"
             />
             <Checkbox
-              bind:checked={instantBook}
+              bind:checked="{instantBook}"
               label="⚡ Instant Book Available"
-              on:change={applyFilters}
+              on:change="{applyFilters}"
             />
           </div>
         </div>
@@ -318,14 +318,14 @@
           <label for="min-rating" class="block text-sm font-medium text-white mb-3">
             Minimum Rating: {minRating > 0 ? `${minRating}+ stars` : 'Any rating'}
           </label>
-          <input
+          </input
             id="min-rating"
             type="range"
             min="0"
             max="5"
             step="0.5"
-            bind:value={minRating}
-            on:change={applyFilters}
+            bind:value="{minRating}"
+            on:change="{applyFilters}"
             class="w-full accent-green-500"
             aria-label="Minimum rating filter"
           />
@@ -339,13 +339,13 @@
         <div class="flex space-x-3 pt-4 border-t border-gray-700">
           <button
             class="flex-1 bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 transition-colors font-medium"
-            on:click={applyFilters}
+            on:click="{applyFilters}"
           >
             Apply Filters
           </button>
           <button
             class="flex-1 bg-gray-600 text-white py-3 px-4 rounded-md hover:bg-gray-700 transition-colors font-medium"
-            on:click={resetFilters}
+            on:click="{resetFilters}"
           >
             Reset All
           </button>

@@ -8,7 +8,7 @@
       preview: 'Hi, I\'m interested in renting your Trek X-Caliber for the weekend...',
       timestamp: '2 hours ago',
       unread: true,
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"
     },
     {
       id: '2',
@@ -17,7 +17,7 @@
       preview: 'Please confirm the pickup time for the camping tent rental...',
       timestamp: '1 day ago',
       unread: false,
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'
+      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"
     }
   ];
 </script>
@@ -120,7 +120,7 @@
             <div class="border border-white/20 rounded-lg p-4 hover:bg-white/5 transition-all bg-white/5 cursor-pointer">
               <div class="flex items-center space-x-4">
                 <div class="flex-shrink-0">
-                  <img class="h-12 w-12 rounded-full" src={message.avatar} alt={message.from} />
+                  <img class="h-12 w-12 rounded-full" src="{message.avatar}" alt="{message.from}" />
                   {#if message.unread}
                     <div class="absolute -mt-2 -ml-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white"></div>
                   {/if}

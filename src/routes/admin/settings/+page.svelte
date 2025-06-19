@@ -124,8 +124,8 @@
       <p class="text-gray-400 mt-1">Configure platform settings and preferences</p>
     </div>
     <button
-      on:click={saveSettings}
-      disabled={loading}
+      on:click="{saveSettings}"
+      disabled="{loading}"
       class="bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-black font-medium py-2 px-6 rounded-lg transition-colors"
     >
       {loading ? 'Saving...' : 'Save Settings'}
@@ -137,19 +137,19 @@
     <h2 class="text-xl font-bold text-white mb-4">Platform Settings</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Site Name</label>
-        <input
+        <label for="site-name" class="block text-sm font-medium text-gray-300 mb-2">Site Name</label>
+        <input id="site-name"
           type="text"
-          bind:value={settings.platform.siteName}
+          bind:value="{settings.platform.siteName}"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
       </div>
       
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Site Description</label>
-        <input
+        <label for="site-description" class="block text-sm font-medium text-gray-300 mb-2">Site Description</label>
+        <input id="site-description"
           type="text"
-          bind:value={settings.platform.siteDescription}
+          bind:value="{settings.platform.siteDescription}"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
       </div>
@@ -158,19 +158,19 @@
     <div class="mt-6 space-y-4">
       <div class="flex items-center">
         <Checkbox
-          bind:checked={settings.platform.maintenanceMode}
+          bind:checked="{settings.platform.maintenanceMode}"
           label="Maintenance Mode"
         />
         <span class="ml-2 text-gray-400 text-sm">(Disables public access)</span>
       </div>
 
       <Checkbox
-        bind:checked={settings.platform.allowNewRegistrations}
+        bind:checked="{settings.platform.allowNewRegistrations}"
         label="Allow New Registrations"
       />
 
       <Checkbox
-        bind:checked={settings.platform.requireEmailVerification}
+        bind:checked="{settings.platform.requireEmailVerification}"
         label="Require Email Verification"
       />
     </div>
@@ -181,65 +181,65 @@
     <h2 class="text-xl font-bold text-white mb-4">Payment Settings</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Platform Fee (%)</label>
-        <input
+        <label for="platform-fee" class="block text-sm font-medium text-gray-300 mb-2">Platform Fee (%)</label>
+        <input id="platform-fee"
           type="number"
           min="0"
           max="50"
           step="0.1"
-          bind:value={settings.payments.platformFeePercentage}
+          bind:value="{settings.payments.platformFeePercentage}"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
       </div>
       
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Min Booking Amount ($)</label>
-        <input
+        <label for="min-booking-amount" class="block text-sm font-medium text-gray-300 mb-2">Min Booking Amount ($)</label>
+        <input id="min-booking-amount"
           type="number"
           min="1"
-          bind:value={settings.payments.minimumBookingAmount}
+          bind:value="{settings.payments.minimumBookingAmount}"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
       </div>
       
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Max Booking Amount ($)</label>
-        <input
+        <label for="max-booking-amount" class="block text-sm font-medium text-gray-300 mb-2">Max Booking Amount ($)</label>
+        <input id="max-booking-amount"
           type="number"
           min="100"
-          bind:value={settings.payments.maximumBookingAmount}
+          bind:value="{settings.payments.maximumBookingAmount}"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
       </div>
     </div>
     
-    <div class="mt-6">
-      <label class="block text-sm font-medium text-gray-300 mb-2">Payment Methods</label>
+    <fieldset class="mt-6">
+      <legend class="block text-sm font-medium text-gray-300 mb-2">Payment Methods</legend>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
         {#each paymentMethodOptions as method}
           <Checkbox
-            checked={settings.payments.paymentMethods.includes(method.value)}
-            label={method.label}
+            checked="{settings.payments.paymentMethods.includes(method.value)}"
+            label="{method.label}"
             on:change={() => togglePaymentMethod(method.value)}
           />
         {/each}
       </div>
-    </div>
+    </fieldset>
 
     <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
       <Checkbox
-        bind:checked={settings.payments.autoPayoutEnabled}
+        bind:checked="{settings.payments.autoPayoutEnabled}"
         label="Auto Payout Enabled"
       />
       
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Payout Schedule</label>
-        <select
-          bind:value={settings.payments.payoutSchedule}
+        <label for="payout-schedule" class="block text-sm font-medium text-gray-300 mb-2">Payout Schedule</label>
+        <select id="payout-schedule"
+          bind:value="{settings.payments.payoutSchedule}"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         >
           {#each payoutScheduleOptions as option}
-            <option value={option.value}>{option.label}</option>
+            <option value="{option.value}">{option.label}</option>
           {/each}
         </select>
       </div>
@@ -251,34 +251,34 @@
     <h2 class="text-xl font-bold text-white mb-4">Security Settings</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Max Login Attempts</label>
-        <input
+        <label for="max-login-attempts" class="block text-sm font-medium text-gray-300 mb-2">Max Login Attempts</label>
+        <input id="max-login-attempts"
           type="number"
           min="3"
           max="10"
-          bind:value={settings.security.maxLoginAttempts}
+          bind:value="{settings.security.maxLoginAttempts}"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
       </div>
       
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Session Timeout (minutes)</label>
-        <input
+        <label for="session-timeout-minutes" class="block text-sm font-medium text-gray-300 mb-2">Session Timeout (minutes)</label>
+        <input id="session-timeout-minutes"
           type="number"
           min="15"
           max="480"
-          bind:value={settings.security.sessionTimeout}
+          bind:value="{settings.security.sessionTimeout}"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
       </div>
       
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Min Password Length</label>
-        <input
+        <label for="min-password-length" class="block text-sm font-medium text-gray-300 mb-2">Min Password Length</label>
+        <input id="min-password-length"
           type="number"
           min="6"
           max="20"
-          bind:value={settings.security.passwordMinLength}
+          bind:value="{settings.security.passwordMinLength}"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
       </div>
@@ -288,13 +288,13 @@
       <!-- HIDDEN: Background check setting temporarily disabled -->
       <!--
       <Checkbox
-        bind:checked={settings.security.requireBackgroundChecks}
+        bind:checked="{settings.security.requireBackgroundChecks}"
         label="Require Background Checks"
       />
       -->
 
       <Checkbox
-        bind:checked={settings.security.twoFactorRequired}
+        bind:checked="{settings.security.twoFactorRequired}"
         label="Require Two-Factor Authentication"
       />
     </div>
@@ -306,29 +306,29 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="space-y-4">
         <Checkbox
-          bind:checked={settings.notifications.emailNotifications}
+          bind:checked="{settings.notifications.emailNotifications}"
           label="Email Notifications"
         />
 
         <Checkbox
-          bind:checked={settings.notifications.smsNotifications}
+          bind:checked="{settings.notifications.smsNotifications}"
           label="SMS Notifications"
         />
 
         <Checkbox
-          bind:checked={settings.notifications.pushNotifications}
+          bind:checked="{settings.notifications.pushNotifications}"
           label="Push Notifications"
         />
       </div>
 
       <div class="space-y-4">
         <Checkbox
-          bind:checked={settings.notifications.adminAlerts}
+          bind:checked="{settings.notifications.adminAlerts}"
           label="Admin Alerts"
         />
 
         <Checkbox
-          bind:checked={settings.notifications.userWelcomeEmails}
+          bind:checked="{settings.notifications.userWelcomeEmails}"
           label="User Welcome Emails"
         />
       </div>
@@ -340,44 +340,44 @@
     <h2 class="text-xl font-bold text-white mb-4">Content Settings</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Max Listing Images</label>
-        <input
+        <label for="max-listing-images" class="block text-sm font-medium text-gray-300 mb-2">Max Listing Images</label>
+        <input id="max-listing-images"
           type="number"
           min="1"
           max="20"
-          bind:value={settings.content.maxListingImages}
+          bind:value="{settings.content.maxListingImages}"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
       </div>
       
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Max Description Length</label>
-        <input
+        <label for="max-description-length" class="block text-sm font-medium text-gray-300 mb-2">Max Description Length</label>
+        <input id="max-description-length"
           type="number"
           min="100"
           max="5000"
-          bind:value={settings.content.maxListingDescriptionLength}
+          bind:value="{settings.content.maxListingDescriptionLength}"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
       </div>
       
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Max File Size (MB)</label>
-        <input
+        <label for="max-file-size-mb" class="block text-sm font-medium text-gray-300 mb-2">Max File Size (MB)</label>
+        <input id="max-file-size-mb"
           type="number"
           min="1"
           max="50"
-          bind:value={settings.content.maxFileSize}
+          bind:value="{settings.content.maxFileSize}"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
       </div>
     </div>
     
     <div class="mt-6">
-      <label class="block text-sm font-medium text-gray-300 mb-2">Allowed File Types</label>
-      <input
+      <label for="allowed-file-types" class="block text-sm font-medium text-gray-300 mb-2">Allowed File Types</label>
+      <input id="allowed-file-types"
         type="text"
-        bind:value={settings.content.allowedFileTypes}
+        bind:value="{settings.content.allowedFileTypes}"
         placeholder="jpg, jpeg, png, pdf"
         class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
       />
@@ -386,7 +386,7 @@
     
     <div class="mt-6">
       <Checkbox
-        bind:checked={settings.content.moderationEnabled}
+        bind:checked="{settings.content.moderationEnabled}"
         label="Content Moderation Enabled"
       />
     </div>
@@ -395,8 +395,8 @@
   <!-- Save Button -->
   <div class="flex justify-end">
     <button
-      on:click={saveSettings}
-      disabled={loading}
+      on:click="{saveSettings}"
+      disabled="{loading}"
       class="bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-black font-medium py-3 px-8 rounded-lg transition-colors"
     >
       {loading ? 'Saving Settings...' : 'Save All Settings'}

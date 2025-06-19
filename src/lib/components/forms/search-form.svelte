@@ -89,22 +89,22 @@
   }
 </script>
 
-<form on:submit={handleSubmit} class="w-full">
+<form on:submit="{handleSubmit}" class="w-full">
   <div class="flex flex-col gap-3 items-center">
     <!-- Search Input with Autocomplete -->
     <div class="w-full relative z-[100]">
       <SearchInput
-        bind:value={selectedQuery}
+        bind:value="{selectedQuery}"
         placeholder="What gear do you need?"
-        on:input={handleQueryInput}
-        on:focus={handleQueryFocus}
-        on:blur={handleQueryBlur}
+        on:input="{handleQueryInput}"
+        on:focus="{handleQueryFocus}"
+        on:blur="{handleQueryBlur}"
       />
 
       <SearchSuggestions
         {suggestions}
-        show={showSuggestions}
-        on:select={handleSuggestionSelect}
+        show="{showSuggestions}"
+        on:select="{handleSuggestionSelect}"
       />
     </div>
 
@@ -112,7 +112,7 @@
     <div class="w-full">
       <input
         type="text"
-        bind:value={selectedLocation}
+        bind:value="{selectedLocation}"
         placeholder="Where?"
         class="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-800/70 backdrop-blur-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white placeholder-gray-300 text-sm md:text-base transition-colors duration-200"
         style="background-color: rgba(31, 41, 55, 0.7) !important; border-color: rgb(75, 85, 99) !important; color: white !important;"

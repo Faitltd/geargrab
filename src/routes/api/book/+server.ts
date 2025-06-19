@@ -120,8 +120,7 @@ Hi ${data.renterName}!
 Great news! Your booking request has been successfully submitted and is now pending approval from the gear owner.
 
 BOOKING SUMMARY
-===============
-Confirmation #: ${data.confirmationNumber}
+========Confirmation #: ${data.confirmationNumber}
 Item: ${data.listingTitle}
 Hosted by: ${data.ownerName}
 Check-in: ${data.startDate}
@@ -229,8 +228,7 @@ Hi ${data.ownerName}!
 You have a new booking request for your listing.
 
 BOOKING DETAILS
-===============
-Renter: ${data.renterName}
+========Renter: ${data.renterName}
 Item: ${data.listingTitle}
 Dates: ${data.startDate} - ${data.endDate}
 Total: $${data.totalPrice}

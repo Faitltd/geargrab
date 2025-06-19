@@ -32,16 +32,16 @@
   <div class="checkbox-wrapper-12">
     <div class="cbx">
       <input
-        id={uniqueId}
+        id="{uniqueId}"
         type="checkbox"
         {name}
         {value}
         {disabled}
         {required}
         bind:checked
-        on:change={handleChange}
+        on:change="{handleChange}"
       />
-      <label for={uniqueId}></label>
+      <label for="{uniqueId}"></label>
       <svg width="15" height="14" viewBox="0 0 15 14" fill="none">
         <path d="M2 8.36364L6.23077 12L13 2"></path>
       </svg>
@@ -49,7 +49,7 @@
   </div>
   
   {#if label}
-    <label for={uniqueId} class="cursor-pointer {labelClass}">
+    <label for="{uniqueId}" class="cursor-pointer {labelClass}">
       {label}
     </label>
   {/if}

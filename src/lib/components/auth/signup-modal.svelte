@@ -137,13 +137,13 @@
   }
 </script>
 
-<Modal bind:show title="Create Your Account" on:close={handleClose}>
+<Modal bind:show title="Create Your Account" on:close="{handleClose}">
   <div class="p-6">
     <!-- Google Sign-up Option -->
     <div class="mb-6">
       <GoogleAuthButton
-        on:success={handleGoogleSignup}
-        on:error={(e) => errors.auth = e.detail.message}
+        on:success="{handleGoogleSignup}"
+        on:error="{(e)" => errors.auth = e.detail.message}
         {loading}
         buttonText="Sign up with Google"
       />
@@ -159,13 +159,13 @@
     </div>
 
     <!-- Signup Form -->
-    <form on:submit|preventDefault={handleSignup} class="space-y-4">
+    <form on:submit|preventDefault="{handleSignup}" class="space-y-4">
       <FormField
         label="Email Address"
         type="email"
-        bind:value={email}
-        error={errors.email}
-        disabled={loading}
+        bind:value="{email}"
+        error="{errors.email}"
+        disabled="{loading}"
         required
         autocomplete="email"
       />
@@ -173,31 +173,31 @@
       <FormField
         label="Password"
         type="password"
-        bind:value={password}
-        error={errors.password}
-        disabled={loading}
+        bind:value="{password}"
+        error="{errors.password}"
+        disabled="{loading}"
         required
         autocomplete="new-password"
         placeholder="At least 6 characters"
       />
 
-      <FormField
+      </FormField
         label="Confirm Password"
         type="password"
-        bind:value={confirmPassword}
-        error={errors.confirmPassword}
-        disabled={loading}
+        bind:value="{confirmPassword}"
+        error="{errors.confirmPassword}"
+        disabled="{loading}"
         required
         autocomplete="new-password"
       />
 
-      <ErrorAlert error={errors.auth} />
+      <ErrorAlert error="{errors.auth}" />
 
       <FormButton
         type="submit"
         variant="primary"
         {loading}
-        disabled={loading}
+        disabled="{loading}"
         class="w-full"
       >
         {loading ? 'Creating Account...' : 'Create Account'}
@@ -210,7 +210,7 @@
         Already have an account?
         <button
           type="button"
-          on:click={switchToLogin}
+          on:click="{switchToLogin}"
           class="text-green-400 hover:text-green-300 underline font-medium"
         >
           Sign in here
@@ -222,11 +222,11 @@
     <div class="mt-6 text-center">
       <p class="text-xs text-gray-400">
         By creating an account, you agree to our
-        <a href="/terms" class="text-green-400 hover:text-green-300 underline" on:click={handleClose}>
+        <a href="/terms" class="text-green-400 hover:text-green-300 underline" on:click="{handleClose}">
           Terms of Service
         </a>
         and
-        <a href="/privacy" class="text-green-400 hover:text-green-300 underline" on:click={handleClose}>
+        <a href="/privacy" class="text-green-400 hover:text-green-300 underline" on:click="{handleClose}">
           Privacy Policy
         </a>
       </p>

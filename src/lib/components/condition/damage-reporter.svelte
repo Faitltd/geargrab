@@ -103,27 +103,27 @@
           </label>
           <select
             id="damage-type"
-            bind:value={newDamage.type}
+            bind:value="{newDamage.type}"
             class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
             {#each damageTypes as type}
-              <option value={type.value}>{type.label}</option>
+              <option value="{type.value}">{type.label}</option>
             {/each}
           </select>
         </div>
 
         <!-- Severity -->
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">
+          <label for="severity" class="block text-sm font-medium text-gray-300 mb-2">
             Severity *
           </label>
           <div class="grid grid-cols-3 gap-3">
             {#each severityLevels as severity}
               <label class="severity-option">
-                <input
+                <input id="severity"
                   type="radio"
-                  bind:group={newDamage.severity}
-                  value={severity.value}
+                  bind:group="{newDamage.severity}"
+                  value="{severity.value}"
                   class="sr-only"
                 />
                 <div class="severity-card {newDamage.severity === severity.value ? 'selected' : ''}">
@@ -141,7 +141,7 @@
           </label>
           <textarea
             id="damage-description"
-            bind:value={newDamage.description}
+            bind:value="{newDamage.description}"
             rows="3"
             placeholder="Describe the damage in detail..."
             class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -159,7 +159,7 @@
             <input
               id="estimated-cost"
               type="number"
-              bind:value={newDamage.estimatedCost}
+              bind:value="{newDamage.estimatedCost}"
               min="0"
               step="0.01"
               placeholder="0.00"
@@ -173,7 +173,7 @@
           <input
             id="repair-required"
             type="checkbox"
-            bind:checked={newDamage.repairRequired}
+            bind:checked="{newDamage.repairRequired}"
             class="w-4 h-4 text-orange-600 bg-white/10 border-white/20 rounded focus:ring-orange-500"
           />
           <label for="repair-required" class="ml-2 text-sm text-gray-300">
@@ -181,16 +181,15 @@
           </label>
         </div>
 
-        <!-- Discovered By -->
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">
+        <!-- Discovered By<label for="discovered-by" class="block text-sm font-medium text-gray-300 mb-2">
             Discovered By
+          </label>covered By
           </label>
           <div class="grid grid-cols-2 gap-3">
             <label class="discoverer-option">
-              <input
+              <input id="discovered-by"
                 type="radio"
-                bind:group={newDamage.discoveredBy}
+                bind:group="{newDamage.discoveredBy}"
                 value="owner"
                 class="sr-only"
               />
@@ -198,10 +197,10 @@
                 <span class="discoverer-label">Owner</span>
               </div>
             </label>
-            <label class="discoverer-option">
+            </label class="discoverer-option">
               <input
                 type="radio"
-                bind:group={newDamage.discoveredBy}
+                bind:group="{newDamage.discoveredBy}"
                 value="renter"
                 class="sr-only"
               />
@@ -216,15 +215,15 @@
         <div class="flex justify-end space-x-3 pt-4">
           <button
             type="button"
-            on:click={cancelDamage}
+            on:click="{cancelDamage}"
             class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
           >
             Cancel
           </button>
           <button
             type="button"
-            on:click={submitDamage}
-            disabled={saving || !newDamage.description.trim()}
+            on:click="{submitDamage}"
+            disabled="{saving" || !newDamage.description.trim()}
             class="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
           >
             {#if saving}

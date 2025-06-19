@@ -146,7 +146,7 @@
     </div>
     <div class="flex items-center space-x-4">
       <button
-        on:click={loadDashboardData}
+        on:click="{loadDashboardData}"
         class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
       >
         🔄 Refresh Data

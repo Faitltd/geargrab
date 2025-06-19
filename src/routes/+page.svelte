@@ -60,7 +60,7 @@
         category: product.category,
         dailyPrice: product.dailyPrice,
         images: product.images || [],
-        primaryImage: product.images?.[0] || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+        primaryImage: product.images?.[0] || "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
         location: product.location,
         averageRating: product.reviews.length > 0
           ? product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length
@@ -81,7 +81,7 @@
 <VideoBackground
   videoSrc="/1877846-hd_1920_1080_30fps.mp4"
   imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
-  overlayOpacity={0.4}
+  overlayOpacity="{0.4}"
 />
 
 <!-- Page Content with Video Background -->
@@ -113,7 +113,7 @@
     </div>
 
     <!-- Stats -->
-    <ScrollLinkedSequential animation="scale-in" startOffset={0.1} endOffset={0.5} incrementDelay={0.1}>
+    <ScrollLinkedSequential animation="scale-in" startOffset="{0.1}" endOffset="{0.5}" incrementDelay="{0.1}">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mt-8">
         {#each stats as stat}
           <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 shadow-lg">
@@ -132,7 +132,7 @@
 
       <!-- Featured Listings with Clean Cards -->
       <div class="text-center mb-20">
-        <ScrollLinkedAnimator animation="fade-up" startOffset={0.2} endOffset={0.6}>
+        <ScrollLinkedAnimator animation="fade-up" startOffset="{0.2}" endOffset="{0.6}">
           <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
             <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Featured Listings</h2>
             <p class="text-xl text-gray-200 drop-shadow-lg">
@@ -141,7 +141,7 @@
           </div>
         </ScrollLinkedAnimator>
 
-        <ScrollLinkedSequential animation="scale-in" startOffset={0.3} endOffset={0.8} incrementDelay={0.1}>
+        <ScrollLinkedSequential animation="scale-in" startOffset="{0.3}" endOffset="{0.8}" incrementDelay="{0.1}">
           <div class="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto mb-12">
             {#if featuredListings.length > 0}
               {#each featuredListings as listing}
@@ -186,7 +186,7 @@
 
       <!-- Explore Categories -->
       <div class="text-center mb-20">
-        <ScrollLinkedAnimator animation="fade-up" startOffset={0.4} endOffset={0.8}>
+        <ScrollLinkedAnimator animation="fade-up" startOffset="{0.4}" endOffset="{0.8}">
           <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
             <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Explore Categories</h2>
             <p class="text-xl text-gray-200 drop-shadow-lg">
@@ -195,19 +195,18 @@
           </div>
         </ScrollLinkedAnimator>
 
-        <ScrollLinkedSequential animation="scale-in" startOffset={0.5} endOffset={0.9} incrementDelay={0.05}>
+        <ScrollLinkedSequential animation="scale-in" startOffset="{0.5}" endOffset="{0.9}" incrementDelay="{0.05}">
           <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 max-w-6xl mx-auto">
             {#each categories as category}
               <a href="/browse?category={category.id}" class="group">
                 <div class="bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20 hover:border-green-500 transition-all duration-300 hover:transform hover:scale-105 shadow-lg hover:shadow-xl">
                   <div class="relative h-24 overflow-hidden">
                     <img
-                      src={category.image}
-                      alt={category.name}
+                      src="{category.image}"
+                      alt="{category.name}"
                       class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       loading="lazy"
-                      on:error={handleImageError}
-                    >
+                      on:error="{handleImageError}" />
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                   <div class="p-3">
@@ -222,7 +221,7 @@
 
       <!-- Why Choose GearGrab -->
       <div class="text-center mb-20">
-        <ScrollLinkedAnimator animation="fade-up" startOffset={0.2} endOffset={0.8}>
+        <ScrollLinkedAnimator animation="fade-up" startOffset="{0.2}" endOffset="{0.8}">
           <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-12 max-w-2xl mx-auto border border-white/20 shadow-lg">
             <h2 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">Why Choose GearGrab?</h2>
             <p class="text-xl text-gray-200 drop-shadow-lg">
@@ -231,7 +230,7 @@
           </div>
         </ScrollLinkedAnimator>
 
-        <ScrollLinkedSequential animation="fade-up" startOffset={0.3} endOffset={0.9} incrementDelay={0.15}>
+        <ScrollLinkedSequential animation="fade-up" startOffset="{0.3}" endOffset="{0.9}" incrementDelay="{0.15}">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {#each features as feature}
               <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 hover:border-green-500 transition-all duration-300 shadow-lg">
@@ -246,7 +245,7 @@
 
       <!-- Call to Action -->
       <div class="text-center">
-        <ScrollLinkedAnimator animation="scale-in" startOffset={0.8} endOffset={1.0}>
+        <ScrollLinkedAnimator animation="scale-in" startOffset="{0.8}" endOffset="{1.0}">
           <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 max-w-3xl mx-auto border border-white/20 shadow-lg">
             <h2 class="text-4xl font-bold text-white mb-6 drop-shadow-lg">Ready to Start Your Adventure?</h2>
             <p class="text-xl text-gray-200 mb-8 drop-shadow-lg">

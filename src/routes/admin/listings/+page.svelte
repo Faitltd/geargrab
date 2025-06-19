@@ -191,10 +191,10 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <!-- Search -->
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Search Listings</label>
-        <input
+        <label for="search-listings" class="block text-sm font-medium text-gray-300 mb-2">Search Listings</label>
+        <input id="search-listings"
           type="text"
-          bind:value={searchQuery}
+          bind:value="{searchQuery}"
           placeholder="Search by title, description, or owner..."
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
@@ -202,13 +202,13 @@
 
       <!-- Status Filter -->
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Status Filter</label>
-        <select
-          bind:value={statusFilter}
+        <label for="status-filter" class="block text-sm font-medium text-gray-300 mb-2">Status Filter</label>
+        <select id="status-filter"
+          bind:value="{statusFilter}"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         >
           {#each statusOptions as option}
-            <option value={option.value}>{option.label}</option>
+            <option value="{option.value}">{option.label}</option>
           {/each}
         </select>
       </div>
@@ -254,7 +254,7 @@
                   <div class="flex items-center">
                     <div class="h-12 w-12 bg-gray-600 rounded-lg mr-4 flex items-center justify-center">
                       {#if listing.images && listing.images[0]}
-                        <img src={listing.images[0]} alt={listing.title} class="h-12 w-12 rounded-lg object-cover" />
+                        <img src="{listing.images[0]}" alt="{listing.title}" class="h-12 w-12 rounded-lg object-cover" />
                       {:else}
                         <span class="text-gray-400">📦</span>
                       {/if}
@@ -333,18 +333,18 @@
       
       <div class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Title</label>
-          <input
+          <label for="title" class="block text-sm font-medium text-gray-300 mb-2">Title</label>
+          <input id="title"
             type="text"
-            bind:value={selectedListing.title}
+            bind:value="{selectedListing.title}"
             class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
           />
         </div>
         
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Description</label>
-          <textarea
-            bind:value={selectedListing.description}
+          <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Description</label>
+          <textarea id="description"
+            bind:value="{selectedListing.description}"
             rows="4"
             class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
           ></textarea>
@@ -352,19 +352,19 @@
         
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Daily Price</label>
-            <input
+            <label for="daily-price" class="block text-sm font-medium text-gray-300 mb-2">Daily Price</label>
+            <input id="daily-price"
               type="number"
-              bind:value={selectedListing.dailyPrice}
+              bind:value="{selectedListing.dailyPrice}"
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
           </div>
           
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Category</label>
-            <input
+            <label for="category" class="block text-sm font-medium text-gray-300 mb-2">Category</label>
+            <input id="category"
               type="text"
-              bind:value={selectedListing.category}
+              bind:value="{selectedListing.category}"
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
           </div>
@@ -373,13 +373,13 @@
       
       <div class="flex justify-end space-x-4 mt-6">
         <button
-          on:click={closeEditModal}
+          on:click="{closeEditModal}"
           class="px-4 py-2 text-gray-400 hover:text-white transition-colors"
         >
           Cancel
         </button>
         <button
-          on:click={saveListing}
+          on:click="{saveListing}"
           class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-medium rounded-lg transition-colors"
         >
           Save Changes

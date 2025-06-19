@@ -94,7 +94,7 @@
           <input
             id="testPassword"
             type="password"
-            bind:value={testPassword}
+            bind:value="{testPassword}"
             placeholder="Enter a password to test strength..."
           />
           
@@ -204,7 +204,7 @@
       <h3>Test with cURL:</h3>
       <pre><code>curl -X POST "http://localhost:5173/api/auth/register" \
   -H "Content-Type: application/json" \
-  -d '{
+  -d '&#123;
     "email": "test@example.com",
     "password": "SecurePass123!",
     "confirmPassword": "SecurePass123!",
@@ -212,7 +212,7 @@
     "lastName": "Doe",
     "agreeToTerms": true,
     "agreeToPrivacy": true
-  }'</code></pre>
+  &#125;'</code></pre>
     </div>
   </section>
 </div>

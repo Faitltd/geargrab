@@ -49,8 +49,7 @@
     <img
       src="/pexels-bianca-gasparoto-834990-1752951.jpg"
       alt="Mountain landscape"
-      class="w-full h-full object-cover"
-    >
+      class="w-full h-full object-cover" />
   </div>
   <div class="absolute inset-0 bg-black opacity-40"></div>
 </div>
@@ -75,14 +74,14 @@
           
           <div class="mt-4 space-y-2">
             <button
-              on:click={handleSignOut}
+              on:click="{handleSignOut}"
               class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
             >
               Sign Out
             </button>
             
             <button
-              on:click={handleRefreshAuth}
+              on:click="{handleRefreshAuth}"
               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors ml-2"
             >
               Refresh Auth

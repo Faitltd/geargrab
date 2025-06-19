@@ -51,8 +51,8 @@
     <div class="flex items-start space-x-4">
       {#if listing.images[0]}
         <img 
-          src={listing.images[0]} 
-          alt={listing.title}
+          src="{listing.images[0]}" 
+          alt="{listing.title}"
           class="w-20 h-20 object-cover rounded-lg"
         />
       {/if}
@@ -124,15 +124,15 @@
   <!-- Action Buttons -->
   <div class="flex space-x-4">
     <button
-      on:click={handleCancel}
+      on:click="{handleCancel}"
       class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
     >
       Cancel
     </button>
     
     <button
-      on:click={handleProceed}
-      disabled={!canProceed || processing}
+      on:click="{handleProceed}"
+      disabled="{!canProceed" || processing}
       class="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors"
     >
       {#if processing}

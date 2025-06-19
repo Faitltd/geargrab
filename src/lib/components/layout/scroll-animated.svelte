@@ -62,7 +62,7 @@
 </script>
 
 <div 
-  bind:this={element}
+  bind:this="{element}"
   class="animate-on-scroll {animationClass} {className}"
   style="transform: {parallaxTransform}; animation-delay: {delay}ms;"
 >

@@ -129,7 +129,7 @@
 <div class="booking-wizard">
   <!-- Step Indicator -->
   <div class="mb-8">
-    <StepIndicator {steps} currentStep={currentStepIndex} />
+    <StepIndicator {steps} currentStep="{currentStepIndex}" />
   </div>
 
   <!-- Error Display -->
@@ -156,8 +156,8 @@
         {dateValidation}
         {canProceed}
         {processing}
-        on:proceed={handleProceedToPayment}
-        on:cancel={handleCancel}
+        on:proceed="{handleProceedToPayment}"
+        on:cancel="{handleCancel}"
       />
     </AuthGuard>
   {:else if currentStep === 'payment'}
@@ -165,9 +165,9 @@
       {listing}
       {rentalFees}
       {paymentMetadata}
-      on:success={handlePaymentSuccess}
-      on:error={handlePaymentError}
-      on:back={handleBack}
+      on:success="{handlePaymentSuccess}"
+      on:error="{handlePaymentError}"
+      on:back="{handleBack}"
     />
   {/if}
 </div>

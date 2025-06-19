@@ -64,7 +64,7 @@
 <VideoBackground
   videoSrc="/1877846-hd_1920_1080_30fps.mp4"
   imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
-  overlayOpacity={0.4}
+  overlayOpacity="{0.4}"
 />
 
 <!-- Page Content with Video Background -->
@@ -81,7 +81,7 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <!-- Contact Form -->
-        <ScrollAnimated animation="fade-left" delay={400}>
+        <ScrollAnimated animation="fade-left" delay="{400}">
           <div>
           <h2 class="text-2xl font-bold mb-6 text-white drop-shadow-lg">Send us a message</h2>
 
@@ -99,7 +99,7 @@
             </div>
           {/if}
 
-          <form on:submit|preventDefault={handleSubmit} class="space-y-6">
+          <form on:submit|preventDefault="{handleSubmit}" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label for="name" class="block text-sm font-medium text-white mb-2 drop-shadow-lg">Name *</label>
@@ -108,7 +108,7 @@
                   id="name"
                   class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
                   placeholder="Your full name"
-                  bind:value={formData.name}
+                  bind:value="{formData.name}"
                   required
                 />
               </div>
@@ -119,7 +119,7 @@
                   id="email"
                   class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
                   placeholder="your.email@example.com"
-                  bind:value={formData.email}
+                  bind:value="{formData.email}"
                   required
                 />
               </div>
@@ -130,10 +130,10 @@
               <select
                 id="category"
                 class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white focus:ring-green-500 focus:border-green-500 shadow-lg"
-                bind:value={formData.category}
+                bind:value="{formData.category}"
               >
                 {#each categories as category}
-                  <option value={category.id} class="bg-gray-800 text-white">{category.name}</option>
+                  <option value="{category.id}" class="bg-gray-800 text-white">{category.name}</option>
                 {/each}
               </select>
             </div>
@@ -145,7 +145,7 @@
                 id="subject"
                 class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
                 placeholder="Brief description of your inquiry"
-                bind:value={formData.subject}
+                bind:value="{formData.subject}"
                 required
               />
             </div>
@@ -157,7 +157,7 @@
                 rows="6"
                 class="block w-full rounded-lg bg-gray-800/70 backdrop-blur-sm border-gray-600/50 text-white placeholder-gray-300 focus:ring-green-500 focus:border-green-500 shadow-lg"
                 placeholder="Please provide details about your inquiry..."
-                bind:value={formData.message}
+                bind:value="{formData.message}"
                 required
               ></textarea>
             </div>
@@ -165,7 +165,7 @@
             <button
               type="submit"
               class="w-full bg-green-600/80 backdrop-blur-sm hover:bg-green-700/80 text-white px-6 py-3 rounded-lg font-medium transition-colors border border-green-500/30 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isSubmitting}
+              disabled="{isSubmitting}"
             >
               {#if isSubmitting}
                 <svg class="animate-spin h-5 w-5 mr-2 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -182,7 +182,7 @@
         </ScrollAnimated>
 
         <!-- Contact Information -->
-        <ScrollAnimated animation="fade-right" delay={600}>
+        <ScrollAnimated animation="fade-right" delay="{600}">
           <div>
           <h2 class="text-2xl font-bold mb-6 text-white drop-shadow-lg">Get in touch</h2>
 
@@ -223,8 +223,8 @@
               <div>
                 <h3 class="text-lg font-medium mb-1 text-white drop-shadow-lg">Office Location</h3>
                 <p class="text-gray-200 drop-shadow-lg">
-                  1234 Mountain View Drive<br>
-                  Boulder, CO 80302<br>
+                  1234 Mountain View Drive<br />
+                  Boulder, CO 80302<br />
                   United States
                 </p>
               </div>

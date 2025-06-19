@@ -13,14 +13,14 @@
 </script>
 
 <a
-  href={`/gear/${gear.id}`}
+  href="{`/gear/${gear.id}`}"
   class="gear-card"
-  class:hovering={isHovering}
-  on:mouseenter={() => isHovering = true}
-  on:mouseleave={() => isHovering = false}
+  class:hovering="{isHovering}"
+  on:mouseenter="{()" => isHovering = true}
+  on:mouseleave="{()" => isHovering = false}
 >
   <div class="image-container">
-    <img src={gear.image} alt={gear.title} class="gear-image" />
+    <img src="{gear.image}" alt="{gear.title}" class="gear-image" />
     <span class="condition-badge">{gear.condition}</span>
   </div>
   <div class="card-content">

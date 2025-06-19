@@ -32,7 +32,7 @@
         booking = {
           id: bookingId,
           listingTitle: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
-          listingImage: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+          listingImage: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
           startDate: new Date('2024-02-15'),
           endDate: new Date('2024-02-18'),
           totalPrice: 165,
@@ -51,7 +51,7 @@
 
       const token = await user.getIdToken();
 
-      const response = await fetch(`/api/book?bookingId=${bookingId}`, {
+      const response = await fetch(`/api/book?bookingId="${bookingId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -70,7 +70,7 @@
         booking = {
           id: bookingId,
           listingTitle: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
-          listingImage: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+            listingImage: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
           startDate: new Date('2024-02-15'),
           endDate: new Date('2024-02-18'),
           totalPrice: 165,
@@ -91,7 +91,7 @@
       booking = {
         id: bookingId,
         listingTitle: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
-        listingImage: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+        listingImage: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
         startDate: new Date('2024-02-15'),
         endDate: new Date('2024-02-18'),
         totalPrice: 165,
@@ -147,8 +147,7 @@
     <img
       src="/pexels-bianca-gasparoto-834990-1752951.jpg"
       alt="Mountain landscape"
-      class="w-full h-full object-cover"
-    >
+      class="w-full h-full object-cover" />
   </div>
   <div class="absolute inset-0 bg-black opacity-40"></div>
 </div>
@@ -189,7 +188,7 @@
           
           <!-- Listing Info -->
           <div class="flex items-center space-x-4 mb-6 p-4 bg-white/5 rounded-lg">
-            <img src={booking.listingImage} alt={booking.listingTitle} class="w-20 h-20 rounded-lg object-cover" />
+            <img src="{booking.listingImage}" alt="{booking.listingTitle}" class="w-20 h-20 rounded-lg object-cover" />
             <div>
               <h3 class="font-semibold text-white">{booking.listingTitle}</h3>
               <p class="text-gray-300">Hosted by {booking.owner.name}</p>
@@ -289,7 +288,7 @@
             </div>
             <button 
               class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-              on:click={handleMessageOwner}
+              on:click="{handleMessageOwner}"
             >
               Send Message
             </button>
@@ -300,7 +299,7 @@
         <div class="flex flex-col sm:flex-row gap-4">
           <button 
             class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
-            on:click={handleViewBooking}
+            on:click="{handleViewBooking}"
           >
             View My Bookings
           </button>

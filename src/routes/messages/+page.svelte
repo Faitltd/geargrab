@@ -15,7 +15,7 @@
   onMount(() => {
     // Redirect if not authenticated
     if (!$authStore.user) {
-      goto('/auth/login?redirectTo=/messages');
+        goto("/auth/login?redirectTo=/messages");
       return;
     }
   });
@@ -77,8 +77,7 @@
     <img
       src="/pexels-bianca-gasparoto-834990-1752951.jpg"
       alt="Mountain landscape"
-      class="w-full h-full object-cover"
-    >
+      class="w-full h-full object-cover" />
   </div>
   <div class="absolute inset-0 bg-black opacity-40"></div>
 </div>
@@ -95,7 +94,7 @@
           <p class="text-gray-300">Chat with gear owners and renters</p>
         </div>
         <button
-          on:click={startNewConversation}
+          on:click="{startNewConversation}"
           class="mt-4 sm:mt-0 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors inline-flex items-center"
         >
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,7 +115,7 @@
             <div class="relative">
               <input
                 type="text"
-                bind:value={searchQuery}
+                bind:value="{searchQuery}"
                 placeholder="Search conversations..."
                 class="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
@@ -153,7 +152,7 @@
               <h3 class="text-lg font-medium text-white mb-2">Select a conversation</h3>
               <p class="text-gray-300 mb-4">Choose a conversation from the list to start chatting</p>
               <button
-                on:click={startNewConversation}
+                on:click="{startNewConversation}"
                 class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
               >
                 Start New Conversation
@@ -174,7 +173,7 @@
             <div class="relative">
               <input
                 type="text"
-                bind:value={searchQuery}
+                bind:value="{searchQuery}"
                 placeholder="Search conversations..."
                 class="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
@@ -196,7 +195,7 @@
           <!-- Mobile Chat Header -->
           <div class="flex items-center p-4 border-b border-white/20">
             <button
-              on:click={handleBackToList}
+              on:click="{handleBackToList}"
               class="mr-3 p-1 text-gray-300 hover:text-white"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -221,8 +220,8 @@
           <!-- Mobile Chat Window -->
           <div class="flex-1">
             <ChatWindow
-              conversationId={selectedConversation.id}
-              otherUser={otherUser}
+              conversationId="{selectedConversation.id}"
+              otherUser="{otherUser}"
               listingTitle={selectedConversation.listingTitle || ''}
             />
           </div>
@@ -236,7 +235,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <button
           type="button"
-          on:click={handleFindGear}
+          on:click="{handleFindGear}"
           class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center cursor-pointer"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,7 +245,7 @@
         </button>
         <button
           type="button"
-          on:click={handleListGear}
+          on:click="{handleListGear}"
           class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center cursor-pointer"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,7 +255,7 @@
         </button>
         <button
           type="button"
-          on:click={handleViewBookings}
+          on:click="{handleViewBookings}"
           class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center cursor-pointer"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

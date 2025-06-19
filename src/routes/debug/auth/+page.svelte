@@ -110,14 +110,14 @@
       <h2 class="text-xl font-semibold text-white mb-4">Debug Controls</h2>
       <div class="flex flex-wrap gap-4">
         <button
-          on:click={refreshAuthState}
+          on:click="{refreshAuthState}"
           class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
         >
           Refresh Auth State
         </button>
         
         <button
-          on:click={clearDebug}
+          on:click="{clearDebug}"
           class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
         >
           Clear Debug

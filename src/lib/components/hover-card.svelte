@@ -56,23 +56,23 @@
   function getDefaultImage(category: string): string {
     const defaultImages = {
       // Main categories
-      'camping': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'biking': 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'electric-mobility': 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'skating': 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'hiking': 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'skiing': 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'climbing': 'https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'water-sports': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'photography': 'https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'fishing': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      'camping': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
+      'biking': 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
+      'electric-mobility': 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
+      'skating': 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
+      'hiking': 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
+      'skiing': 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
+      'climbing': 'https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
+      'water-sports': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
+      'photography': 'https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
+      'fishing': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
 
       // Additional categories for new listings
-      'winter-sports': 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'outdoor-gear': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'sports': 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'adventure': 'https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'equipment': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      'winter-sports': 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
+      'outdoor-gear': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
+      'sports': 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
+      'adventure': 'https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80',"
+      'equipment': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80'"
     };
 
     // Try exact match first
@@ -89,7 +89,7 @@
     }
 
     // Ultimate fallback - outdoor gear image
-    return 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+    return 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80';"
   }
 
   // Get the best available image from the listing
@@ -163,22 +163,22 @@
 
 <div
   class="listing-card"
-  class:hovering={isHovering}
+  class:hovering="{isHovering}"
   style="background-image: url('{displayImage}'); background-color: #1a1a1a;"
-  on:click={handleClick}
-  on:keydown={handleClick}
-  on:mouseenter={() => isHovering = true}
-  on:mouseleave={() => isHovering = false}
+  on:click="{handleClick}"
+  on:keydown="{handleClick}"
+  on:mouseenter="{()" => isHovering = true}
+  on:mouseleave="{()" => isHovering = false}
   role="button"
   tabindex="0"
 >
   <!-- Hidden image for error detection -->
   <img
-    src={currentImageUrl}
+    src="{currentImageUrl}"
     alt=""
     style="display: none;"
-    on:error={handleImageError}
-    on:load={() => { imageError = false; fallbackAttempts = 0; }}
+    on:error="{handleImageError}"
+    on:load="{()" = /> { imageError = false; fallbackAttempts = 0; }}
   />
   <!-- Background overlay for better text readability -->
   <div class="background-overlay"></div>
@@ -189,7 +189,7 @@
   </div>
 
   <!-- Glass effect details overlay - visible on hover -->
-  <div class="glass-overlay" class:visible={isHovering}>
+  <div class="glass-overlay" class:visible="{isHovering}">
     <div class="details-content">
       <div class="category-badge">{category}</div>
 

@@ -78,7 +78,7 @@
 <VideoBackground
   videoSrc="/1877846-hd_1920_1080_30fps.mp4"
   imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
-  overlayOpacity={0.4}
+  overlayOpacity="{0.4}"
 />
 
 <!-- Page Content with Video Background -->
@@ -94,7 +94,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
 
       <!-- Quick Actions -->
-      <ScrollAnimated animation="fade-up" delay={400}>
+      <ScrollAnimated animation="fade-up" delay="{400}">
         <div class="mb-16">
           <h2 class="text-2xl font-bold text-center mb-8 text-white drop-shadow-lg">Need immediate help?</h2>
 
@@ -106,32 +106,10 @@
                   class="block w-full text-left p-6 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 hover:bg-white/20 transition-colors shadow-lg"
                 >
                   <div class="flex items-center mb-3">
-                    <div class={`w-10 h-10 rounded-lg flex items-center justify-center mr-3 backdrop-blur-sm border shadow-lg ${
-                      action.color === 'green' ? 'bg-green-600/20 border-green-500/30' :
-                      action.color === 'red' ? 'bg-red-600/20 border-red-500/30' : 'bg-blue-600/20 border-blue-500/30'
-                    }`}>
-                      {#if action.icon === 'mail'}
-                        <svg xmlns="http://www.w3.org/2000/svg" class={`h-5 w-5 ${
-                          action.color === 'green' ? 'text-green-400' :
-                          action.color === 'red' ? 'text-red-400' : 'text-blue-400'
-                        }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      {:else if action.icon === 'flag'}
-                        <svg xmlns="http://www.w3.org/2000/svg" class={`h-5 w-5 ${
-                          action.color === 'green' ? 'text-green-400' :
-                          action.color === 'red' ? 'text-red-400' : 'text-blue-400'
-                        }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 2h7a2 2 0 012 2v6a2 2 0 01-2 2H12l-1-2H5a2 2 0 00-2 2z" />
-                        </svg>
-                      {:else if action.icon === 'users'}
-                        <svg xmlns="http://www.w3.org/2000/svg" class={`h-5 w-5 ${
-                          action.color === 'green' ? 'text-green-400' :
-                          action.color === 'red' ? 'text-red-400' : 'text-blue-400'
-                        }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                        </svg>
-                      {/if}
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-3 backdrop-blur-sm border shadow-lg bg-blue-600/20 border-blue-500/30">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
                     </div>
                     <h3 class="text-lg font-medium text-white drop-shadow-lg">{action.title}</h3>
                   </div>
@@ -144,7 +122,7 @@
       </ScrollAnimated>
 
       <!-- Help Categories -->
-      <ScrollAnimated animation="fade-up" delay={1000}>
+      <ScrollAnimated animation="fade-up" delay="{1000}">
         <div class="mb-16">
           <h2 class="text-3xl font-bold text-center mb-12 text-white drop-shadow-lg">Browse Help Topics</h2>
 
@@ -211,12 +189,12 @@
       </ScrollAnimated>
 
       <!-- Call to Action -->
-      <ScrollAnimated animation="scale-in" delay={1800}>
+      <ScrollAnimated animation="scale-in" delay="{1800}">
         <div class="text-center text-white">
           <h2 class="text-2xl md:text-3xl font-bold mb-4 drop-shadow-lg">Still Need Help?</h2>
           <p class="text-lg max-w-2xl mx-auto mb-6 text-gray-200 drop-shadow-lg">Our support team is here to help you with any questions or issues.</p>
           <button
-            on:click={openContactModal}
+            on:click="{openContactModal}"
             class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white text-lg px-8 py-3 rounded-lg font-semibold transition-colors border border-white/30 shadow-lg"
           >
             Contact Support
@@ -229,7 +207,7 @@
 </div>
 
 <!-- Modals -->
-<HelpModal bind:show={showHelpModal} content={selectedHelpContent} />
-<ContactSupportModal bind:show={showContactModal} />
-<ReportIssueModal bind:show={showReportModal} />
-<CommunityGuidelinesModal bind:show={showGuidelinesModal} />
+<HelpModal bind:show="{showHelpModal}" content="{selectedHelpContent}" />
+<ContactSupportModal bind:show="{showContactModal}" />
+<ReportIssueModal bind:show="{showReportModal}" />
+<CommunityGuidelinesModal bind:show="{showGuidelinesModal}" />

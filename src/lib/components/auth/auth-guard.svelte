@@ -37,7 +37,7 @@
     console.log('🔄 Navigating to login page...');
 
     const loginUrl = redirectAfterLogin
-      ? `/auth/login?redirectTo=${encodeURIComponent(currentUrl)}`
+      ? `/auth/login?redirectTo=/admin`
       : '/auth/login';
 
     // Method 1: SvelteKit goto
@@ -53,7 +53,7 @@
     console.log('🔄 Navigating to signup page...');
 
     const signupUrl = redirectAfterLogin
-      ? `/auth/signup?redirectTo=${encodeURIComponent(currentUrl)}`
+      ? `/auth/signup?redirectTo=/admin`
       : '/auth/signup';
 
     // Method 1: SvelteKit goto
@@ -91,7 +91,7 @@
       <div class="space-y-4">
         <button
           type="button"
-          on:click|preventDefault={handleLogin}
+          on:click|preventDefault="{handleLogin}"
           class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
         >
           Sign In to Continue
@@ -101,7 +101,7 @@
           Don't have an account?
           <button
             type="button"
-            on:click|preventDefault={handleSignup}
+            on:click|preventDefault="{handleSignup}"
             class="text-green-400 hover:text-green-300 underline font-medium"
           >
             Sign up here

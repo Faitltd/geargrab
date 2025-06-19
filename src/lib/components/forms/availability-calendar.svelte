@@ -158,7 +158,7 @@
 
   <!-- Calendar header -->
   <div class="flex justify-between items-center mb-4">
-    <button class="focus:outline-none" on:click={previousMonth}>
+    <button class="focus:outline-none" on:click="{previousMonth}">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
       </svg>
@@ -166,7 +166,7 @@
     <h2 class="text-lg font-semibold">
       {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
     </h2>
-    <button class="focus:outline-none" on:click={nextMonth}>
+    <button class="focus:outline-none" on:click="{nextMonth}">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
       </svg>
@@ -185,7 +185,7 @@
         {day.isSelected ? 'selected bg-red-100 text-red-800' : ''}
         {day.isUnavailable || day.isPast || day.isOutOfRange ? 'disabled cursor-not-allowed opacity-50' : 'hover:bg-gray-100 cursor-pointer'}"
         on:click={() => toggleDate(day.date)}
-        aria-label={day.date.toLocaleDateString()}
+        aria-label="{day.date.toLocaleDateString()}"
       >
         {day.date.getDate()}
       </div>

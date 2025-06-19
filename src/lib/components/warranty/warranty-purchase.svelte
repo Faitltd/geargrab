@@ -82,8 +82,8 @@
         <label class="flex items-start space-x-3 p-4 bg-white/5 rounded-lg border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">
           <input
             type="radio"
-            bind:group={selectedPlan}
-            value={plan.id}
+            bind:group="{selectedPlan}"
+            value="{plan.id}"
             class="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
           />
           <div class="flex-1">
@@ -173,8 +173,8 @@
           <div class="text-2xl font-bold text-white">{formatCurrency(warrantyCost)}</div>
         </div>
         <button
-          on:click={handlePurchaseWarranty}
-          disabled={processing}
+          on:click="{handlePurchaseWarranty}"
+          disabled="{processing}"
           class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-colors"
         >
           {#if processing}
@@ -194,17 +194,17 @@
       <div class="border-t border-white/20 pt-6">
         <h4 class="text-lg font-semibold text-white mb-4">Complete Warranty Payment</h4>
         <StripePaymentForm
-          amount={warrantyCost}
+          amount="{warrantyCost}"
           currency="usd"
-          metadata={{
+          metadata="{{"
             type: 'warranty',
             warrantyId,
             planId: selectedPlan,
             listingId,
             userId
           }}
-          on:success={handlePaymentSuccess}
-          on:error={handlePaymentError}
+          on:success="{handlePaymentSuccess}"
+          on:error="{handlePaymentError}"
         />
       </div>
     {/if}

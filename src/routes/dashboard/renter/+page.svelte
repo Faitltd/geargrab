@@ -12,7 +12,7 @@
       startDate: '2024-02-15',
       endDate: '2024-02-18',
       totalPrice: 165,
-      image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       confirmationNumber: 'GG-123456',
       owner: 'David Wilson',
       ownerId: 'owner_123',
@@ -26,7 +26,7 @@
       startDate: '2024-02-10',
       endDate: '2024-02-12',
       totalPrice: 135,
-      image: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       confirmationNumber: 'GG-234567',
       owner: 'Lisa Martinez',
       ownerId: 'owner_456',
@@ -178,7 +178,7 @@
             <div class="border border-white/20 rounded-lg p-6 hover:bg-white/5 transition-all bg-white/5">
               <div class="flex items-start space-x-4">
                 <div class="flex-shrink-0 h-20 w-20 bg-gray-200 rounded-lg overflow-hidden">
-                  <img src={booking.image} alt={booking.title} class="h-full w-full object-cover" />
+                  <img src="{booking.image}" alt="{booking.title}" class="h-full w-full object-cover" />
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="flex items-start justify-between">

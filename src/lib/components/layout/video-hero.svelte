@@ -18,36 +18,35 @@
   <!-- Background Image (always visible as fallback) -->
   <div class="absolute inset-0">
     <img
-      src={fallbackImage}
+      src="{fallbackImage}"
       alt="Mountain landscape with stars"
-      class="w-full h-full object-cover"
-    >
+      class="w-full h-full object-cover" />
   </div>
 
   <!-- Video Background (overlays image when loaded) -->
   <video
-    bind:this={videoElement}
+    bind:this="{videoElement}"
     class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
     style="opacity: 1;"
     autoplay
     muted
     loop
     playsinline
-    on:loadeddata={() => {
+    on:loadeddata="{()" => {
       console.log('VideoHero video loaded');
       if (videoElement) {
         videoElement.style.opacity = '1';
       }
     }}
-    on:error={() => {
+    on:error="{()" => {
       console.log('VideoHero video error');
       if (videoElement) {
         videoElement.style.display = 'none';
       }
     }}
-    on:loadstart={() => console.log('VideoHero video load started')}
+    on:loadstart="{()" => console.log('VideoHero video load started')}
   >
-    <source src={videoUrl} type="video/mp4" />
+    <source src="{videoUrl}" type="video/mp4" />
     <!-- Fallback video -->
     <source src="https://player.vimeo.com/external/291648067.hd.mp4?s=94998971682c6a3267e4cbd19d16a7b6c720f345&profile_id=175" type="video/mp4" />
   </video>

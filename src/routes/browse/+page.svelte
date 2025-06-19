@@ -119,7 +119,7 @@
 <VideoBackground
   videoSrc="/Stars.mp4"
   imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
-  overlayOpacity={0.5}
+  overlayOpacity="{0.5}"
 />
 
 <!-- Page Content -->
@@ -128,7 +128,7 @@
   <div class="relative min-h-[50vh] flex flex-col text-center text-white px-2 pt-20">
     <div class="flex-1 flex items-center justify-center relative z-30">
       <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 max-w-4xl mx-auto shadow-lg">
-        <ScrollLinkedAnimator animation="scale-in" startOffset={0} endOffset={0.4}>
+        <ScrollLinkedAnimator animation="scale-in" startOffset="{0}" endOffset="{0.4}">
           <h1 class="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
             Find Your Perfect Gear
           </h1>
@@ -139,7 +139,7 @@
 
         <!-- Search Form -->
         <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto border border-white/20 shadow-lg relative z-40">
-          <HeroSearch on:search={handleSearch} />
+          <HeroSearch on:search="{handleSearch}" />
         </div>
       </div>
     </div>
@@ -150,14 +150,14 @@
     <!-- Filter Bar -->
     <div class="mb-8 relative z-10">
       <FilterBar
-        selectedCategory={category}
-        selectedSort={sort}
-        on:filter={handleFilterChange}
+        selectedCategory="{category}"
+        selectedSort="{sort}"
+        on:filter="{handleFilterChange}"
       />
     </div>
 
     <!-- Results Header -->
-    <ScrollLinkedAnimator animation="scale-in" startOffset={0.25} endOffset={0.65}>
+    <ScrollLinkedAnimator animation="scale-in" startOffset="{0.25}" endOffset="{0.65}">
       <div class="text-center mb-4">
         <h1 class="text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-lg">
           {#if query}
@@ -185,7 +185,7 @@
     </div>
 
     <!-- Adventure Call-to-Action -->
-    <ScrollLinkedAnimator animation="scale-in" startOffset={0.4} endOffset={0.8}>
+    <ScrollLinkedAnimator animation="scale-in" startOffset="{0.4}" endOffset="{0.8}">
       <div class="text-center py-16">
         <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 max-w-3xl mx-auto border border-white/20 shadow-lg">
           <h2 class="text-4xl font-bold text-white mb-6 drop-shadow-lg">Ready for Your Next Adventure?</h2>

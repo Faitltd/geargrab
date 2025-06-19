@@ -124,8 +124,7 @@
     <img
       src="/pexels-bianca-gasparoto-834990-1752951.jpg"
       alt="Mountain landscape"
-      class="w-full h-full object-cover"
-    >
+      class="w-full h-full object-cover" />
   </div>
   <div class="absolute inset-0 bg-black opacity-40"></div>
 </div>
@@ -379,7 +378,7 @@
 
             <!-- Background Check Status (if verified) -->
             {#if verificationStatus.verifiedMethods.background_check && showBackgroundCheckDetails}
-              <BackgroundCheckStatus showDetails={showBackgroundCheckDetails} />
+              <BackgroundCheckStatus showDetails="{showBackgroundCheckDetails}" />
             {/if}
 
           </div>
@@ -390,10 +389,10 @@
             <h2 class="text-xl font-semibold text-white mb-6">Email Verification</h2>
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-                <input
+                <label for="email-address" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                <input id="email-address"
                   type="email"
-                  bind:value={email}
+                  bind:value="{email}"
                   placeholder="your@email.com"
                   class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -401,8 +400,8 @@
               <div class="flex space-x-4">
                 <button 
                   class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
-                  on:click={startEmailVerification}
-                  disabled={!email}
+                  on:click="{startEmailVerification}"
+                  disabled="{!email}"
                 >
                   Send Verification Email
                 </button>
@@ -422,10 +421,10 @@
             <h2 class="text-xl font-semibold text-white mb-6">Phone Verification</h2>
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Phone Number</label>
-                <input
+                <label for="phone-number" class="block text-sm font-medium text-gray-300 mb-2">Phone Number</label>
+                <input id="phone-number"
                   type="tel"
-                  bind:value={phoneNumber}
+                  bind:value="{phoneNumber}"
                   placeholder="+1 (555) 123-4567"
                   class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -433,8 +432,8 @@
               <div class="flex space-x-4">
                 <button 
                   class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
-                  on:click={startPhoneVerification}
-                  disabled={!phoneNumber}
+                  on:click="{startPhoneVerification}"
+                  disabled="{!phoneNumber}"
                 >
                   Send SMS Code
                 </button>
@@ -455,10 +454,10 @@
             <p class="text-gray-300 mb-4">We sent a 6-digit code to {phoneNumber}</p>
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Verification Code</label>
-                <input
+                <label for="verification-code" class="block text-sm font-medium text-gray-300 mb-2">Verification Code</label>
+                <input id="verification-code"
                   type="text"
-                  bind:value={verificationCode}
+                  bind:value="{verificationCode}"
                   placeholder="123456"
                   maxlength="6"
                   class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -474,7 +473,7 @@
                 </button>
                 <button
                   class="text-blue-400 hover:text-blue-300 px-6 py-2"
-                  on:click={startPhoneVerification}
+                  on:click="{startPhoneVerification}"
                 >
                   Resend Code
                 </button>
@@ -490,7 +489,7 @@
 
         <!-- Background Check Step -->
         {:else if activeStep === 'background_check'}
-          <BackgroundCheckFlow on:submitted={handleBackgroundCheckSubmitted} />
+          <BackgroundCheckFlow on:submitted="{handleBackgroundCheckSubmitted}" />
         {/if}
 
       {/if}

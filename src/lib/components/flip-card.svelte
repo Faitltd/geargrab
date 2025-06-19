@@ -25,13 +25,13 @@
   $: monthlyPrice = listing?.monthlyPrice || 500;
   $: location = listing?.location || { city: 'Local', state: 'Area' };
   $: images = listing?.images || [];
-  $: primaryImage = images[0] || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+  $: primaryImage = images[0] || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80';"
   $: averageRating = listing?.averageRating || 4.5;
   $: reviewCount = listing?.reviewCount || 12;
   $: description = listing?.description || 'High-quality outdoor equipment for your adventures.';
 </script>
 
-<div class="flip-card" on:click={handleClick} on:keydown={handleClick} role="button" tabindex="0">
+<div class="flip-card" on:click="{handleClick}" on:keydown="{handleClick}" role="button" tabindex="0">
   <div class="flip-card-inner">
     <!-- Front: Photo -->
     <div class="flip-card-front" style="background-image: url('{primaryImage}')">

@@ -135,7 +135,7 @@
   }
 </script>
 
-<Modal bind:show title="Sign In to Continue" on:close={handleClose}>
+<Modal bind:show title="Sign In to Continue" on:close="{handleClose}">
   <div class="p-6">
     <!-- Google Sign-in Option -->
     <div class="mb-6">

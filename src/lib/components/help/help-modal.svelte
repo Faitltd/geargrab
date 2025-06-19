@@ -140,7 +140,7 @@
         Still need help? <a href="/contact" class="text-green-400 hover:text-green-300">Contact Support</a>
       </p>
       <button
-        on:click={close}
+        on:click="{close}"
         class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
       >
         Close

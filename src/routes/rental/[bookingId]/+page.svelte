@@ -148,7 +148,7 @@
 <VideoBackground
   videoSrc="/1877846-hd_1920_1080_30fps.mp4"
   imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
-  overlayOpacity={0.4}
+  overlayOpacity="{0.4}"
 />
 
 <!-- Content -->
@@ -327,8 +327,8 @@
             {booking}
             phase="pickup"
             {userRole}
-            on:confirmed={handleHandoffConfirmed}
-            on:refresh={loadBookingData}
+            on:confirmed="{handleHandoffConfirmed}"
+            on:refresh="{loadBookingData}"
           />
         </div>
       {/if}
@@ -340,8 +340,8 @@
             {booking}
             phase="return"
             {userRole}
-            on:confirmed={handleHandoffConfirmed}
-            on:refresh={loadBookingData}
+            on:confirmed="{handleHandoffConfirmed}"
+            on:refresh="{loadBookingData}"
           />
         </div>
       {/if}
@@ -358,13 +358,13 @@
               {booking}
               phase="pickup"
               {userRole}
-              readonly={true}
+              readonly="{true}"
             />
             <RentalHandoff
               {booking}
               phase="return"
               {userRole}
-              readonly={true}
+              readonly="{true}"
             />
           </div>
         </div>

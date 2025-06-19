@@ -120,7 +120,7 @@
     Write a Review for {otherPartyName}
   </h2>
 
-  <form on:submit|preventDefault={submitReview} class="space-y-6">
+  <form on:submit|preventDefault="{submitReview}" class="space-y-6">
     
     <!-- Overall Rating -->
     <div>
@@ -168,10 +168,10 @@
 
     <!-- Review Title -->
     <div>
-      <label class="block text-sm font-medium text-gray-300 mb-2">Review Title</label>
-      <input
+      <label for="review-title" class="block text-sm font-medium text-gray-300 mb-2">Review Title</label>
+      <input id="review-title"
         type="text"
-        bind:value={title}
+        bind:value="{title}"
         placeholder="Summarize your experience..."
         class="w-full px-4 py-3 rounded-lg bg-gray-800/70 border border-gray-600 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
         maxlength="100"
@@ -181,9 +181,9 @@
 
     <!-- Review Comment -->
     <div>
-      <label class="block text-sm font-medium text-gray-300 mb-2">Your Review</label>
-      <textarea
-        bind:value={comment}
+      <label for="your-review" class="block text-sm font-medium text-gray-300 mb-2">Your Review</label>
+      <textarea id="your-review"
+        bind:value="{comment}"
         placeholder="Share details about your experience..."
         rows="4"
         class="w-full px-4 py-3 rounded-lg bg-gray-800/70 border border-gray-600 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
@@ -194,12 +194,12 @@
 
     <!-- Pros -->
     <div>
-      <label class="block text-sm font-medium text-gray-300 mb-2">What did you like?</label>
+      <label for="what-did-you-like" class="block text-sm font-medium text-gray-300 mb-2">What did you like?</label>
       {#each pros as pro, index}
         <div class="flex items-center space-x-2 mb-2">
-          <input
+          <input id="what-did-you-like"
             type="text"
-            bind:value={pros[index]}
+            bind:value="{pros[index]}"
             placeholder="Something positive..."
             class="flex-1 px-4 py-3 rounded-lg bg-gray-800/70 border border-gray-600 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
           />
@@ -217,20 +217,15 @@
       <button
         type="button"
         class="text-green-400 hover:text-green-300 text-sm font-medium"
-        on:click={addPro}
+        on:click="{addPro}"
       >
         + Add another positive
-      </button>
-    </div>
-
-    <!-- Cons -->
-    <div>
-      <label class="block text-sm font-medium text-gray-300 mb-2">What could be improved?</label>
+      </button><label for="what-could-be-improved" class="block text-sm font-medium text-gray-300 mb-2">What could be improved?</label>-gray-300 mb-2">What could be improved?</label>
       {#each cons as con, index}
         <div class="flex items-center space-x-2 mb-2">
-          <input
+          <input id="what-could-be-improved"
             type="text"
-            bind:value={cons[index]}
+            bind:value="{cons[index]}"
             placeholder="Something to improve..."
             class="flex-1 px-4 py-3 rounded-lg bg-gray-800/70 border border-gray-600 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
           />
@@ -248,23 +243,19 @@
       <button
         type="button"
         class="text-green-400 hover:text-green-300 text-sm font-medium"
-        on:click={addCon}
+        on:click="{addCon}"
       >
-        + Add improvement suggestion
-      </button>
-    </div>
-
-    <!-- Recommendation -->
-    <div>
-      <label class="block text-sm font-medium text-gray-300 mb-3">
+     <label for="would-you-recommend-otherpartytype-owner-this-gear-this-renter" class="block text-sm font-medium text-gray-300 mb-3">
+        Would you recommend {otherPartyType === 'owner' ? 'this gear' : 'this renter'}?
+      </label>
         Would you recommend {otherPartyType === 'owner' ? 'this gear' : 'this renter'}?
       </label>
       <div class="flex space-x-4">
         <label class="flex items-center">
-          <input
+          <input id="would-you-recommend-otherpartytype-owner-this-gear-this-renter"
             type="radio"
-            bind:group={wouldRecommend}
-            value={true}
+            bind:group="{wouldRecommend}"
+            value="{true}"
             class="mr-2 text-green-600 focus:ring-green-500"
           />
           <span class="text-white">Yes, I would recommend</span>
@@ -272,8 +263,8 @@
         <label class="flex items-center">
           <input
             type="radio"
-            bind:group={wouldRecommend}
-            value={false}
+            bind:group="{wouldRecommend}"
+            value="{false}"
             class="mr-2 text-red-600 focus:ring-red-500"
           />
           <span class="text-white">No, I would not recommend</span>
@@ -298,7 +289,7 @@
       </button>
       <button
         type="submit"
-        disabled={submitting || overallRating === 0}
+        disabled="{submitting" || overallRating === 0}
         class="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
       >
         {#if submitting}

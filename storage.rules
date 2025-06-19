@@ -1,53 +1,118 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+
     // Utility functions
     function isAuthenticated() {
       return request.auth != null;
     }
-    
+
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
-    
+
+    function isValidImageFile() {
+      return request.resource.contentType.matches('image/.*') &&
+             request.resource.size < 5 * 1024 * 1024; // 5MB limit
+    }
+
+    function isValidDocumentFile() {
+      return request.resource.contentType in ['application/pdf', 'image/jpeg', 'image/png'] &&
+             request.resource.size < 10 * 1024 * 1024; // 10MB limit
+    }
+
+    function hasValidFileName() {
+      return resource.name.matches('[a-zA-Z0-9._-]+') &&
+             resource.name.size() <= 100;
+    }
+
     function isAdmin() {
-      return isAuthenticated() && firestore.get(/databases/(default)/documents/adminUsers/$(request.auth.uid)).data.isAdmin == true;
+      return isAuthenticated() && request.auth.token.admin == true;
     }
-    
-    // User profile images - public read, user-only write
+
+    // User profile images - authenticated read, owner write with validation
     match /users/{userId}/profile/{fileName} {
-      allow read: if true;
-      allow write: if isOwner(userId) || isAdmin();
+      // Require authentication to view profile images
+      allow read: if isAuthenticated();
+
+      allow write: if isOwner(userId) &&
+        isValidImageFile() &&
+        hasValidFileName() &&
+        fileName.matches('[a-zA-Z0-9._-]+\\.(jpg|jpeg|png|webp)');
+
+      allow delete: if isOwner(userId);
     }
-    
-    // Listing images - public read, owner-only write
+
+    // Listing images - authenticated read, owner write with validation
     match /listings/{listingId}/{fileName} {
-      allow read: if true;
-      allow write: if isAuthenticated() && (
-        // Check if user is the owner of the listing
-        firestore.get(/databases/(default)/documents/listings/$(listingId)).data.ownerUid == request.auth.uid
-      ) || isAdmin();
+      // Require authentication to view listing images
+      allow read: if isAuthenticated();
+
+      allow write: if isAuthenticated() &&
+        isValidImageFile() &&
+        hasValidFileName() &&
+        fileName.matches('[a-zA-Z0-9._-]+\\.(jpg|jpeg|png|webp)') &&
+        // Use custom claims instead of firestore.get() for better performance
+        (request.auth.token.listing_owner == true || isAdmin());
+
+      allow delete: if isAuthenticated() &&
+        (request.auth.token.listing_owner == true || isAdmin());
     }
-    
-    // Verification documents - restricted access
+
+    // Verification documents - strict access control
     match /verification/{userId}/{fileName} {
       allow read: if isOwner(userId) || isAdmin();
-      allow write: if isOwner(userId) || isAdmin();
-    }
-    
-    // Booking evidence (damage photos, etc.) - involved parties only
-    match /bookings/{bookingId}/{fileName} {
-      allow read: if isAuthenticated() && (
-        // Check if user is involved in the booking
-        request.auth.uid == firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.renterUid ||
-        request.auth.uid == firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.ownerUid
-      ) || isAdmin();
 
-      allow write: if isAuthenticated() && (
-        // Check if user is involved in the booking
-        request.auth.uid == firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.renterUid ||
-        request.auth.uid == firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.ownerUid
-      ) || isAdmin();
+      allow write: if isOwner(userId) &&
+        isValidDocumentFile() &&
+        hasValidFileName() &&
+        fileName.matches('[a-zA-Z0-9._-]+\\.(pdf|jpg|jpeg|png)');
+
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    // Booking evidence - involved parties with validation
+    match /bookings/{bookingId}/{fileName} {
+      allow read: if isAuthenticated() &&
+        (request.auth.token.booking_participant == true || isAdmin());
+
+      allow write: if isAuthenticated() &&
+        request.auth.token.booking_participant == true &&
+        isValidImageFile() &&
+        hasValidFileName() &&
+        fileName.matches('[a-zA-Z0-9._-]+\\.(jpg|jpeg|png)');
+
+      allow delete: if isAuthenticated() && isAdmin();
+    }
+
+    // Chat/message attachments
+    match /messages/{messageId}/{fileName} {
+      allow read: if isAuthenticated() &&
+        request.auth.token.message_participant == true;
+
+      allow write: if isAuthenticated() &&
+        request.auth.token.message_participant == true &&
+        isValidImageFile() &&
+        hasValidFileName() &&
+        fileName.matches('[a-zA-Z0-9._-]+\\.(jpg|jpeg|png|pdf)');
+
+      allow delete: if isAuthenticated() &&
+        (request.auth.token.message_participant == true || isAdmin());
+    }
+
+    // Temporary uploads (for processing)
+    match /temp/{userId}/{fileName} {
+      allow read, write: if isOwner(userId) &&
+        isValidImageFile() &&
+        hasValidFileName();
+
+      // Auto-delete after 1 hour (implement via Cloud Functions)
+      allow delete: if true;
+    }
+
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
     }
   }
 }

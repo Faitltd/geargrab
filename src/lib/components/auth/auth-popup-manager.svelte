@@ -63,16 +63,16 @@
 
 <!-- Login Popup -->
 <LoginPopup
-  bind:show={showLogin}
-  on:close={handleLoginClose}
-  on:success={handleLoginSuccess}
-  on:switchToSignup={handleLoginSwitchToSignup}
+  bind:show="{showLogin}"
+  on:close="{handleLoginClose}"
+  on:success="{handleLoginSuccess}"
+  on:switchToSignup="{handleLoginSwitchToSignup}"
 />
 
 <!-- Signup Popup -->
 <SignupPopup
-  bind:show={showSignup}
-  on:close={handleSignupClose}
-  on:success={handleSignupSuccess}
-  on:switchToLogin={handleSignupSwitchToLogin}
+  bind:show="{showSignup}"
+  on:close="{handleSignupClose}"
+  on:success="{handleSignupSuccess}"
+  on:switchToLogin="{handleSignupSwitchToLogin}"
 />

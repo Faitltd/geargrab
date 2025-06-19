@@ -157,43 +157,43 @@
 />
 
 <div class="relative min-h-[60vh] flex items-center justify-center px-4 py-12">
-  <ScrollLinkedAnimator animation="fade-up" startOffset={0.1} endOffset={0.5}>
+  <ScrollLinkedAnimator animation="fade-up" startOffset="{0.1}" endOffset="{0.5}">
     <FormContainer
       title="List Your Gear"
       subtitle="Share your outdoor equipment and earn money"
       maxWidth="2xl"
     >
-      <form on:submit|preventDefault={handleSubmit}>
+      <form on:submit|preventDefault="{handleSubmit}">
         <FormField
           id="title"
           label="Gear Title"
           type="text"
-          bind:value={formData.title}
+          bind:value="{formData.title}"
           placeholder="e.g., 4-Person Camping Tent"
           required
-          error={errors.title}
+          error="{errors.title}"
         />
 
         <FormField
           id="category"
           label="Category"
           type="select"
-          bind:value={formData.category}
+          bind:value="{formData.category}"
           placeholder="Select a category"
           options={GEAR_CATEGORIES.map(cat => ({ value: cat.id, label: cat.name }))}
           required
-          error={errors.category}
+          error="{errors.category}"
         />
 
         <FormField
           id="description"
           label="Description"
           type="textarea"
-          bind:value={formData.description}
+          bind:value="{formData.description}"
           placeholder="Describe your gear, its condition, and any special features..."
-          rows={4}
+          rows="{4}"
           required
-          error={errors.description}
+          error="{errors.description}"
         />
 
         <div class="relative">
@@ -201,12 +201,12 @@
             id="dailyPrice"
             label="Daily Price"
             type="number"
-            bind:value={formData.dailyPrice}
+            bind:value="{formData.dailyPrice}"
             placeholder="25.00"
-            min={1}
-            step={0.01}
+            min="{1}"
+            step="{0.01}"
             required
-            error={errors.dailyPrice}
+            error="{errors.dailyPrice}"
             className="pl-8"
           />
           <!-- Dollar sign overlay for price field -->
@@ -220,10 +220,10 @@
               id="city"
               label="City"
               type="text"
-              bind:value={formData.city}
+              bind:value="{formData.city}"
               placeholder="Denver"
               required
-              error={errors.city}
+              error="{errors.city}"
             />
           </div>
 
@@ -232,11 +232,11 @@
               id="state"
               label="State"
               type="text"
-              bind:value={formData.state}
+              bind:value="{formData.state}"
               placeholder="CO"
-              maxlength={2}
+              maxlength="{2}"
               required
-              error={errors.state}
+              error="{errors.state}"
             />
           </div>
 
@@ -245,11 +245,11 @@
               id="zipCode"
               label="ZIP Code"
               type="text"
-              bind:value={formData.zipCode}
+              bind:value="{formData.zipCode}"
               placeholder="80202"
-              maxlength={10}
+              maxlength="{10}"
               required
-              error={errors.zipCode}
+              error="{errors.zipCode}"
             />
           </div>
         </div>
@@ -261,7 +261,7 @@
             size="lg"
             fullWidth
             {loading}
-            disabled={loading}
+            disabled="{loading}"
           >
             {loading ? 'Creating Listing...' : 'List My Gear'}
           </FormButton>

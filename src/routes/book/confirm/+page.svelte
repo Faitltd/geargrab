@@ -463,7 +463,7 @@
 
       // Navigate to success page with booking ID
       console.log('Navigating to success page with booking ID:', result.bookingId);
-      goto(`/book/success?bookingId=${result.bookingId}`);
+      goto(`/book/success?bookingId="${result.bookingId}`);
     } catch (err) {
       console.error('Booking error:', err);
       error = err.message || 'Failed to create booking. Please try again.';
@@ -506,8 +506,7 @@
     <img
       src="/pexels-bianca-gasparoto-834990-1752951.jpg"
       alt="Mountain landscape"
-      class="w-full h-full object-cover"
-    >
+      class="w-full h-full object-cover" />
   </div>
   <div class="absolute inset-0 bg-black opacity-40"></div>
 </div>
@@ -536,65 +535,65 @@
           </div>
 
           <!-- Booking Form -->
-          <form on:submit|preventDefault={handleBookingSubmit}>
+          <form on:submit|preventDefault="{handleBookingSubmit}">
             <!-- Contact Information -->
             <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6 mb-6">
             <h2 class="text-lg font-semibold text-white mb-4">Contact Information</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">First Name *</label>
-                <input 
+                <label for="first-name" class="block text-sm font-medium text-gray-300 mb-2">First Name *</label>
+                <input id="first-name" 
                   type="text" 
-                  bind:value={contactInfo.firstName}
+                  bind:value="{contactInfo.firstName}"
                   class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="John"
                   required
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Last Name *</label>
-                <input 
+                <label for="last-name" class="block text-sm font-medium text-gray-300 mb-2">Last Name *</label>
+                <input id="last-name" 
                   type="text" 
-                  bind:value={contactInfo.lastName}
+                  bind:value="{contactInfo.lastName}"
                   class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="Doe"
                   required
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Email *</label>
-                <input 
+                <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email *</label>
+                <input id="email" 
                   type="email" 
-                  bind:value={contactInfo.email}
+                  bind:value="{contactInfo.email}"
                   class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="john@example.com"
                   required
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Phone *</label>
-                <input 
+                <label for="phone" class="block text-sm font-medium text-gray-300 mb-2">Phone *</label>
+                <input id="phone" 
                   type="tel" 
-                  bind:value={contactInfo.phone}
+                  bind:value="{contactInfo.phone}"
                   class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="(555) 123-4567"
                   required
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Emergency Contact</label>
-                <input 
+                <label for="emergency-contact" class="block text-sm font-medium text-gray-300 mb-2">Emergency Contact</label>
+                <input id="emergency-contact" 
                   type="text" 
-                  bind:value={contactInfo.emergencyContact}
+                  bind:value="{contactInfo.emergencyContact}"
                   class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="Jane Doe"
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Emergency Phone</label>
-                <input 
+                <label for="emergency-phone" class="block text-sm font-medium text-gray-300 mb-2">Emergency Phone</label>
+                <input id="emergency-phone" 
                   type="tel" 
-                  bind:value={contactInfo.emergencyPhone}
+                  bind:value="{contactInfo.emergencyPhone}"
                   class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="(555) 987-6543"
                 />
@@ -606,7 +605,7 @@
           <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6">
             <h2 class="text-lg font-semibold text-white mb-4">Special Requests</h2>
             <textarea 
-              bind:value={specialRequests}
+              bind:value="{specialRequests}"
               rows="4"
               class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Any special requests or questions for the owner..."
@@ -618,7 +617,7 @@
             <label class="flex items-start space-x-3">
               <input 
                 type="checkbox" 
-                bind:checked={agreeToTerms}
+                bind:checked="{agreeToTerms}"
                 class="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
               />
               <span class="text-sm text-gray-300">
@@ -669,7 +668,7 @@
               {:else}
                 <div class="flex justify-center">
                   <StripePaymentForm
-                    amount={calculatedTotal}
+                    amount="{calculatedTotal}"
                     currency="usd"
                     metadata={{
                       listingId,
@@ -678,9 +677,9 @@
                       deliveryMethod,
                       insuranceTier
                     }}
-                    disabled={paymentProcessing}
-                    on:success={handlePaymentSuccess}
-                    on:error={handlePaymentError}
+                    disabled="{paymentProcessing}"
+                    on:success="{handlePaymentSuccess}"
+                    on:error="{handlePaymentError}"
                   />
                 </div>
               {/if}
@@ -696,7 +695,7 @@
             <!-- Listing Info -->
             {#if listing}
               <div class="flex items-center space-x-4 mb-6">
-                <img src={listing.images[0]} alt={listing.title} class="w-16 h-16 rounded-lg object-cover" />
+                <img src="{listing.images[0]}" alt="{listing.title}" class="w-16 h-16 rounded-lg object-cover" />
                 <div>
                   <h3 class="font-semibold text-white text-sm">{listing.title}</h3>
                   <p class="text-gray-300 text-sm">{listing.location.city}, {listing.location.state}</p>
@@ -809,8 +808,8 @@
 
 <!-- Login Modal -->
 <LoginModal
-  bind:show={showLoginModal}
-  redirectAfterLogin={false}
-  on:success={handleLoginSuccess}
-  on:close={handleLoginClose}
+  bind:show="{showLoginModal}"
+  redirectAfterLogin="{false}"
+  on:success="{handleLoginSuccess}"
+  on:close="{handleLoginClose}"
 />

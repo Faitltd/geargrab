@@ -57,16 +57,16 @@
 
   <!-- Payment Form -->
   <StripePaymentForm
-    amount={rentalFees.totalPrice}
+    amount="{rentalFees.totalPrice}"
     currency="usd"
-    metadata={paymentMetadata}
-    on:success={handlePaymentSuccess}
-    on:error={handlePaymentError}
+    metadata="{paymentMetadata}"
+    on:success="{handlePaymentSuccess}"
+    on:error="{handlePaymentError}"
   />
 
   <!-- Back Button -->
   <button
-    on:click={handleBack}
+    on:click="{handleBack}"
     class="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
   >
     ← Back to Details

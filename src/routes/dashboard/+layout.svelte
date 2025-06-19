@@ -79,7 +79,7 @@
 <!-- Full Page Video Background -->
 <VideoBackground
   videoSrc="/857134-hd_1280_720_24fps.mp4"
-  overlayOpacity={0.3}
+  overlayOpacity="{0.3}"
 />
 
 <div class="min-h-screen relative z-10">
@@ -97,7 +97,7 @@
       </div>
     {:else if $authState.user && $authState.isAuthenticated && authCheckComplete}
       <!-- Dashboard Header -->
-      <ScrollLinkedAnimator animation="fade-up" startOffset={0} endOffset={0.4}>
+      <ScrollLinkedAnimator animation="fade-up" startOffset="{0}" endOffset="{0.4}">
         <div class="mb-8">
           <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 shadow-lg">
             <h1 class="text-3xl font-bold text-white drop-shadow-lg">Dashboard</h1>
@@ -107,12 +107,12 @@
       </ScrollLinkedAnimator>
 
       <!-- Dashboard Tabs -->
-      <ScrollLinkedAnimator animation="fade-up" startOffset={0.1} endOffset={0.5}>
+      <ScrollLinkedAnimator animation="fade-up" startOffset="{0.1}" endOffset="{0.5}">
         <div class="mb-8">
           <nav class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-lg p-1 flex space-x-1">
             {#each tabs as tab}
               <a
-                href={tab.href}
+                href="{tab.href}"
                 class="{currentTab === tab.id
                   ? 'bg-green-600 text-white shadow-lg transform scale-105'
                   : 'text-white/90 hover:text-white hover:bg-white/10 hover:transform hover:scale-102'}
@@ -126,14 +126,14 @@
       </ScrollLinkedAnimator>
 
       <!-- Dashboard Content -->
-      <ScrollLinkedAnimator animation="fade-up" startOffset={0.2} endOffset={0.6}>
+      <ScrollLinkedAnimator animation="fade-up" startOffset="{0.2}" endOffset="{0.6}">
         <div>
           <slot />
         </div>
       </ScrollLinkedAnimator>
     {:else}
       <!-- Fallback for when store is not initialized or user is not logged in -->
-      <ScrollLinkedAnimator animation="fade-up" startOffset={0} endOffset={0.5}>
+      <ScrollLinkedAnimator animation="fade-up" startOffset="{0}" endOffset="{0.5}">
         <div class="flex justify-center items-center h-64">
           <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8 text-center shadow-lg">
             <h2 class="text-xl font-semibold text-white mb-2 drop-shadow-lg">Access Restricted</h2>

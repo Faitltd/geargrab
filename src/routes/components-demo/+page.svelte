@@ -116,11 +116,11 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {#each sampleGear as gear}
           <HoverCard
-            imageSrc={gear.imageSrc}
-            imageAlt={gear.title}
-            title={gear.title}
-            subtitle={gear.subtitle}
-            description={gear.description}
+            imageSrc="{gear.imageSrc}"
+            imageAlt="{gear.title}"
+            title="{gear.title}"
+            subtitle="{gear.subtitle}"
+            description="{gear.description}"
             href="/browse"
           />
         {/each}
@@ -139,9 +139,9 @@
       <div class="flex flex-wrap justify-center gap-6">
         {#each services as service}
           <ServiceCard
-            icon={service.icon}
-            title={service.title}
-            description={service.description}
+            icon="{service.icon}"
+            title="{service.title}"
+            description="{service.description}"
             on:click={() => console.log(`Clicked: ${service.title}`)}
           />
         {/each}
@@ -158,7 +158,7 @@
 
     <div class="space-y-8">
       <!-- Skewed Background -->
-      <GeometricBackground variant="skewed" color="#10b981" opacity={0.1} height="300px">
+      <GeometricBackground variant="skewed" color="#10b981" opacity="{0.1}" height="300px">
         <div class="text-center text-gray-900">
           <h3 class="text-2xl font-bold mb-2">Skewed Background</h3>
           <p class="text-lg">Perfect for hero sections and dynamic layouts</p>
@@ -166,7 +166,7 @@
       </GeometricBackground>
 
       <!-- Mountain Background -->
-      <GeometricBackground variant="mountain" color="#059669" opacity={0.15} height="300px">
+      <GeometricBackground variant="mountain" color="#059669" opacity="{0.15}" height="300px">
         <div class="text-center text-gray-900">
           <h3 class="text-2xl font-bold mb-2">Mountain Background</h3>
           <p class="text-lg">Great for outdoor and adventure themes</p>
@@ -174,7 +174,7 @@
       </GeometricBackground>
 
       <!-- Wave Background -->
-      <GeometricBackground variant="wave" color="#0d9488" opacity={0.2} height="300px">
+      <GeometricBackground variant="wave" color="#0d9488" opacity="{0.2}" height="300px">
         <div class="text-center text-gray-900">
           <h3 class="text-2xl font-bold mb-2">Wave Background</h3>
           <p class="text-lg">Smooth flowing design for modern layouts</p>
@@ -182,7 +182,7 @@
       </GeometricBackground>
 
       <!-- Egg Background -->
-      <GeometricBackground variant="egg" color="#FBDF7E" opacity={0.3} height="300px">
+      <GeometricBackground variant="egg" color="#FBDF7E" opacity="{0.3}" height="300px">
         <div class="text-center text-gray-900">
           <h3 class="text-2xl font-bold mb-2">Egg Background</h3>
           <p class="text-lg">Unique organic shape for creative designs</p>
@@ -211,7 +211,7 @@
           secondary: 'support@geargrab.com'
         }
       }}
-      on:submit={handleContactSubmit}
+      on:submit="{handleContactSubmit}"
     />
   </section>
 

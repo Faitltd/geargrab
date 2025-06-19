@@ -190,7 +190,7 @@
   <div class="flex items-center justify-between p-4 border-b border-white/20">
     <div class="flex items-center space-x-3">
       <img 
-        src={otherUser.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'} 
+        src={otherUser.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'}
         alt={otherUser.name}
         class="w-10 h-10 rounded-full object-cover"
       />
@@ -217,7 +217,7 @@
 
   <!-- Messages Area -->
   <div 
-    bind:this={messagesContainer}
+    bind:this="{messagesContainer}"
     class="flex-1 overflow-y-auto p-4 space-y-4 max-h-96"
   >
     {#if messages.length === 0}
@@ -244,7 +244,7 @@
           <div class="flex items-end space-x-2 max-w-xs lg:max-w-md">
             {#if message.senderId !== $authStore.user?.uid}
               <img 
-                src={otherUser.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'} 
+                src={otherUser.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'}
                 alt={otherUser.name}
                 class="w-6 h-6 rounded-full object-cover"
               />
@@ -274,9 +274,9 @@
   <div class="p-4 border-t border-white/20">
     <!-- Hidden file input -->
     <input
-      bind:this={fileInput}
+      bind:this="{fileInput}"
       type="file"
-      on:change={handleFileSelect}
+      on:change="{handleFileSelect}"
       accept="image/*,.pdf,.txt"
       class="hidden"
     />
@@ -284,8 +284,8 @@
     <div class="flex items-end space-x-2">
       <!-- Attachment button -->
       <button
-        on:click={handleAttachmentClick}
-        disabled={uploadingFile}
+        on:click="{handleAttachmentClick}"
+        disabled="{uploadingFile}"
         class="p-2 text-gray-300 hover:text-white hover:bg-white/10 disabled:text-gray-600 rounded-lg transition-colors"
         title="Attach file"
       >
@@ -300,12 +300,12 @@
       
       <div class="flex-1">
         <textarea
-          bind:value={newMessage}
-          on:keypress={handleKeyPress}
+          bind:value="{newMessage}"
+          on:keypress="{handleKeyPress}"
           placeholder="Type a message..."
           rows="1"
           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-          disabled={sending}
+          disabled="{sending}"
         ></textarea>
       </div>
       

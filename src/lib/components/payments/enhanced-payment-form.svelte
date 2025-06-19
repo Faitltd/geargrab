@@ -225,8 +225,8 @@
       <input
         id="guest-email"
         type="email"
-        bind:value={guestEmail}
-        on:input={handleEmailInput}
+        bind:value="{guestEmail}"
+        on:input="{handleEmailInput}"
         placeholder="your@email.com"
         class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
         required
@@ -244,7 +244,7 @@
       <div class="mb-6">
         <button
           type="button"
-          on:click={initializePayment}
+          on:click="{initializePayment}"
           class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
         >
           Continue to Payment
@@ -259,7 +259,7 @@
       <h3 class="text-lg font-semibold text-white mb-4">Payment Information</h3>
 
       <!-- Stripe Payment Element Container -->
-      <div bind:this={paymentElementContainer} class="mb-6">
+      <div bind:this="{paymentElementContainer}" class="mb-6">
         <!-- Stripe Elements will be mounted here -->
       </div>
 
@@ -273,8 +273,8 @@
       <!-- Submit Button -->
       <button
         type="button"
-        on:click={handleSubmit}
-        disabled={disabled || processing || !paymentReady || !canProceed}
+        on:click="{handleSubmit}"
+        disabled="{disabled" || processing || !paymentReady || !canProceed}
         class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors"
       >
         {#if processing}

@@ -3,7 +3,7 @@
  * Implements background check functionality with proper FCRA compliance
  */
 
-import axios from 'axios';
+// Using native fetch instead of axios for better compatibility
 
 class IProspectCheckClient {
   constructor() {
@@ -26,14 +26,43 @@ class IProspectCheckClient {
     // Create Basic Auth header
     this.authHeader = Buffer.from(`${this.apiKey}:${this.apiSecret}`).toString('base64');
 
-    this.client = axios.create({
-      baseURL: this.baseURL,
-      headers: {
-        'Authorization': `Basic ${this.authHeader}`,
-        'Content-Type': 'application/json',
-        'User-Agent': 'GearGrab/1.0'
+    // Create a simple fetch-based client
+    this.client = {
+      post: async (url, data) => {
+        const response = await fetch(`${this.baseURL}${url}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${this.authHeader}`,
+            'Content-Type': 'application/json',
+            'User-Agent': 'GearGrab/1.0'
+          },
+          body: JSON.stringify(data)
+        });
+
+        return {
+          status: response.status,
+          statusText: response.statusText,
+          data: response.ok ? await response.json() : null
+        };
+      },
+
+      get: async (url) => {
+        const response = await fetch(`${this.baseURL}${url}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Basic ${this.authHeader}`,
+            'Content-Type': 'application/json',
+            'User-Agent': 'GearGrab/1.0'
+          }
+        });
+
+        return {
+          status: response.status,
+          statusText: response.statusText,
+          data: response.ok ? await response.json() : null
+        };
       }
-    });
+    };
 
     this.initialized = true;
   }

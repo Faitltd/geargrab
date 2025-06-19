@@ -21,7 +21,7 @@
   onMount(async () => {
     try {
       if (!$authStore.user) {
-        goto('/auth/login?redirectTo=/admin/system-health');
+          goto("/auth/login?redirectTo=/admin/system-health");
         return;
       }
 
@@ -400,8 +400,8 @@
           </div>
           
           <button
-            on:click={runHealthChecks}
-            disabled={testing}
+            on:click="{runHealthChecks}"
+            disabled="{testing}"
             class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-2 px-6 rounded-lg transition-colors inline-flex items-center"
           >
             {#if testing}

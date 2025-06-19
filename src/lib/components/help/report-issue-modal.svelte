@@ -79,7 +79,7 @@
 
 </script>
 
-<Modal bind:show title="Report an Issue" maxWidth="max-w-2xl" on:close={close}>
+<Modal bind:show title="Report an Issue" maxWidth="max-w-2xl" on:close="{close}">
   <div class="p-6">
     {#if submitSuccess}
       <div class="text-center py-8">
@@ -110,7 +110,7 @@
         </div>
       </div>
 
-      <form on:submit|preventDefault={handleSubmit} class="space-y-6">
+      <form on:submit|preventDefault="{handleSubmit}" class="space-y-6">
         <!-- Issue Type -->
         <fieldset>
           <legend class="block text-sm font-medium text-white mb-3">
@@ -121,8 +121,8 @@
               <label class="flex items-start space-x-3 cursor-pointer">
                 <input
                   type="radio"
-                  bind:group={formData.issueType}
-                  value={type.value}
+                  bind:group="{formData.issueType}"
+                  value="{type.value}"
                   class="mt-1 text-red-600 focus:ring-red-500"
                 />
                 <div>
@@ -142,7 +142,7 @@
           <input
             type="email"
             id="email"
-            bind:value={formData.email}
+            bind:value="{formData.email}"
             required
             class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
             placeholder="your.email@example.com"
@@ -157,7 +157,7 @@
           <input
             type="text"
             id="subject"
-            bind:value={formData.subject}
+            bind:value="{formData.subject}"
             required
             class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
             placeholder="Brief description of the issue"
@@ -174,7 +174,7 @@
               <input
                 type="text"
                 id="userInvolved"
-                bind:value={formData.userInvolved}
+                bind:value="{formData.userInvolved}"
                 class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 placeholder="Username (if applicable)"
               />
@@ -187,7 +187,7 @@
               <input
                 type="text"
                 id="listingId"
-                bind:value={formData.listingId}
+                bind:value="{formData.listingId}"
                 class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 placeholder="Listing ID (if applicable)"
               />
@@ -202,7 +202,7 @@
               <input
                 type="datetime-local"
                 id="incidentDate"
-                bind:value={formData.incidentDate}
+                bind:value="{formData.incidentDate}"
                 class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
             </div>
@@ -233,7 +233,7 @@
             required
             rows="6"
             class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
-            placeholder={formData.issueType === 'safety' 
+            placeholder={formData.issueType === 'safety'
               ? "Describe the incident in detail. Include what happened, when it occurred, and any evidence you have..."
               : "Describe the technical issue. Include what you were doing when it occurred, error messages, and your device/browser info..."
             }

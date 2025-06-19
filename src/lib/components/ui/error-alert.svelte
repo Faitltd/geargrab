@@ -40,7 +40,7 @@
             <button
               type="button"
               class="inline-flex rounded-md p-1.5 text-red-400 hover:text-red-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              on:click={dismiss}
+              on:click="{dismiss}"
             >
               <span class="sr-only">Dismiss</span>
               <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

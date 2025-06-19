@@ -111,7 +111,7 @@
   }
 </script>
 
-<svelte:window on:click={handleClickOutside} />
+<svelte:window on:click="{handleClickOutside}" />
 
 <nav class="bg-black/20 backdrop-blur-md fixed top-0 left-0 right-0 w-full z-50 shadow-lg" aria-label="Main">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -132,9 +132,9 @@
         <!-- Desktop Navigation Dropdown -->
         <div class="hidden sm:ml-6 sm:flex sm:items-center relative dropdown-container">
           <button
-            on:click={toggleDropdown}
+            on:click="{toggleDropdown}"
             class="border-transparent text-white/90 hover:text-white hover:border-white/30 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors"
-            aria-expanded={isDropdownOpen}
+            aria-expanded="{isDropdownOpen}"
             aria-haspopup="true"
           >
             Menu
@@ -147,33 +147,33 @@
             <!-- Dropdown Menu -->
             <div class="absolute top-full left-0 mt-2 w-48 bg-black/90 backdrop-blur-md rounded-lg shadow-lg border border-white/20 z-50">
               <div class="py-2">
-                <a href="/" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                <a href="/" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   Home
                 </a>
-                <a href="/browse" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                <a href="/browse" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   Browse
                 </a>
-                <a href="/list-gear" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                <a href="/list-gear" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   List Gear
                 </a>
-                <a href="/how-it-works" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                <a href="/how-it-works" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   How It Works
                 </a>
                 <div class="border-t border-white/20 my-1"></div>
-                <a href="/blog" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                <a href="/blog" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   Blog
                 </a>
-                <a href="/about" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                <a href="/about" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   About
                 </a>
-                <a href="/contact" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                <a href="/contact" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   Contact
                 </a>
                 <div class="border-t border-white/20 my-1"></div>
-                <a href="/help" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                <a href="/help" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   Help
                 </a>
-                <a href="/faq" on:click={closeDropdown} class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                <a href="/faq" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   FAQ
                 </a>
               </div>
@@ -187,22 +187,22 @@
             Dashboard
           </a>
           <button
-            on:click={handleSignOut}
+            on:click="{handleSignOut}"
             class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium disabled:opacity-50"
-            disabled={isSigningOut}
+            disabled="{isSigningOut}"
             data-cy="logout"
           >
             {isSigningOut ? 'Signing out...' : 'Sign Out'}
           </button>
         {:else}
           <button
-            on:click={openLoginPopup}
+            on:click="{openLoginPopup}"
             class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
           >
             Log In
           </button>
           <button
-            on:click={openSignupPopup}
+            on:click="{openSignupPopup}"
             class="bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-md text-sm font-medium ml-2 transition-colors"
           >
             Sign Up
@@ -225,9 +225,9 @@
         <button
           type="button"
           class="inline-flex items-center justify-center p-2 rounded-md text-white/90 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
-          aria-expanded={isMenuOpen}
+          aria-expanded="{isMenuOpen}"
           aria-controls="mobile-menu"
-          on:click={toggleMenu}
+          on:click="{toggleMenu}"
         >
           <span class="sr-only">Open main menu</span>
           <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -241,31 +241,31 @@
   {#if isMenuOpen}
     <div id="mobile-menu" class="sm:hidden navbar-glass">
       <div class="pt-2 pb-3 space-y-1">
-        <a href="/" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Home
         </a>
-        <a href="/browse" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/browse" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Browse
         </a>
-        <a href="/list-gear" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/list-gear" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           List Gear
         </a>
-        <a href="/how-it-works" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/how-it-works" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           How It Works
         </a>
-        <a href="/blog" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/blog" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Blog
         </a>
-        <a href="/about" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/about" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           About
         </a>
-        <a href="/contact" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/contact" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Contact
         </a>
-        <a href="/help" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/help" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Help
         </a>
-        <a href="/faq" on:click={handleMobileNavClick} class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+        <a href="/faq" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           FAQ
         </a>
       </div>
@@ -284,13 +284,13 @@
             </div>
           </div>
           <div class="mt-3 space-y-1">
-            <a href="/dashboard" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
+            <a href="/dashboard" on:click="{handleMobileNavClick}" class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Dashboard
             </a>
             <button
-              on:click={handleSignOut}
+              on:click="{handleSignOut}"
               class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10 disabled:opacity-50"
-              disabled={isSigningOut}
+              disabled="{isSigningOut}"
               data-cy="logout"
             >
               {isSigningOut ? 'Signing out...' : 'Sign Out'}
@@ -299,20 +299,20 @@
         {:else}
           <div class="mt-3 space-y-1">
             <button
-              on:click={openLoginPopup}
+              on:click="{openLoginPopup}"
               class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors"
             >
               Log In
             </button>
             <button
-              on:click={openSignupPopup}
+              on:click="{openSignupPopup}"
               class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors"
             >
               Sign Up
             </button>
             <!-- Debug link for development -->
             {#if import.meta.env.DEV}
-              <a href="/debug/auth" on:click={handleMobileNavClick} class="block px-4 py-2 text-base font-medium text-yellow-400 hover:text-yellow-300 hover:bg-white/10">
+              <a href="/debug/auth" on:click="{handleMobileNavClick}" class="block px-4 py-2 text-base font-medium text-yellow-400 hover:text-yellow-300 hover:bg-white/10">
                 🔍 Debug Auth
               </a>
               <button
@@ -331,9 +331,9 @@
 
 <!-- Auth Popup Manager -->
 <AuthPopupManager
-  bind:this={authPopupManager}
-  on:loginSuccess={handleAuthSuccess}
-  on:signupSuccess={handleAuthSuccess}
+  bind:this="{authPopupManager}"
+  on:loginSuccess="{handleAuthSuccess}"
+  on:signupSuccess="{handleAuthSuccess}"
 />
 
 <style>

@@ -2,48 +2,137 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users can read and write their own user document
+
+    // Utility functions for validation
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidString(field, minLen, maxLen) {
+      return field is string && field.size() >= minLen && field.size() <= maxLen;
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches('.*@.*\\..*');
+    }
+
+    function isValidPrice(price) {
+      return price is number && price >= 0 && price <= 10000;
+    }
+
+    // Users collection - strict validation
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) &&
+        isValidString(request.resource.data.name, 2, 50) &&
+        isValidEmail(request.resource.data.email) &&
+        request.resource.data.keys().hasAll(['name', 'email', 'createdAt']) &&
+        request.resource.data.keys().hasOnly(['name', 'email', 'phone', 'bio', 'avatar', 'createdAt', 'updatedAt']);
+      allow update: if isOwner(userId) &&
+        (!('email' in request.resource.data.diff(resource.data).affectedKeys())) && // Prevent email changes
+        request.resource.data.updatedAt == request.time;
     }
 
-    // Users can read and write their own private data
+    // Private user data
     match /users/{userId}/private/{document} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isOwner(userId);
     }
 
-    // Listings - authenticated users can read all, but only owners can write
+    // Listings - authenticated read with validation
     match /listings/{listingId} {
-      allow read: if true; // Anyone can browse listings
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.ownerUid;
-      allow update, delete: if request.auth != null && request.auth.uid == resource.data.ownerUid;
+      // Require authentication for reading listings
+      allow read: if isAuthenticated();
+
+      allow create: if isAuthenticated() &&
+        request.auth.uid == request.resource.data.ownerUid &&
+        isValidString(request.resource.data.title, 5, 100) &&
+        isValidString(request.resource.data.description, 20, 2000) &&
+        isValidPrice(request.resource.data.pricePerDay) &&
+        request.resource.data.category in ['camping', 'hiking', 'skiing', 'climbing', 'water-sports', 'other'] &&
+        request.resource.data.keys().hasAll(['title', 'description', 'pricePerDay', 'category', 'ownerUid', 'createdAt']) &&
+        request.resource.data.keys().hasOnly(['title', 'description', 'pricePerDay', 'category', 'location', 'images', 'ownerUid', 'isActive', 'createdAt', 'updatedAt']);
+
+      allow update: if isAuthenticated() &&
+        request.auth.uid == resource.data.ownerUid &&
+        request.auth.uid == request.resource.data.ownerUid && // Prevent ownership transfer
+        request.resource.data.updatedAt == request.time;
+
+      allow delete: if isAuthenticated() && request.auth.uid == resource.data.ownerUid;
     }
 
-    // Bookings - only involved parties can access
+    // Bookings - strict access control
     match /bookings/{bookingId} {
-      allow read, write: if request.auth != null &&
+      allow read: if isAuthenticated() &&
         (request.auth.uid == resource.data.renterUid ||
          request.auth.uid == resource.data.ownerUid);
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.renterUid;
+
+      allow create: if isAuthenticated() &&
+        request.auth.uid == request.resource.data.renterUid &&
+        request.resource.data.keys().hasAll(['listingId', 'renterUid', 'ownerUid', 'startDate', 'endDate', 'totalPrice', 'status', 'createdAt']) &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.startDate is timestamp &&
+        request.resource.data.endDate is timestamp &&
+        request.resource.data.startDate < request.resource.data.endDate;
+
+      allow update: if isAuthenticated() &&
+        (request.auth.uid == resource.data.renterUid ||
+         request.auth.uid == resource.data.ownerUid) &&
+        // Only allow status updates and prevent critical field changes
+        !('renterUid' in request.resource.data.diff(resource.data).affectedKeys()) &&
+        !('ownerUid' in request.resource.data.diff(resource.data).affectedKeys()) &&
+        !('totalPrice' in request.resource.data.diff(resource.data).affectedKeys());
     }
 
-    // Messages - only participants can access
+    // Messages - participant access only
     match /messages/{messageId} {
-      allow read, write: if request.auth != null &&
-        (request.auth.uid in resource.data.participants);
-      allow create: if request.auth != null && request.auth.uid in request.resource.data.participants;
+      allow read: if isAuthenticated() &&
+        request.auth.uid in resource.data.participants;
+
+      allow create: if isAuthenticated() &&
+        request.auth.uid in request.resource.data.participants &&
+        request.auth.uid == request.resource.data.senderId &&
+        isValidString(request.resource.data.content, 1, 1000) &&
+        request.resource.data.keys().hasAll(['content', 'senderId', 'participants', 'createdAt']);
+
+      // Prevent message editing/deletion for integrity
+      allow update, delete: if false;
     }
 
-    // Reviews - authenticated users can read all, only reviewers can write their own
+    // Reviews - authenticated read with validation
     match /reviews/{reviewId} {
-      allow read: if true;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.reviewerUid;
-      allow update, delete: if request.auth != null && request.auth.uid == resource.data.reviewerUid;
+      allow read: if isAuthenticated(); // Require auth to read reviews
+
+      allow create: if isAuthenticated() &&
+        request.auth.uid == request.resource.data.reviewerUid &&
+        request.resource.data.rating is int &&
+        request.resource.data.rating >= 1 &&
+        request.resource.data.rating <= 5 &&
+        isValidString(request.resource.data.comment, 10, 500) &&
+        request.resource.data.keys().hasAll(['listingId', 'reviewerUid', 'rating', 'comment', 'createdAt']);
+
+      allow update: if isAuthenticated() &&
+        request.auth.uid == resource.data.reviewerUid &&
+        // Only allow comment and rating updates within 24 hours
+        request.time < resource.data.createdAt + duration.value(24, 'h') &&
+        !('reviewerUid' in request.resource.data.diff(resource.data).affectedKeys()) &&
+        !('listingId' in request.resource.data.diff(resource.data).affectedKeys());
+
+      allow delete: if isAuthenticated() && request.auth.uid == resource.data.reviewerUid;
     }
 
-    // For development - temporary open access (remove in production)
-    // match /{document=**} {
-    //   allow read, write: if true;
-    // }
+    // Admin collection for role management
+    match /adminUsers/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if false; // Admin roles managed server-side only
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
 }

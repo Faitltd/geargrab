@@ -218,8 +218,7 @@
     <img
       src="/pexels-bianca-gasparoto-834990-1752951.jpg"
       alt="Mountain landscape"
-      class="w-full h-full object-cover"
-    >
+      class="w-full h-full object-cover" />
   </div>
   <div class="absolute inset-0 bg-black opacity-40"></div>
 </div>
@@ -239,8 +238,8 @@
       <div class="text-center">
         <p class="text-sm text-gray-300 mb-4">Quick login with Google</p>
         <GoogleAuthButton
-          on:success={handleGoogleSuccess}
-          on:error={handleGoogleError}
+          on:success="{handleGoogleSuccess}"
+          on:error="{handleGoogleError}"
           {loading}
         />
         <div class="mt-4 relative">
@@ -253,30 +252,30 @@
         </div>
       </div>
 
-      <ErrorAlert error={errors.auth} />
+      <ErrorAlert error="{errors.auth}" />
 
       <!-- Login Form -->
-      <form on:submit|preventDefault={handleSubmit}>
+      <form on:submit|preventDefault="{handleSubmit}">
         <FormField
           id="email-address"
           label="Email Address"
           type="email"
-          bind:value={email}
+          bind:value="{email}"
           placeholder="Email address"
           autocomplete="email"
           required
-          error={errors.email}
+          error="{errors.email}"
         />
 
         <FormField
           id="password"
           label="Password"
           type="password"
-          bind:value={password}
+          bind:value="{password}"
           placeholder="Password"
           autocomplete="current-password"
           required
-          error={errors.password}
+          error="{errors.password}"
         />
 
         <!-- Forgot Password Link -->
@@ -292,7 +291,7 @@
           size="lg"
           fullWidth
           {loading}
-          disabled={loading}
+          disabled="{loading}"
         >
           {loading ? 'Logging in...' : 'Log in'}
         </FormButton>

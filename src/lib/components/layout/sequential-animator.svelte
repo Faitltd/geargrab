@@ -55,7 +55,7 @@
   }
 </script>
 
-<div bind:this={containerElement} class="sequential-animator {className}">
+<div bind:this="{containerElement}" class="sequential-animator {className}">
   <slot />
 </div>
 

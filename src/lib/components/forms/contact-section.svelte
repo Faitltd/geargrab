@@ -113,16 +113,16 @@
         <div class="title-divider"></div>
         <p class="form-description">{description}</p>
         
-        <form on:submit|preventDefault={handleSubmit} class="contact-form">
+        <form on:submit|preventDefault="{handleSubmit}" class="contact-form">
           <div class="form-row">
             <div class="form-group">
               <label for="name" class="form-label">Name *</label>
               <input
                 type="text"
                 id="name"
-                bind:value={formData.name}
+                bind:value="{formData.name}"
                 class="form-input"
-                class:error={errors.name}
+                class:error="{errors.name}"
                 placeholder="Your name"
                 required
               />
@@ -136,7 +136,7 @@
               <input
                 type="tel"
                 id="phone"
-                bind:value={formData.phone}
+                bind:value="{formData.phone}"
                 class="form-input"
                 placeholder="Your phone number"
               />
@@ -148,9 +148,9 @@
             <input
               type="email"
               id="email"
-              bind:value={formData.email}
+              bind:value="{formData.email}"
               class="form-input"
-              class:error={errors.email}
+              class:error="{errors.email}"
               placeholder="your.email@example.com"
               required
             />
@@ -163,9 +163,9 @@
             <label for="message" class="form-label">Message *</label>
             <textarea
               id="message"
-              bind:value={formData.message}
+              bind:value="{formData.message}"
               class="form-textarea"
-              class:error={errors.message}
+              class:error="{errors.message}"
               placeholder="Tell us how we can help you..."
               rows="5"
               required
@@ -178,7 +178,7 @@
           <button
             type="submit"
             class="submit-button"
-            disabled={isSubmitting}
+            disabled="{isSubmitting}"
           >
             {#if isSubmitting}
               <i class="fas fa-spinner fa-spin"></i>

@@ -6,7 +6,7 @@
   // BACKGROUND CHECKS TEMPORARILY DISABLED
   // Redirect admins back to admin dashboard
   onMount(() => {
-    goto('/admin?message=background-checks-disabled');
+    goto("/admin?message=background-checks-disabled");
   });
 </script>
 
@@ -17,7 +17,7 @@
 <!-- Full Page Background -->
 <VideoBackground
   videoSrc="/857134-hd_1280_720_24fps.mp4"
-  overlayOpacity={0.3}
+  overlayOpacity="{0.3}"
 />
 
 <div class="min-h-screen relative z-10 flex items-center justify-center">

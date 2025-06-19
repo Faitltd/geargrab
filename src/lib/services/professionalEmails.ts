@@ -311,8 +311,7 @@ Hi ${data.renterName}!
 Great news! Your booking request has been successfully submitted and is now pending approval from the gear owner.
 
 BOOKING SUMMARY
-===============
-Confirmation #: ${data.confirmationNumber}
+========Confirmation #: ${data.confirmationNumber}
 Booking ID: ${data.bookingId}
 Item: ${data.listingTitle}
 Hosted by: ${data.ownerName}
@@ -323,8 +322,7 @@ ${data.pickupLocation ? `Pickup Location: ${data.pickupLocation}` : ''}
 Total Amount: $${data.totalPrice}
 
 WHAT HAPPENS NEXT?
-==================
-1. Owner Review (Within 24 hours)
+===========1. Owner Review (Within 24 hours)
    ${data.ownerName} will review your booking request and rental dates.
 
 2. Booking Confirmation

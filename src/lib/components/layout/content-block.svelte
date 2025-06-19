@@ -29,9 +29,9 @@
   ].filter(Boolean).join(' ');
 </script>
 
-<div class={containerClasses}>
+<div class="{containerClasses}">
   <div
-    class={cardClasses}
+    class="{cardClasses}"
     style="animation-delay: {delay}ms;"
   >
     <slot />

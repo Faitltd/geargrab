@@ -192,7 +192,7 @@
 
       <div class="space-y-4">
         <Checkbox
-          bind:checked={consentGiven}
+          bind:checked="{consentGiven}"
           labelClass="text-gray-300 text-sm"
           wrapperClass="items-start"
         >
@@ -206,7 +206,7 @@
 
       <div class="flex justify-end">
         <button
-          on:click={handleConsentSubmit}
+          on:click="{handleConsentSubmit}"
           disabled={!consentGiven || isSubmitting}
           class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-colors"
         >
@@ -233,8 +233,8 @@
             <label class="cursor-pointer">
               <input 
                 type="radio" 
-                bind:group={selectedCheckType} 
-                value={checkType}
+                bind:group="{selectedCheckType}" 
+                value="{checkType}"
                 class="sr-only"
               />
               <div class="border-2 {selectedCheckType === checkType ? 'border-blue-500 bg-blue-500/20' : 'border-white/20 bg-white/5'} rounded-lg p-4 transition-all">
@@ -265,8 +265,8 @@
             <label class="cursor-pointer block">
               <input 
                 type="radio" 
-                bind:group={selectedProvider} 
-                value={provider.id}
+                bind:group="{selectedProvider}" 
+                value="{provider.id}"
                 class="sr-only"
               />
               <div class="border-2 {selectedProvider === provider.id ? 'border-blue-500 bg-blue-500/20' : 'border-white/20 bg-white/5'} rounded-lg p-4 transition-all">
@@ -284,13 +284,13 @@
 
       <div class="flex justify-between">
         <button
-          on:click={goBack}
+          on:click="{goBack}"
           class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
         >
           Back
         </button>
         <button
-          on:click={handleProviderSelect}
+          on:click="{handleProviderSelect}"
           class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
         >
           Continue
@@ -335,14 +335,14 @@
 
       <div class="flex justify-between">
         <button
-          on:click={goBack}
+          on:click="{goBack}"
           class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
         >
           Back
         </button>
         <button
-          on:click={handleSubmitBackgroundCheck}
-          disabled={isSubmitting}
+          on:click="{handleSubmitBackgroundCheck}"
+          disabled="{isSubmitting}"
           class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-colors"
         >
           {isSubmitting ? 'Processing...' : `Pay $${estimatedCost} & Submit`}
@@ -376,10 +376,10 @@
 
       <div class="bg-blue-500/20 border border-blue-500/50 rounded-lg p-4">
         <p class="text-blue-200 text-sm">
-          <strong>What happens next?</strong><br>
-          1. Our partner will process your background check<br>
-          2. You'll receive email updates on the progress<br>
-          3. Once complete, your verification status will be updated<br>
+          <strong>What happens next?</strong><br />
+          1. Our partner will process your background check<br />
+          2. You'll receive email updates on the progress<br />
+          3. Once complete, your verification status will be updated<br />
           4. You'll gain access to premium features and reduced security deposits
         </p>
       </div>

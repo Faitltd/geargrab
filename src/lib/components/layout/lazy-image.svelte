@@ -60,8 +60,8 @@
 
 <div 
   class="lazy-image-container {className}"
-  style={containerStyle}
-  bind:this={imageElement}
+  style="{containerStyle}"
+  bind:this="{imageElement}"
 >
   {#if intersecting || loading === 'eager'}
     <img
@@ -69,17 +69,17 @@
       {alt}
       class="lazy-image"
       class:loaded
-      class:fade-in={fadeIn}
+      class:fade-in="{fadeIn}"
       class:error
-      on:load={handleLoad}
-      on:error={handleError}
+      on:load="{handleLoad}"
+      on:error="{handleError}"
     />
   {/if}
   
   {#if !loaded && !error}
     <div class="image-placeholder">
       {#if placeholder}
-        <img src={placeholder} {alt} class="placeholder-img" />
+        <img src="{placeholder}" {alt} class="placeholder-img" />
       {:else}
         <div class="skeleton-placeholder"></div>
       {/if}

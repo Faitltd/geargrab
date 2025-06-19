@@ -81,7 +81,7 @@
   }
 </script>
 
-<Modal bind:show title="Contact Support" maxWidth="max-w-2xl" on:close={close}>
+<Modal bind:show title="Contact Support" maxWidth="max-w-2xl" on:close="{close}">
   <div class="p-6">
     {#if submitSuccess}
       <div class="text-center py-8">
@@ -117,7 +117,7 @@
         </div>
       </div>
 
-      <form on:submit|preventDefault={handleSubmit} class="space-y-6">
+      <form on:submit|preventDefault="{handleSubmit}" class="space-y-6">
         <!-- Email -->
         <div>
           <label for="email" class="block text-sm font-medium text-white mb-2">
@@ -126,7 +126,7 @@
           <input
             type="email"
             id="email"
-            bind:value={formData.email}
+            bind:value="{formData.email}"
             required
             class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             placeholder="your.email@example.com"
@@ -141,11 +141,11 @@
             </label>
             <select
               id="category"
-              bind:value={formData.category}
+              bind:value="{formData.category}"
               class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             >
               {#each categories as category}
-                <option value={category.value}>{category.label}</option>
+                <option value="{category.value}">{category.label}</option>
               {/each}
             </select>
           </div>
@@ -156,11 +156,11 @@
             </label>
             <select
               id="priority"
-              bind:value={formData.priority}
+              bind:value="{formData.priority}"
               class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             >
               {#each priorities as priority}
-                <option value={priority.value}>{priority.label}</option>
+                <option value="{priority.value}">{priority.label}</option>
               {/each}
             </select>
           </div>
@@ -174,7 +174,7 @@
           <input
             type="text"
             id="subject"
-            bind:value={formData.subject}
+            bind:value="{formData.subject}"
             required
             class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             placeholder="Brief description of your issue"
@@ -188,7 +188,7 @@
           </label>
           <textarea
             id="message"
-            bind:value={formData.message}
+            bind:value="{formData.message}"
             required
             rows="6"
             class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
@@ -210,15 +210,15 @@
       <div class="flex justify-end space-x-4">
         <button
           type="button"
-          on:click={close}
+          on:click="{close}"
           class="px-6 py-2 text-gray-300 hover:text-white transition-colors"
         >
           Cancel
         </button>
         <button
           type="submit"
-          on:click={handleSubmit}
-          disabled={isSubmitting}
+          on:click="{handleSubmit}"
+          disabled="{isSubmitting}"
           class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center"
         >
           {#if isSubmitting}

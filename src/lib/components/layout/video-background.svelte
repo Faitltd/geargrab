@@ -46,16 +46,15 @@
   <!-- Background Image (always visible) -->
   <div class="absolute inset-0">
     <img
-      src={imageSrc}
-      alt={imageAlt}
+      src="{imageSrc}"
+      alt="{imageAlt}"
       class="w-full h-full object-cover"
-      loading="eager"
-    >
+      loading="eager" />
   </div>
 
   <!-- Video Background (overlays image when loaded) -->
   <video
-    bind:this={videoElement}
+    bind:this="{videoElement}"
     class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
     style="opacity: {videoLoaded ? 1 : 0};"
     autoplay
@@ -63,11 +62,11 @@
     loop
     playsinline
     preload="auto"
-    on:loadeddata={handleVideoLoaded}
-    on:canplay={handleVideoLoaded}
-    on:error={handleVideoError}
+    on:loadeddata="{handleVideoLoaded}"
+    on:canplay="{handleVideoLoaded}"
+    on:error="{handleVideoError}"
   >
-    <source src={videoSrc} type="video/mp4" />
+    <source src="{videoSrc}" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 

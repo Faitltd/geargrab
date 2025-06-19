@@ -415,7 +415,7 @@
     </div>
     <div class="flex items-center space-x-4">
       <button
-        on:click={openAddUserModal}
+        on:click="{openAddUserModal}"
         class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
       >
         + Add User
@@ -440,7 +440,7 @@
 
       <!-- Loading skeleton for user cards -->
       <div class="space-y-4">
-        <SkeletonCard variant="user" count={6} />
+        <SkeletonCard variant="user" count="{6}" />
       </div>
     </div>
   {:else}
@@ -449,10 +449,10 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Search -->
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Search Users</label>
-          <input
+          <label for="search-users" class="block text-sm font-medium text-gray-300 mb-2">Search Users</label>
+          <input id="search-users"
             type="text"
-            bind:value={searchQuery}
+            bind:value="{searchQuery}"
             placeholder="Search by email, name, or UID..."
             class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
           />
@@ -460,13 +460,13 @@
 
         <!-- Status Filter -->
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Status Filter</label>
-          <select
-            bind:value={statusFilter}
+          <label for="status-filter" class="block text-sm font-medium text-gray-300 mb-2">Status Filter</label>
+          <select id="status-filter"
+            bind:value="{statusFilter}"
             class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
           >
             {#each statusOptions as option}
-              <option value={option.value}>{option.label}</option>
+              <option value="{option.value}">{option.label}</option>
             {/each}
           </select>
         </div>
@@ -507,7 +507,7 @@
                     <div class="flex items-center">
                       <div class="h-10 w-10 bg-gray-600 rounded-full mr-4 flex items-center justify-center">
                         {#if user.photoURL}
-                          <img src={user.photoURL} alt={user.displayName} class="h-10 w-10 rounded-full object-cover" />
+                          <img src="{user.photoURL}" alt="{user.displayName}" class="h-10 w-10 rounded-full object-cover" />
                         {:else}
                           <span class="text-gray-400">👤</span>
                         {/if}
@@ -612,10 +612,10 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">User UID</label>
-          <input
+          <label for="user-uid" class="block text-sm font-medium text-gray-300 mb-2">User UID</label>
+          <input id="user-uid"
             type="text"
-            bind:value={newAdminUid}
+            bind:value="{newAdminUid}"
             placeholder="Enter user UID to grant/remove admin..."
             class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
           />
@@ -623,14 +623,14 @@
 
         <div class="flex items-end space-x-2">
           <button
-            on:click={addAdmin}
+            on:click="{addAdmin}"
             disabled={processing || !newAdminUid.trim()}
             class="bg-green-500 hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors"
           >
             {processing ? 'Processing...' : 'Grant Admin'}
           </button>
           <button
-            on:click={removeAdmin}
+            on:click="{removeAdmin}"
             disabled={processing || !newAdminUid.trim()}
             class="bg-red-500 hover:bg-red-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors"
           >
@@ -649,7 +649,7 @@
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-bold text-white">Add New User</h2>
         <button
-          on:click={closeAddUserModal}
+          on:click="{closeAddUserModal}"
           class="text-gray-400 hover:text-white"
         >
           ✕
@@ -658,10 +658,10 @@
 
       <div class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-          <input
+          <label for="email-address" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+          <input id="email-address"
             type="email"
-            bind:value={newUser.email}
+            bind:value="{newUser.email}"
             placeholder="user@example.com"
             class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 {formErrors.email ? 'border-red-500' : ''}"
             required
@@ -672,10 +672,10 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Display Name</label>
-          <input
+          <label for="display-name" class="block text-sm font-medium text-gray-300 mb-2">Display Name</label>
+          <input id="display-name"
             type="text"
-            bind:value={newUser.displayName}
+            bind:value="{newUser.displayName}"
             placeholder="John Doe"
             class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 {formErrors.displayName ? 'border-red-500' : ''}"
           />
@@ -685,10 +685,10 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Temporary Password</label>
-          <input
+          <label for="temporary-password" class="block text-sm font-medium text-gray-300 mb-2">Temporary Password</label>
+          <input id="temporary-password"
             type="password"
-            bind:value={newUser.password}
+            bind:value="{newUser.password}"
             placeholder="Temporary password"
             class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 {formErrors.password ? 'border-red-500' : ''}"
             required
@@ -701,9 +701,9 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Role</label>
-          <select
-            bind:value={newUser.role}
+          <label for="role" class="block text-sm font-medium text-gray-300 mb-2">Role</label>
+          <select id="role"
+            bind:value="{newUser.role}"
             class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
           >
             <option value="user">Regular User</option>
@@ -714,13 +714,13 @@
 
       <div class="flex justify-end space-x-4 mt-6">
         <button
-          on:click={closeAddUserModal}
+          on:click="{closeAddUserModal}"
           class="px-4 py-2 text-gray-400 hover:text-white transition-colors"
         >
           Cancel
         </button>
         <button
-          on:click={createUser}
+          on:click="{createUser}"
           disabled={processing || !newUser.email || !newUser.password}
           class="px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
         >
@@ -738,7 +738,7 @@
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-bold text-white">User Details</h2>
         <button
-          on:click={closeUserModal}
+          on:click="{closeUserModal}"
           class="text-gray-400 hover:text-white"
         >
           ✕
@@ -806,7 +806,7 @@
       <!-- Actions -->
       <div class="flex justify-end space-x-4 mt-6 pt-6 border-t border-white/20">
         <button
-          on:click={closeUserModal}
+          on:click="{closeUserModal}"
           class="px-4 py-2 text-gray-400 hover:text-white transition-colors"
         >
           Close

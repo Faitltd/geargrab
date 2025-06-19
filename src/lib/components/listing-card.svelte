@@ -23,15 +23,15 @@
   $: dailyPrice = listing?.dailyPrice || 25;
   $: location = listing?.location || { city: 'Local', state: 'Area' };
   $: images = listing?.images || [];
-  $: primaryImage = images[0] || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+  $: primaryImage = images[0] || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib="rb-4.0.3&auto=format&fit=crop&w=800&q=80';"
   $: averageRating = listing?.averageRating || 4.5;
   $: reviewCount = listing?.reviewCount || 12;
 </script>
 
-<div class="listing-card" on:click={handleClick} on:keydown={handleClick} role="button" tabindex="0">
+<div class="listing-card" on:click="{handleClick}" on:keydown="{handleClick}" role="button" tabindex="0">
   <!-- Image -->
   <div class="image-container">
-    <img src={primaryImage} alt={title} class="listing-image" />
+    <img src="{primaryImage}" alt="{title}" class="listing-image" />
     <div class="price-badge">
       {formatPrice(dailyPrice)}/day
     </div>

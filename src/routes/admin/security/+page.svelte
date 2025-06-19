@@ -13,7 +13,7 @@
   onMount(async () => {
     try {
       if (!$authStore.user) {
-        goto('/auth/login?redirectTo=/admin/security');
+          goto("/auth/login?redirectTo=/admin/security");
         return;
       }
 
@@ -107,8 +107,8 @@
           </div>
           
           <button
-            on:click={refreshData}
-            disabled={refreshing}
+            on:click="{refreshData}"
+            disabled="{refreshing}"
             class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors inline-flex items-center"
           >
             {#if refreshing}

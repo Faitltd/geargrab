@@ -6,7 +6,7 @@
     phone: '+1 (555) 123-4567',
     location: 'Salt Lake City, UT',
     bio: 'Outdoor enthusiast who loves hiking, camping, and mountain biking.',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
     verified: true,
     memberSince: 'January 2024'
   };
@@ -39,7 +39,7 @@
   <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6">
     <div class="flex items-center space-x-6">
       <div class="flex-shrink-0">
-        <img class="h-24 w-24 rounded-full border-4 border-white/20" src={user.avatar} alt={user.name} />
+        <img class="h-24 w-24 rounded-full border-4 border-white/20" src="{user.avatar}" alt="{user.name}" />
       </div>
       <div class="flex-1">
         <div class="flex items-center space-x-2">
@@ -67,11 +67,11 @@
     <div class="p-6 space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+          <label for="full-name" class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
           {#if editing}
-            <input
+            <input id="full-name"
               type="text"
-              bind:value={user.name}
+              bind:value="{user.name}"
               class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
           {:else}
@@ -80,11 +80,11 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+          <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
           {#if editing}
-            <input
+            <input id="email"
               type="email"
-              bind:value={user.email}
+              bind:value="{user.email}"
               class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
           {:else}
@@ -93,37 +93,37 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Phone</label>
+          <label for="phone" class="block text-sm font-medium text-gray-300 mb-2">Phone</label>
           {#if editing}
-            <input
+            <input id="phone"
               type="tel"
-              bind:value={user.phone}
+              bind:value="{user.phone}"
               class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
           {:else}
-            <p class="text-white">{user.phone}</p>
+            <p class="text-white">{user.phone || 'Not provided'}</p>
           {/if}
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Location</label>
+          <label for="location" class="block text-sm font-medium text-gray-300 mb-2">Location</label>
           {#if editing}
-            <input
+            <input id="location"
               type="text"
-              bind:value={user.location}
+              bind:value="{user.location}"
               class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
           {:else}
-            <p class="text-white">{user.location}</p>
+            <p class="text-white">{user.location || 'Not provided'}</p>
           {/if}
         </div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-300 mb-2">Bio</label>
+        <label for="bio" class="block text-sm font-medium text-gray-300 mb-2">Bio</label>
         {#if editing}
-          <textarea
-            bind:value={user.bio}
+          <textarea id="bio"
+            bind:value="{user.bio}"
             rows="4"
             class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           ></textarea>
@@ -146,7 +146,7 @@
           <p class="text-gray-300 text-sm">Receive notifications about bookings and messages</p>
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" checked class="sr-only peer">
+          <input type="checkbox" checked class="sr-only peer" />
           <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
         </label>
       </div>
@@ -157,7 +157,7 @@
           <p class="text-gray-300 text-sm">Receive text messages for urgent updates</p>
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" class="sr-only peer">
+          <input type="checkbox" class="sr-only peer" />
           <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
         </label>
       </div>

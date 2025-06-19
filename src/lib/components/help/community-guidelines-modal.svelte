@@ -11,7 +11,7 @@
   }
 </script>
 
-<Modal bind:show title={guidelines.title} maxWidth="max-w-4xl" on:close={close}>
+<Modal bind:show title="{guidelines.title}" maxWidth="max-w-4xl" on:close="{close}">
   <div class="p-6">
     <div class="mb-6">
       <p class="text-gray-300 text-lg leading-relaxed">{guidelines.content}</p>
@@ -73,7 +73,7 @@
         Last updated: January 2024
       </p>
       <button
-        on:click={close}
+        on:click="{close}"
         class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
       >
         I Understand

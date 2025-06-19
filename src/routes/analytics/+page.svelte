@@ -56,8 +56,7 @@
     <img
       src="/pexels-bianca-gasparoto-834990-1752951.jpg"
       alt="Mountain landscape"
-      class="w-full h-full object-cover"
-    >
+      class="w-full h-full object-cover" />
   </div>
   <div class="absolute inset-0 bg-black opacity-40"></div>
 </div>
@@ -75,8 +74,8 @@
         </div>
         <div class="flex items-center space-x-4">
           <select
-            bind:value={selectedPeriod}
-            on:change={loadAnalyticsData}
+            bind:value="{selectedPeriod}"
+            on:change="{loadAnalyticsData}"
             class="px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             <option value="week">Last Week</option>

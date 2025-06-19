@@ -13,7 +13,7 @@
       description: 'Spacious and waterproof tent perfect for family camping trips.',
       dailyPrice: 25,
       status: 'active',
-      image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+      image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80",
       views: 45,
       bookings: 3,
       earnings: 150
@@ -24,7 +24,7 @@
       description: '65L backpack with advanced suspension system for multi-day hikes.',
       dailyPrice: 15,
       status: 'active',
-      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+      image: "https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80",
       views: 32,
       bookings: 2,
       earnings: 90
@@ -35,7 +35,7 @@
       description: 'Complete climbing gear including harness, helmet, and ropes.',
       dailyPrice: 40,
       status: 'pending',
-      image: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+      image: "https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80",
       views: 18,
       bookings: 0,
       earnings: 0
@@ -70,7 +70,7 @@
     try {
       bookingsLoading = true;
       bookingsError = '';
-      const response = await fetch('/api/bookings?role=owner&status=pending_owner_approval');
+      const response = await fetch("/api/bookings?role=owner&status=pending_owner_approval");
 
       if (!response.ok) {
         throw new Error('Failed to load bookings');
@@ -188,7 +188,7 @@
       </div>
       <div class="mt-4 sm:mt-0">
         <button
-          on:click={createNewListing}
+          on:click="{createNewListing}"
           class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors inline-flex items-center"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,7 +300,7 @@
           <div class="bg-red-500/20 border border-red-500/50 rounded-lg p-4">
             <p class="text-red-200">{bookingsError}</p>
             <button
-              on:click={loadPendingBookings}
+              on:click="{loadPendingBookings}"
               class="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
             >
               Try Again
@@ -410,7 +410,7 @@
         <p class="mt-1 text-sm text-gray-300">Start earning money by listing your outdoor gear for rent!</p>
         <div class="mt-6">
           <button
-            on:click={createNewListing}
+            on:click="{createNewListing}"
             class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors inline-flex items-center"
           >
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -430,10 +430,9 @@
                 <!-- Image -->
                 <div class="flex-shrink-0">
                   <img
-                    src={listing.image}
-                    alt={listing.title}
-                    class="w-20 h-20 object-cover rounded-lg"
-                  >
+                    src="{listing.image}"
+                    alt="{listing.title}"
+                    class="w-20 h-20 object-cover rounded-lg" />
                 </div>
 
                 <!-- Content -->

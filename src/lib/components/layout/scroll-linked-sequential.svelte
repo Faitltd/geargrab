@@ -136,7 +136,7 @@
 </script>
 
 <div
-  bind:this={containerElement}
+  bind:this="{containerElement}"
   class="scroll-linked-sequential {className}"
   data-scroll-linked="true"
 >

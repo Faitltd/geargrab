@@ -54,7 +54,7 @@
   <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
   <div
     class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-    on:click={handleBackdropClick}
+    on:click="{handleBackdropClick}"
     role="dialog"
     aria-modal="true"
     transition:fade={{ duration: 200 }}
@@ -75,7 +75,7 @@
           
           {#if showCloseButton}
             <button
-              on:click={close}
+              on:click="{close}"
               class="text-gray-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10"
               aria-label="Close modal"
             >

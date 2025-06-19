@@ -41,7 +41,7 @@
 </script>
 
 <div class="form-field">
-  <label for={id} class="block text-sm font-medium text-white mb-2">
+  <label for="{id}" class="block text-sm font-medium text-white mb-2">
     {label}
     {#if required}
       <span class="text-red-400 ml-1" aria-label="required">*</span>
@@ -49,7 +49,7 @@
   </label>
 
   {#if helpText}
-    <p id={helpId} class="text-sm text-gray-300 mb-2">{helpText}</p>
+    <p id="{helpId}" class="text-sm text-gray-300 mb-2">{helpText}</p>
   {/if}
 
   {#if isTextarea}
@@ -86,7 +86,7 @@
     >
       <option value="">{placeholder || `Select ${label.toLowerCase()}`}</option>
       {#each options as option}
-        <option value={option.value}>{option.label}</option>
+        <option value="{option.value}">{option.label}</option>
       {/each}
     </select>
   {:else if isEmail}
@@ -169,7 +169,7 @@
   {/if}
 
   {#if error}
-    <p id={errorId} class="mt-1 text-sm text-red-400" role="alert" aria-live="polite">{error}</p>
+    <p id="{errorId}" class="mt-1 text-sm text-red-400" role="alert" aria-live="polite">{error}</p>
   {/if}
 </div>
 

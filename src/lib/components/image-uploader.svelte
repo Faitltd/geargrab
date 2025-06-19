@@ -148,26 +148,26 @@
   <!-- Drag and drop area -->
   <div
     class="upload-area {dragActive ? 'active' : ''} {images.length >= maxImages ? 'disabled' : ''}"
-    on:dragenter={handleDragEnter}
-    on:dragover={handleDragOver}
-    on:dragleave={handleDragLeave}
-    on:drop={handleDrop}
-    on:click={openFileDialog}
-    on:keydown={handleKeydown}
+    on:dragenter="{handleDragEnter}"
+    on:dragover="{handleDragOver}"
+    on:dragleave="{handleDragLeave}"
+    on:drop="{handleDrop}"
+    on:click="{openFileDialog}"
+    on:keydown="{handleKeydown}"
     tabindex="0"
     role="button"
-    aria-disabled={images.length >= maxImages}
+    aria-disabled="{images.length" >= maxImages}
     aria-label="Upload images by clicking or dragging files here"
   >
     <input 
       type="file" 
-      bind:this={fileInput}
-      on:change={handleFileSelect}
+      bind:this="{fileInput}"
+      on:change="{handleFileSelect}"
       accept="image/*"
       multiple
       class="hidden"
       aria-label="Upload images"
-      disabled={images.length >= maxImages}
+      disabled="{images.length" />= maxImages}
     />
     
     <div class="upload-content">
@@ -202,14 +202,14 @@
         {#each images as image, i (image)}
           <div class="image-item">
             <div class="image-wrapper">
-              <img src={image} alt={`Preview ${i+1}`} class="preview-image" />
+              <img src="{image}" alt="{`Preview" ${i+1}`} class="preview-image" />
 
               <!-- Remove button -->
               <button
                 type="button"
                 class="remove-button"
                 on:click={() => removeImage(i)}
-                aria-label={`Remove image ${i+1}`}
+                aria-label="{`Remove" image ${i+1}`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
                   <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -223,7 +223,7 @@
                     type="button"
                     class="move-button"
                     on:click={() => moveImageUp(i)}
-                    aria-label={`Move image ${i+1} left`}
+                    aria-label="{`Move" image ${i+1} left`}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
                       <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -235,7 +235,7 @@
                     type="button"
                     class="move-button"
                     on:click={() => moveImageDown(i)}
-                    aria-label={`Move image ${i+1} right`}
+                    aria-label="{`Move" image ${i+1} right`}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
                       <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />

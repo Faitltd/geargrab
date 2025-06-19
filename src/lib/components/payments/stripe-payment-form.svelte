@@ -171,7 +171,7 @@
     <h3 class="text-lg font-semibold text-white mb-4">Payment Information</h3>
 
     <!-- Stripe Payment Element Container -->
-    <div bind:this={paymentElementContainer} class="mb-6">
+    <div bind:this="{paymentElementContainer}" class="mb-6">
       <!-- Stripe Elements will be mounted here -->
     </div>
 

@@ -159,36 +159,36 @@
       <h2 class="text-xl font-semibold text-white mb-4">Test Controls</h2>
       <div class="flex flex-wrap gap-4">
         <button
-          on:click={testGoogleSignIn}
-          disabled={loading}
+          on:click="{testGoogleSignIn}"
+          disabled="{loading}"
           class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
         >
           {loading ? 'Testing...' : 'Test Google Sign-In'}
         </button>
         
         <button
-          on:click={testPopup}
+          on:click="{testPopup}"
           class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
         >
           Test Popup
         </button>
 
         <button
-          on:click={checkHeaders}
+          on:click="{checkHeaders}"
           class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
         >
           Check Headers
         </button>
 
         <button
-          on:click={clearCache}
+          on:click="{clearCache}"
           class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
         >
           Clear Cache & Reload
         </button>
 
         <button
-          on:click={clearDebug}
+          on:click="{clearDebug}"
           class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
         >
           Clear Debug

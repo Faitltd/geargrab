@@ -114,7 +114,7 @@
   <div class="bg-red-500/20 border border-red-500/50 rounded-lg p-4">
     <p class="text-red-200">{error}</p>
     <button 
-      on:click={loadBackgroundCheckStatus}
+      on:click="{loadBackgroundCheckStatus}"
       class="mt-2 text-red-300 hover:text-red-100 underline text-sm"
     >
       Try again
@@ -207,7 +207,7 @@
           <span class="text-orange-200 text-sm">Your background check expires soon. Renew to maintain verification status.</span>
         </div>
         <button 
-          on:click={handleRenewBackgroundCheck}
+          on:click="{handleRenewBackgroundCheck}"
           class="mt-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold py-1 px-3 rounded transition-colors"
         >
           Renew Now

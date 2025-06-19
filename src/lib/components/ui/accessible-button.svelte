@@ -75,15 +75,15 @@
     {href}
     {target}
     {rel}
-    class={buttonClasses}
-    aria-label={ariaLabel}
-    aria-describedby={ariaDescribedBy || undefined}
-    aria-disabled={disabled}
-    tabindex={disabled ? -1 : 0}
-    on:click={handleClick}
-    on:keydown={handleKeydown}
-    on:focus={handleFocus}
-    on:blur={handleBlur}
+    class="{buttonClasses}"
+    aria-label="{ariaLabel}"
+    aria-describedby="{ariaDescribedBy" || undefined}
+    aria-disabled="{disabled}"
+    tabindex="{disabled" ? -1 : 0}
+    on:click="{handleClick}"
+    on:keydown="{handleKeydown}"
+    on:focus="{handleFocus}"
+    on:blur="{handleBlur}"
   >
     {#if loading}
       <svg class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -99,14 +99,14 @@
   <button
     {type}
     {disabled}
-    class={buttonClasses}
-    aria-label={ariaLabel}
-    aria-describedby={ariaDescribedBy || undefined}
-    aria-disabled={disabled || loading}
-    on:click={handleClick}
-    on:keydown={handleKeydown}
-    on:focus={handleFocus}
-    on:blur={handleBlur}
+    class="{buttonClasses}"
+    aria-label="{ariaLabel}"
+    aria-describedby="{ariaDescribedBy" || undefined}
+    aria-disabled="{disabled" || loading}
+    on:click="{handleClick}"
+    on:keydown="{handleKeydown}"
+    on:focus="{handleFocus}"
+    on:blur="{handleBlur}"
   >
     {#if loading}
       <svg class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

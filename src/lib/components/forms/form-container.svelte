@@ -22,7 +22,7 @@
   $: wrapperClasses = `w-full ${maxWidthClasses[maxWidth]} ${className}`;
 </script>
 
-<div class={wrapperClasses}>
+<div class="{wrapperClasses}">
   {#if title || subtitle}
     <div class="text-center mb-8">
       {#if title}
@@ -38,7 +38,7 @@
     </div>
   {/if}
 
-  <div class={containerClasses}>
+  <div class="{containerClasses}">
     <slot />
   </div>
 </div>

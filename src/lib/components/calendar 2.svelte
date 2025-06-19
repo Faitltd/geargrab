@@ -170,7 +170,7 @@
 
 <div class="calendar-container">
   <div class="calendar-header">
-    <button type="button" class="calendar-nav-btn" on:click={prevMonth} aria-label="Previous month">
+    <button type="button" class="calendar-nav-btn" on:click="{prevMonth}" aria-label="Previous month">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
       </svg>
@@ -178,7 +178,7 @@
     <div class="calendar-title">
       {getMonthName(currentDate.getMonth())} {currentDate.getFullYear()}
     </div>
-    <button type="button" class="calendar-nav-btn" on:click={nextMonth} aria-label="Next month">
+    <button type="button" class="calendar-nav-btn" on:click="{nextMonth}" aria-label="Next month">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
       </svg>
@@ -210,9 +210,9 @@
               type="button"
               class="calendar-day {isCurrentMonth ? 'current-month' : 'other-month'} {isSelected ? 'selected' : ''} {isDisabled ? 'disabled' : ''}"
               on:click={() => handleDateClick(date)}
-              disabled={isDisabled}
+              disabled="{isDisabled}"
               aria-label="{date.toLocaleDateString()} {isSelected ? 'selected' : ''}"
-              aria-pressed={isSelected}
+              aria-pressed="{isSelected}"
             >
               {date.getDate()}
             </button>

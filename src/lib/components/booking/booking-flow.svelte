@@ -23,7 +23,7 @@
   {endDate}
   {deliveryMethod}
   {deliveryFee}
-  on:cancel={handleCancel}
+  on:cancel="{handleCancel}"
 />
 
 
