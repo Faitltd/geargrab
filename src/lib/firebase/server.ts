@@ -19,6 +19,7 @@ let adminApp: App;
 let adminAuth: Auth;
 let adminFirestore: Firestore;
 let adminStorage: Storage;
+let isAdminInitialized = false;
 
 // Initialize Firebase Admin SDK
 try {
@@ -41,13 +42,30 @@ try {
       const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
       const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
+      console.log('🔍 Firebase Admin environment check:', {
+        hasProjectId: !!projectId,
+        hasClientEmail: !!clientEmail,
+        hasPrivateKey: !!privateKey,
+        projectId,
+        clientEmail: clientEmail?.substring(0, 30) + '...',
+        privateKeyLength: privateKey?.length
+      });
+
       if (projectId && clientEmail && privateKey) {
         shouldInitialize = true;
         credentials = { projectId, clientEmail, privateKey };
+        console.log('✅ Firebase Admin credentials found, will initialize');
       } else if (dev) {
         // For development, use demo project
         shouldInitialize = true;
         credentials = { projectId: 'demo-project' };
+        console.log('🔧 Development mode: using demo project');
+      } else {
+        console.log('❌ Missing Firebase Admin credentials:', {
+          projectId: !!projectId,
+          clientEmail: !!clientEmail,
+          privateKey: !!privateKey
+        });
       }
     }
 
@@ -67,6 +85,7 @@ try {
       adminAuth = getAuth(adminApp);
       adminFirestore = getFirestore(adminApp);
       adminStorage = getStorage(adminApp);
+      isAdminInitialized = true;
 
       console.log('✅ Firebase Admin SDK initialized successfully');
     } else {
@@ -84,6 +103,7 @@ try {
     adminAuth = getAuth(adminApp);
     adminFirestore = getFirestore(adminApp);
     adminStorage = getStorage(adminApp);
+    isAdminInitialized = true;
   }
 } catch (error) {
   console.error('❌ Failed to initialize Firebase Admin SDK:', error);
@@ -107,7 +127,7 @@ export { adminApp, adminAuth, adminFirestore, adminStorage };
 
 // Helper function to check if Firebase Admin is available
 export function isFirebaseAdminAvailable(): boolean {
-  return adminApp !== null && adminFirestore !== null && adminApp !== undefined;
+  return isAdminInitialized && adminApp !== null && adminFirestore !== null && adminApp !== undefined;
 }
 
 // Safe wrapper for Firestore operations
