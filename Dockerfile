@@ -26,7 +26,7 @@ ENV VITE_FIREBASE_APP_ID=1:227444442028:web:6eeaed1e136d07f5b73009
 
 # Stripe configuration (required at build time for client-side)
 ENV VITE_STRIPE_PUBLISHABLE_KEY=pk_live_51RZXbxBfCDZxMJmHHUzHwNJq1gNdpcMjp4kAJK28n8d5kTXPhI4pnptDiLJmyHybfhJzY7vIVZOaNrzJClCkY3vS00tMlh4lyZ
-ENV STRIPE_SECRET_KEY=sk_live_placeholder_will_be_overridden_by_cloud_run
+ENV STRIPE_SECRET_KEY=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
 
 # Build the application
 RUN npm run build
