@@ -37,6 +37,6 @@ export default {
   },
   plugins: [
     // require('@tailwindcss/forms'), // Temporarily disabled due to dependency issue
-    require('@tailwindcss/typography'),
+    // require('@tailwindcss/typography'), // Temporarily disabled due to dependency issue
   ],
 };
