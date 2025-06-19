@@ -101,6 +101,9 @@ export const POST: RequestHandler = async (event) => {
       const paymentIntent = await stripeClient.paymentIntents.create({
         amount: Math.round(amount),
         currency,
+        automatic_payment_methods: {
+          enabled: true,
+        },
         metadata: {
           userId,
           ...metadata
