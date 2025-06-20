@@ -1,7 +1,9 @@
+<!-- TEMPORARILY DISABLED FOR DEPLOYMENT -->
+<!--
 <script lang="ts">
   import { onMount } from 'svelte';
   import { notifications } from '$lib/stores/notifications';
-  import Checkbox from '$lib/components/ui/checkbox.svelte';
+  // import Checkbox from '$lib/components/ui/checkbox.svelte';
 
   let loading = false;
   let settings = {
@@ -401,5 +403,14 @@
     >
       {loading ? 'Saving Settings...' : 'Save All Settings'}
     </button>
+  </div>
+</div>
+-->
+
+<!-- Temporary placeholder for admin settings -->
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+    <h1 class="text-2xl font-bold text-white mb-4">Admin Settings</h1>
+    <p class="text-gray-300">Settings page temporarily disabled during deployment optimization.</p>
   </div>
 </div>
