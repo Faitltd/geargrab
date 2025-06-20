@@ -277,10 +277,11 @@
 
   // Calculate booking details
   $: days = startDate && endDate ?
-    Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) : 0;
+    Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))) : 1;
 
-  // Two-stage payment calculation
-  $: basePrice = listing ? (listing.dailyPrice || 0) * days : 0;
+  // Two-stage payment calculation with fallback pricing
+  $: effectiveDailyPrice = listing?.dailyPrice || 25; // Fallback to $25/day if missing
+  $: basePrice = effectiveDailyPrice * days;
   $: serviceFee = Math.round(basePrice * 0.1);
   $: deliveryFee = deliveryMethod === 'pickup' ? 0 : 30;
   $: insuranceFee = insuranceTier === 'none' ? 0 : insuranceTier === 'basic' ? 5 : insuranceTier === 'standard' ? 10 : 15;
@@ -295,6 +296,8 @@
   $: {
     console.log('🔧 Full Payment Pricing Debug:', {
       listing: listing ? 'loaded' : 'null',
+      listingId,
+      listingTitle: listing?.title || 'unknown',
       dailyPrice: listing?.dailyPrice || 0,
       days,
       basePrice,
@@ -308,8 +311,21 @@
       calculatedTotalInCents: Math.round(calculatedTotal * 100),
       isValidAmount: calculatedTotal >= 0.50,
       startDate,
-      endDate
+      endDate,
+      startDateParsed: new Date(startDate),
+      endDateParsed: new Date(endDate),
+      timeDiff: new Date(endDate).getTime() - new Date(startDate).getTime(),
+      daysCalculated: Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))
     });
+
+    // If dailyPrice is 0 or missing, show a warning
+    if (!listing?.dailyPrice || listing.dailyPrice === 0) {
+      console.warn('⚠️ PRICING ISSUE: Listing has no daily price!', {
+        listingId,
+        listing: listing ? 'exists' : 'null',
+        dailyPrice: listing?.dailyPrice
+      });
+    }
   }
 
   function formatCurrency(amount) {
