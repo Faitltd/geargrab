@@ -420,15 +420,32 @@ export const POST: RequestHandler = createSecureHandler(
         firstName: { required: true, type: 'string' as const, minLength: 1 },
         lastName: { required: true, type: 'string' as const, minLength: 1 },
         email: { required: true, type: 'email' as const },
-        phone: { required: true, type: 'string' as const, minLength: 1 }
+        phone: { required: true, type: 'string' as const, minLength: 1 },
+        emergencyContact: { required: false, type: 'string' as const },
+        emergencyPhone: { required: false, type: 'string' as const }
       }
     },
     totalPrice: { required: true, type: 'number' as const, min: 0 },
-    priceBreakdown: { required: false, type: 'object' as const },
+    totalBookingCost: { required: false, type: 'number' as const, min: 0 },
+    priceBreakdown: {
+      required: false,
+      type: 'object' as const,
+      properties: {
+        dailyPrice: { required: false, type: 'number' as const },
+        days: { required: false, type: 'number' as const },
+        basePrice: { required: false, type: 'number' as const },
+        serviceFee: { required: false, type: 'number' as const },
+        deliveryFee: { required: false, type: 'number' as const },
+        insuranceFee: { required: false, type: 'number' as const },
+        upfrontFees: { required: false, type: 'number' as const },
+        laterFees: { required: false, type: 'number' as const }
+      }
+    },
     deliveryMethod: { required: false, type: 'string' as const },
     insuranceTier: { required: false, type: 'string' as const },
     specialRequests: { required: false, type: 'string' as const },
-    paymentIntentId: { required: false, type: 'string' as const }
+    paymentIntentId: { required: false, type: 'string' as const },
+    paymentStage: { required: false, type: 'string' as const }
   }
 }
 );
