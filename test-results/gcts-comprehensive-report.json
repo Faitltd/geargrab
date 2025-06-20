@@ -1,0 +1,120 @@
+{
+  "testSuite": "GearGrab Comprehensive Test Suite (GCTS)",
+  "version": "1.0.0",
+  "summary": {
+    "attempt": 1,
+    "totalTests": 6,
+    "passed": 3,
+    "failed": 3,
+    "duration": 2747,
+    "timestamp": "2025-06-20T12:17:29.581Z",
+    "phases": {
+      "authentication": {
+        "passed": 1,
+        "failed": 2,
+        "total": 3
+      },
+      "transaction": {
+        "passed": 2,
+        "failed": 1,
+        "total": 3
+      }
+    }
+  },
+  "phaseResults": {
+    "authentication": {
+      "passed": 1,
+      "failed": 2,
+      "total": 3
+    },
+    "transaction": {
+      "passed": 2,
+      "failed": 1,
+      "total": 3
+    }
+  },
+  "testResults": [
+    {
+      "name": "Firebase Authentication Integration",
+      "type": "auth-core",
+      "phase": "authentication",
+      "success": true,
+      "stdout": "\n> geargrab@0.0.1 test:auth:unit\n> jest --testPathPattern=auth\n\n",
+      "stderr": "PASS tests/auth/auth-database.test.ts\n  Authentication Database Operations\n    User Profile Management\n      ✓ should create user profile in database (2 ms)\n      ✓ should retrieve user profile from database (1 ms)\n      ✓ should handle non-existent user profile\n      ✓ should update user profile\n      ✓ should delete user profile\n    User Sessions Management\n      ✓ should create user session (1 ms)\n      ✓ should query user sessions\n      ✓ should clean up expired sessions\n    Database Error Handling\n      ✓ should handle Firestore permission errors\n      ✓ should handle Firestore network errors (1 ms)\n      ✓ should handle Firestore quota exceeded errors\n      ✓ should handle invalid document references (6 ms)\n    Data Validation\n      ✓ should validate user data before saving\n      ✓ should sanitize user input\n    Batch Operations\n      ✓ should handle batch user operations\n\nPASS tests/auth/basic-auth.test.ts\n  Basic Authentication Tests\n    Test Environment\n      ✓ should have Jest configured correctly (1 ms)\n      ✓ should support TypeScript\n      ✓ should have environment variables available\n    Mock Functions\n      ✓ should support Jest mocking\n      ✓ should support async testing (12 ms)\n    Error Handling\n      ✓ should handle thrown errors (3 ms)\n      ✓ should handle async errors\n\nPASS tests/auth/simple-auth.test.ts\n  SimpleAuth Service\n    Password Hashing with bcrypt\n      ✓ should hash passwords securely (1 ms)\n      ✓ should verify passwords correctly\n      ✓ should reject invalid passwords\n    JWT Token Management\n      ✓ should create JWT tokens correctly\n      ✓ should validate JWT tokens correctly\n      ✓ should reject invalid JWT tokens (4 ms)\n      ✓ should reject expired JWT tokens\n    Social Authentication\n      ✓ should handle Google sign-in successfully\n      ✓ should handle Google sign-in errors\n      ✓ should handle Apple sign-in successfully\n      ✓ should handle Facebook sign-in successfully (1 ms)\n      ✓ should handle GitHub sign-in successfully\n    Error Handling\n      ✓ should handle network errors gracefully\n      ✓ should handle popup blocked errors\n      ✓ should handle cancelled authentication\n    Sign Out\n      ✓ should sign out successfully\n      ✓ should handle sign out errors\n    Auth State Management\n      ✓ should initialize with loading state (1 ms)\n      ✓ should update auth state on user change\n\nTest Suites: 3 passed, 3 total\nTests:       41 passed, 41 total\nSnapshots:   0 total\nTime:        0.436 s, estimated 1 s\nRan all test suites matching /auth/i.\n",
+      "timestamp": "2025-06-20T12:17:28.085Z",
+      "attempt": 1,
+      "critical": true
+    },
+    {
+      "name": "Social Login Providers",
+      "type": "auth-social",
+      "phase": "authentication",
+      "success": false,
+      "stdout": "\n> geargrab@0.0.1 test:unit\n> jest --testPathPattern=social.*auth|auth.*social --verbose\n\nNo tests found, exiting with code 1\nRun with `--passWithNoTests` to exit with code 0\nIn /Users/raymondkinneiii/Documents/augment-projects/GearGrab\n  1480 files checked.\n  testMatch: /Users/raymondkinneiii/Documents/augment-projects/GearGrab/src/**/__tests__/**/*.(ts|js), /Users/raymondkinneiii/Documents/augment-projects/GearGrab/src/**/*.(test|spec).(ts|js), /Users/raymondkinneiii/Documents/augment-projects/GearGrab/tests/**/*.(test|spec).(ts|js) - 6 matches\n  testPathIgnorePatterns: /Users/raymondkinneiii/Documents/augment-projects/GearGrab/node_modules/, /Users/raymondkinneiii/Documents/augment-projects/GearGrab/build/, /Users/raymondkinneiii/Documents/augment-projects/GearGrab/.svelte-kit/, /Users/raymondkinneiii/Documents/augment-projects/GearGrab/cypress/ - 296 matches\n  testRegex:  - 0 matches\nPattern: social.*auth|auth.*social - 0 matches\n",
+      "stderr": "",
+      "timestamp": "2025-06-20T12:17:28.418Z",
+      "attempt": 1,
+      "critical": true
+    },
+    {
+      "name": "JWT Token Management",
+      "type": "auth-jwt",
+      "phase": "authentication",
+      "success": false,
+      "stdout": "\n> geargrab@0.0.1 test:unit\n> jest --testPathPattern=jwt|token --verbose\n\nNo tests found, exiting with code 1\nRun with `--passWithNoTests` to exit with code 0\nIn /Users/raymondkinneiii/Documents/augment-projects/GearGrab\n  1480 files checked.\n  testMatch: /Users/raymondkinneiii/Documents/augment-projects/GearGrab/src/**/__tests__/**/*.(ts|js), /Users/raymondkinneiii/Documents/augment-projects/GearGrab/src/**/*.(test|spec).(ts|js), /Users/raymondkinneiii/Documents/augment-projects/GearGrab/tests/**/*.(test|spec).(ts|js) - 6 matches\n  testPathIgnorePatterns: /Users/raymondkinneiii/Documents/augment-projects/GearGrab/node_modules/, /Users/raymondkinneiii/Documents/augment-projects/GearGrab/build/, /Users/raymondkinneiii/Documents/augment-projects/GearGrab/.svelte-kit/, /Users/raymondkinneiii/Documents/augment-projects/GearGrab/cypress/ - 296 matches\n  testRegex:  - 0 matches\nPattern: jwt|token - 0 matches\n",
+      "stderr": "",
+      "timestamp": "2025-06-20T12:17:28.751Z",
+      "attempt": 1,
+      "critical": true
+    },
+    {
+      "name": "Payment Intent API Security",
+      "type": "payment-api",
+      "phase": "transaction",
+      "success": true,
+      "stdout": "200",
+      "stderr": "",
+      "timestamp": "2025-06-20T12:17:28.926Z",
+      "attempt": 1,
+      "critical": true
+    },
+    {
+      "name": "Booking API Authentication",
+      "type": "booking-auth",
+      "phase": "transaction",
+      "success": true,
+      "stdout": "{\"error\":\"Authentication required. Please log in and try again.\"}",
+      "stderr": "",
+      "timestamp": "2025-06-20T12:17:29.219Z",
+      "attempt": 1,
+      "critical": true
+    },
+    {
+      "name": "Stripe Integration Validation",
+      "type": "payment-integration",
+      "phase": "transaction",
+      "success": false,
+      "stdout": "\n> geargrab@0.0.1 test:unit\n> jest --testPathPattern=stripe|payment --verbose\n\nNo tests found, exiting with code 1\nRun with `--passWithNoTests` to exit with code 0\nIn /Users/raymondkinneiii/Documents/augment-projects/GearGrab\n  1480 files checked.\n  testMatch: /Users/raymondkinneiii/Documents/augment-projects/GearGrab/src/**/__tests__/**/*.(ts|js), /Users/raymondkinneiii/Documents/augment-projects/GearGrab/src/**/*.(test|spec).(ts|js), /Users/raymondkinneiii/Documents/augment-projects/GearGrab/tests/**/*.(test|spec).(ts|js) - 6 matches\n  testPathIgnorePatterns: /Users/raymondkinneiii/Documents/augment-projects/GearGrab/node_modules/, /Users/raymondkinneiii/Documents/augment-projects/GearGrab/build/, /Users/raymondkinneiii/Documents/augment-projects/GearGrab/.svelte-kit/, /Users/raymondkinneiii/Documents/augment-projects/GearGrab/cypress/ - 296 matches\n  testRegex:  - 0 matches\nPattern: stripe|payment - 0 matches\n",
+      "stderr": "",
+      "timestamp": "2025-06-20T12:17:29.581Z",
+      "attempt": 1,
+      "critical": false
+    }
+  ],
+  "corrections": [],
+  "recommendations": [
+    {
+      "category": "Authentication",
+      "priority": "HIGH",
+      "description": "Fix authentication system issues",
+      "action": "Review Firebase configuration and social login providers"
+    },
+    {
+      "category": "Transaction Flow",
+      "priority": "HIGH",
+      "description": "Fix transaction processing issues",
+      "action": "Review payment and booking API integration"
+    }
+  ],
+  "status": "NEEDS_ATTENTION"
+}

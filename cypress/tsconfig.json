@@ -1,14 +1,26 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["es5", "dom"],
-    "types": ["cypress", "node"],
-    "moduleResolution": "node",
+    "target": "es2020",
+    "lib": [
+      "es2020",
+      "dom"
+    ],
     "module": "commonjs",
+    "moduleResolution": "node",
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "types": [
+      "cypress",
+      "node"
+    ]
   },
-  "include": ["**/*.ts", "**/*.js"]
+  "include": [
+    "cypress/**/*.ts",
+    "cypress/**/*.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

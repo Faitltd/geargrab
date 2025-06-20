@@ -1,0 +1,73 @@
+{
+  "summary": {
+    "attempt": 3,
+    "totalTests": 5,
+    "passed": 0,
+    "failed": 5,
+    "duration": 10030,
+    "timestamp": "2025-06-20T12:04:06.367Z"
+  },
+  "testResults": [
+    {
+      "name": "Authentication Integration Tests",
+      "type": "auth-integration",
+      "success": false,
+      "error": "Cannot access 'process' before initialization",
+      "timestamp": "2025-06-20T12:04:06.367Z",
+      "attempt": 3
+    },
+    {
+      "name": "Booking API Tests",
+      "type": "booking-api",
+      "success": false,
+      "error": "Cannot access 'process' before initialization",
+      "timestamp": "2025-06-20T12:04:06.367Z",
+      "attempt": 3
+    },
+    {
+      "name": "Payment Integration Tests",
+      "type": "payment-integration",
+      "success": false,
+      "error": "Cannot access 'process' before initialization",
+      "timestamp": "2025-06-20T12:04:06.367Z",
+      "attempt": 3
+    },
+    {
+      "name": "Transaction Flow E2E Tests",
+      "type": "e2e-transaction",
+      "success": false,
+      "error": "Cannot access 'process' before initialization",
+      "timestamp": "2025-06-20T12:04:06.367Z",
+      "attempt": 3
+    },
+    {
+      "name": "Firestore Transaction Tests",
+      "type": "firestore-transaction",
+      "success": false,
+      "error": "Cannot access 'process' before initialization",
+      "timestamp": "2025-06-20T12:04:06.367Z",
+      "attempt": 3
+    }
+  ],
+  "corrections": [],
+  "recommendations": [
+    {
+      "category": "Authentication",
+      "priority": "HIGH",
+      "description": "Update transaction endpoints to use Firebase authentication middleware",
+      "action": "Replace Prisma auth checks with Firebase auth validation in booking and payment APIs"
+    },
+    {
+      "category": "Payment Processing",
+      "priority": "HIGH",
+      "description": "Fix Stripe payment integration with updated authentication",
+      "action": "Ensure payment intent creation works with Firebase ID tokens"
+    },
+    {
+      "category": "Booking System",
+      "priority": "MEDIUM",
+      "description": "Update booking creation to work with Firebase user data",
+      "action": "Replace Prisma user queries with Firestore user document lookups"
+    }
+  ]
+}

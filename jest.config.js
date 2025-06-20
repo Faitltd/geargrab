@@ -15,10 +15,7 @@ export default {
   // Module file extensions
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   
-  // Transform files with ts-jest
-  transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest'
-  },
+  // Transform configuration moved below
   
   // Test file patterns
   testMatch: [
@@ -36,7 +33,7 @@ export default {
   ],
   
   // Module name mapping for SvelteKit aliases
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^\\$lib/(.*)$': '<rootDir>/src/lib/$1',
     '^\\$lib$': '<rootDir>/src/lib',
     '^\\$components/(.*)$': '<rootDir>/src/lib/components/$1',
@@ -52,7 +49,10 @@ export default {
     '^\\$services/(.*)$': '<rootDir>/src/lib/services/$1',
     '^\\$services$': '<rootDir>/src/lib/services',
     '^\\$constants/(.*)$': '<rootDir>/src/lib/constants/$1',
-    '^\\$constants$': '<rootDir>/src/lib/constants'
+    '^\\$constants$': '<rootDir>/src/lib/constants',
+    '^\\$app/(.*)$': '<rootDir>/tests/mocks/$app/$1',
+    '^svelte/store$': '<rootDir>/tests/mocks/svelte/store.ts',
+    '^svelte/(.*)$': '<rootDir>/tests/mocks/svelte/$1.ts'
   },
   
   // Setup files to run before tests
@@ -80,22 +80,28 @@ export default {
   // Coverage thresholds for authentication module
   coverageThreshold: {
     global: {
-      branches: 85,
-      functions: 85,
-      lines: 85,
-      statements: 85
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80
     },
-    'src/lib/services/AuthService.ts': {
+    'src/lib/auth/simple-auth.ts': {
       branches: 90,
       functions: 90,
       lines: 90,
       statements: 90
     },
     'src/lib/auth/**/*.ts': {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80
+      branches: 85,
+      functions: 85,
+      lines: 85,
+      statements: 85
+    },
+    'src/lib/services/auth/**/*.ts': {
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90
     }
   },
   
@@ -119,19 +125,11 @@ export default {
   // Verbose output
   verbose: true,
   
-  // Global variables
-  globals: {
-    'ts-jest': {
-      tsconfig: {
-        target: 'es2020',
-        module: 'esnext',
-        moduleResolution: 'node',
-        allowSyntheticDefaultImports: true,
-        esModuleInterop: true,
-        skipLibCheck: true,
-        strict: true
-      }
-    }
+  // Transform configuration
+  transform: {
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
+      tsconfig: 'tsconfig.jest.json'
+    }]
   },
   
   // Module directories

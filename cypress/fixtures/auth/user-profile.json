@@ -1,0 +1,47 @@
+{
+  "success": true,
+  "user": {
+    "uid": "google-user-123456",
+    "email": "test@gmail.com",
+    "displayName": "Test User",
+    "photoURL": "https://lh3.googleusercontent.com/a/default-user",
+    "provider": "google",
+    "emailVerified": true,
+    "phoneNumber": null,
+    "profile": {
+      "firstName": "Test",
+      "lastName": "User",
+      "bio": "Test user for authentication testing",
+      "location": "San Francisco, CA",
+      "website": "https://example.com",
+      "preferences": {
+        "notifications": {
+          "email": true,
+          "push": true,
+          "sms": false
+        },
+        "privacy": {
+          "profileVisible": true,
+          "showEmail": false,
+          "showPhone": false
+        }
+      }
+    },
+    "roles": ["user"],
+    "permissions": ["read:profile", "write:profile", "read:bookings", "write:bookings"],
+    "subscription": {
+      "plan": "free",
+      "status": "active",
+      "expiresAt": null
+    },
+    "stats": {
+      "totalBookings": 5,
+      "totalListings": 2,
+      "rating": 4.8,
+      "reviewCount": 12
+    },
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "updatedAt": "2024-01-15T10:30:00.000Z",
+    "lastLoginAt": "2024-01-15T10:30:00.000Z"
+  }
+}

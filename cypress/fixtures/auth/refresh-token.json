@@ -1,0 +1,7 @@
+{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJnb29nbGUtdXNlci0xMjM0NTYiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwiaWF0IjoxNzA1MzE4MjAwLCJleHAiOjE3MDUzMjE4MDB9.new-test-signature",
+  "refreshToken": "new-refresh-token-123456",
+  "expiresIn": 3600,
+  "tokenType": "Bearer"
+}
