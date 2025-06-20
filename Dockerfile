@@ -36,12 +36,24 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Copy package files and install only production dependencies
 COPY --from=build /app/package*.json ./
-COPY --from=build /app/build ./build
-COPY --from=build /app/node_modules ./node_modules
+RUN npm ci --omit=dev --cache /tmp/.npm
 
+# Copy built application
+COPY --from=build /app/build ./build
+
+# Set environment variables
 ENV PORT=8080
 ENV NODE_ENV=production
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+
+# Change ownership of the app directory
+RUN chown -R nextjs:nodejs /app
+USER nextjs
 
 EXPOSE 8080
 

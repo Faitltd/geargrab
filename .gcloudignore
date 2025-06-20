@@ -1,0 +1,84 @@
+# Ignore development dependencies and build artifacts
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Ignore version control
+.git/
+.github/
+.gitignore
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Ignore environment files
+.env
+.env.*
+!.env.example
+
+# Ignore build artifacts and cache
+/build/
+/.svelte-kit/
+/static/build/
+/dist/
+/.next/
+/.nuxt/
+/coverage/
+/.nyc_output/
+
+# Ignore test artifacts
+/test-results/
+/playwright-report/
+/cypress/videos/
+/cypress/screenshots/
+/cypress/downloads/
+
+# Ignore documentation and non-essential files
+/docs/
+/documentation/
+README*.md
+CHANGELOG.md
+LICENSE
+*.md
+
+# Ignore large development files
+/scripts/
+/tests/
+/cypress/
+/jest.config.js
+/cypress.config.js
+/cypress-simple.config.js
+/tsconfig.jest.json
+
+# Ignore package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Ignore logs
+*.log
+logs/
+
+# Ignore temporary files
+/tmp/
+/temp/
+*.tmp
+*.temp
+
+# Ignore backup files
+*.bak
+*.backup

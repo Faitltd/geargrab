@@ -173,18 +173,28 @@ class SimpleAuthService {
     try {
       console.log('🔄 Simple Auth: Starting Google sign-in with popup...');
 
-      const { auth } = await import('$lib/firebase/client');
-      const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
+      // Pre-load Firebase modules for faster execution
+      const [{ auth }, { GoogleAuthProvider, signInWithPopup }] = await Promise.all([
+        import('$lib/firebase/client'),
+        import('firebase/auth')
+      ]);
 
       if (!auth) {
         throw new Error('Firebase auth not available');
       }
 
+      // Optimize provider configuration for speed
       const provider = new GoogleAuthProvider();
       provider.addScope('email');
       provider.addScope('profile');
 
-      // Use popup for fastest authentication
+      // Set custom parameters for faster authentication
+      provider.setCustomParameters({
+        prompt: 'select_account', // Allow account selection for faster re-auth
+        include_granted_scopes: 'true' // Include previously granted scopes
+      });
+
+      // Use popup for fastest authentication with optimized settings
       const result = await signInWithPopup(auth, provider);
 
       console.log('✅ Simple Auth: Google sign-in successful:', result.user.email);
@@ -200,7 +210,18 @@ class SimpleAuthService {
       return { success: true };
     } catch (error: any) {
       console.error('❌ Simple Auth: Google sign-in failed:', error);
-      return { success: false, error: error.message };
+
+      // Provide more specific error messages
+      let errorMessage = error.message;
+      if (error.code === 'auth/popup-blocked') {
+        errorMessage = 'Popup was blocked. Please allow popups for this site and try again.';
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Sign-in was cancelled. Please try again.';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      }
+
+      return { success: false, error: errorMessage };
     }
   }
 
@@ -208,8 +229,11 @@ class SimpleAuthService {
     try {
       console.log('🔄 Simple Auth: Starting Apple sign-in...');
 
-      const { auth } = await import('$lib/firebase/client');
-      const { OAuthProvider, signInWithPopup } = await import('firebase/auth');
+      // Pre-load Firebase modules for faster execution
+      const [{ auth }, { OAuthProvider, signInWithPopup }] = await Promise.all([
+        import('$lib/firebase/client'),
+        import('firebase/auth')
+      ]);
 
       if (!auth) {
         throw new Error('Firebase auth not available');
@@ -218,6 +242,11 @@ class SimpleAuthService {
       const provider = new OAuthProvider('apple.com');
       provider.addScope('email');
       provider.addScope('name');
+
+      // Set custom parameters for Apple Sign-In
+      provider.setCustomParameters({
+        locale: 'en_US'
+      });
 
       const result = await signInWithPopup(auth, provider);
 
@@ -233,7 +262,15 @@ class SimpleAuthService {
       return { success: true };
     } catch (error: any) {
       console.error('❌ Simple Auth: Apple sign-in failed:', error);
-      return { success: false, error: error.message };
+
+      let errorMessage = error.message;
+      if (error.code === 'auth/popup-blocked') {
+        errorMessage = 'Popup was blocked. Please allow popups for this site and try again.';
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Sign-in was cancelled. Please try again.';
+      }
+
+      return { success: false, error: errorMessage };
     }
   }
 
@@ -241,8 +278,11 @@ class SimpleAuthService {
     try {
       console.log('🔄 Simple Auth: Starting Facebook sign-in...');
 
-      const { auth } = await import('$lib/firebase/client');
-      const { FacebookAuthProvider, signInWithPopup } = await import('firebase/auth');
+      // Pre-load Firebase modules for faster execution
+      const [{ auth }, { FacebookAuthProvider, signInWithPopup }] = await Promise.all([
+        import('$lib/firebase/client'),
+        import('firebase/auth')
+      ]);
 
       if (!auth) {
         throw new Error('Firebase auth not available');
@@ -250,6 +290,12 @@ class SimpleAuthService {
 
       const provider = new FacebookAuthProvider();
       provider.addScope('email');
+      provider.addScope('public_profile');
+
+      // Set custom parameters for Facebook
+      provider.setCustomParameters({
+        display: 'popup'
+      });
 
       const result = await signInWithPopup(auth, provider);
 
@@ -265,7 +311,17 @@ class SimpleAuthService {
       return { success: true };
     } catch (error: any) {
       console.error('❌ Simple Auth: Facebook sign-in failed:', error);
-      return { success: false, error: error.message };
+
+      let errorMessage = error.message;
+      if (error.code === 'auth/popup-blocked') {
+        errorMessage = 'Popup was blocked. Please allow popups for this site and try again.';
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Sign-in was cancelled. Please try again.';
+      } else if (error.code === 'auth/account-exists-with-different-credential') {
+        errorMessage = 'An account already exists with this email using a different sign-in method.';
+      }
+
+      return { success: false, error: errorMessage };
     }
   }
 
@@ -273,8 +329,11 @@ class SimpleAuthService {
     try {
       console.log('🔄 Simple Auth: Starting GitHub sign-in...');
 
-      const { auth } = await import('$lib/firebase/client');
-      const { GithubAuthProvider, signInWithPopup } = await import('firebase/auth');
+      // Pre-load Firebase modules for faster execution
+      const [{ auth }, { GithubAuthProvider, signInWithPopup }] = await Promise.all([
+        import('$lib/firebase/client'),
+        import('firebase/auth')
+      ]);
 
       if (!auth) {
         throw new Error('Firebase auth not available');
@@ -282,6 +341,7 @@ class SimpleAuthService {
 
       const provider = new GithubAuthProvider();
       provider.addScope('user:email');
+      provider.addScope('read:user');
 
       const result = await signInWithPopup(auth, provider);
 
@@ -297,7 +357,17 @@ class SimpleAuthService {
       return { success: true };
     } catch (error: any) {
       console.error('❌ Simple Auth: GitHub sign-in failed:', error);
-      return { success: false, error: error.message };
+
+      let errorMessage = error.message;
+      if (error.code === 'auth/popup-blocked') {
+        errorMessage = 'Popup was blocked. Please allow popups for this site and try again.';
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Sign-in was cancelled. Please try again.';
+      } else if (error.code === 'auth/account-exists-with-different-credential') {
+        errorMessage = 'An account already exists with this email using a different sign-in method.';
+      }
+
+      return { success: false, error: errorMessage };
     }
   }
 
