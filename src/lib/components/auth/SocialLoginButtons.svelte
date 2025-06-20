@@ -1,6 +1,7 @@
 <script lang="ts">
   import { simpleAuth } from '$lib/auth/simple-auth';
   import { createEventDispatcher } from 'svelte';
+  import { notifications } from '$lib/stores/notifications';
 
   const dispatch = createEventDispatcher();
 
@@ -30,12 +31,27 @@
       }
 
       if (result.success) {
+        notifications.add({
+          type: 'success',
+          message: 'Successfully signed in!',
+          timeout: 3000
+        });
         dispatch('success');
       } else {
         error = result.error || 'Login failed';
+        notifications.add({
+          type: 'error',
+          message: error,
+          timeout: 5000
+        });
       }
     } catch (err: any) {
       error = err.message || 'Login failed';
+      notifications.add({
+        type: 'error',
+        message: error,
+        timeout: 5000
+      });
     } finally {
       loading = false;
     }
