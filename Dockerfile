@@ -7,7 +7,7 @@ COPY package*.json ./
 
 # Install ALL dependencies (including dev dependencies needed for build)
 RUN npm cache clean --force && \
-    npm ci --include=dev
+    npm install --include=dev
 
 COPY . .
 
