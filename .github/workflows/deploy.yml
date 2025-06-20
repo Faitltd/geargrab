@@ -1,10 +1,11 @@
 name: Deploy to Cloud Run
 
 on:
-  push:
-    branches:
-      - main
-      - latest-version
+  # DISABLED automatic deployment to prevent costs
+  # push:
+  #   branches:
+  #     - main
+  #     - latest-version
   # Only deploy on manual trigger to save costs during development
   workflow_dispatch:
     inputs:
