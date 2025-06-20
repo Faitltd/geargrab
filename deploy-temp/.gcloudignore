@@ -1,0 +1,16 @@
+# Ignore everything not needed for deployment
+*.md
+*.log
+.git/
+.github/
+.vscode/
+.idea/
+.DS_Store
+.env*
+!.env.example
+/test-results/
+/playwright-report/
+/cypress/
+/scripts/
+/docs/
+deploy-*/
