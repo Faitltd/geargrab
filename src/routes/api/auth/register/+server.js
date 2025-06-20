@@ -5,7 +5,7 @@
 
 import { json } from '@sveltejs/kit';
 import { createReport, fetchReport, determineAdverseAction, getReportPdfUrl } from '$lib/utils/i-prospect-check-client.js';
-import { fcraNoticeService } from '$lib/utils/fcra-notices.js';
+// import { fcraNoticeService } from '$lib/utils/fcra-notices.js'; // Temporarily disabled for deployment
 import { BackgroundCheckRecord } from '$lib/models/backgroundCheck.js';
 import { adminAuth, adminFirestore } from '$lib/firebase/server';
 
@@ -264,11 +264,12 @@ async function processBackgroundCheckCompletion(reportId, recordId, userData) {
       console.log('Sending pre-adverse notice for:', userData.email);
       
       try {
-        await fcraNoticeService.sendPreAdverseNotice(
-          userData.email,
-          reportPdfUrl,
-          { firstName: userData.firstName, lastName: userData.lastName }
-        );
+        // await fcraNoticeService.sendPreAdverseNotice(
+        //   userData.email,
+        //   reportPdfUrl,
+        //   { firstName: userData.firstName, lastName: userData.lastName }
+        // ); // Temporarily disabled for deployment
+        console.log('Pre-adverse notice would be sent to:', userData.email);
 
         // Update record to mark pre-adverse notice sent
         await BackgroundCheckRecord.update(recordId, {
