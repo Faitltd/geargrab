@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
   import { simpleAuth } from '$lib/auth/simple-auth';
   import { onMount } from 'svelte';
+  import FastLoginModal from './fast-login-modal.svelte';
+  import FastSignupModal from './fast-signup-modal.svelte';
 
   export let message: string = 'You must be signed in to access this feature.';
   export let showLoginPrompt: boolean = true;
@@ -13,8 +13,9 @@
   $: isAuthenticated = $authState.isAuthenticated;
   $: isLoading = $authState.loading;
 
-  // Get current page URL for redirect
-  $: currentUrl = $page.url.pathname + $page.url.search;
+  // Modal state
+  let showLoginModal = false;
+  let showSignupModal = false;
 
   onMount(async () => {
     console.log('🔐 Auth Guard: Mounted, checking auth state...');
@@ -33,35 +34,40 @@
   });
 
   function handleLogin() {
-    // Force navigation to login page - multiple fallback methods
-    console.log('🔄 Navigating to login page...');
-
-    const loginUrl = redirectAfterLogin
-      ? `/auth/login?redirectTo=/admin`
-      : '/auth/login';
-
-    // Method 1: SvelteKit goto
-    goto(loginUrl).catch(() => {
-      // Method 2: Direct window location if goto fails
-      console.log('⚠️ goto failed, using window.location');
-      window.location.href = loginUrl;
-    });
+    console.log('🔄 Opening fast login modal...');
+    showLoginModal = true;
   }
 
   function handleSignup() {
-    // Force navigation to signup page - multiple fallback methods
-    console.log('🔄 Navigating to signup page...');
+    console.log('🔄 Opening fast signup modal...');
+    showSignupModal = true;
+  }
 
-    const signupUrl = redirectAfterLogin
-      ? `/auth/signup?redirectTo=/admin`
-      : '/auth/signup';
+  function handleLoginSuccess() {
+    console.log('✅ Fast login successful!');
+    showLoginModal = false;
+    // Auth state will automatically update via simpleAuth
+  }
 
-    // Method 1: SvelteKit goto
-    goto(signupUrl).catch(() => {
-      // Method 2: Direct window location if goto fails
-      console.log('⚠️ goto failed, using window.location');
-      window.location.href = signupUrl;
-    });
+  function handleSignupSuccess() {
+    console.log('✅ Fast signup successful!');
+    showSignupModal = false;
+    // Auth state will automatically update via simpleAuth
+  }
+
+  function handleModalClose() {
+    showLoginModal = false;
+    showSignupModal = false;
+  }
+
+  function switchToSignup() {
+    showLoginModal = false;
+    showSignupModal = true;
+  }
+
+  function switchToLogin() {
+    showSignupModal = false;
+    showLoginModal = true;
   }
 </script>
 
@@ -121,5 +127,20 @@
     </div>
   </div>
 {/if}
+
+<!-- Fast Social Login Modals -->
+<FastLoginModal
+  bind:show={showLoginModal}
+  on:success={handleLoginSuccess}
+  on:close={handleModalClose}
+  on:switchToSignup={switchToSignup}
+/>
+
+<FastSignupModal
+  bind:show={showSignupModal}
+  on:success={handleSignupSuccess}
+  on:close={handleModalClose}
+  on:switchToLogin={switchToLogin}
+/>
 
 

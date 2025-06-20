@@ -171,10 +171,10 @@ class SimpleAuthService {
 
   async signInWithGoogle(): Promise<{ success: boolean; error?: string }> {
     try {
-      console.log('🔄 Simple Auth: Starting Google sign-in with redirect...');
+      console.log('🔄 Simple Auth: Starting Google sign-in with popup...');
 
       const { auth } = await import('$lib/firebase/client');
-      const { GoogleAuthProvider, signInWithRedirect } = await import('firebase/auth');
+      const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
 
       if (!auth) {
         throw new Error('Firebase auth not available');
@@ -184,16 +184,119 @@ class SimpleAuthService {
       provider.addScope('email');
       provider.addScope('profile');
 
-      // Use redirect instead of popup to avoid browser blocking
-      await signInWithRedirect(auth, provider);
+      // Use popup for fastest authentication
+      const result = await signInWithPopup(auth, provider);
 
-      // Note: signInWithRedirect doesn't return a result immediately
-      // The result will be handled by getRedirectResult in the app initialization
-      console.log('🔄 Simple Auth: Google redirect initiated...');
+      console.log('✅ Simple Auth: Google sign-in successful:', result.user.email);
+
+      // Update auth state immediately
+      this.currentUser = result.user;
+      this.authStore.set({
+        user: result.user,
+        loading: false,
+        isAuthenticated: true
+      });
 
       return { success: true };
     } catch (error: any) {
       console.error('❌ Simple Auth: Google sign-in failed:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async signInWithApple(): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log('🔄 Simple Auth: Starting Apple sign-in...');
+
+      const { auth } = await import('$lib/firebase/client');
+      const { OAuthProvider, signInWithPopup } = await import('firebase/auth');
+
+      if (!auth) {
+        throw new Error('Firebase auth not available');
+      }
+
+      const provider = new OAuthProvider('apple.com');
+      provider.addScope('email');
+      provider.addScope('name');
+
+      const result = await signInWithPopup(auth, provider);
+
+      console.log('✅ Simple Auth: Apple sign-in successful:', result.user.email);
+
+      this.currentUser = result.user;
+      this.authStore.set({
+        user: result.user,
+        loading: false,
+        isAuthenticated: true
+      });
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('❌ Simple Auth: Apple sign-in failed:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async signInWithFacebook(): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log('🔄 Simple Auth: Starting Facebook sign-in...');
+
+      const { auth } = await import('$lib/firebase/client');
+      const { FacebookAuthProvider, signInWithPopup } = await import('firebase/auth');
+
+      if (!auth) {
+        throw new Error('Firebase auth not available');
+      }
+
+      const provider = new FacebookAuthProvider();
+      provider.addScope('email');
+
+      const result = await signInWithPopup(auth, provider);
+
+      console.log('✅ Simple Auth: Facebook sign-in successful:', result.user.email);
+
+      this.currentUser = result.user;
+      this.authStore.set({
+        user: result.user,
+        loading: false,
+        isAuthenticated: true
+      });
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('❌ Simple Auth: Facebook sign-in failed:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async signInWithGitHub(): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log('🔄 Simple Auth: Starting GitHub sign-in...');
+
+      const { auth } = await import('$lib/firebase/client');
+      const { GithubAuthProvider, signInWithPopup } = await import('firebase/auth');
+
+      if (!auth) {
+        throw new Error('Firebase auth not available');
+      }
+
+      const provider = new GithubAuthProvider();
+      provider.addScope('user:email');
+
+      const result = await signInWithPopup(auth, provider);
+
+      console.log('✅ Simple Auth: GitHub sign-in successful:', result.user.email);
+
+      this.currentUser = result.user;
+      this.authStore.set({
+        user: result.user,
+        loading: false,
+        isAuthenticated: true
+      });
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('❌ Simple Auth: GitHub sign-in failed:', error);
       return { success: false, error: error.message };
     }
   }
@@ -233,60 +336,7 @@ class SimpleAuthService {
     }
   }
 
-  async signInWithEmailPassword(email: string, password: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      console.log('🔄 Simple Auth: Starting email/password sign-in...');
-
-      const { auth } = await import('$lib/firebase/client');
-      const { signInWithEmailAndPassword } = await import('firebase/auth');
-
-      if (!auth) {
-        throw new Error('Firebase auth not available');
-      }
-
-      const result = await signInWithEmailAndPassword(auth, email, password);
-
-      console.log('✅ Simple Auth: Email sign-in successful:', result.user.email);
-
-      // Immediately update our auth state
-      this.currentUser = result.user;
-      this.authStore.set({
-        user: result.user,
-        loading: false,
-        isAuthenticated: true
-      });
-
-      // Wait a moment for state to propagate
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      return { success: true };
-    } catch (error: any) {
-      console.error('❌ Simple Auth: Email sign-in failed:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  async createUserWithEmailPassword(email: string, password: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      console.log('🔄 Simple Auth: Creating user with email/password...');
-
-      const { auth } = await import('$lib/firebase/client');
-      const { createUserWithEmailAndPassword } = await import('firebase/auth');
-
-      if (!auth) {
-        throw new Error('Firebase auth not available');
-      }
-
-      const result = await createUserWithEmailAndPassword(auth, email, password);
-
-      console.log('✅ Simple Auth: User creation successful:', result.user.email);
-
-      return { success: true };
-    } catch (error: any) {
-      console.error('❌ Simple Auth: User creation failed:', error);
-      return { success: false, error: error.message };
-    }
-  }
+  // Email authentication removed - using social logins only for better security and speed
 
   async signOut(): Promise<{ success: boolean; error?: string }> {
     try {
