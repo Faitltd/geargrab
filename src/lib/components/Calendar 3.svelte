@@ -209,7 +209,7 @@
             <button
               type="button"
               class="calendar-day {isCurrentMonth ? 'current-month' : 'other-month'} {isSelected ? 'selected' : ''} {isDisabled ? 'disabled' : ''}"
-              on:click="{()" => handleDateClick(date)}
+              on:click={() => handleDateClick(date)}
               disabled="{isDisabled}"
               aria-label="{date.toLocaleDateString()} {isSelected ? 'selected' : ''}"
               aria-pressed="{isSelected}"

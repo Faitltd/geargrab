@@ -822,7 +822,7 @@
   </div>
 </div>
 
-<!-- Login Modal -->
+<!-- Fast Social Login Modal -->
 <LoginModal
   bind:show="{showLoginModal}"
   redirectAfterLogin="{false}"
