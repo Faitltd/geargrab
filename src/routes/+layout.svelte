@@ -4,8 +4,8 @@
   import '../app.css';
   import { simpleAuth } from '$lib/auth/simple-auth';
   import { BookingContextManager } from '$lib/utils/booking-context';
-  import Navbar from '$lib/components/layout/navbar.svelte';
-  import Footer from '$lib/components/layout/footer.svelte';
+  import Navbar from '$lib/components/layout/Navbar.svelte';
+  import Footer from '$lib/components/layout/Footer.svelte';
   import PageTransition from '$lib/components/layout/page-transition.svelte';
   import ToastNotifications from '$lib/components/ui/toast-notifications.svelte';
 
