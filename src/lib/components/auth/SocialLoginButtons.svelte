@@ -1,4 +1,5 @@
 <script lang="ts">
+  // Social-only authentication buttons - v2.1.0 - Updated 2024-12-21
   import { simpleAuth } from '$lib/auth/simple-auth';
   import { createEventDispatcher } from 'svelte';
   import { notifications } from '$lib/stores/notifications';

@@ -1,0 +1,17 @@
+{
+  "success": true,
+  "user": {
+    "uid": "google-user-123456",
+    "email": "test@gmail.com",
+    "displayName": "Test User",
+    "photoURL": "https://lh3.googleusercontent.com/a/default-user",
+    "provider": "google",
+    "emailVerified": true,
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "lastLoginAt": "2024-01-15T10:30:00.000Z"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJnb29nbGUtdXNlci0xMjM0NTYiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwiaWF0IjoxNzA1MzE0NjAwLCJleHAiOjE3MDUzMTgyMDB9.test-signature",
+  "refreshToken": "refresh-token-123456",
+  "expiresIn": 3600,
+  "tokenType": "Bearer"
+}

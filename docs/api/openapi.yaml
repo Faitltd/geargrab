@@ -1,0 +1,2691 @@
+openapi: 3.0.3
+info:
+  title: GearGrab API
+  description: |
+    RESTful API for GearGrab - A comprehensive gear rental platform.
+    
+    ## Authentication
+    This API uses JWT Bearer tokens for authentication. Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <your-jwt-token>
+    ```
+    
+    ## Rate Limiting
+    API requests are rate limited to prevent abuse:
+    - Authenticated users: 1000 requests per hour
+    - Unauthenticated users: 100 requests per hour
+    
+    ## Error Handling
+    All errors follow RFC 7807 Problem Details format with consistent structure.
+    
+    ## Versioning
+    API versioning is handled through the URL path (e.g., `/api/v1/`).
+  version: 1.0.0
+  contact:
+    name: GearGrab API Support
+    email: api-support@geargrab.co
+    url: https://geargrab.co/support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://geargrab.co/terms
+
+servers:
+  - url: https://api.geargrab.co/v1
+    description: Production server
+  - url: https://staging-api.geargrab.co/v1
+    description: Staging server
+  - url: http://localhost:5173/api/v1
+    description: Development server
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []
+
+paths:
+  # Authentication Endpoints
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account with email and password
+      operationId: registerUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            examples:
+              basic_user:
+                summary: Basic user registration
+                value:
+                  email: "john.doe@example.com"
+                  password: "SecurePass123!"
+                  name: "John Doe"
+                  username: "johndoe"
+              minimal_user:
+                summary: Minimal registration
+                value:
+                  email: "jane@example.com"
+                  password: "SecurePass123!"
+                  name: "Jane Smith"
+      responses:
+        '201':
+          description: User registered successfully
+          headers:
+            Location:
+              description: URL of the created user resource
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+              examples:
+                success:
+                  summary: Successful registration
+                  value:
+                    success: true
+                    message: "User registered successfully"
+                    data:
+                      user:
+                        id: "usr_1234567890"
+                        email: "john.doe@example.com"
+                        name: "John Doe"
+                        username: "johndoe"
+                        role: "USER"
+                        emailVerified: false
+                        createdAt: "2024-01-15T10:30:00Z"
+                      token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      expiresAt: "2024-01-15T11:30:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                email_exists:
+                  summary: Email already registered
+                  value:
+                    success: false
+                    error:
+                      code: "EMAIL_EXISTS"
+                      message: "A user with this email address already exists"
+                      details:
+                        field: "email"
+                        value: "john.doe@example.com"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    requestId: "req_1234567890"
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate user
+      description: Login with email and password to receive JWT token
+      operationId: loginUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              valid_login:
+                summary: Valid login credentials
+                value:
+                  email: "john.doe@example.com"
+                  password: "SecurePass123!"
+                  rememberMe: true
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              description: Session cookie for web clients
+              schema:
+                type: string
+                example: "__session=abc123; HttpOnly; Secure; SameSite=Strict"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+              examples:
+                success:
+                  summary: Successful login
+                  value:
+                    success: true
+                    message: "Login successful"
+                    data:
+                      user:
+                        id: "usr_1234567890"
+                        email: "john.doe@example.com"
+                        name: "John Doe"
+                        username: "johndoe"
+                        role: "USER"
+                        emailVerified: true
+                        lastLoginAt: "2024-01-15T10:30:00Z"
+                      token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      expiresAt: "2024-01-15T11:30:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_credentials:
+                  summary: Wrong email or password
+                  value:
+                    success: false
+                    error:
+                      code: "INVALID_CREDENTIALS"
+                      message: "Invalid email or password"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    requestId: "req_1234567890"
+                account_locked:
+                  summary: Account temporarily locked
+                  value:
+                    success: false
+                    error:
+                      code: "ACCOUNT_LOCKED"
+                      message: "Account locked due to too many failed login attempts. Try again in 15 minutes."
+                      details:
+                        lockoutExpiresAt: "2024-01-15T10:45:00Z"
+                        attemptsRemaining: 0
+                    timestamp: "2024-01-15T10:30:00Z"
+                    requestId: "req_1234567890"
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout user
+      description: Invalidate current session and JWT token
+      operationId: logoutUser
+      responses:
+        '200':
+          description: Logout successful
+          headers:
+            Set-Cookie:
+              description: Clear session cookie
+              schema:
+                type: string
+                example: "__session=; HttpOnly; Secure; SameSite=Strict; Max-Age=0"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              examples:
+                success:
+                  summary: Successful logout
+                  value:
+                    success: true
+                    message: "Logout successful"
+                    timestamp: "2024-01-15T10:30:00Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh JWT token
+      description: Get a new access token using refresh token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+                  description: Valid refresh token
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+              examples:
+                success:
+                  summary: Token refreshed
+                  value:
+                    success: true
+                    data:
+                      token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      expiresAt: "2024-01-15T11:30:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_token:
+                  summary: Invalid refresh token
+                  value:
+                    success: false
+                    error:
+                      code: "INVALID_REFRESH_TOKEN"
+                      message: "Invalid or expired refresh token"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    requestId: "req_1234567890"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Request password reset
+      description: Send password reset email to user
+      operationId: forgotPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email address of the account
+                  example: "john.doe@example.com"
+      responses:
+        '200':
+          description: Password reset email sent (always returns 200 for security)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              examples:
+                success:
+                  summary: Reset email sent
+                  value:
+                    success: true
+                    message: "If an account with this email exists, a password reset link has been sent"
+                    timestamp: "2024-01-15T10:30:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from login endpoint
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for service-to-service communication
+
+  schemas:
+    # Request Schemas
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - name
+      properties:
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "john.doe@example.com"
+          maxLength: 254
+        password:
+          type: string
+          description: User's password (minimum 8 characters)
+          example: "SecurePass123!"
+          minLength: 8
+          maxLength: 128
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]'
+        name:
+          type: string
+          description: User's full name
+          example: "John Doe"
+          minLength: 2
+          maxLength: 100
+        username:
+          type: string
+          description: Unique username (optional)
+          example: "johndoe"
+          minLength: 3
+          maxLength: 30
+          pattern: '^[a-zA-Z0-9_-]+$'
+        acceptTerms:
+          type: boolean
+          description: User accepts terms and conditions
+          example: true
+        marketingOptIn:
+          type: boolean
+          description: User opts in to marketing communications
+          example: false
+          default: false
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "john.doe@example.com"
+        password:
+          type: string
+          description: User's password
+          example: "SecurePass123!"
+        rememberMe:
+          type: boolean
+          description: Extend session duration
+          example: true
+          default: false
+        deviceInfo:
+          type: object
+          description: Optional device information for security
+          properties:
+            userAgent:
+              type: string
+              example: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            ipAddress:
+              type: string
+              format: ipv4
+              example: "192.168.1.1"
+            deviceId:
+              type: string
+              example: "device_123456"
+
+    # Response Schemas
+    AuthResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Login successful"
+        data:
+          type: object
+          required:
+            - user
+            - token
+            - expiresAt
+          properties:
+            user:
+              $ref: '#/components/schemas/User'
+            token:
+              type: string
+              description: JWT access token
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            refreshToken:
+              type: string
+              description: JWT refresh token
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            expiresAt:
+              type: string
+              format: date-time
+              description: Token expiration time
+              example: "2024-01-15T11:30:00Z"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    TokenResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - token
+            - expiresAt
+          properties:
+            token:
+              type: string
+              description: New JWT access token
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            refreshToken:
+              type: string
+              description: New refresh token
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            expiresAt:
+              type: string
+              format: date-time
+              description: Token expiration time
+              example: "2024-01-15T11:30:00Z"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - name
+        - role
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: Unique user identifier
+          example: "usr_1234567890"
+          pattern: '^usr_[a-zA-Z0-9]{10}$'
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "john.doe@example.com"
+        name:
+          type: string
+          description: User's full name
+          example: "John Doe"
+        username:
+          type: string
+          nullable: true
+          description: User's username
+          example: "johndoe"
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+          description: URL to user's avatar image
+          example: "https://cdn.geargrab.co/avatars/usr_1234567890.jpg"
+        bio:
+          type: string
+          nullable: true
+          description: User's biography
+          example: "Outdoor enthusiast and gear collector"
+          maxLength: 500
+        role:
+          type: string
+          enum: [USER, ADMIN, MODERATOR]
+          description: User's role in the system
+          example: "USER"
+        emailVerified:
+          type: boolean
+          description: Whether user's email is verified
+          example: true
+        isActive:
+          type: boolean
+          description: Whether user account is active
+          example: true
+        lastLoginAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last login timestamp
+          example: "2024-01-15T10:30:00Z"
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+          example: "2024-01-01T00:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: "2024-01-15T10:30:00Z"
+
+    # Gear Schemas
+    GearItem:
+      type: object
+      required:
+        - id
+        - name
+        - category
+        - dailyPrice
+        - owner
+        - location
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: Unique gear identifier
+          example: "gear_1234567890"
+          pattern: '^gear_[a-zA-Z0-9]{10}$'
+        name:
+          type: string
+          description: Gear item name
+          example: "4-Person Camping Tent"
+          minLength: 3
+          maxLength: 100
+        description:
+          type: string
+          description: Detailed description of the gear
+          example: "Spacious family tent perfect for car camping"
+          maxLength: 2000
+        category:
+          type: string
+          enum: [camping, hiking, climbing, cycling, water-sports, winter-sports, photography, electronics]
+          description: Gear category
+          example: "camping"
+        dailyPrice:
+          type: number
+          format: decimal
+          minimum: 0.01
+          maximum: 9999.99
+          description: Daily rental price in USD
+          example: 25.00
+        condition:
+          type: string
+          enum: [excellent, very-good, good, fair]
+          description: Condition of the gear
+          example: "excellent"
+        brand:
+          type: string
+          description: Brand name
+          example: "REI Co-op"
+          maxLength: 50
+        model:
+          type: string
+          description: Model name/number
+          example: "Base Camp 4"
+          maxLength: 50
+        specifications:
+          type: object
+          description: Technical specifications
+          additionalProperties: true
+          example:
+            capacity: "4 people"
+            weight: "9.5 lbs"
+            dimensions: "8' x 8' x 5'6\""
+        images:
+          type: array
+          items:
+            type: object
+            required:
+              - url
+              - alt
+            properties:
+              url:
+                type: string
+                format: uri
+                description: Image URL
+                example: "https://cdn.geargrab.co/gear/gear_1234567890_1.jpg"
+              alt:
+                type: string
+                description: Alt text for accessibility
+                example: "Tent exterior view"
+              isPrimary:
+                type: boolean
+                description: Whether this is the primary image
+                example: true
+          minItems: 1
+          maxItems: 10
+        location:
+          $ref: '#/components/schemas/Location'
+        owner:
+          $ref: '#/components/schemas/GearOwner'
+        rating:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 5
+          description: Average rating (0-5 stars)
+          example: 4.9
+        reviewCount:
+          type: integer
+          minimum: 0
+          description: Number of reviews
+          example: 23
+        availabilityRules:
+          type: object
+          required:
+            - minRentalDays
+            - maxRentalDays
+          properties:
+            minRentalDays:
+              type: integer
+              minimum: 1
+              maximum: 365
+              description: Minimum rental period in days
+              example: 1
+            maxRentalDays:
+              type: integer
+              minimum: 1
+              maximum: 365
+              description: Maximum rental period in days
+              example: 14
+            advanceBookingDays:
+              type: integer
+              minimum: 0
+              maximum: 365
+              description: How far in advance bookings can be made
+              example: 30
+        deliveryOptions:
+          type: object
+          required:
+            - pickup
+            - delivery
+          properties:
+            pickup:
+              type: boolean
+              description: Pickup available
+              example: true
+            delivery:
+              type: boolean
+              description: Delivery available
+              example: true
+            deliveryRadius:
+              type: number
+              minimum: 0
+              maximum: 100
+              description: Delivery radius in miles
+              example: 10
+            deliveryFee:
+              type: number
+              format: decimal
+              minimum: 0
+              description: Delivery fee in USD
+              example: 15.00
+        isAvailable:
+          type: boolean
+          description: Whether gear is currently available
+          example: true
+        status:
+          type: string
+          enum: [pending_approval, active, inactive, suspended, deleted]
+          description: Gear listing status
+          example: "active"
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+          example: "2024-01-01T00:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: "2024-01-15T10:30:00Z"
+
+    GearOwner:
+      type: object
+      required:
+        - id
+        - name
+        - rating
+      properties:
+        id:
+          type: string
+          description: Owner user ID
+          example: "usr_0987654321"
+        name:
+          type: string
+          description: Owner's name
+          example: "Jane Smith"
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+          description: Owner's avatar URL
+          example: "https://cdn.geargrab.co/avatars/usr_0987654321.jpg"
+        rating:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 5
+          description: Owner's average rating
+          example: 4.8
+        reviewCount:
+          type: integer
+          minimum: 0
+          description: Number of reviews for owner
+          example: 45
+        responseRate:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Response rate percentage
+          example: 95
+        responseTime:
+          type: string
+          description: Typical response time
+          example: "within an hour"
+        memberSince:
+          type: string
+          format: date-time
+          description: Member since date
+          example: "2023-06-15T00:00:00Z"
+
+    Location:
+      type: object
+      required:
+        - city
+        - state
+      properties:
+        address:
+          type: string
+          description: Street address (private, not shown publicly)
+          example: "123 Main St"
+          maxLength: 200
+        city:
+          type: string
+          description: City name
+          example: "San Francisco"
+          maxLength: 100
+        state:
+          type: string
+          description: State/province code
+          example: "CA"
+          maxLength: 10
+        zipCode:
+          type: string
+          description: ZIP/postal code
+          example: "94102"
+          maxLength: 20
+        country:
+          type: string
+          description: Country code (ISO 3166-1 alpha-2)
+          example: "US"
+          default: "US"
+          maxLength: 2
+        coordinates:
+          type: object
+          description: GPS coordinates (approximate for privacy)
+          required:
+            - lat
+            - lng
+          properties:
+            lat:
+              type: number
+              format: decimal
+              minimum: -90
+              maximum: 90
+              description: Latitude
+              example: 37.7749
+            lng:
+              type: number
+              format: decimal
+              minimum: -180
+              maximum: 180
+              description: Longitude
+              example: -122.4194
+
+    CreateGearRequest:
+      type: object
+      required:
+        - name
+        - description
+        - category
+        - dailyPrice
+        - condition
+        - location
+        - images
+      properties:
+        name:
+          type: string
+          description: Gear item name
+          example: "4-Person Camping Tent"
+          minLength: 3
+          maxLength: 100
+        description:
+          type: string
+          description: Detailed description
+          example: "Spacious family tent perfect for car camping"
+          minLength: 20
+          maxLength: 2000
+        category:
+          type: string
+          enum: [camping, hiking, climbing, cycling, water-sports, winter-sports, photography, electronics]
+          description: Gear category
+          example: "camping"
+        dailyPrice:
+          type: number
+          format: decimal
+          minimum: 0.01
+          maximum: 9999.99
+          description: Daily rental price in USD
+          example: 25.00
+        condition:
+          type: string
+          enum: [excellent, very-good, good, fair]
+          description: Condition of the gear
+          example: "excellent"
+        brand:
+          type: string
+          description: Brand name
+          example: "REI Co-op"
+          maxLength: 50
+        model:
+          type: string
+          description: Model name/number
+          example: "Base Camp 4"
+          maxLength: 50
+        specifications:
+          type: object
+          description: Technical specifications
+          additionalProperties: true
+          example:
+            capacity: "4 people"
+            weight: "9.5 lbs"
+        location:
+          $ref: '#/components/schemas/Location'
+        availabilityRules:
+          type: object
+          properties:
+            minRentalDays:
+              type: integer
+              minimum: 1
+              maximum: 365
+              default: 1
+            maxRentalDays:
+              type: integer
+              minimum: 1
+              maximum: 365
+              default: 30
+            advanceBookingDays:
+              type: integer
+              minimum: 0
+              maximum: 365
+              default: 30
+        deliveryOptions:
+          type: object
+          properties:
+            pickup:
+              type: boolean
+              default: true
+            delivery:
+              type: boolean
+              default: false
+            deliveryRadius:
+              type: number
+              minimum: 0
+              maximum: 100
+              default: 0
+            deliveryFee:
+              type: number
+              format: decimal
+              minimum: 0
+              default: 0
+        images:
+          type: array
+          items:
+            type: string
+            format: binary
+            description: Image file (JPEG, PNG, WebP)
+          minItems: 1
+          maxItems: 10
+
+    UpdateGearRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+        description:
+          type: string
+          minLength: 20
+          maxLength: 2000
+        dailyPrice:
+          type: number
+          format: decimal
+          minimum: 0.01
+          maximum: 9999.99
+        condition:
+          type: string
+          enum: [excellent, very-good, good, fair]
+        specifications:
+          type: object
+          additionalProperties: true
+        availabilityRules:
+          type: object
+          properties:
+            minRentalDays:
+              type: integer
+              minimum: 1
+              maximum: 365
+            maxRentalDays:
+              type: integer
+              minimum: 1
+              maximum: 365
+            advanceBookingDays:
+              type: integer
+              minimum: 0
+              maximum: 365
+        deliveryOptions:
+          type: object
+          properties:
+            pickup:
+              type: boolean
+            delivery:
+              type: boolean
+            deliveryRadius:
+              type: number
+              minimum: 0
+              maximum: 100
+            deliveryFee:
+              type: number
+              format: decimal
+              minimum: 0
+        isAvailable:
+          type: boolean
+
+    GearResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Gear item retrieved successfully"
+        data:
+          $ref: '#/components/schemas/GearItem'
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    GearDetailResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          allOf:
+            - $ref: '#/components/schemas/GearItem'
+            - type: object
+              properties:
+                reviews:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Review'
+                  maxItems: 5
+                  description: Recent reviews (limited to 5)
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    GearListResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - items
+            - pagination
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/GearItem'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+            filters:
+              type: object
+              description: Applied filters
+              additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    Review:
+      type: object
+      required:
+        - id
+        - rating
+        - reviewer
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: Review identifier
+          example: "rev_1234567890"
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Rating (1-5 stars)
+          example: 5
+        comment:
+          type: string
+          description: Review comment
+          example: "Great tent, exactly as described!"
+          maxLength: 1000
+        reviewer:
+          type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: Reviewer's name (first name + last initial)
+              example: "John D."
+            avatar:
+              type: string
+              format: uri
+              nullable: true
+              description: Reviewer's avatar
+              example: "https://cdn.geargrab.co/avatars/usr_1111111111.jpg"
+        createdAt:
+          type: string
+          format: date-time
+          description: Review creation date
+          example: "2024-01-10T15:30:00Z"
+
+    Pagination:
+      type: object
+      required:
+        - page
+        - limit
+        - total
+        - totalPages
+        - hasNext
+        - hasPrev
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          description: Current page number
+          example: 1
+        limit:
+          type: integer
+          minimum: 1
+          description: Items per page
+          example: 20
+        total:
+          type: integer
+          minimum: 0
+          description: Total number of items
+          example: 150
+        totalPages:
+          type: integer
+          minimum: 0
+          description: Total number of pages
+          example: 8
+        hasNext:
+          type: boolean
+          description: Whether there is a next page
+          example: true
+        hasPrev:
+          type: boolean
+          description: Whether there is a previous page
+          example: false
+        nextPage:
+          type: integer
+          nullable: true
+          description: Next page number
+          example: 2
+        prevPage:
+          type: integer
+          nullable: true
+          description: Previous page number
+          example: null
+
+    # Booking Schemas
+    Booking:
+      type: object
+      required:
+        - id
+        - gear
+        - renter
+        - owner
+        - startDate
+        - endDate
+        - status
+        - pricing
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: Unique booking identifier
+          example: "book_1234567890"
+          pattern: '^book_[a-zA-Z0-9]{10}$'
+        gear:
+          type: object
+          required:
+            - id
+            - name
+            - dailyPrice
+          properties:
+            id:
+              type: string
+              example: "gear_1234567890"
+            name:
+              type: string
+              example: "4-Person Camping Tent"
+            dailyPrice:
+              type: number
+              format: decimal
+              example: 25.00
+            images:
+              type: array
+              items:
+                type: string
+                format: uri
+              example: ["https://cdn.geargrab.co/gear/gear_1234567890_1.jpg"]
+        renter:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: string
+              example: "usr_1111111111"
+            name:
+              type: string
+              example: "John Doe"
+            avatar:
+              type: string
+              format: uri
+              nullable: true
+              example: "https://cdn.geargrab.co/avatars/usr_1111111111.jpg"
+            rating:
+              type: number
+              format: decimal
+              example: 4.7
+        owner:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: string
+              example: "usr_0987654321"
+            name:
+              type: string
+              example: "Jane Smith"
+            avatar:
+              type: string
+              format: uri
+              nullable: true
+              example: "https://cdn.geargrab.co/avatars/usr_0987654321.jpg"
+            rating:
+              type: number
+              format: decimal
+              example: 4.8
+        startDate:
+          type: string
+          format: date
+          description: Rental start date
+          example: "2024-02-01"
+        endDate:
+          type: string
+          format: date
+          description: Rental end date
+          example: "2024-02-07"
+        status:
+          type: string
+          enum: [pending, confirmed, active, completed, cancelled]
+          description: Current booking status
+          example: "confirmed"
+        deliveryMethod:
+          type: string
+          enum: [pickup, delivery]
+          description: How gear will be transferred
+          example: "pickup"
+        pricing:
+          type: object
+          required:
+            - dailyRate
+            - days
+            - subtotal
+            - fees
+            - total
+          properties:
+            dailyRate:
+              type: number
+              format: decimal
+              description: Daily rental rate
+              example: 25.00
+            days:
+              type: integer
+              description: Number of rental days
+              example: 6
+            subtotal:
+              type: number
+              format: decimal
+              description: Subtotal (dailyRate * days)
+              example: 150.00
+            fees:
+              type: object
+              properties:
+                serviceFee:
+                  type: number
+                  format: decimal
+                  description: Platform service fee
+                  example: 15.00
+                deliveryFee:
+                  type: number
+                  format: decimal
+                  description: Delivery fee (if applicable)
+                  example: 0.00
+                tax:
+                  type: number
+                  format: decimal
+                  description: Tax amount
+                  example: 13.20
+            total:
+              type: number
+              format: decimal
+              description: Total amount
+              example: 178.20
+        message:
+          type: string
+          nullable: true
+          description: Message from renter to owner
+          example: "Looking forward to using this tent!"
+          maxLength: 500
+        paymentStatus:
+          type: string
+          enum: [pending, paid, refunded, failed]
+          description: Payment status
+          example: "paid"
+        createdAt:
+          type: string
+          format: date-time
+          description: Booking creation timestamp
+          example: "2024-01-15T10:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: "2024-01-15T10:30:00Z"
+
+    CreateBookingRequest:
+      type: object
+      required:
+        - gearId
+        - startDate
+        - endDate
+        - deliveryMethod
+      properties:
+        gearId:
+          type: string
+          description: ID of gear to book
+          example: "gear_1234567890"
+          pattern: '^gear_[a-zA-Z0-9]{10}$'
+        startDate:
+          type: string
+          format: date
+          description: Rental start date (must be in future)
+          example: "2024-02-01"
+        endDate:
+          type: string
+          format: date
+          description: Rental end date (must be after start date)
+          example: "2024-02-07"
+        deliveryMethod:
+          type: string
+          enum: [pickup, delivery]
+          description: How gear will be transferred
+          example: "pickup"
+        deliveryAddress:
+          type: object
+          description: Delivery address (required if deliveryMethod is 'delivery')
+          properties:
+            street:
+              type: string
+              example: "456 Oak Ave"
+            city:
+              type: string
+              example: "San Francisco"
+            state:
+              type: string
+              example: "CA"
+            zipCode:
+              type: string
+              example: "94103"
+        message:
+          type: string
+          description: Optional message to gear owner
+          example: "Looking forward to using this tent for our family camping trip!"
+          maxLength: 500
+
+    UpdateBookingRequest:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum: [confirm, cancel, complete, start_rental, end_rental]
+          description: Action to perform on booking
+          example: "confirm"
+        reason:
+          type: string
+          description: Reason for action (required for cancel)
+          enum: [plans_changed, weather, emergency, other]
+          example: "plans_changed"
+        message:
+          type: string
+          description: Optional message
+          example: "Confirmed! Looking forward to renting to you."
+          maxLength: 500
+
+    PaymentRequest:
+      type: object
+      required:
+        - paymentMethodId
+      properties:
+        paymentMethodId:
+          type: string
+          description: Stripe payment method ID
+          example: "pm_1234567890"
+        savePaymentMethod:
+          type: boolean
+          description: Save payment method for future use
+          example: true
+          default: false
+
+    BookingResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Booking created successfully"
+        data:
+          $ref: '#/components/schemas/Booking'
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    BookingDetailResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          allOf:
+            - $ref: '#/components/schemas/Booking'
+            - type: object
+              properties:
+                timeline:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - event
+                      - timestamp
+                    properties:
+                      event:
+                        type: string
+                        enum: [created, confirmed, payment_processed, started, completed, cancelled]
+                        example: "created"
+                      timestamp:
+                        type: string
+                        format: date-time
+                        example: "2024-01-15T10:30:00Z"
+                      message:
+                        type: string
+                        nullable: true
+                        example: "Booking request submitted"
+                      actor:
+                        type: string
+                        enum: [renter, owner, system]
+                        example: "renter"
+                cancellationPolicy:
+                  type: object
+                  properties:
+                    refundPercentage:
+                      type: integer
+                      minimum: 0
+                      maximum: 100
+                      description: Refund percentage if cancelled now
+                      example: 100
+                    cutoffDate:
+                      type: string
+                      format: date-time
+                      description: Last date for full refund
+                      example: "2024-01-30T23:59:59Z"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    BookingListResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - items
+            - pagination
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Booking'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+            summary:
+              type: object
+              description: Booking summary statistics
+              properties:
+                total:
+                  type: integer
+                  example: 25
+                pending:
+                  type: integer
+                  example: 3
+                confirmed:
+                  type: integer
+                  example: 2
+                active:
+                  type: integer
+                  example: 1
+                completed:
+                  type: integer
+                  example: 18
+                cancelled:
+                  type: integer
+                  example: 1
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    PaymentResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Payment processed successfully"
+        data:
+          type: object
+          required:
+            - paymentId
+            - amount
+            - status
+          properties:
+            paymentId:
+              type: string
+              description: Payment transaction ID
+              example: "pay_1234567890"
+            amount:
+              type: number
+              format: decimal
+              description: Payment amount
+              example: 178.20
+            currency:
+              type: string
+              description: Currency code
+              example: "USD"
+            status:
+              type: string
+              enum: [succeeded, pending, failed]
+              description: Payment status
+              example: "succeeded"
+            receiptUrl:
+              type: string
+              format: uri
+              nullable: true
+              description: URL to payment receipt
+              example: "https://pay.stripe.com/receipts/..."
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    SuccessResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Operation completed successfully"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+        requestId:
+          type: string
+          description: Unique request identifier for tracking
+          example: "req_1234567890"
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: "VALIDATION_ERROR"
+              enum:
+                - VALIDATION_ERROR
+                - INVALID_CREDENTIALS
+                - ACCOUNT_LOCKED
+                - EMAIL_EXISTS
+                - USER_NOT_FOUND
+                - TOKEN_EXPIRED
+                - INSUFFICIENT_PERMISSIONS
+                - RATE_LIMIT_EXCEEDED
+                - INTERNAL_ERROR
+            message:
+              type: string
+              description: Human-readable error message
+              example: "Validation failed for one or more fields"
+            details:
+              type: object
+              description: Additional error details
+              additionalProperties: true
+              example:
+                field: "email"
+                value: "invalid-email"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+        requestId:
+          type: string
+          description: Unique request identifier for tracking
+          example: "req_1234567890"
+        path:
+          type: string
+          description: API endpoint that generated the error
+          example: "/api/v1/auth/login"
+
+  responses:
+    BadRequest:
+      description: Bad request - Invalid input parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalid_json:
+              summary: Invalid JSON in request body
+              value:
+                success: false
+                error:
+                  code: "INVALID_JSON"
+                  message: "Request body contains invalid JSON"
+                  details:
+                    line: 3
+                    column: 15
+                timestamp: "2024-01-15T10:30:00Z"
+                requestId: "req_1234567890"
+
+    Unauthorized:
+      description: Unauthorized - Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            missing_token:
+              summary: Missing authentication token
+              value:
+                success: false
+                error:
+                  code: "MISSING_TOKEN"
+                  message: "Authentication token is required"
+                timestamp: "2024-01-15T10:30:00Z"
+                requestId: "req_1234567890"
+            invalid_token:
+              summary: Invalid or expired token
+              value:
+                success: false
+                error:
+                  code: "INVALID_TOKEN"
+                  message: "Authentication token is invalid or expired"
+                timestamp: "2024-01-15T10:30:00Z"
+                requestId: "req_1234567890"
+
+    Forbidden:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            insufficient_permissions:
+              summary: User lacks required permissions
+              value:
+                success: false
+                error:
+                  code: "INSUFFICIENT_PERMISSIONS"
+                  message: "You do not have permission to access this resource"
+                  details:
+                    requiredRole: "ADMIN"
+                    userRole: "USER"
+                timestamp: "2024-01-15T10:30:00Z"
+                requestId: "req_1234567890"
+
+    NotFound:
+      description: Not found - Resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            resource_not_found:
+              summary: Requested resource not found
+              value:
+                success: false
+                error:
+                  code: "RESOURCE_NOT_FOUND"
+                  message: "The requested resource was not found"
+                  details:
+                    resourceType: "user"
+                    resourceId: "usr_1234567890"
+                timestamp: "2024-01-15T10:30:00Z"
+                requestId: "req_1234567890"
+
+    ValidationError:
+      description: Validation error - Invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            field_validation:
+              summary: Field validation errors
+              value:
+                success: false
+                error:
+                  code: "VALIDATION_ERROR"
+                  message: "Validation failed for one or more fields"
+                  details:
+                    fields:
+                      email:
+                        - "Email format is invalid"
+                        - "Email is required"
+                      password:
+                        - "Password must be at least 8 characters long"
+                        - "Password must contain at least one uppercase letter"
+                timestamp: "2024-01-15T10:30:00Z"
+                requestId: "req_1234567890"
+
+    RateLimitExceeded:
+      description: Rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          description: Request limit per time window
+          schema:
+            type: integer
+            example: 1000
+        X-RateLimit-Remaining:
+          description: Remaining requests in current window
+          schema:
+            type: integer
+            example: 0
+        X-RateLimit-Reset:
+          description: Time when rate limit resets (Unix timestamp)
+          schema:
+            type: integer
+            example: 1705320600
+        Retry-After:
+          description: Seconds to wait before retrying
+          schema:
+            type: integer
+            example: 3600
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            rate_limit:
+              summary: Rate limit exceeded
+              value:
+                success: false
+                error:
+                  code: "RATE_LIMIT_EXCEEDED"
+                  message: "Rate limit exceeded. Please try again later."
+                  details:
+                    limit: 1000
+                    remaining: 0
+                    resetTime: "2024-01-15T11:30:00Z"
+                timestamp: "2024-01-15T10:30:00Z"
+                requestId: "req_1234567890"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            server_error:
+              summary: Internal server error
+              value:
+                success: false
+                error:
+                  code: "INTERNAL_ERROR"
+                  message: "An internal server error occurred. Please try again later."
+                timestamp: "2024-01-15T10:30:00Z"
+                requestId: "req_1234567890"
+
+  # Gear Management Endpoints
+  /gear:
+    get:
+      tags:
+        - Gear
+      summary: List gear items
+      description: Retrieve a paginated list of gear items with filtering and sorting options
+      operationId: listGear
+      security: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+        - name: category
+          in: query
+          description: Filter by gear category
+          schema:
+            type: string
+            enum: [camping, hiking, climbing, cycling, water-sports, winter-sports, photography, electronics]
+            example: "camping"
+        - name: location
+          in: query
+          description: Filter by location (city, state, or coordinates)
+          schema:
+            type: string
+            example: "San Francisco, CA"
+        - name: radius
+          in: query
+          description: Search radius in miles (requires location)
+          schema:
+            type: number
+            minimum: 1
+            maximum: 100
+            default: 25
+            example: 25
+        - name: priceMin
+          in: query
+          description: Minimum daily rental price
+          schema:
+            type: number
+            minimum: 0
+            example: 10.00
+        - name: priceMax
+          in: query
+          description: Maximum daily rental price
+          schema:
+            type: number
+            minimum: 0
+            example: 100.00
+        - name: available
+          in: query
+          description: Only show available items
+          schema:
+            type: boolean
+            default: true
+            example: true
+        - name: dateFrom
+          in: query
+          description: Availability start date (ISO 8601)
+          schema:
+            type: string
+            format: date
+            example: "2024-02-01"
+        - name: dateTo
+          in: query
+          description: Availability end date (ISO 8601)
+          schema:
+            type: string
+            format: date
+            example: "2024-02-07"
+        - name: sortBy
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [price, distance, rating, createdAt, popularity]
+            default: "createdAt"
+            example: "price"
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: "desc"
+            example: "asc"
+        - name: search
+          in: query
+          description: Search query for gear name or description
+          schema:
+            type: string
+            maxLength: 100
+            example: "tent"
+      responses:
+        '200':
+          description: List of gear items retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GearListResponse'
+              examples:
+                success:
+                  summary: Successful gear list
+                  value:
+                    success: true
+                    data:
+                      items:
+                        - id: "gear_1234567890"
+                          name: "4-Person Camping Tent"
+                          description: "Spacious family tent perfect for car camping"
+                          category: "camping"
+                          dailyPrice: 25.00
+                          images:
+                            - "https://cdn.geargrab.co/gear/gear_1234567890_1.jpg"
+                          location:
+                            city: "San Francisco"
+                            state: "CA"
+                            coordinates:
+                              lat: 37.7749
+                              lng: -122.4194
+                          owner:
+                            id: "usr_0987654321"
+                            name: "Jane Smith"
+                            avatar: "https://cdn.geargrab.co/avatars/usr_0987654321.jpg"
+                            rating: 4.8
+                          rating: 4.9
+                          reviewCount: 23
+                          isAvailable: true
+                          createdAt: "2024-01-01T00:00:00Z"
+                      pagination:
+                        page: 1
+                        limit: 20
+                        total: 150
+                        totalPages: 8
+                        hasNext: true
+                        hasPrev: false
+                      filters:
+                        category: "camping"
+                        location: "San Francisco, CA"
+                        radius: 25
+                        available: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Gear
+      summary: Create new gear item
+      description: Add a new gear item for rental
+      operationId: createGear
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateGearRequest'
+            examples:
+              camping_tent:
+                summary: Camping tent listing
+                value:
+                  name: "4-Person Camping Tent"
+                  description: "Spacious family tent perfect for car camping with easy setup"
+                  category: "camping"
+                  dailyPrice: 25.00
+                  condition: "excellent"
+                  brand: "REI Co-op"
+                  model: "Base Camp 4"
+                  specifications:
+                    capacity: "4 people"
+                    weight: "9.5 lbs"
+                    dimensions: "8' x 8' x 5'6\""
+                    material: "Polyester"
+                  location:
+                    address: "123 Main St"
+                    city: "San Francisco"
+                    state: "CA"
+                    zipCode: "94102"
+                    coordinates:
+                      lat: 37.7749
+                      lng: -122.4194
+                  availabilityRules:
+                    minRentalDays: 1
+                    maxRentalDays: 14
+                    advanceBookingDays: 30
+                  deliveryOptions:
+                    pickup: true
+                    delivery: true
+                    deliveryRadius: 10
+                    deliveryFee: 15.00
+      responses:
+        '201':
+          description: Gear item created successfully
+          headers:
+            Location:
+              description: URL of the created gear item
+              schema:
+                type: string
+                format: uri
+                example: "/api/v1/gear/gear_1234567890"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GearResponse'
+              examples:
+                success:
+                  summary: Gear created successfully
+                  value:
+                    success: true
+                    message: "Gear item created successfully"
+                    data:
+                      id: "gear_1234567890"
+                      name: "4-Person Camping Tent"
+                      description: "Spacious family tent perfect for car camping"
+                      category: "camping"
+                      dailyPrice: 25.00
+                      status: "pending_approval"
+                      createdAt: "2024-01-15T10:30:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /gear/{gearId}:
+    get:
+      tags:
+        - Gear
+      summary: Get gear item details
+      description: Retrieve detailed information about a specific gear item
+      operationId: getGear
+      security: []
+      parameters:
+        - name: gearId
+          in: path
+          required: true
+          description: Unique gear item identifier
+          schema:
+            type: string
+            pattern: '^gear_[a-zA-Z0-9]{10}$'
+            example: "gear_1234567890"
+      responses:
+        '200':
+          description: Gear item details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GearDetailResponse'
+              examples:
+                success:
+                  summary: Gear details
+                  value:
+                    success: true
+                    data:
+                      id: "gear_1234567890"
+                      name: "4-Person Camping Tent"
+                      description: "Spacious family tent perfect for car camping with easy setup and excellent weather protection"
+                      category: "camping"
+                      dailyPrice: 25.00
+                      condition: "excellent"
+                      brand: "REI Co-op"
+                      model: "Base Camp 4"
+                      specifications:
+                        capacity: "4 people"
+                        weight: "9.5 lbs"
+                        dimensions: "8' x 8' x 5'6\""
+                        material: "Polyester"
+                        features:
+                          - "Easy setup"
+                          - "Weather resistant"
+                          - "Color-coded poles"
+                      images:
+                        - url: "https://cdn.geargrab.co/gear/gear_1234567890_1.jpg"
+                          alt: "Tent exterior view"
+                          isPrimary: true
+                        - url: "https://cdn.geargrab.co/gear/gear_1234567890_2.jpg"
+                          alt: "Tent interior view"
+                          isPrimary: false
+                      location:
+                        city: "San Francisco"
+                        state: "CA"
+                        coordinates:
+                          lat: 37.7749
+                          lng: -122.4194
+                      owner:
+                        id: "usr_0987654321"
+                        name: "Jane Smith"
+                        avatar: "https://cdn.geargrab.co/avatars/usr_0987654321.jpg"
+                        rating: 4.8
+                        reviewCount: 45
+                        responseRate: 95
+                        responseTime: "within an hour"
+                        memberSince: "2023-06-15T00:00:00Z"
+                      rating: 4.9
+                      reviewCount: 23
+                      reviews:
+                        - id: "rev_1234567890"
+                          rating: 5
+                          comment: "Great tent, exactly as described!"
+                          reviewer:
+                            name: "John D."
+                            avatar: "https://cdn.geargrab.co/avatars/usr_1111111111.jpg"
+                          createdAt: "2024-01-10T15:30:00Z"
+                      availabilityRules:
+                        minRentalDays: 1
+                        maxRentalDays: 14
+                        advanceBookingDays: 30
+                      deliveryOptions:
+                        pickup: true
+                        delivery: true
+                        deliveryRadius: 10
+                        deliveryFee: 15.00
+                      isAvailable: true
+                      status: "active"
+                      createdAt: "2024-01-01T00:00:00Z"
+                      updatedAt: "2024-01-15T10:30:00Z"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Gear
+      summary: Update gear item
+      description: Update an existing gear item (owner only)
+      operationId: updateGear
+      parameters:
+        - name: gearId
+          in: path
+          required: true
+          description: Unique gear item identifier
+          schema:
+            type: string
+            pattern: '^gear_[a-zA-Z0-9]{10}$'
+            example: "gear_1234567890"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGearRequest'
+            examples:
+              price_update:
+                summary: Update price and description
+                value:
+                  dailyPrice: 30.00
+                  description: "Updated description with more details about the tent's features"
+      responses:
+        '200':
+          description: Gear item updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GearResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Gear
+      summary: Delete gear item
+      description: Delete a gear item (owner only, soft delete)
+      operationId: deleteGear
+      parameters:
+        - name: gearId
+          in: path
+          required: true
+          description: Unique gear item identifier
+          schema:
+            type: string
+            pattern: '^gear_[a-zA-Z0-9]{10}$'
+            example: "gear_1234567890"
+      responses:
+        '204':
+          description: Gear item deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Cannot delete gear with active bookings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                active_bookings:
+                  summary: Active bookings prevent deletion
+                  value:
+                    success: false
+                    error:
+                      code: "ACTIVE_BOOKINGS"
+                      message: "Cannot delete gear item with active bookings"
+                      details:
+                        activeBookings: 2
+                        nextAvailableDate: "2024-02-15T00:00:00Z"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    requestId: "req_1234567890"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Booking Endpoints
+  /bookings:
+    get:
+      tags:
+        - Bookings
+      summary: List user bookings
+      description: Retrieve a list of bookings for the authenticated user
+      operationId: listBookings
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: status
+          in: query
+          description: Filter by booking status
+          schema:
+            type: string
+            enum: [pending, confirmed, active, completed, cancelled]
+        - name: role
+          in: query
+          description: Filter by user role in booking
+          schema:
+            type: string
+            enum: [renter, owner]
+            default: "renter"
+        - name: dateFrom
+          in: query
+          description: Filter bookings from this date
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          description: Filter bookings to this date
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Bookings retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Bookings
+      summary: Create new booking
+      description: Create a new gear rental booking
+      operationId: createBooking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+            examples:
+              tent_booking:
+                summary: Tent rental booking
+                value:
+                  gearId: "gear_1234567890"
+                  startDate: "2024-02-01"
+                  endDate: "2024-02-07"
+                  deliveryMethod: "pickup"
+                  message: "Looking forward to using this tent for our family camping trip!"
+      responses:
+        '201':
+          description: Booking created successfully
+          headers:
+            Location:
+              description: URL of the created booking
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Booking conflict (dates not available)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                date_conflict:
+                  summary: Requested dates not available
+                  value:
+                    success: false
+                    error:
+                      code: "BOOKING_CONFLICT"
+                      message: "The requested dates are not available"
+                      details:
+                        conflictingBookings:
+                          - id: "book_0987654321"
+                            startDate: "2024-02-03"
+                            endDate: "2024-02-05"
+                        nextAvailableDate: "2024-02-08"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    requestId: "req_1234567890"
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /bookings/{bookingId}:
+    get:
+      tags:
+        - Bookings
+      summary: Get booking details
+      description: Retrieve detailed information about a specific booking
+      operationId: getBooking
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          description: Unique booking identifier
+          schema:
+            type: string
+            pattern: '^book_[a-zA-Z0-9]{10}$'
+            example: "book_1234567890"
+      responses:
+        '200':
+          description: Booking details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetailResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      tags:
+        - Bookings
+      summary: Update booking status
+      description: Update booking status (owner or renter actions)
+      operationId: updateBookingStatus
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          description: Unique booking identifier
+          schema:
+            type: string
+            pattern: '^book_[a-zA-Z0-9]{10}$'
+            example: "book_1234567890"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookingRequest'
+            examples:
+              confirm_booking:
+                summary: Owner confirms booking
+                value:
+                  action: "confirm"
+                  message: "Confirmed! Looking forward to renting to you."
+              cancel_booking:
+                summary: Renter cancels booking
+                value:
+                  action: "cancel"
+                  reason: "plans_changed"
+                  message: "Sorry, our plans changed and we won't need the tent anymore."
+      responses:
+        '200':
+          description: Booking updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Invalid status transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_transition:
+                  summary: Cannot perform action in current state
+                  value:
+                    success: false
+                    error:
+                      code: "INVALID_STATUS_TRANSITION"
+                      message: "Cannot cancel a completed booking"
+                      details:
+                        currentStatus: "completed"
+                        requestedAction: "cancel"
+                        allowedActions: ["review"]
+                    timestamp: "2024-01-15T10:30:00Z"
+                    requestId: "req_1234567890"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /bookings/{bookingId}/payment:
+    post:
+      tags:
+        - Bookings
+      summary: Process booking payment
+      description: Process payment for a confirmed booking
+      operationId: processBookingPayment
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          description: Unique booking identifier
+          schema:
+            type: string
+            pattern: '^book_[a-zA-Z0-9]{10}$'
+            example: "book_1234567890"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+            examples:
+              card_payment:
+                summary: Credit card payment
+                value:
+                  paymentMethodId: "pm_1234567890"
+                  savePaymentMethod: true
+      responses:
+        '200':
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          description: Payment required or failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                payment_failed:
+                  summary: Payment processing failed
+                  value:
+                    success: false
+                    error:
+                      code: "PAYMENT_FAILED"
+                      message: "Payment could not be processed"
+                      details:
+                        reason: "insufficient_funds"
+                        declineCode: "generic_decline"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    requestId: "req_1234567890"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization endpoints
+    externalDocs:
+      description: Authentication Guide
+      url: https://docs.geargrab.co/authentication
+  - name: Gear
+    description: Gear item management endpoints
+    externalDocs:
+      description: Gear Management Guide
+      url: https://docs.geargrab.co/gear-management
+  - name: Bookings
+    description: Rental booking management endpoints
+    externalDocs:
+      description: Booking Guide
+      url: https://docs.geargrab.co/bookings
+
+# Webhook Events (for future implementation)
+webhooks:
+  bookingCreated:
+    post:
+      summary: Booking Created
+      description: Triggered when a new booking is created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: string
+                  example: "booking.created"
+                data:
+                  $ref: '#/components/schemas/Booking'
+                timestamp:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Webhook received successfully
+
+  bookingConfirmed:
+    post:
+      summary: Booking Confirmed
+      description: Triggered when a booking is confirmed by the owner
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: string
+                  example: "booking.confirmed"
+                data:
+                  $ref: '#/components/schemas/Booking'
+                timestamp:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Webhook received successfully
+
+  paymentProcessed:
+    post:
+      summary: Payment Processed
+      description: Triggered when a payment is successfully processed
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: string
+                  example: "payment.processed"
+                data:
+                  type: object
+                  properties:
+                    bookingId:
+                      type: string
+                      example: "book_1234567890"
+                    paymentId:
+                      type: string
+                      example: "pay_1234567890"
+                    amount:
+                      type: number
+                      format: decimal
+                      example: 178.20
+                timestamp:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Webhook received successfully
