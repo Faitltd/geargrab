@@ -205,7 +205,7 @@
   }
 
   async function populateUserInfo() {
-    if ($authState.user) {
+    if ($authState.user && firestore) {
       const user = $authState.user;
 
       try {
@@ -251,28 +251,61 @@
         }
         contactInfo.email = user.email || '';
       }
+    } else if ($authState.user) {
+      // If no firestore connection, just use basic auth data
+      const user = $authState.user;
+      if (user.displayName) {
+        const nameParts = user.displayName.trim().split(' ');
+        contactInfo.firstName = nameParts[0] || '';
+        contactInfo.lastName = nameParts.slice(1).join(' ') || '';
+      }
+      contactInfo.email = user.email || '';
     }
   }
 
-  function loadListingData() {
-    // Simulate API call - in real app, fetch listing by ID
-    setTimeout(() => {
-      listing = {
-        id: listingId,
-        title: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
-        images: ['https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'],
-        dailyPrice: 45,
-        owner: {
-          name: 'David Wilson',
-          image: 'https://randomuser.me/api/portraits/men/32.jpg'
-        },
-        location: {
-          city: 'Salt Lake City',
-          state: 'UT'
-        }
-      };
+  async function loadListingData() {
+    if (!listingId) {
+      error = 'No listing ID provided';
       loading = false;
-    }, 500);
+      return;
+    }
+
+    if (!firestore) {
+      error = 'Database connection not available';
+      loading = false;
+      return;
+    }
+
+    try {
+      console.log('🔧 Loading listing data for ID:', listingId);
+
+      // Fetch the actual listing from Firestore
+      const listingRef = doc(firestore, 'listings', listingId);
+      const listingDoc = await getDoc(listingRef);
+
+      if (!listingDoc.exists()) {
+        throw new Error('Listing not found');
+      }
+
+      const listingData = listingDoc.data();
+      listing = {
+        id: listingDoc.id,
+        ...listingData
+      } as any;
+
+      console.log('✅ Listing loaded:', {
+        id: listing.id,
+        title: listing.title,
+        dailyPrice: listing.dailyPrice,
+        hasImages: listing.images?.length > 0
+      });
+
+      loading = false;
+    } catch (err: any) {
+      console.error('❌ Error loading listing:', err);
+      error = `Failed to load listing: ${err.message}`;
+      loading = false;
+    }
   }
 
   // Calculate booking details
