@@ -6,7 +6,7 @@
   import { authStore } from '$lib/stores/auth';
   import { BookingContextManager } from '$lib/utils/booking-context';
   import StripePaymentForm from '$lib/components/payments/stripe-payment-form.svelte';
-  import LoginModal from '$lib/components/auth/login-modal.svelte';
+  import SocialOnlyLoginModal from '$lib/components/auth/SocialOnlyLoginModal.svelte';
   import { firestore } from '$lib/firebase/client';
   import { doc, getDoc } from 'firebase/firestore';
 
@@ -855,10 +855,9 @@
   </div>
 </div>
 
-<!-- Fast Social Login Modal -->
-<LoginModal
+<!-- Social-Only Login Modal -->
+<SocialOnlyLoginModal
   bind:show="{showLoginModal}"
-  redirectAfterLogin="{false}"
   on:success="{handleLoginSuccess}"
   on:close="{handleLoginClose}"
 />
