@@ -6,10 +6,10 @@ WORKDIR /app
 # Copy package files first for better Docker layer caching
 COPY package*.json ./
 
-# Install dependencies with npm ci for faster, deterministic builds
+# Install dependencies with optimizations for speed and reliability
 RUN npm config set fetch-timeout 180000 && \
     npm config set registry https://registry.npmjs.org/ && \
-    npm ci --include=dev --no-audit --no-fund
+    npm install --include=dev --no-audit --no-fund
 
 # Copy source code (separate layer for better caching)
 COPY . .
@@ -39,11 +39,11 @@ FROM node:18.19.0-alpine
 
 WORKDIR /app
 
-# Copy package files and install only production dependencies with npm ci
+# Copy package files and install only production dependencies
 COPY --from=build /app/package*.json ./
 RUN npm config set fetch-timeout 120000 && \
     npm config set registry https://registry.npmjs.org/ && \
-    npm ci --omit=dev --no-audit --no-fund
+    npm install --omit=dev --no-audit --no-fund
 
 # Copy built application
 COPY --from=build /app/build ./build
