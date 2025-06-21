@@ -1,5 +1,5 @@
 <script lang="ts">
-  // BRAND NEW DEDICATED LOGIN PAGE - v3.0.0 - COMPLETELY FRESH
+  // BRAND NEW DEDICATED LOGIN PAGE - v3.0.2 - FORCE REDEPLOY
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { simpleAuth } from '$lib/auth/simple-auth';
