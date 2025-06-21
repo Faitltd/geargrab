@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Modal from '$lib/components/ui/modal.svelte';
+  // import Modal from '$lib/components/ui/modal.svelte'; // Temporarily disabled for deployment
   import { helpContent } from '$lib/data/helpContent';
 
   export let show = false;
@@ -11,8 +11,23 @@
   }
 </script>
 
-<Modal bind:show title="{guidelines.title}" maxWidth="max-w-4xl" on:close="{close}">
-  <div class="p-6">
+{#if show}
+  <!-- Simple modal backdrop -->
+  <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" on:click={close}>
+    <!-- Modal content -->
+    <div class="bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" on:click|stopPropagation>
+      <!-- Modal header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-700">
+        <h2 class="text-xl font-semibold text-white">{guidelines.title}</h2>
+        <button type="button" class="text-gray-400 hover:text-gray-300" on:click={close}>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="p-6">
     <div class="mb-6">
       <p class="text-gray-300 text-lg leading-relaxed">{guidelines.content}</p>
     </div>
@@ -65,19 +80,22 @@
         has a positive experience on GearGrab.
       </p>
     </div>
-  </div>
+      </div>
 
-  <div slot="footer" class="p-6 border-t border-white/20 bg-gray-800/50">
-    <div class="flex justify-between items-center">
-      <p class="text-gray-400 text-sm">
-        Last updated: January 2024
-      </p>
-      <button
-        on:click="{close}"
-        class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-      >
-        I Understand
-      </button>
+      <!-- Modal footer -->
+      <div class="p-6 border-t border-gray-700 bg-gray-800/50">
+        <div class="flex justify-between items-center">
+          <p class="text-gray-400 text-sm">
+            Last updated: January 2024
+          </p>
+          <button
+            on:click="{close}"
+            class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+          >
+            I Understand
+          </button>
+        </div>
+      </div>
     </div>
   </div>
-</Modal>
+{/if}
