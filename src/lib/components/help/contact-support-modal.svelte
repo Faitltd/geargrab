@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Modal from '$lib/components/ui/modal.svelte';
+  // import Modal from '$lib/components/ui/modal.svelte'; // Temporarily disabled for deployment
 
   export let show = false;
 
@@ -81,8 +81,23 @@
   }
 </script>
 
-<Modal bind:show title="Contact Support" maxWidth="max-w-2xl" on:close="{close}">
-  <div class="p-6">
+{#if show}
+  <!-- Simple modal backdrop -->
+  <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" on:click={close}>
+    <!-- Modal content -->
+    <div class="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" on:click|stopPropagation>
+      <!-- Modal header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-700">
+        <h2 class="text-xl font-semibold text-white">Contact Support</h2>
+        <button type="button" class="text-gray-400 hover:text-gray-300" on:click={close}>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="p-6">
     {#if submitSuccess}
       <div class="text-center py-8">
         <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -203,32 +218,35 @@
         {/if}
       </form>
     {/if}
-  </div>
-
-  <div slot="footer" class="p-6 border-t border-white/20 bg-gray-800/50">
-    {#if !submitSuccess}
-      <div class="flex justify-end space-x-4">
-        <button
-          type="button"
-          on:click="{close}"
-          class="px-6 py-2 text-gray-300 hover:text-white transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          on:click="{handleSubmit}"
-          disabled="{isSubmitting}"
-          class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center"
-        >
-          {#if isSubmitting}
-            <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-            Submitting...
-          {:else}
-            Send Message
-          {/if}
-        </button>
       </div>
-    {/if}
+
+      <!-- Modal footer -->
+      <div class="p-6 border-t border-gray-700 bg-gray-800/50">
+        {#if !submitSuccess}
+          <div class="flex justify-end space-x-4">
+            <button
+              type="button"
+              on:click="{close}"
+              class="px-6 py-2 text-gray-300 hover:text-white transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              on:click="{handleSubmit}"
+              disabled="{isSubmitting}"
+              class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center"
+            >
+              {#if isSubmitting}
+                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                Submitting...
+              {:else}
+                Send Message
+              {/if}
+            </button>
+          </div>
+        {/if}
+      </div>
+    </div>
   </div>
-</Modal>
+{/if}
