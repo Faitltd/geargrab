@@ -1,18 +1,17 @@
-FROM node:18-alpine as build
+# Use specific Node.js version for consistency and caching
+FROM node:18.19.0-alpine as build
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first for better Docker layer caching
 COPY package*.json ./
 
-# Install ALL dependencies (including dev dependencies needed for build)
-# Increase timeout and add retry configurations for reliability
-RUN npm cache clean --force && \
-    npm config set fetch-timeout 600000 && \
-    npm config set fetch-retry-mintimeout 20000 && \
-    npm config set fetch-retry-maxtimeout 120000 && \
-    npm install --include=dev
+# Install dependencies with npm ci for faster, deterministic builds
+RUN npm config set fetch-timeout 180000 && \
+    npm config set registry https://registry.npmjs.org/ && \
+    npm ci --include=dev --no-audit --no-fund
 
+# Copy source code (separate layer for better caching)
 COPY . .
 
 # Set production environment variables for build
@@ -35,15 +34,16 @@ ENV STRIPE_SECRET_KEY=sk_live_51RZXbxBfCDZxMJmHHUzHwNJq1gNdpcMjp4kAJK28n8d5kTXPh
 # Build the application
 RUN npm run build
 
-# Production stage
-FROM node:18-alpine
+# Production stage - use same Node version for consistency
+FROM node:18.19.0-alpine
 
 WORKDIR /app
 
-# Copy package files and install only production dependencies
+# Copy package files and install only production dependencies with npm ci
 COPY --from=build /app/package*.json ./
-RUN npm config set fetch-timeout 600000 && \
-    npm install --omit=dev --cache /tmp/.npm
+RUN npm config set fetch-timeout 120000 && \
+    npm config set registry https://registry.npmjs.org/ && \
+    npm ci --omit=dev --no-audit --no-fund
 
 # Copy built application
 COPY --from=build /app/build ./build
