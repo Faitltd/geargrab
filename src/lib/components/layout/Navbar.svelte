@@ -92,10 +92,13 @@
     }
   }
 
-  // Handle authentication - redirect to auth subdomain
+  // Handle authentication - redirect to auth subdomain - v5.0.0 - TIMESTAMP: 2025-01-21
   function openLoginPopup() {
+    console.log('🔄 v5.0.0 - Redirecting to auth subdomain for login...');
     const currentUrl = encodeURIComponent(window.location.href);
-    window.location.href = `https://geargrab-auth-nxoediodla-uc.a.run.app?redirectTo=${currentUrl}`;
+    const authUrl = `https://geargrab-auth-nxoediodla-uc.a.run.app?redirectTo=${currentUrl}&t=${Date.now()}`;
+    console.log('🔗 Auth URL:', authUrl);
+    window.location.href = authUrl;
     // Close mobile menu if open
     if (isMenuOpen) {
       isMenuOpen = false;
@@ -103,8 +106,11 @@
   }
 
   function openSignupPopup() {
+    console.log('🔄 v5.0.0 - Redirecting to auth subdomain for signup...');
     const currentUrl = encodeURIComponent(window.location.href);
-    window.location.href = `https://geargrab-auth-nxoediodla-uc.a.run.app?redirectTo=${currentUrl}&mode=signup`;
+    const authUrl = `https://geargrab-auth-nxoediodla-uc.a.run.app?redirectTo=${currentUrl}&mode=signup&t=${Date.now()}`;
+    console.log('🔗 Auth URL:', authUrl);
+    window.location.href = authUrl;
     // Close mobile menu if open
     if (isMenuOpen) {
       isMenuOpen = false;
