@@ -6,8 +6,12 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install ALL dependencies (including dev dependencies needed for build)
+# Use npm ci for faster, more reliable installs and increase timeout
 RUN npm cache clean --force && \
-    npm install --include=dev
+    npm config set fetch-timeout 600000 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm ci --include=dev
 
 COPY . .
 
@@ -38,7 +42,8 @@ WORKDIR /app
 
 # Copy package files and install only production dependencies
 COPY --from=build /app/package*.json ./
-RUN npm ci --omit=dev --cache /tmp/.npm
+RUN npm config set fetch-timeout 600000 && \
+    npm ci --omit=dev --cache /tmp/.npm
 
 # Copy built application
 COPY --from=build /app/build ./build
