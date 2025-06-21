@@ -1,4 +1,5 @@
 <script lang="ts">
+  // Social-only login popup - v2.0 (no email/password)
   import { createEventDispatcher } from 'svelte';
   import { notifications } from '$lib/stores/notifications';
   import { goto } from '$app/navigation';
@@ -96,7 +97,7 @@
       <!-- Header -->
       <div class="text-center mb-8">
         <h2 id="login-title" class="text-2xl font-bold text-white mb-2">Welcome Back</h2>
-        <p class="text-gray-300">Sign in to your GearGrab account</p>
+        <p class="text-gray-300">Choose your preferred sign-in method</p>
       </div>
 
       <!-- Error display -->
