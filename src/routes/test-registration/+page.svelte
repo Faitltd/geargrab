@@ -1,27 +1,16 @@
 <script lang="ts">
   import RegistrationForm from '$lib/components/RegistrationForm.svelte';
-  import { registrationSchema, getPasswordStrength } from '$lib/validation/registration';
-  
+
   /**
-   * Test page for the Registration Form with Zod validation
-   * 
+   * Test page for the Registration Form with simple validation
+   *
    * This page demonstrates:
    * - Complete registration form with validation
-   * - Real-time password strength checking
-   * - Comprehensive error handling
-   * - Step-by-step validation
+   * - Simple HTML5 validation
+   * - Basic error handling
    */
 
   let showValidationDemo = false;
-  let testPassword = '';
-  let passwordStrength = { score: 0, feedback: [], isStrong: false };
-
-  // Update password strength in real-time
-  $: if (testPassword) {
-    passwordStrength = getPasswordStrength(testPassword);
-  } else {
-    passwordStrength = { score: 0, feedback: [], isStrong: false };
-  }
 
   // Test data for quick form filling
   const testData = {
@@ -67,13 +56,13 @@
 
 <svelte:head>
   <title>Registration Form Test - GearGrab</title>
-  <meta name="description" content="Test page for registration form with Zod validation" />
+  <meta name="description" content="Test page for registration form with simple validation" />
 </svelte:head>
 
 <div class="test-page">
   <header class="page-header">
-    <h1>🔐 Registration Form with Zod Validation</h1>
-    <p>Comprehensive form validation using Zod schema with real-time feedback</p>
+    <h1>🔐 Registration Form with Simple Validation</h1>
+    <p>Clean registration form with HTML5 validation and basic error handling</p>
   </header>
 
   <!-- Validation Demo Section -->
@@ -88,40 +77,6 @@
 
     {#if showValidationDemo}
       <div class="validation-demo">
-        <h3>Password Strength Tester</h3>
-        <div class="password-tester">
-          <label for="testPassword">Test Password Strength:</label>
-          <input
-            id="testPassword"
-            type="password"
-            bind:value="{testPassword}"
-            placeholder="Enter a password to test strength..."
-          />
-          
-          {#if testPassword}
-            <div class="strength-display">
-              <div class="strength-bar">
-                <div 
-                  class="strength-fill strength-{passwordStrength.score}"
-                  style="width: {(passwordStrength.score / 6) * 100}%"
-                ></div>
-              </div>
-              <div class="strength-info">
-                <span class="strength-score">Score: {passwordStrength.score}/6</span>
-                <span class="strength-status {passwordStrength.isStrong ? 'strong' : 'weak'}">
-                  {passwordStrength.isStrong ? '✅ Strong' : '❌ Weak'}
-                </span>
-              </div>
-              {#if passwordStrength.feedback.length > 0}
-                <ul class="feedback-list">
-                  {#each passwordStrength.feedback as feedback}
-                    <li>• {feedback}</li>
-                  {/each}
-                </ul>
-              {/if}
-            </div>
-          {/if}
-        </div>
 
         <h3>Validation Features</h3>
         <div class="features-grid">
@@ -129,9 +84,8 @@
             <h4>📧 Email Validation</h4>
             <ul>
               <li>Valid email format</li>
-              <li>Maximum length (254 chars)</li>
-              <li>Lowercase normalization</li>
-              <li>No + symbols allowed</li>
+              <li>HTML5 email validation</li>
+              <li>Required field checking</li>
             </ul>
           </div>
 
@@ -139,29 +93,25 @@
             <h4>🔒 Password Security</h4>
             <ul>
               <li>Minimum 8 characters</li>
-              <li>Uppercase & lowercase letters</li>
-              <li>Numbers required</li>
-              <li>Special characters required</li>
-              <li>No common patterns</li>
+              <li>Password confirmation</li>
+              <li>Simple strength checking</li>
             </ul>
           </div>
 
           <div class="feature-card">
             <h4>👤 Profile Validation</h4>
             <ul>
-              <li>Name format validation</li>
-              <li>Username pattern checking</li>
-              <li>Phone number formatting</li>
-              <li>Age restrictions (13+)</li>
+              <li>Required name fields</li>
+              <li>Optional username</li>
+              <li>Basic phone validation</li>
             </ul>
           </div>
 
           <div class="feature-card">
-            <h4>🎯 Advanced Features</h4>
+            <h4>🎯 Simple Features</h4>
             <ul>
-              <li>Real-time validation</li>
+              <li>HTML5 validation</li>
               <li>Password confirmation</li>
-              <li>Optional field handling</li>
               <li>Terms agreement required</li>
             </ul>
           </div>

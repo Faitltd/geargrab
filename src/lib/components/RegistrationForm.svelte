@@ -1,20 +1,31 @@
 <script lang="ts">
-  import { registrationSchema, getPasswordStrength, type RegistrationFormData } from '$lib/validation/registration';
-  import { z } from 'zod';
-
   /**
-   * Registration Form Component with Zod Validation
-   * 
+   * Simple Registration Form Component
+   *
    * Features:
-   * - Real-time validation using Zod schema
-   * - Password strength indicator
-   * - Step-by-step form validation
-   * - Comprehensive error handling
-   * - Type-safe form data
+   * - Basic HTML5 validation
+   * - Simple password confirmation check
+   * - Clean form handling
    */
 
-  // Form data with proper typing
-  let formData: Partial<RegistrationFormData> = {
+  // Simple form data interface
+  interface FormData {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    firstName: string;
+    lastName: string;
+    username: string;
+    phoneNumber: string;
+    age: number | undefined;
+    gender: string;
+    agreeToTerms: boolean;
+    agreeToPrivacy: boolean;
+    marketingConsent: boolean;
+  }
+
+  // Form data
+  let formData: FormData = {
     email: '',
     password: '',
     confirmPassword: '',
@@ -23,84 +34,67 @@
     username: '',
     phoneNumber: '',
     age: undefined,
-    dateOfBirth: '',
-    gender: undefined,
-    bio: '',
-    location: {
-      city: '',
-      state: '',
-      country: '',
-      zipCode: ''
-    },
-    preferences: {
-      newsletter: false,
-      marketing: false,
-      notifications: true,
-      theme: 'auto'
-    },
+    gender: '',
     agreeToTerms: false,
     agreeToPrivacy: false,
     marketingConsent: false
   };
 
   // Validation state
-  let errors: Record<string, string[]> = {};
+  let errors: Record<string, string> = {};
   let isSubmitting = false;
   let submitSuccess = false;
   let submitMessage = '';
 
-  // Password strength state
-  let passwordStrength = { score: 0, feedback: [], isStrong: false };
-
-  // Real-time validation functions
-  function validateField(fieldName: keyof RegistrationFormData, value: any) {
-    try {
-      const fieldSchema = registrationSchema.shape[fieldName];
-      fieldSchema.parse(value);
-      
-      // Clear errors for this field
-      if (errors[fieldName]) {
-        delete errors[fieldName];
-        errors = { ...errors };
-      }
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        errors[fieldName] = error.issues.map(issue => issue.message);
-        errors = { ...errors };
-      }
-    }
+  // Simple validation functions
+  function validateEmail(email: string): string | null {
+    if (!email) return 'Email is required';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Invalid email format';
+    return null;
   }
 
-  // Password strength validation
-  function updatePasswordStrength() {
-    if (formData.password) {
-      passwordStrength = getPasswordStrength(formData.password);
-    } else {
-      passwordStrength = { score: 0, feedback: [], isStrong: false };
-    }
+  function validatePassword(password: string): string | null {
+    if (!password) return 'Password is required';
+    if (password.length < 8) return 'Password must be at least 8 characters';
+    return null;
+  }
+
+  function validateRequired(value: string, fieldName: string): string | null {
+    if (!value || value.trim() === '') return `${fieldName} is required`;
+    return null;
   }
 
   // Handle form submission
   async function handleSubmit() {
     isSubmitting = true;
     errors = {};
-    
+
     try {
-      // Validate entire form
-      const validationResult = registrationSchema.safeParse(formData);
-      
-      if (!validationResult.success) {
-        // Group errors by field
-        validationResult.error.issues.forEach(issue => {
-          const fieldPath = issue.path.join('.');
-          const fieldName = fieldPath || 'general';
-          
-          if (!errors[fieldName]) {
-            errors[fieldName] = [];
-          }
-          errors[fieldName].push(issue.message);
-        });
-        
+      // Simple validation
+      const emailError = validateEmail(formData.email);
+      const passwordError = validatePassword(formData.password);
+      const firstNameError = validateRequired(formData.firstName, 'First name');
+      const lastNameError = validateRequired(formData.lastName, 'Last name');
+
+      if (emailError) errors.email = emailError;
+      if (passwordError) errors.password = passwordError;
+      if (firstNameError) errors.firstName = firstNameError;
+      if (lastNameError) errors.lastName = lastNameError;
+
+      if (formData.password !== formData.confirmPassword) {
+        errors.confirmPassword = 'Passwords do not match';
+      }
+
+      if (!formData.agreeToTerms) {
+        errors.agreeToTerms = 'You must agree to the terms and conditions';
+      }
+
+      if (!formData.agreeToPrivacy) {
+        errors.agreeToPrivacy = 'You must agree to the privacy policy';
+      }
+
+      // If there are errors, stop submission
+      if (Object.keys(errors).length > 0) {
         errors = { ...errors };
         isSubmitting = false;
         return;
@@ -112,22 +106,18 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(validationResult.data)
+        body: JSON.stringify(formData)
       });
 
       const result = await response.json();
 
       if (result.success) {
         submitSuccess = true;
-        submitMessage = result.message;
+        submitMessage = result.message || 'Registration successful!';
         console.log('✅ Registration successful:', result);
       } else {
         submitSuccess = false;
         submitMessage = result.message || 'Registration failed';
-        
-        if (result.fieldErrors) {
-          errors = result.fieldErrors;
-        }
       }
 
     } catch (error) {
@@ -139,23 +129,16 @@
     }
   }
 
-  // Reactive statements for real-time validation
-  $: if (formData.email) validateField('email', formData.email);
-  $: if (formData.password) {
-    validateField('password', formData.password);
-    updatePasswordStrength();
-  }
+  // Simple reactive validation for password confirmation
   $: if (formData.confirmPassword && formData.password) {
     if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = ['Passwords do not match'];
+      errors.confirmPassword = 'Passwords do not match';
       errors = { ...errors };
     } else if (errors.confirmPassword) {
       delete errors.confirmPassword;
       errors = { ...errors };
     }
   }
-  $: if (formData.firstName) validateField('firstName', formData.firstName);
-  $: if (formData.lastName) validateField('lastName', formData.lastName);
 </script>
 
 <div class="registration-form">
@@ -183,9 +166,7 @@
           />
           {#if errors.email}
             <div class="error-messages">
-              {#each errors.email as error}
-                <span class="error">{error}</span>
-              {/each}
+              <span class="error">{errors.email}</span>
             </div>
           {/if}
         </div>
@@ -200,33 +181,16 @@
             required
           />
           
-          <!-- Password Strength Indicator -->
-          {#if formData.password}
-            <div class="password-strength">
-              <div class="strength-bar">
-                <div 
-                  class="strength-fill strength-{passwordStrength.score}"
-                  style="width: {(passwordStrength.score / 6) * 100}%"
-                ></div>
-              </div>
-              <div class="strength-text">
-                Strength: {passwordStrength.isStrong ? 'Strong' : 'Weak'}
-              </div>
-              {#if passwordStrength.feedback.length > 0}
-                <ul class="strength-feedback">
-                  {#each passwordStrength.feedback as feedback}
-                    <li>{feedback}</li>
-                  {/each}
-                </ul>
-              {/if}
+          <!-- Simple password hint -->
+          {#if formData.password && formData.password.length < 8}
+            <div class="password-hint">
+              <small class="text-gray-500">Password must be at least 8 characters</small>
             </div>
           {/if}
           
           {#if errors.password}
             <div class="error-messages">
-              {#each errors.password as error}
-                <span class="error">{error}</span>
-              {/each}
+              <span class="error">{errors.password}</span>
             </div>
           {/if}
         </div>
@@ -242,9 +206,7 @@
           />
           {#if errors.confirmPassword}
             <div class="error-messages">
-              {#each errors.confirmPassword as error}
-                <span class="error">{error}</span>
-              {/each}
+              <span class="error">{errors.confirmPassword}</span>
             </div>
           {/if}
         </div>
@@ -253,7 +215,7 @@
       <!-- Step 2: Personal Information -->
       <fieldset>
         <legend>Personal Information</legend>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label for="firstName">First Name *</label>
@@ -266,9 +228,7 @@
             />
             {#if errors.firstName}
               <div class="error-messages">
-                {#each errors.firstName as error}
-                  <span class="error">{error}</span>
-                {/each}
+                <span class="error">{errors.firstName}</span>
               </div>
             {/if}
           </div>
@@ -284,9 +244,7 @@
             />
             {#if errors.lastName}
               <div class="error-messages">
-                {#each errors.lastName as error}
-                  <span class="error">{error}</span>
-                {/each}
+                <span class="error">{errors.lastName}</span>
               </div>
             {/if}
           </div>
@@ -303,9 +261,7 @@
           />
           {#if errors.username}
             <div class="error-messages">
-              {#each errors.username as error}
-                <span class="error">{error}</span>
-              {/each}
+              <span class="error">{errors.username}</span>
             </div>
           {/if}
         </div>
@@ -314,7 +270,7 @@
       <!-- Step 3: Optional Information -->
       <fieldset>
         <legend>Additional Information (Optional)</legend>
-        
+
         <div class="form-group">
           <label for="phoneNumber">Phone Number</label>
           <input
@@ -326,9 +282,7 @@
           />
           {#if errors.phoneNumber}
             <div class="error-messages">
-              {#each errors.phoneNumber as error}
-                <span class="error">{error}</span>
-              {/each}
+              <span class="error">{errors.phoneNumber}</span>
             </div>
           {/if}
         </div>
@@ -376,9 +330,7 @@
           </label>
           {#if errors.agreeToTerms}
             <div class="error-messages">
-              {#each errors.agreeToTerms as error}
-                <span class="error">{error}</span>
-              {/each}
+              <span class="error">{errors.agreeToTerms}</span>
             </div>
           {/if}
         </div>
@@ -395,9 +347,7 @@
           </label>
           {#if errors.agreeToPrivacy}
             <div class="error-messages">
-              {#each errors.agreeToPrivacy as error}
-                <span class="error">{error}</span>
-              {/each}
+              <span class="error">{errors.agreeToPrivacy}</span>
             </div>
           {/if}
         </div>
