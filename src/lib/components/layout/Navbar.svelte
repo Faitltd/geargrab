@@ -1,10 +1,11 @@
 <script lang="ts">
-  // Version: 4.0 - Updated to use popup-based authentication
+  // Version: 5.0 - Updated to use auth subdomain
   import { simpleAuth } from '$lib/auth/simple-auth';
   import { smoothScrollWithNavOffset } from '$lib/utils/smooth-scroll';
   import { signOut } from '$lib/firebase/auth';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import { onMount } from 'svelte';
 
 
   let isMenuOpen = false;
@@ -16,6 +17,37 @@
 
   // Determine if we're on the homepage
   $: isHomepage = $page.url.pathname === '/';
+
+  // Check for auth success on mount
+  onMount(async () => {
+    // Check if user returned from auth subdomain
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('auth') === 'success') {
+      // Check localStorage for auth data
+      const authData = localStorage.getItem('geargrab_auth');
+      if (authData) {
+        try {
+          const userData = JSON.parse(authData);
+          console.log('🎉 Auth success detected, updating auth state:', userData);
+
+          // Update simple auth with the user data
+          const result = await simpleAuth.handleAuthSubdomainReturn(userData);
+          if (result.success) {
+            console.log('✅ Auth subdomain return processed successfully');
+          } else {
+            console.error('❌ Auth subdomain return failed:', result.error);
+          }
+
+          // Clean up URL and localStorage
+          localStorage.removeItem('geargrab_auth');
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, '', cleanUrl);
+        } catch (error) {
+          console.error('Error processing auth data:', error);
+        }
+      }
+    }
+  });
 
   function toggleMenu() {
     isMenuOpen = !isMenuOpen;
@@ -60,9 +92,10 @@
     }
   }
 
-  // Handle authentication - redirect to new page
+  // Handle authentication - redirect to auth subdomain
   function openLoginPopup() {
-    goto('/auth-new');
+    const currentUrl = encodeURIComponent(window.location.href);
+    window.location.href = `https://geargrab-auth-nxoediodla-uc.a.run.app?redirectTo=${currentUrl}`;
     // Close mobile menu if open
     if (isMenuOpen) {
       isMenuOpen = false;
@@ -70,7 +103,8 @@
   }
 
   function openSignupPopup() {
-    goto('/auth-new?mode=signup');
+    const currentUrl = encodeURIComponent(window.location.href);
+    window.location.href = `https://geargrab-auth-nxoediodla-uc.a.run.app?redirectTo=${currentUrl}&mode=signup`;
     // Close mobile menu if open
     if (isMenuOpen) {
       isMenuOpen = false;

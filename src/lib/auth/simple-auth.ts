@@ -406,6 +406,40 @@ class SimpleAuthService {
     }
   }
 
+  // Handle auth subdomain return with token
+  async handleAuthSubdomainReturn(authData: any): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log('🔄 Simple Auth: Processing auth subdomain return...');
+
+      const { auth } = await import('$lib/firebase/client');
+      const { signInWithCustomToken } = await import('firebase/auth');
+
+      if (!auth) {
+        throw new Error('Firebase auth not available');
+      }
+
+      // If we have an ID token, use it to sign in
+      if (authData.idToken) {
+        await signInWithCustomToken(auth, authData.idToken);
+        console.log('✅ Simple Auth: Successfully signed in with token');
+        return { success: true };
+      } else {
+        // Fallback: manually set the auth state (less secure but works)
+        console.log('⚠️ Simple Auth: No token available, setting manual auth state');
+        this.currentUser = authData as any;
+        this.authStore.set({
+          user: authData as any,
+          loading: false,
+          isAuthenticated: true
+        });
+        return { success: true };
+      }
+    } catch (error: any) {
+      console.error('❌ Simple Auth: Auth subdomain return failed:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
   // Email authentication removed - using social logins only for better security and speed
 
   async signOut(): Promise<{ success: boolean; error?: string }> {

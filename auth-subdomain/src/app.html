@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%sveltekit.assets%/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="GearGrab Authentication - Sign in to your outdoor gear marketplace" />
+    
+    <!-- Prevent caching -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    
+    <!-- Firebase Config -->
+    <script>
+      window.firebaseConfig = {
+        apiKey: "AIzaSyANV1v2FhD2ktXxBUsfGrDm9442dGGCuYs",
+        authDomain: "geargrabco.firebaseapp.com",
+        projectId: "geargrabco",
+        storageBucket: "geargrabco.firebasestorage.app",
+        messagingSenderId: "227444442028",
+        appId: "1:227444442028:web:6eeaed1e136d07f5b73009"
+      };
+    </script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    %sveltekit.head%
+  </head>
+  <body data-sveltekit-preload-data="hover" class="bg-gray-900">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>
