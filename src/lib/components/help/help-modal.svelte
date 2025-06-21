@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Modal from '$lib/components/ui/modal.svelte';
+  import Modal from '$lib/components/ui/Modal.svelte';
   import type { HelpCategory, HelpArticle } from '$lib/data/helpContent';
 
   export let show = false;
