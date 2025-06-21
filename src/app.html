@@ -16,14 +16,15 @@
         <meta name="apple-mobile-web-app-title" content="GearGrab" />
         <link rel="apple-touch-icon" href="%sveltekit.assets%/geargrab-logo.png" />
 
-        <!-- Cache busting -->
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <!-- Aggressive cache busting v3.0.0 -->
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0" />
         <meta http-equiv="Pragma" content="no-cache" />
         <meta http-equiv="Expires" content="0" />
+        <meta name="cache-bust" content="v3.0.0-20241221-1730" />
 
         <!-- COOP header removed for development to avoid popup issues -->
 
-        <!-- Version 2.1.0 - Social-only authentication (no email/password) -->
+        <!-- Version 3.0.0 - Complete auth rebuild - Cache bust: 20241221-1730 -->
 
         <!-- DNS Preconnect for faster authentication -->
         <link rel="preconnect" href="https://accounts.google.com" />
@@ -96,6 +97,25 @@
         </style>
 
         %sveltekit.head%
+
+        <!-- Aggressive cache busting service worker -->
+        <script>
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+              navigator.serviceWorker.register('/sw.js?v=3.0.0-20241221-1730')
+                .then((registration) => {
+                  console.log('🔄 SW registered for cache busting:', registration);
+                  // Force immediate activation
+                  if (registration.waiting) {
+                    registration.waiting.postMessage({type: 'SKIP_WAITING'});
+                  }
+                })
+                .catch((error) => {
+                  console.log('❌ SW registration failed:', error);
+                });
+            });
+          }
+        </script>
     </head>
     <body data-sveltekit-preload-data="hover">
         <div style="display: contents">%sveltekit.body%</div>
