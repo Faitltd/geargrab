@@ -1,8 +1,8 @@
 <script lang="ts">
   import { simpleAuth } from '$lib/auth/simple-auth';
   import { onMount } from 'svelte';
-  import FastLoginModal from './fast-login-modal.svelte';
-  import FastSignupModal from './fast-signup-modal.svelte';
+  import SocialOnlyLoginModal from './SocialOnlyLoginModal.svelte';
+  import SocialOnlySignupModal from './SocialOnlySignupModal.svelte';
 
   export let message: string = 'You must be signed in to access this feature.';
   export let showLoginPrompt: boolean = true;
@@ -128,15 +128,15 @@
   </div>
 {/if}
 
-<!-- Fast Social Login Modals -->
-<FastLoginModal
+<!-- New Social-Only Login Modals -->
+<SocialOnlyLoginModal
   bind:show={showLoginModal}
   on:success={handleLoginSuccess}
   on:close={handleModalClose}
   on:switchToSignup={switchToSignup}
 />
 
-<FastSignupModal
+<SocialOnlySignupModal
   bind:show={showSignupModal}
   on:success={handleSignupSuccess}
   on:close={handleModalClose}

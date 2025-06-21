@@ -1,7 +1,8 @@
 <script lang="ts">
+  // BRAND NEW Auth Manager - v3.0.0 - SOCIAL ONLY
   import { createEventDispatcher } from 'svelte';
-  import LoginPopup from './login-popup.svelte';
-  import SignupPopup from './signup-popup.svelte';
+  import SocialOnlyLoginModal from './SocialOnlyLoginModal.svelte';
+  import SocialOnlySignupModal from './SocialOnlySignupModal.svelte';
 
   export let showLogin = false;
   export let showSignup = false;
@@ -12,7 +13,7 @@
     close: void;
   }>();
 
-  // Handle login popup events
+  // Handle login modal events
   function handleLoginClose() {
     showLogin = false;
     dispatch('close');
@@ -28,7 +29,7 @@
     showSignup = true;
   }
 
-  // Handle signup popup events
+  // Handle signup modal events
   function handleSignupClose() {
     showSignup = false;
     dispatch('close');
@@ -44,7 +45,7 @@
     showLogin = true;
   }
 
-  // Public methods to open popups
+  // Public methods to open modals
   export function openLogin() {
     showLogin = true;
     showSignup = false;
@@ -61,16 +62,16 @@
   }
 </script>
 
-<!-- Login Popup -->
-<LoginPopup
+<!-- Social-Only Login Modal -->
+<SocialOnlyLoginModal
   bind:show="{showLogin}"
   on:close="{handleLoginClose}"
   on:success="{handleLoginSuccess}"
   on:switchToSignup="{handleLoginSwitchToSignup}"
 />
 
-<!-- Signup Popup -->
-<SignupPopup
+<!-- Social-Only Signup Modal -->
+<SocialOnlySignupModal
   bind:show="{showSignup}"
   on:close="{handleSignupClose}"
   on:success="{handleSignupSuccess}"
