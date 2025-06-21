@@ -5,11 +5,11 @@
   import { signOut } from '$lib/firebase/auth';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import NewAuthManager from '$lib/components/auth/NewAuthManager.svelte';
+
 
   let isMenuOpen = false;
   let isDropdownOpen = false;
-  let newAuthManager: NewAuthManager;
+
 
   // Use simple auth system for testing
   $: authState = simpleAuth.authState;
@@ -60,9 +60,9 @@
     }
   }
 
-  // Handle authentication popups
+  // Handle authentication - redirect to new page
   function openLoginPopup() {
-    newAuthManager?.openLogin();
+    goto('/auth-new');
     // Close mobile menu if open
     if (isMenuOpen) {
       isMenuOpen = false;
@@ -70,7 +70,7 @@
   }
 
   function openSignupPopup() {
-    newAuthManager?.openSignup();
+    goto('/auth-new?mode=signup');
     // Close mobile menu if open
     if (isMenuOpen) {
       isMenuOpen = false;
@@ -329,12 +329,7 @@
   {/if}
 </nav>
 
-<!-- New Social-Only Auth Manager -->
-<NewAuthManager
-  bind:this="{newAuthManager}"
-  on:loginSuccess="{handleAuthSuccess}"
-  on:signupSuccess="{handleAuthSuccess}"
-/>
+<!-- Auth now handled by dedicated /auth-new page -->
 
 <style>
   .navbar-glass {
