@@ -64,10 +64,41 @@ LICENSE
 /cypress-simple.config.js
 /tsconfig.jest.json
 
-# Ignore package manager files
-package-lock.json
+# Ignore package manager files (keep package-lock.json for npm ci)
 yarn.lock
 pnpm-lock.yaml
+
+# Ignore development and testing files
+/dev-routes/
+/cypress/
+/tests/
+/scripts/
+/coverage/
+*.test.*
+*.spec.*
+jest.config.js
+cypress.config.*
+tsconfig.jest.json
+
+# Ignore large video files (use optimized versions)
+*.mp4
+*.mov
+*.avi
+
+# Ignore documentation and markdown files
+*.md
+/docs/
+LICENSE
+
+# Ignore deployment temp directories
+/deploy-*/
+/deploy-temp/
+/deploy-simple/
+
+# Ignore backup files
+*.backup
+*.bak
+*.old
 
 # Ignore logs
 *.log
