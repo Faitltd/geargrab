@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { notifications } from '$lib/stores/notifications';
-  import Modal from '$lib/components/ui/modal.svelte';
+  import Modal from '$lib/components/ui/Modal.svelte';
   import SocialLoginButtons from './SocialLoginButtons.svelte';
 
   export let show = false;
