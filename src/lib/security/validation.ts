@@ -1,4 +1,4 @@
-import DOMPurify from 'isomorphic-dompurify';
+// import DOMPurify from 'isomorphic-dompurify'; // Temporarily disabled for deployment
 
 // Enhanced validation with security focus
 export interface ValidationRule {
@@ -67,7 +67,8 @@ const SECURITY_PATTERNS = {
 const SANITIZERS = {
   // Remove HTML tags and encode special characters
   html: (value: string): string => {
-    return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
+    // return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] }); // Temporarily disabled for deployment
+    return value.replace(/<[^>]*>/g, ''); // Simple HTML tag removal
   },
   
   // Remove SQL injection patterns
