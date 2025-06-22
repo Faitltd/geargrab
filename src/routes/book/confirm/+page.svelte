@@ -315,15 +315,15 @@
   // Two-stage payment calculation with fallback pricing
   $: effectiveDailyPrice = listing?.dailyPrice || 25; // Fallback to $25/day if missing
   $: basePrice = effectiveDailyPrice * days;
-  $: serviceFee = Math.round(basePrice * 0.1);
+  $: serviceFee = Math.round(basePrice * 0.1 * 100) / 100; // Round to nearest cent
   $: deliveryFee = deliveryMethod === 'pickup' ? 0 : 30;
   $: insuranceFee = insuranceTier === 'none' ? 0 : insuranceTier === 'basic' ? 5 : insuranceTier === 'standard' ? 10 : 15;
 
-  // Full payment: Charge complete booking cost
+  // Two-stage payment: Charge only upfront fees now, rental fee later
   $: upfrontFees = serviceFee + insuranceFee;
   $: laterFees = basePrice + deliveryFee;
   $: totalBookingCost = upfrontFees + laterFees;
-  $: calculatedTotal = Math.max(0.50, totalBookingCost); // Charge full amount
+  $: calculatedTotal = Math.max(0.50, upfrontFees); // Charge only upfront fees now
 
   // Debug pricing calculation
   $: {
