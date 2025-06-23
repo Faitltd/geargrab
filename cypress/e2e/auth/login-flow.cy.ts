@@ -9,43 +9,11 @@
  * - Protected endpoint access verification
  */
 
-describe('Authentication Login Flow', () => {
+describe('Social-Only Authentication Flow', () => {
   const baseUrl = Cypress.config('baseUrl') || 'http://localhost:5173';
-  
-  // Test user credentials
-  const validUser = {
-    email: 'test@example.com',
-    password: 'password123',
-    name: 'Test User'
-  };
 
-  const invalidCredentials = [
-    {
-      email: 'nonexistent@example.com',
-      password: 'wrongpassword',
-      expectedError: 'Invalid email or password'
-    },
-    {
-      email: 'test@example.com',
-      password: 'wrongpassword',
-      expectedError: 'Invalid email or password'
-    },
-    {
-      email: 'invalid-email',
-      password: 'password123',
-      expectedError: 'Invalid email format'
-    },
-    {
-      email: '',
-      password: 'password123',
-      expectedError: 'Email is required'
-    },
-    {
-      email: 'test@example.com',
-      password: '',
-      expectedError: 'Password is required'
-    }
-  ];
+  // Social providers for testing
+  const socialProviders = ['google', 'apple', 'facebook', 'github'];
 
   beforeEach(() => {
     // Clear cookies and local storage before each test
@@ -63,16 +31,20 @@ describe('Authentication Login Flow', () => {
   describe('Login Page Access', () => {
     it('should load the login page successfully', () => {
       cy.visit('/auth/login');
-      
-      // Verify page elements
-      cy.get('[data-cy="login-form"]').should('be.visible');
-      cy.get('[data-cy="email-input"]').should('be.visible');
-      cy.get('[data-cy="password-input"]').should('be.visible');
-      cy.get('[data-cy="login-button"]').should('be.visible');
-      cy.get('[data-cy="signup-link"]').should('be.visible');
-      
+
+      // Verify social login buttons are visible
+      cy.contains('Continue with Google').should('be.visible');
+      cy.contains('Continue with Apple').should('be.visible');
+      cy.contains('Continue with Facebook').should('be.visible');
+      cy.contains('Continue with GitHub').should('be.visible');
+      cy.contains('Sign up here').should('be.visible');
+
+      // Verify no email/password fields exist
+      cy.get('[data-cy="email-input"]').should('not.exist');
+      cy.get('[data-cy="password-input"]').should('not.exist');
+
       // Verify page title and meta
-      cy.title().should('contain', 'Login');
+      cy.title().should('contain', 'Log In');
       cy.get('meta[name="description"]').should('have.attr', 'content');
     });
 
@@ -257,16 +229,12 @@ describe('Authentication Login Flow', () => {
       cy.get('[data-cy="login-button"]').should('be.disabled');
     });
 
-    it('should clear error messages when user starts typing', () => {
+    it('should handle social login button clicks', () => {
       cy.visit('/auth/login');
-      
-      // Trigger an error
-      cy.get('[data-cy="login-button"]').click();
-      cy.get('[data-cy="error-message"]').should('be.visible');
-      
-      // Start typing in email field
-      cy.get('[data-cy="email-input"]').type('t');
-      cy.get('[data-cy="error-message"]').should('not.exist');
+
+      // Click Google login button (should show loading state)
+      cy.contains('Continue with Google').click();
+      cy.contains('Signing in...').should('exist');
     });
   });
 
@@ -511,19 +479,14 @@ describe('Authentication Login Flow', () => {
       cy.get('[data-cy="login-button"]').should('not.be.disabled');
     });
 
-    it('should have proper ARIA labels and roles', () => {
+    it('should have proper accessibility for social login buttons', () => {
       cy.visit('/auth/login');
-      
-      // Check form accessibility
-      cy.get('[data-cy="login-form"]').should('have.attr', 'role', 'form');
-      cy.get('[data-cy="email-input"]').should('have.attr', 'aria-label');
-      cy.get('[data-cy="password-input"]').should('have.attr', 'aria-label');
-      cy.get('[data-cy="login-button"]').should('have.attr', 'aria-describedby');
-      
-      // Check error message accessibility
-      cy.get('[data-cy="login-button"]').click();
-      cy.get('[data-cy="error-message"]').should('have.attr', 'role', 'alert');
-      cy.get('[data-cy="error-message"]').should('have.attr', 'aria-live', 'polite');
+
+      // Check social login button accessibility
+      cy.contains('Continue with Google').should('be.visible').and('not.be.disabled');
+      cy.contains('Continue with Apple').should('be.visible').and('not.be.disabled');
+      cy.contains('Continue with Facebook').should('be.visible').and('not.be.disabled');
+      cy.contains('Continue with GitHub').should('be.visible').and('not.be.disabled');
     });
   });
 });

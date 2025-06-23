@@ -102,7 +102,7 @@
 
 <!-- Full Page Background -->
 <VideoBackground
-  videoSrc="/Milky Way.mp4"
+  videoSrc="/857136-hd_1280_720_24fps.mp4"
   imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
   overlayOpacity="{0.4}"
 />

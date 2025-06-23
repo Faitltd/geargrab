@@ -39,8 +39,6 @@ jest.mock('firebase-admin', () => ({
 // Mock Firebase Client SDK
 jest.mock('firebase/auth', () => ({
   getAuth: jest.fn(),
-  signInWithEmailAndPassword: jest.fn(),
-  createUserWithEmailAndPassword: jest.fn(),
   signInWithPopup: jest.fn(),
   signInWithRedirect: jest.fn(),
   signOut: jest.fn(),

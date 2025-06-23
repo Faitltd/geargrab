@@ -1,15 +1,7 @@
 import { browser } from '$app/environment';
 import { auth } from './client';
 import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
-  sendPasswordResetEmail,
-  updateProfile,
-  updateEmail,
-  updatePassword,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
   GoogleAuthProvider,
   signInWithPopup,
   signInWithRedirect,
@@ -35,11 +27,7 @@ export async function handleGoogleRedirectResult(): Promise<UserCredential | nul
   }
 }
 
-// Sign in with email and password
-export async function signInWithEmail(email: string, password: string): Promise<UserCredential> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  return signInWithEmailAndPassword(auth, email, password);
-}
+
 
 // Sign in with Google - supports both popup and redirect methods
 export async function signInWithGoogle(usePopup: boolean = true): Promise<UserCredential> {
@@ -107,25 +95,7 @@ export async function signInWithGoogle(usePopup: boolean = true): Promise<UserCr
   }
 }
 
-// Sign up with email and password
-export async function signUpWithEmail(
-  email: string, 
-  password: string, 
-  displayName: string
-): Promise<UserCredential> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  
-  // Create the user in Firebase Auth
-  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  
-  // Update the user profile with display name
-  await updateProfile(userCredential.user, { displayName });
-  
-  // Create the user document in Firestore
-  await createUserDocument(userCredential.user);
-  
-  return userCredential;
-}
+
 
 // Create user document in Firestore
 export async function createUserDocument(user: User): Promise<void> {
@@ -179,11 +149,7 @@ export async function signOut(): Promise<void> {
   }
 }
 
-// Reset password
-export async function resetPassword(email: string): Promise<void> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  return sendPasswordResetEmail(auth, email);
-}
+
 
 // Update user profile
 export async function updateUserProfile(
@@ -200,31 +166,7 @@ export async function updateUserProfile(
   return updateProfile(auth.currentUser, updates);
 }
 
-// Update user email
-export async function updateUserEmail(newEmail: string): Promise<void> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  if (!auth.currentUser) throw new Error('No user is signed in');
-  
-  return updateEmail(auth.currentUser, newEmail);
-}
 
-// Update user password
-export async function updateUserPassword(newPassword: string): Promise<void> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  if (!auth.currentUser) throw new Error('No user is signed in');
-  
-  return updatePassword(auth.currentUser, newPassword);
-}
-
-// Reauthenticate user
-export async function reauthenticate(password: string): Promise<UserCredential> {
-  if (!browser) throw new Error('Auth functions can only be called in the browser');
-  if (!auth.currentUser) throw new Error('No user is signed in');
-  if (!auth.currentUser.email) throw new Error('User has no email');
-
-  const credential = EmailAuthProvider.credential(auth.currentUser.email, password);
-  return reauthenticateWithCredential(auth.currentUser, credential);
-}
 
 // Admin functions
 export async function isCurrentUserAdmin(): Promise<boolean> {

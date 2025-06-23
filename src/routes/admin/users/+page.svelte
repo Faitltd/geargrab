@@ -275,28 +275,13 @@
     }
   }
 
+  // Password reset is not available for social-only authentication
   async function resetUserPassword(userId: string, userEmail: string) {
-    if (!confirm(`Are you sure you want to reset the password for ${userEmail}?`)) {
-      return;
-    }
-
-    try {
-      // In a real app, this would use Firebase Admin SDK to reset password
-      // For now, we'll simulate the reset
-
-      notifications.add({
-        type: 'success',
-        message: `Password reset email sent to ${userEmail}`,
-        timeout: 3000
-      });
-    } catch (error) {
-      console.error('Error resetting password:', error);
-      notifications.add({
-        type: 'error',
-        message: 'Failed to reset password',
-        timeout: 5000
-      });
-    }
+    notifications.add({
+      type: 'info',
+      message: 'Password reset is not available for social authentication users',
+      timeout: 3000
+    });
   }
 
   async function deleteUser(userId: string, userEmail: string) {

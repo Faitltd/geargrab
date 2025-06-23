@@ -38,11 +38,8 @@ const SECURITY_PATTERNS = {
   // Command injection detection
   commandInjection: /[;&|`$(){}[\]]/,
   
-  // Email validation (RFC 5322 compliant)
+  // Email validation (RFC 5322 compliant) - kept for contact forms and other uses
   email: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
-  
-  // Strong password (8+ chars, uppercase, lowercase, number, special char)
-  strongPassword: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
   
   // Phone number (US format)
   phone: /^\+?1?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/,
@@ -326,11 +323,7 @@ export function validateInput(data: Record<string, any>, schema: ValidationSchem
 
 // Common validation schemas
 export const CommonSchemas = {
-  // User authentication
-  login: {
-    email: { required: true, type: 'email' as const, sanitize: true },
-    password: { required: true, type: 'string' as const, minLength: 1 }
-  },
+  // Social-only authentication (no email/password validation needed)
 
   register: {
     email: { required: true, type: 'email' as const, sanitize: true },

@@ -83,21 +83,14 @@ declare global {
 }
 
 /**
- * Login via UI form
+ * Login via social authentication (deprecated - use social login flows)
  */
 Cypress.Commands.add('login', (email: string, password: string) => {
+  // Since we're using social-only auth, this command is deprecated
+  cy.log('login command is deprecated - use social login flows for testing');
   cy.visit('/auth/login');
-  cy.get('[data-cy="email-input"]').type(email);
-  cy.get('[data-cy="password-input"]').type(password);
-  cy.get('[data-cy="login-button"]').click();
-  
-  // Wait for login to complete
-  cy.intercept('POST', '/api/auth/login').as('loginRequest');
-  cy.wait('@loginRequest');
-  
-  // Verify successful login
-  cy.url().should('not.include', '/auth/login');
-  cy.getCookie('__session').should('exist');
+  // Social login buttons should be visible
+  cy.get('[data-cy="social-login-google"]').should('be.visible');
 });
 
 /**

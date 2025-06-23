@@ -48,7 +48,8 @@ export const POST: RequestHandler = async (event) => {
     // Check if this is a test request (for debugging payment forms)
     const url = new URL(event.request.url);
     const isTestMode = url.searchParams.get('test') === 'true' ||
-                      event.request.headers.get('X-Test-Mode') === 'true';
+                      event.request.headers.get('X-Test-Mode') === 'true' ||
+                      process.env.NODE_ENV === 'development';
 
     let userId: string;
 

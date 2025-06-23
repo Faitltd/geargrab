@@ -92,13 +92,13 @@
     }
   }
 
-  // Handle authentication - redirect to auth subdomain - v5.0.0 - TIMESTAMP: 2025-01-21
+  // Handle authentication - NUCLEAR CACHE BUST v4.0.0 - Use new auth page
   function openLoginPopup() {
-    console.log('🔄 v5.0.0 - Redirecting to auth subdomain for login...');
+    console.log('🚀 v4.0.0 - NUCLEAR CACHE BUST - Using new auth page for login...');
     const currentUrl = encodeURIComponent(window.location.href);
-    const authUrl = `https://geargrab-auth-nxoediodla-uc.a.run.app?redirectTo=${currentUrl}&t=${Date.now()}`;
+    const authUrl = `/auth-v4?redirectTo=${currentUrl}&t=${Date.now()}`;
     console.log('🔗 Auth URL:', authUrl);
-    window.location.href = authUrl;
+    goto(authUrl);
     // Close mobile menu if open
     if (isMenuOpen) {
       isMenuOpen = false;
@@ -106,11 +106,11 @@
   }
 
   function openSignupPopup() {
-    console.log('🔄 v5.0.0 - Redirecting to auth subdomain for signup...');
+    console.log('🚀 v4.0.0 - NUCLEAR CACHE BUST - Using new auth page for signup...');
     const currentUrl = encodeURIComponent(window.location.href);
-    const authUrl = `https://geargrab-auth-nxoediodla-uc.a.run.app?redirectTo=${currentUrl}&mode=signup&t=${Date.now()}`;
+    const authUrl = `/auth-v4?redirectTo=${currentUrl}&mode=signup&t=${Date.now()}`;
     console.log('🔗 Auth URL:', authUrl);
-    window.location.href = authUrl;
+    goto(authUrl);
     // Close mobile menu if open
     if (isMenuOpen) {
       isMenuOpen = false;

@@ -1,31 +1,8 @@
 <script lang="ts">
-  /**
-   * Simple Registration Form Component
-   *
-   * Features:
-   * - Basic HTML5 validation
-   * - Simple password confirmation check
-   * - Clean form handling
-   */
-
-  // Simple form data interface
-  interface FormData {
-    email: string;
-    password: string;
-    confirmPassword: string;
-    firstName: string;
-    lastName: string;
-    username: string;
-    phoneNumber: string;
-    age: number | undefined;
-    gender: string;
-    agreeToTerms: boolean;
-    agreeToPrivacy: boolean;
-    marketingConsent: boolean;
-  }
-
+  import { registrationSchema, getPasswordStrength } from '$lib/validation/registration';
+  
   // Form data
-  let formData: FormData = {
+  let formData = {
     email: '',
     password: '',
     confirmPassword: '',
@@ -33,436 +10,351 @@
     lastName: '',
     username: '',
     phoneNumber: '',
-    age: undefined,
+    age: '',
     gender: '',
     agreeToTerms: false,
-    agreeToPrivacy: false,
-    marketingConsent: false
+    agreeToPrivacy: false
   };
-
-  // Validation state
-  let errors: Record<string, string> = {};
+  
+  // Form state
+  let errors = {};
   let isSubmitting = false;
-  let submitSuccess = false;
-  let submitMessage = '';
-
-  // Simple validation functions
-  function validateEmail(email: string): string | null {
-    if (!email) return 'Email is required';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Invalid email format';
-    return null;
+  let passwordStrength = { score: 0, feedback: [], isStrong: false };
+  
+  // Update password strength in real-time
+  $: if (formData.password) {
+    passwordStrength = getPasswordStrength(formData.password);
+  } else {
+    passwordStrength = { score: 0, feedback: [], isStrong: false };
   }
-
-  function validatePassword(password: string): string | null {
-    if (!password) return 'Password is required';
-    if (password.length < 8) return 'Password must be at least 8 characters';
-    return null;
-  }
-
-  function validateRequired(value: string, fieldName: string): string | null {
-    if (!value || value.trim() === '') return `${fieldName} is required`;
-    return null;
-  }
-
-  // Handle form submission
+  
   async function handleSubmit() {
     isSubmitting = true;
     errors = {};
-
+    
     try {
-      // Simple validation
-      const emailError = validateEmail(formData.email);
-      const passwordError = validatePassword(formData.password);
-      const firstNameError = validateRequired(formData.firstName, 'First name');
-      const lastNameError = validateRequired(formData.lastName, 'Last name');
-
-      if (emailError) errors.email = emailError;
-      if (passwordError) errors.password = passwordError;
-      if (firstNameError) errors.firstName = firstNameError;
-      if (lastNameError) errors.lastName = lastNameError;
-
-      if (formData.password !== formData.confirmPassword) {
-        errors.confirmPassword = 'Passwords do not match';
-      }
-
-      if (!formData.agreeToTerms) {
-        errors.agreeToTerms = 'You must agree to the terms and conditions';
-      }
-
-      if (!formData.agreeToPrivacy) {
-        errors.agreeToPrivacy = 'You must agree to the privacy policy';
-      }
-
-      // If there are errors, stop submission
-      if (Object.keys(errors).length > 0) {
-        errors = { ...errors };
-        isSubmitting = false;
-        return;
-      }
-
-      // Submit to API
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        submitSuccess = true;
-        submitMessage = result.message || 'Registration successful!';
-        console.log('✅ Registration successful:', result);
-      } else {
-        submitSuccess = false;
-        submitMessage = result.message || 'Registration failed';
-      }
-
+      // Validate with Zod schema
+      const validatedData = registrationSchema.parse(formData);
+      console.log('✅ Form validation passed:', validatedData);
+      
+      // Here you would typically send the data to your API
+      alert('Registration form submitted successfully! (This is a test component)');
+      
     } catch (error) {
-      console.error('❌ Registration error:', error);
-      submitSuccess = false;
-      submitMessage = 'Network error. Please try again.';
+      console.error('❌ Validation failed:', error);
+      
+      if (error.errors) {
+        // Zod validation errors
+        error.errors.forEach(err => {
+          errors[err.path[0]] = err.message;
+        });
+      }
     } finally {
       isSubmitting = false;
     }
   }
-
-  // Simple reactive validation for password confirmation
-  $: if (formData.confirmPassword && formData.password) {
-    if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
-      errors = { ...errors };
-    } else if (errors.confirmPassword) {
-      delete errors.confirmPassword;
-      errors = { ...errors };
-    }
-  }
 </script>
 
-<div class="registration-form">
-  <h2>Create Your Account</h2>
+<div class="registration-form-container">
+  <div class="form-header">
+    <h2>Registration Form</h2>
+    <p>This is a test component for form validation</p>
+  </div>
   
-  {#if submitSuccess}
-    <div class="success-message">
-      <h3>✅ Registration Successful!</h3>
-      <p>{submitMessage}</p>
+  <form on:submit|preventDefault={handleSubmit} class="registration-form">
+    <!-- Email -->
+    <div class="form-group">
+      <label for="email">Email *</label>
+      <input
+        id="email"
+        type="email"
+        bind:value={formData.email}
+        class:error={errors.email}
+        placeholder="your@email.com"
+        required
+      />
+      {#if errors.email}
+        <span class="error-message">{errors.email}</span>
+      {/if}
     </div>
-  {:else}
-    <form on:submit|preventDefault="{handleSubmit}">
-      <!-- Step 1: Basic Information -->
-      <fieldset>
-        <legend>Basic Information</legend>
-        
-        <div class="form-group">
-          <label for="email">Email Address *</label>
-          <input
-            id="email"
-            type="email"
-            bind:value="{formData.email}"
-            class:error="{errors.email}"
-            required
-          />
-          {#if errors.email}
-            <div class="error-messages">
-              <span class="error">{errors.email}</span>
-            </div>
-          {/if}
-        </div>
-
-        <div class="form-group">
-          <label for="password">Password *</label>
-          <input
-            id="password"
-            type="password"
-            bind:value="{formData.password}"
-            class:error="{errors.password}"
-            required
-          />
-          
-          <!-- Simple password hint -->
-          {#if formData.password && formData.password.length < 8}
-            <div class="password-hint">
-              <small class="text-gray-500">Password must be at least 8 characters</small>
-            </div>
-          {/if}
-          
-          {#if errors.password}
-            <div class="error-messages">
-              <span class="error">{errors.password}</span>
-            </div>
-          {/if}
-        </div>
-
-        <div class="form-group">
-          <label for="confirmPassword">Confirm Password *</label>
-          <input
-            id="confirmPassword"
-            type="password"
-            bind:value="{formData.confirmPassword}"
-            class:error="{errors.confirmPassword}"
-            required
-          />
-          {#if errors.confirmPassword}
-            <div class="error-messages">
-              <span class="error">{errors.confirmPassword}</span>
-            </div>
-          {/if}
-        </div>
-      </fieldset>
-
-      <!-- Step 2: Personal Information -->
-      <fieldset>
-        <legend>Personal Information</legend>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="firstName">First Name *</label>
-            <input
-              id="firstName"
-              type="text"
-              bind:value="{formData.firstName}"
-              class:error="{errors.firstName}"
-              required
-            />
-            {#if errors.firstName}
-              <div class="error-messages">
-                <span class="error">{errors.firstName}</span>
-              </div>
-            {/if}
+    
+    <!-- Password -->
+    <div class="form-group">
+      <label for="password">Password *</label>
+      <input
+        id="password"
+        type="password"
+        bind:value={formData.password}
+        class:error={errors.password}
+        placeholder="Enter a strong password"
+        required
+      />
+      {#if formData.password}
+        <div class="password-strength">
+          <div class="strength-bar">
+            <div 
+              class="strength-fill strength-{passwordStrength.score}"
+              style="width: {(passwordStrength.score / 6) * 100}%"
+            ></div>
           </div>
-
-          <div class="form-group">
-            <label for="lastName">Last Name *</label>
-            <input
-              id="lastName"
-              type="text"
-              bind:value="{formData.lastName}"
-              class:error="{errors.lastName}"
-              required
-            />
-            {#if errors.lastName}
-              <div class="error-messages">
-                <span class="error">{errors.lastName}</span>
-              </div>
-            {/if}
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="username">Username (optional)</label>
-          <input
-            id="username"
-            type="text"
-            bind:value="{formData.username}"
-            class:error="{errors.username}"
-            placeholder="3-30 characters, letters, numbers, _, -"
-          />
-          {#if errors.username}
-            <div class="error-messages">
-              <span class="error">{errors.username}</span>
-            </div>
-          {/if}
-        </div>
-      </fieldset>
-
-      <!-- Step 3: Optional Information -->
-      <fieldset>
-        <legend>Additional Information (Optional)</legend>
-
-        <div class="form-group">
-          <label for="phoneNumber">Phone Number</label>
-          <input
-            id="phoneNumber"
-            type="tel"
-            bind:value="{formData.phoneNumber}"
-            class:error="{errors.phoneNumber}"
-            placeholder="(555) 123-4567"
-          />
-          {#if errors.phoneNumber}
-            <div class="error-messages">
-              <span class="error">{errors.phoneNumber}</span>
-            </div>
-          {/if}
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="age">Age</label>
-            <input
-              id="age"
-              type="number"
-              bind:value="{formData.age}"
-              class:error="{errors.age}"
-              min="13"
-              max="120"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="gender">Gender</label>
-            <select id="gender" bind:value="{formData.gender}">
-              <option value="">Select...</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="non-binary">Non-binary</option>
-              <option value="prefer-not-to-say">Prefer not to say</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
-      </fieldset>
-
-      <!-- Step 4: Terms and Conditions -->
-      <fieldset>
-        <legend>Terms and Conditions</legend>
-        
-        <div class="checkbox-group">
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              bind:checked="{formData.agreeToTerms}"
-              class:error="{errors.agreeToTerms}"
-              required
-            />
-            I agree to the <a href="/terms" target="_blank">Terms and Conditions</a> *
-          </label>
-          {#if errors.agreeToTerms}
-            <div class="error-messages">
-              <span class="error">{errors.agreeToTerms}</span>
-            </div>
-          {/if}
-        </div>
-
-        <div class="checkbox-group">
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              bind:checked="{formData.agreeToPrivacy}"
-              class:error="{errors.agreeToPrivacy}"
-              required
-            />
-            I agree to the <a href="/privacy" target="_blank">Privacy Policy</a> *
-          </label>
-          {#if errors.agreeToPrivacy}
-            <div class="error-messages">
-              <span class="error">{errors.agreeToPrivacy}</span>
-            </div>
-          {/if}
-        </div>
-
-        <div class="checkbox-group">
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              bind:checked="{formData.marketingConsent}"
-            />
-            I would like to receive marketing emails and updates
-          </label>
-        </div>
-      </fieldset>
-
-      <!-- Submit Button -->
-      <div class="form-actions">
-        <button 
-          type="submit" 
-          disabled="{isSubmitting}"
-          class="submit-button"
-        >
-          {#if isSubmitting}
-            Creating Account...
-          {:else}
-            Create Account
-          {/if}
-        </button>
-      </div>
-
-      <!-- Error Message -->
-      {#if !submitSuccess && submitMessage}
-        <div class="error-message">
-          {submitMessage}
+          <span class="strength-text {passwordStrength.isStrong ? 'strong' : 'weak'}">
+            {passwordStrength.isStrong ? 'Strong' : 'Weak'} ({passwordStrength.score}/6)
+          </span>
         </div>
       {/if}
-    </form>
-  {/if}
+      {#if errors.password}
+        <span class="error-message">{errors.password}</span>
+      {/if}
+    </div>
+    
+    <!-- Confirm Password -->
+    <div class="form-group">
+      <label for="confirmPassword">Confirm Password *</label>
+      <input
+        id="confirmPassword"
+        type="password"
+        bind:value={formData.confirmPassword}
+        class:error={errors.confirmPassword}
+        placeholder="Confirm your password"
+        required
+      />
+      {#if errors.confirmPassword}
+        <span class="error-message">{errors.confirmPassword}</span>
+      {/if}
+    </div>
+    
+    <!-- Name Fields -->
+    <div class="form-row">
+      <div class="form-group">
+        <label for="firstName">First Name *</label>
+        <input
+          id="firstName"
+          type="text"
+          bind:value={formData.firstName}
+          class:error={errors.firstName}
+          placeholder="John"
+          required
+        />
+        {#if errors.firstName}
+          <span class="error-message">{errors.firstName}</span>
+        {/if}
+      </div>
+      
+      <div class="form-group">
+        <label for="lastName">Last Name *</label>
+        <input
+          id="lastName"
+          type="text"
+          bind:value={formData.lastName}
+          class:error={errors.lastName}
+          placeholder="Doe"
+          required
+        />
+        {#if errors.lastName}
+          <span class="error-message">{errors.lastName}</span>
+        {/if}
+      </div>
+    </div>
+    
+    <!-- Username -->
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input
+        id="username"
+        type="text"
+        bind:value={formData.username}
+        class:error={errors.username}
+        placeholder="johndoe123"
+      />
+      {#if errors.username}
+        <span class="error-message">{errors.username}</span>
+      {/if}
+    </div>
+    
+    <!-- Phone -->
+    <div class="form-group">
+      <label for="phoneNumber">Phone Number</label>
+      <input
+        id="phoneNumber"
+        type="tel"
+        bind:value={formData.phoneNumber}
+        class:error={errors.phoneNumber}
+        placeholder="(555) 123-4567"
+      />
+      {#if errors.phoneNumber}
+        <span class="error-message">{errors.phoneNumber}</span>
+      {/if}
+    </div>
+    
+    <!-- Age and Gender -->
+    <div class="form-row">
+      <div class="form-group">
+        <label for="age">Age</label>
+        <input
+          id="age"
+          type="number"
+          bind:value={formData.age}
+          class:error={errors.age}
+          placeholder="25"
+          min="13"
+          max="120"
+        />
+        {#if errors.age}
+          <span class="error-message">{errors.age}</span>
+        {/if}
+      </div>
+      
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <select
+          id="gender"
+          bind:value={formData.gender}
+          class:error={errors.gender}
+        >
+          <option value="">Select...</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+          <option value="prefer-not-to-say">Prefer not to say</option>
+        </select>
+        {#if errors.gender}
+          <span class="error-message">{errors.gender}</span>
+        {/if}
+      </div>
+    </div>
+    
+    <!-- Agreements -->
+    <div class="form-group">
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          bind:checked={formData.agreeToTerms}
+          class:error={errors.agreeToTerms}
+        />
+        I agree to the Terms of Service *
+      </label>
+      {#if errors.agreeToTerms}
+        <span class="error-message">{errors.agreeToTerms}</span>
+      {/if}
+    </div>
+    
+    <div class="form-group">
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          bind:checked={formData.agreeToPrivacy}
+          class:error={errors.agreeToPrivacy}
+        />
+        I agree to the Privacy Policy *
+      </label>
+      {#if errors.agreeToPrivacy}
+        <span class="error-message">{errors.agreeToPrivacy}</span>
+      {/if}
+    </div>
+    
+    <!-- Submit Button -->
+    <button
+      type="submit"
+      disabled={isSubmitting}
+      class="submit-button"
+    >
+      {isSubmitting ? 'Submitting...' : 'Register'}
+    </button>
+  </form>
 </div>
 
 <style>
-  .registration-form {
+  .registration-form-container {
     max-width: 600px;
     margin: 0 auto;
     padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
-
-  fieldset {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+  
+  .form-header {
+    text-align: center;
+    margin-bottom: 2rem;
   }
-
-  legend {
-    font-weight: bold;
-    padding: 0 0.5rem;
+  
+  .form-header h2 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
   }
-
-  .form-group {
-    margin-bottom: 1rem;
+  
+  .form-header p {
+    color: #7f8c8d;
   }
-
+  
+  .registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
   .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
   }
-
-  label {
-    display: block;
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
     margin-bottom: 0.5rem;
     font-weight: 500;
+    color: #2c3e50;
   }
-
-  input, select, textarea {
-    width: 100%;
+  
+  .form-group input,
+  .form-group select {
     padding: 0.75rem;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 1rem;
+    transition: border-color 0.3s ease;
   }
-
-  input.error, select.error {
+  
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  }
+  
+  .form-group input.error,
+  .form-group select.error {
     border-color: #e74c3c;
-    background-color: #fdf2f2;
   }
-
-  .error-messages {
-    margin-top: 0.25rem;
-  }
-
-  .error {
+  
+  .error-message {
     color: #e74c3c;
     font-size: 0.875rem;
-    display: block;
+    margin-top: 0.25rem;
   }
-
+  
   .password-strength {
     margin-top: 0.5rem;
   }
-
+  
   .strength-bar {
     width: 100%;
     height: 4px;
     background-color: #eee;
     border-radius: 2px;
     overflow: hidden;
+    margin-bottom: 0.25rem;
   }
-
+  
   .strength-fill {
     height: 100%;
     transition: width 0.3s ease;
   }
-
+  
   .strength-fill.strength-0,
   .strength-fill.strength-1,
   .strength-fill.strength-2 { background-color: #e74c3c; }
@@ -470,82 +362,59 @@
   .strength-fill.strength-4 { background-color: #f39c12; }
   .strength-fill.strength-5,
   .strength-fill.strength-6 { background-color: #27ae60; }
-
+  
   .strength-text {
     font-size: 0.875rem;
-    margin-top: 0.25rem;
+    font-weight: 500;
   }
-
-  .strength-feedback {
-    font-size: 0.75rem;
-    color: #666;
-    margin-top: 0.25rem;
-    padding-left: 1rem;
+  
+  .strength-text.strong {
+    color: #27ae60;
   }
-
-  .checkbox-group {
-    margin-bottom: 1rem;
+  
+  .strength-text.weak {
+    color: #e74c3c;
   }
-
+  
   .checkbox-label {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.5rem;
     cursor: pointer;
   }
-
+  
   .checkbox-label input[type="checkbox"] {
     width: auto;
-    margin: 0;
   }
-
+  
   .submit-button {
-    width: 100%;
-    padding: 1rem;
-    background-color: #3498db;
+    background: #3498db;
     color: white;
     border: none;
-    border-radius: 4px;
-    font-size: 1.1rem;
+    padding: 1rem 2rem;
+    border-radius: 6px;
+    font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
-
+  
   .submit-button:hover:not(:disabled) {
-    background-color: #2980b9;
+    background: #2980b9;
   }
-
+  
   .submit-button:disabled {
-    background-color: #bdc3c7;
+    background: #bdc3c7;
     cursor: not-allowed;
   }
-
-  .success-message {
-    text-align: center;
-    padding: 2rem;
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    border-radius: 8px;
-    color: #155724;
-  }
-
-  .error-message {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    border-radius: 4px;
-    color: #721c24;
-    text-align: center;
-  }
-
-  a {
-    color: #3498db;
-    text-decoration: none;
-  }
-
-  a:hover {
-    text-decoration: underline;
+  
+  @media (max-width: 640px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+    
+    .registration-form-container {
+      padding: 1rem;
+    }
   }
 </style>

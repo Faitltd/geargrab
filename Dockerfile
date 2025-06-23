@@ -40,11 +40,14 @@ WORKDIR /app
 COPY --from=build /app/package*.json ./
 RUN npm install --omit=dev
 
-# Copy built application
+# Copy built application and static files
 COPY --from=build /app/build ./build
+COPY --from=build /app/static ./static
 
-# Set environment variables
-ENV PORT=8080
+# Also copy static files directly from source (in case build doesn't preserve them)
+COPY static ./static
+
+# Set environment variables (PORT is automatically set by Cloud Run)
 ENV NODE_ENV=production
 
 # Create non-root user for security

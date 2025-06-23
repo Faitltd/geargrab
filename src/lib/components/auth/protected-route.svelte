@@ -88,7 +88,7 @@
         >
           Sign In to Continue
         </a>
-        
+
         <p class="text-sm text-gray-400">
           Don't have an account?
           <a href="/auth/signup" class="text-green-400 hover:text-green-300 underline font-medium">

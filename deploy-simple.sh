@@ -28,7 +28,6 @@ gcloud run deploy geargrab \
     --timeout 300 \
     --concurrency 80 \
     --set-env-vars NODE_ENV=production \
-    --set-env-vars PORT=8080 \
     --set-env-vars VITE_USE_EMULATORS=false \
     --set-env-vars VITE_APP_URL=https://geargrab.co \
     --quiet

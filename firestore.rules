@@ -42,10 +42,10 @@ service cloud.firestore {
       allow read, write: if isOwner(userId);
     }
 
-    // Listings - authenticated read with validation
+    // Listings - public read with validation
     match /listings/{listingId} {
-      // Require authentication for reading listings
-      allow read: if isAuthenticated();
+      // Allow public reading of listings for booking flow
+      allow read: if true;
 
       allow create: if isAuthenticated() &&
         request.auth.uid == request.resource.data.ownerUid &&

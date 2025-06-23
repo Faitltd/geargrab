@@ -69,14 +69,31 @@
   }
 
   onMount(() => {
-    // Get URL parameters
+    // Get URL parameters first - these take precedence
     const urlParams = $page.url.searchParams;
-    listingId = urlParams.get('listingId') || '';
-    startDate = urlParams.get('startDate') || '';
-    endDate = urlParams.get('endDate') || '';
-    deliveryMethod = urlParams.get('deliveryMethod') || 'pickup';
-    insuranceTier = urlParams.get('insuranceTier') || 'standard';
-    totalPrice = parseFloat(urlParams.get('totalPrice') || '0');
+    const urlListingId = urlParams.get('listingId') || '';
+    const urlStartDate = urlParams.get('startDate') || '';
+    const urlEndDate = urlParams.get('endDate') || '';
+    const urlDeliveryMethod = urlParams.get('deliveryMethod') || 'pickup';
+    const urlInsuranceTier = urlParams.get('insuranceTier') || 'standard';
+    const urlTotalPrice = parseFloat(urlParams.get('totalPrice') || '0');
+
+    // Set URL parameters (these will be used unless overridden by context restore)
+    listingId = urlListingId;
+    startDate = urlStartDate;
+    endDate = urlEndDate;
+    deliveryMethod = urlDeliveryMethod;
+    insuranceTier = urlInsuranceTier;
+    totalPrice = urlTotalPrice;
+
+    console.log('🔧 URL Parameters loaded:', {
+      listingId,
+      startDate,
+      endDate,
+      deliveryMethod,
+      insuranceTier,
+      totalPrice
+    });
 
     // Load listing data (in a real app, this would fetch from API)
     loadListingData();
@@ -155,15 +172,23 @@
   function restoreBookingContext() {
     const context = BookingContextManager.restoreContext();
     if (context) {
-      // Restore URL parameters
-      listingId = context.listingId || listingId;
-      startDate = context.startDate || startDate;
-      endDate = context.endDate || endDate;
-      deliveryMethod = context.deliveryMethod || deliveryMethod;
-      insuranceTier = context.insuranceTier || insuranceTier;
-      totalPrice = context.totalPrice || totalPrice;
+      // Get current URL parameters to check if they should take precedence
+      const urlParams = $page.url.searchParams;
+      const hasUrlParams = urlParams.get('listingId') || urlParams.get('startDate') ||
+                          urlParams.get('endDate') || urlParams.get('deliveryMethod') ||
+                          urlParams.get('insuranceTier');
 
-      // Restore form data
+      // Only restore URL parameters if no URL params are present (returning from auth)
+      if (!hasUrlParams) {
+        listingId = context.listingId || listingId;
+        startDate = context.startDate || startDate;
+        endDate = context.endDate || endDate;
+        deliveryMethod = context.deliveryMethod || deliveryMethod;
+        insuranceTier = context.insuranceTier || insuranceTier;
+        totalPrice = context.totalPrice || totalPrice;
+      }
+
+      // Always restore form data
       contactInfo = context.contactInfo || contactInfo;
       specialRequests = context.specialRequests || '';
       agreeToTerms = context.agreeToTerms || false;
@@ -173,7 +198,12 @@
         showPayment = true;
       }
 
-      console.log('📥 Booking context restored');
+      console.log('📥 Booking context restored', {
+        hasUrlParams,
+        restoredUrlParams: !hasUrlParams,
+        insuranceTier,
+        deliveryMethod
+      });
     }
   }
 
@@ -315,7 +345,7 @@
   // Two-stage payment calculation with fallback pricing
   $: effectiveDailyPrice = listing?.dailyPrice || 25; // Fallback to $25/day if missing
   $: basePrice = effectiveDailyPrice * days;
-  $: serviceFee = Math.round(basePrice * 0.1 * 100) / 100; // Round to nearest cent
+  $: serviceFee = 2.50; // Fixed service fee as discussed
   $: deliveryFee = deliveryMethod === 'pickup' ? 0 : 30;
   $: insuranceFee = insuranceTier === 'none' ? 0 : insuranceTier === 'basic' ? 5 : insuranceTier === 'standard' ? 10 : 15;
 
@@ -335,7 +365,9 @@
       days,
       basePrice,
       serviceFee,
+      deliveryMethod,
       deliveryFee,
+      insuranceTier,
       insuranceFee,
       upfrontFees,
       laterFees,

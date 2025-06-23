@@ -110,37 +110,34 @@ describe('Authentication Flow - Comprehensive E2E Tests', () => {
       cy.visit('/auth/login');
     });
 
-    it('should display login form', () => {
+    it('should display social login options', () => {
       // Check page title
       cy.title().should('include', 'Log In');
 
-      // Check form elements
-      cy.get('h1').should('contain', 'Welcome back');
-      cy.get('input[type="email"]').should('exist');
-      cy.get('input[type="password"]').should('exist');
-      cy.get('button[type="submit"]').should('contain', 'Log in');
+      // Check social login buttons
+      cy.get('h2').should('contain', 'Welcome Back');
+      cy.contains('Continue with Google').should('exist');
+      cy.contains('Continue with Apple').should('exist');
+      cy.contains('Continue with Facebook').should('exist');
+      cy.contains('Continue with GitHub').should('exist');
 
       // Check link to signup
-      cy.contains('create a new account').should('exist');
+      cy.contains('Sign up here').should('exist');
     });
 
-    it('should validate required fields', () => {
-      // Try to submit empty form
-      cy.get('button[type="submit"]').click();
-      
-      // Should show validation errors
-      cy.get('input[type="email"]:invalid').should('exist');
-      cy.get('input[type="password"]:invalid').should('exist');
+    it('should show social login buttons', () => {
+      // Check that all social login buttons are present and clickable
+      cy.contains('Continue with Google').should('be.visible').and('not.be.disabled');
+      cy.contains('Continue with Apple').should('be.visible').and('not.be.disabled');
+      cy.contains('Continue with Facebook').should('be.visible').and('not.be.disabled');
+      cy.contains('Continue with GitHub').should('be.visible').and('not.be.disabled');
     });
 
-    it('should validate email format', () => {
-      // Enter invalid email
-      cy.get('input[type="email"]').type('invalid-email');
-      cy.get('input[type="password"]').type('password123');
-      cy.get('button[type="submit"]').click();
-      
-      // Should show email validation error
-      cy.get('input[type="email"]:invalid').should('exist');
+    it('should not have email/password fields', () => {
+      // Verify no email/password fields exist
+      cy.get('input[type="email"]').should('not.exist');
+      cy.get('input[type="password"]').should('not.exist');
+      cy.get('button[type="submit"]').should('not.exist');
     });
 
     it('should handle login attempt', () => {
@@ -160,34 +157,23 @@ describe('Authentication Flow - Comprehensive E2E Tests', () => {
       cy.get('button[type="submit"]').should('contain', 'Logging in...');
     });
 
-    it('should handle login errors', () => {
-      // Fill in credentials and try to submit
-      cy.get('input[type="email"]').type('test@example.com');
-      cy.get('input[type="password"]').type('wrongpassword');
-      cy.get('button[type="submit"]').click();
+    it('should handle social login clicks', () => {
+      // Click Google login button
+      cy.contains('Continue with Google').click();
 
-      // For now, just check that the form was submitted
-      // Error handling depends on Firebase response
-      cy.get('button[type="submit"]').should('contain', 'Logging in...');
+      // For testing, we expect the button to show loading state
+      // In a real test, this would open a popup or redirect
+      cy.contains('Signing in...').should('exist');
     });
+
+
 
     it('should navigate to signup page', () => {
       // Click signup link
-      cy.contains('create a new account').click();
+      cy.contains('Sign up here').click();
 
       // Should navigate to signup
       cy.url().should('include', '/auth/signup');
-    });
-
-    it('should handle forgot password', () => {
-      // Check if forgot password link exists
-      cy.get('body').then(($body) => {
-        if ($body.find('a:contains("Forgot password")').length > 0) {
-          cy.contains('Forgot password').click();
-          // Should show forgot password form or modal
-          cy.contains('Reset password').should('be.visible');
-        }
-      });
     });
   });
 
@@ -196,19 +182,19 @@ describe('Authentication Flow - Comprehensive E2E Tests', () => {
       cy.visit('/auth/signup');
     });
 
-    it('should display signup form', () => {
+    it('should display social signup options', () => {
       // Check page title
       cy.title().should('include', 'Sign Up');
 
-      // Check form elements
-      cy.get('h1').should('contain', 'Create your GearGrab account');
-      cy.get('input[name="firstName"]').should('exist');
-      cy.get('input[name="lastName"]').should('exist');
-      cy.get('input[name="email"]').should('exist');
-      // Password is on step 2, so we need to navigate there first
+      // Check social signup buttons
+      cy.get('h2').should('contain', 'Create Your Account');
+      cy.contains('Continue with Google').should('exist');
+      cy.contains('Continue with Apple').should('exist');
+      cy.contains('Continue with Facebook').should('exist');
+      cy.contains('Continue with GitHub').should('exist');
 
       // Check link to login
-      cy.contains('sign in to your existing account').should('exist');
+      cy.contains('Sign in here').should('exist');
     });
 
     it('should validate required fields', () => {

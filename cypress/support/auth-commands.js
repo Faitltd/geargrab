@@ -6,21 +6,14 @@
  */
 
 /**
- * Login via UI form
+ * Login via social authentication (deprecated - use social login flows)
  */
 Cypress.Commands.add('login', (email, password) => {
+  // Since we're using social-only auth, this command is deprecated
+  cy.log('login command is deprecated - use social login flows for testing');
   cy.visit('/auth/login');
-  cy.get('[data-cy="email-input"]').type(email);
-  cy.get('[data-cy="password-input"]').type(password);
-  cy.get('[data-cy="login-button"]').click();
-  
-  // Wait for login to complete
-  cy.intercept('POST', '/api/auth/login').as('loginRequest');
-  cy.wait('@loginRequest');
-  
-  // Verify successful login
-  cy.url().should('not.include', '/auth/login');
-  cy.getCookie('__session').should('exist');
+  // Social login buttons should be visible
+  cy.get('[data-cy="social-login-google"]').should('be.visible');
 });
 
 /**
@@ -125,19 +118,14 @@ Cypress.Commands.add('clearAuth', () => {
 });
 
 /**
- * Create test user via API
+ * Create test user via social login (for testing purposes)
+ * Note: In social-only authentication, users are created through social providers
  */
 Cypress.Commands.add('createTestUser', (userData) => {
-  return cy.request({
-    method: 'POST',
-    url: '/api/auth/register',
-    body: userData
-  }).then((response) => {
-    expect(response.status).to.equal(201);
-    expect(response.body).to.have.property('success', true);
-    expect(response.body).to.have.property('user');
-    return response.body.user;
-  });
+  // Since we're using social-only auth, this command is deprecated
+  // Test users should be created through social login flows
+  cy.log('createTestUser is deprecated - use social login flows for testing');
+  return Promise.resolve(null);
 });
 
 /**

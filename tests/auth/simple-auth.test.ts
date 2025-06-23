@@ -29,8 +29,6 @@ const mockSimpleAuth = {
 };
 
 // Mock Firebase auth methods
-const mockSignInWithEmailAndPassword = jest.fn();
-const mockCreateUserWithEmailAndPassword = jest.fn();
 const mockSignInWithPopup = jest.fn();
 const mockSignOut = jest.fn();
 const mockOnAuthStateChanged = jest.fn();
@@ -38,8 +36,6 @@ const mockOnAuthStateChanged = jest.fn();
 // Mock Firebase auth instance
 const mockAuth = {
   currentUser: null,
-  signInWithEmailAndPassword: mockSignInWithEmailAndPassword,
-  createUserWithEmailAndPassword: mockCreateUserWithEmailAndPassword,
   signInWithPopup: mockSignInWithPopup,
   signOut: mockSignOut,
   onAuthStateChanged: mockOnAuthStateChanged
@@ -51,8 +47,6 @@ jest.mock('$lib/firebase/client', () => ({
 }));
 
 jest.mock('firebase/auth', () => ({
-  signInWithEmailAndPassword: mockSignInWithEmailAndPassword,
-  createUserWithEmailAndPassword: mockCreateUserWithEmailAndPassword,
   signInWithPopup: mockSignInWithPopup,
   signOut: mockSignOut,
   onAuthStateChanged: mockOnAuthStateChanged,

@@ -210,6 +210,7 @@ export class SecurityMiddleware {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
       "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
       "img-src 'self' data: https: blob:",
+      "media-src 'self' data: blob:",
       "connect-src 'self' https://api.stripe.com https://js.stripe.com https://m.stripe.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://firebase.googleapis.com https://fcm.googleapis.com https://storage.googleapis.com https://apis.google.com https://accounts.google.com wss://firestore.googleapis.com",
       "frame-src https://js.stripe.com https://accounts.google.com https://geargrabco.firebaseapp.com https://geargrab.co",
       "object-src 'none'",

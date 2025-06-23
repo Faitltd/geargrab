@@ -2,9 +2,48 @@ import type { Handle } from '@sveltejs/kit';
 import { adminAuth, isFirebaseAdminAvailable } from '$lib/firebase/server';
 import { SecurityMiddleware } from '$lib/security/middleware';
 import { dev } from '$app/environment';
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 
 export const handle: Handle = async ({ event, resolve }) => {
   const start = Date.now();
+
+  // Handle static video files first
+  const { pathname } = event.url;
+  if (pathname.endsWith('.mp4') || pathname.endsWith('.webm') || pathname.endsWith('.mov')) {
+    console.log('🎥 Video file requested:', pathname);
+    const filePath = join(process.cwd(), 'static', pathname.substring(1));
+    console.log('🎥 Looking for file at:', filePath);
+
+    // Debug: Check if static directory exists
+    const staticDir = join(process.cwd(), 'static');
+    console.log('📁 Static directory path:', staticDir);
+    console.log('📁 Static directory exists:', existsSync(staticDir));
+
+    if (existsSync(filePath)) {
+      console.log('🎥 File exists, serving...');
+      try {
+        const fileBuffer = readFileSync(filePath);
+        const mimeType = pathname.endsWith('.mp4') ? 'video/mp4' :
+                        pathname.endsWith('.webm') ? 'video/webm' :
+                        'video/quicktime';
+
+        console.log('🎥 Serving video file:', { size: fileBuffer.length, mimeType });
+        return new Response(fileBuffer, {
+          headers: {
+            'Content-Type': mimeType,
+            'Cache-Control': 'public, max-age=31536000',
+            'Accept-Ranges': 'bytes'
+          }
+        });
+      } catch (error) {
+        console.error('❌ Error serving static file:', error);
+      }
+    } else {
+      console.log('❌ Video file not found:', filePath);
+    }
+  }
+
   // Initialize locals
   event.locals.user = null;
   event.locals.userId = null;
@@ -68,7 +107,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   if (!dev) {
     response.headers.set(
       'Content-Security-Policy',
-      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://r.stripe.com https://www.gstatic.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.stripe.com https://js.stripe.com https://r.stripe.com https://m.stripe.com https://q.stripe.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://firebase.googleapis.com https://fcm.googleapis.com https://storage.googleapis.com https://apis.google.com https://accounts.google.com wss://firestore.googleapis.com; frame-src https://js.stripe.com https://hooks.stripe.com https://accounts.google.com https://geargrabco.firebaseapp.com https://geargrab.co; object-src 'none'; base-uri 'self'"
+      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://r.stripe.com https://www.gstatic.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; media-src 'self' data: blob:; connect-src 'self' https://api.stripe.com https://js.stripe.com https://r.stripe.com https://m.stripe.com https://q.stripe.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://firebase.googleapis.com https://fcm.googleapis.com https://storage.googleapis.com https://apis.google.com https://accounts.google.com wss://firestore.googleapis.com; frame-src https://js.stripe.com https://hooks.stripe.com https://accounts.google.com https://geargrabco.firebaseapp.com https://geargrab.co; object-src 'none'; base-uri 'self'"
     );
   }
 

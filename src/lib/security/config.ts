@@ -1,13 +1,10 @@
 // Security configuration for GearGrab
 export const SECURITY_CONFIG = {
-  // Authentication settings
+  // Authentication settings (Social-only authentication)
   auth: {
     sessionDuration: 5 * 24 * 60 * 60 * 1000, // 5 days in milliseconds
     maxLoginAttempts: 5,
     lockoutDuration: 15 * 60 * 1000, // 15 minutes
-    passwordMinLength: 8,
-    requireStrongPassword: true,
-    requireEmailVerification: true,
     enableTwoFactor: false, // TODO: Implement 2FA
     sessionCookieName: '__session',
     sessionIdCookieName: '__session_id'

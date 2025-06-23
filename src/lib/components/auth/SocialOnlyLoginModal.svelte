@@ -1,131 +1,83 @@
-<script lang="ts">
-  // BRAND NEW Social-Only Login Modal - v3.0.0 - NO EMAIL/PASSWORD
+<script>
   import { createEventDispatcher } from 'svelte';
-  import { notifications } from '$lib/stores/notifications';
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
   import { simpleAuth } from '$lib/auth/simple-auth';
 
   export let show = false;
 
-  const dispatch = createEventDispatcher<{
-    close: void;
-    success: { user: any };
-    switchToSignup: void;
-  }>();
+  const dispatch = createEventDispatcher();
 
   let loading = false;
   let error = '';
 
-  // Get redirect URL from query params
-  $: redirectTo = $page.url.searchParams.get('redirectTo') || '/';
-
-  async function handleSocialLogin(provider: 'google' | 'apple' | 'facebook' | 'github') {
+  async function handleSocialAuth(provider) {
     loading = true;
     error = '';
 
     try {
+      console.log(`🚀 Starting login with ${provider}...`);
+
       let result;
-      
       switch (provider) {
         case 'google':
           result = await simpleAuth.signInWithGoogle();
           break;
-        case 'apple':
-          result = await simpleAuth.signInWithApple();
-          break;
-        case 'facebook':
-          result = await simpleAuth.signInWithFacebook();
-          break;
         case 'github':
           result = await simpleAuth.signInWithGitHub();
           break;
+        case 'apple':
+          result = await simpleAuth.signInWithApple();
+          break;
+        default:
+          throw new Error(`Provider ${provider} not yet configured.`);
       }
 
       if (result.success) {
-        notifications.add({
-          type: 'success',
-          message: 'Successfully signed in!',
-          timeout: 3000
-        });
-
-        // Force refresh auth state
-        setTimeout(() => {
-          simpleAuth.refreshAuth();
-        }, 500);
-
-        // Close modal and dispatch success
+        console.log('✅ Login successful');
+        dispatch('success');
         show = false;
-        dispatch('success', { user: null });
-
-        // Navigate to redirect URL
-        await goto(redirectTo);
       } else {
-        error = result.error || 'Login failed';
-        notifications.add({
-          type: 'error',
-          message: error,
-          timeout: 5000
-        });
+        error = result.error || 'Login failed. Please try again.';
       }
-    } catch (err: any) {
-      error = err.message || 'Login failed';
-      notifications.add({
-        type: 'error',
-        message: error,
-        timeout: 5000
-      });
+    } catch (err) {
+      console.error('❌ Login error:', err);
+      error = err.message || 'An unexpected error occurred. Please try again.';
     } finally {
       loading = false;
     }
   }
 
   function handleClose() {
-    show = false;
-    dispatch('close');
-  }
-
-  function switchToSignup() {
-    show = false;
-    dispatch('switchToSignup');
-  }
-
-  // Handle escape key
-  function handleKeydown(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      handleClose();
+    if (!loading) {
+      show = false;
+      dispatch('close');
     }
   }
 
-  // Reset state when modal opens/closes
-  $: if (show) {
-    error = '';
-    loading = false;
+  function handleBackdropClick(event) {
+    if (event.target === event.currentTarget) {
+      handleClose();
+    }
   }
 </script>
 
-<svelte:window on:keydown="{handleKeydown}" />
-
 {#if show}
-  <!-- Modal backdrop -->
-  <div 
+  <!-- Modal Backdrop -->
+  <div
     class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-    on:click="{handleClose}"
+    on:click={handleBackdropClick}
+    on:keydown={(e) => e.key === 'Escape' && handleClose()}
     role="dialog"
     aria-modal="true"
-    aria-labelledby="login-title"
+    aria-labelledby="login-modal-title"
   >
-    <!-- Modal content -->
-    <div 
-      class="bg-gray-900/95 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl w-full max-w-md p-8 relative"
-      on:click|stopPropagation
-      role="document"
-    >
-      <!-- Close button -->
+    <!-- Modal Content -->
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
+      <!-- Close Button -->
       <button
-        on:click="{handleClose}"
-        class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
-        aria-label="Close login modal"
+        on:click={handleClose}
+        disabled={loading}
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+        aria-label="Close modal"
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -134,24 +86,33 @@
 
       <!-- Header -->
       <div class="text-center mb-8">
-        <h2 id="login-title" class="text-2xl font-bold text-white mb-2">Welcome Back</h2>
-        <p class="text-gray-300">Choose your sign-in method</p>
+        <h2 id="login-modal-title" class="text-2xl font-bold text-gray-900 mb-2">
+          Sign in to continue
+        </h2>
+        <p class="text-gray-600">
+          Please sign in to complete your booking
+        </p>
       </div>
 
-      <!-- Error display -->
+      <!-- Error Message -->
       {#if error}
-        <div class="mb-6 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-          <p class="text-sm text-red-400">{error}</p>
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div class="flex items-center">
+            <svg class="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-sm text-red-700">{error}</span>
+          </div>
         </div>
       {/if}
 
       <!-- Social Login Buttons -->
-      <div class="space-y-3">
-        <!-- Google Login -->
+      <div class="space-y-4">
+        <!-- Google Auth -->
         <button
-          on:click={() => handleSocialLogin('google')}
+          on:click={() => handleSocialAuth('google')}
           disabled={loading}
-          class="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-900 font-medium py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+          class="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-900 font-medium py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl border border-gray-200"
         >
           <svg class="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -162,9 +123,9 @@
           {loading ? 'Signing in...' : 'Continue with Google'}
         </button>
 
-        <!-- Apple Login -->
+        <!-- Apple Auth -->
         <button
-          on:click={() => handleSocialLogin('apple')}
+          on:click={() => handleSocialAuth('apple')}
           disabled={loading}
           class="w-full flex items-center justify-center gap-3 bg-black hover:bg-gray-900 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
         >
@@ -174,21 +135,9 @@
           {loading ? 'Signing in...' : 'Continue with Apple'}
         </button>
 
-        <!-- Facebook Login -->
+        <!-- GitHub Auth -->
         <button
-          on:click={() => handleSocialLogin('facebook')}
-          disabled={loading}
-          class="w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166FE5] text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
-        >
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-          </svg>
-          {loading ? 'Signing in...' : 'Continue with Facebook'}
-        </button>
-
-        <!-- GitHub Login -->
-        <button
-          on:click={() => handleSocialLogin('github')}
+          on:click={() => handleSocialAuth('github')}
           disabled={loading}
           class="w-full flex items-center justify-center gap-3 bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
         >
@@ -200,15 +149,9 @@
       </div>
 
       <!-- Footer -->
-      <div class="mt-6 text-center">
-        <p class="text-gray-400 text-sm">
-          Don't have an account?
-          <button
-            on:click="{switchToSignup}"
-            class="text-green-400 hover:text-green-300 font-medium transition-colors"
-          >
-            Sign up
-          </button>
+      <div class="mt-8 text-center">
+        <p class="text-xs text-gray-500">
+          By signing in, you agree to our Terms of Service and Privacy Policy
         </p>
       </div>
     </div>
