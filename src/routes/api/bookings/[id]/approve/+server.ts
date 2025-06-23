@@ -3,9 +3,9 @@ import type { RequestHandler } from './$types';
 import { adminFirestore } from '$firebase/server';
 import { BookingStatus, isValidStatusTransition } from '$lib/types/booking-status';
 import Stripe from 'stripe';
-import { STRIPE_SECRET_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
+const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: '2023-10-16'
 });
 
