@@ -2,47 +2,12 @@ import type { Handle } from '@sveltejs/kit';
 import { adminAuth, isFirebaseAdminAvailable } from '$lib/firebase/server';
 import { SecurityMiddleware } from '$lib/security/middleware';
 import { dev } from '$app/environment';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
 
 export const handle: Handle = async ({ event, resolve }) => {
   const start = Date.now();
 
-  // Handle static video files first
-  const { pathname } = event.url;
-  if (pathname.endsWith('.mp4') || pathname.endsWith('.webm') || pathname.endsWith('.mov')) {
-    console.log('🎥 Video file requested:', pathname);
-    const filePath = join(process.cwd(), 'static', pathname.substring(1));
-    console.log('🎥 Looking for file at:', filePath);
-
-    // Debug: Check if static directory exists
-    const staticDir = join(process.cwd(), 'static');
-    console.log('📁 Static directory path:', staticDir);
-    console.log('📁 Static directory exists:', existsSync(staticDir));
-
-    if (existsSync(filePath)) {
-      console.log('🎥 File exists, serving...');
-      try {
-        const fileBuffer = readFileSync(filePath);
-        const mimeType = pathname.endsWith('.mp4') ? 'video/mp4' :
-                        pathname.endsWith('.webm') ? 'video/webm' :
-                        'video/quicktime';
-
-        console.log('🎥 Serving video file:', { size: fileBuffer.length, mimeType });
-        return new Response(fileBuffer, {
-          headers: {
-            'Content-Type': mimeType,
-            'Cache-Control': 'public, max-age=31536000',
-            'Accept-Ranges': 'bytes'
-          }
-        });
-      } catch (error) {
-        console.error('❌ Error serving static file:', error);
-      }
-    } else {
-      console.log('❌ Video file not found:', filePath);
-    }
-  }
+  // Let SvelteKit handle static files automatically
+  // Custom static file handling removed to prevent conflicts
 
   // Initialize locals
   event.locals.user = null;
@@ -111,8 +76,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     );
   }
 
-  // Set Cross-Origin-Opener-Policy to allow Firebase popup authentication
-  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  // COOP header is handled by SecurityMiddleware to prevent popup blocking
 
   // Additional security headers for better compatibility
   response.headers.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
