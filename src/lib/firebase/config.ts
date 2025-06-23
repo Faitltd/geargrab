@@ -65,20 +65,20 @@ export function validateFirebaseAdminConfig(): boolean {
            firebaseAdminConfig.privateKey);
 }
 
-// Debug logging
+// Debug logging (development only)
 export function logFirebaseConfigStatus(): void {
-  console.log('🔥 Firebase Configuration Status:');
-  console.log('Client Config:', {
-    apiKey: firebaseConfig.apiKey?.substring(0, 10) + '...',
-    authDomain: firebaseConfig.authDomain,
-    projectId: firebaseConfig.projectId,
-    storageBucket: firebaseConfig.storageBucket,
-    messagingSenderId: firebaseConfig.messagingSenderId,
-    appId: firebaseConfig.appId?.substring(0, 20) + '...',
-    valid: validateFirebaseConfig()
-  });
-  
-  if (typeof process !== 'undefined') {
+  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+    console.log('🔥 Firebase Configuration Status:');
+    console.log('Client Config:', {
+      apiKey: firebaseConfig.apiKey?.substring(0, 10) + '...',
+      authDomain: firebaseConfig.authDomain,
+      projectId: firebaseConfig.projectId,
+      storageBucket: firebaseConfig.storageBucket,
+      messagingSenderId: firebaseConfig.messagingSenderId,
+      appId: firebaseConfig.appId?.substring(0, 20) + '...',
+      valid: validateFirebaseConfig()
+    });
+
     console.log('Admin Config:', {
       projectId: firebaseAdminConfig.projectId,
       clientEmail: firebaseAdminConfig.clientEmail?.substring(0, 20) + '...',
@@ -86,7 +86,7 @@ export function logFirebaseConfigStatus(): void {
       valid: validateFirebaseAdminConfig()
     });
   }
-  
+
   if (emulatorConfig.useEmulators) {
     console.log('🔧 Emulator mode enabled');
   }

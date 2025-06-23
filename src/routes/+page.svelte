@@ -5,7 +5,9 @@
   import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
   import ScrollLinkedSequential from '$lib/components/layout/scroll-linked-sequential.svelte';
   import UniverseCard from '$lib/components/cards/universe-card.svelte';
-  import { categories } from '$lib/data/products';
+  import { categories, products } from '$lib/data/products';
+  import type { Listing } from '$lib/types/firestore';
+  import { Timestamp } from 'firebase/firestore';
 
   // Stats data
   const stats = [
@@ -35,7 +37,7 @@
   ];
 
   // Featured listings for homepage - simplified and consolidated
-  let featuredListings = [];
+  let featuredListings: Listing[] = [];
 
   // Handle image loading errors
   function handleImageError(event: Event) {
@@ -48,29 +50,51 @@
     window.location.href = `/listing/${listing.id}`;
   }
 
-  onMount(async () => {
+  onMount(() => {
     try {
-      // Import products and take first 6 as featured
-      const { products } = await import('$lib/data/products');
-      console.log('Loaded products:', products.length);
+      console.log('🔍 Loading products:', products?.length || 'undefined');
+
+      if (!products || !Array.isArray(products)) {
+        console.error('❌ Products is not an array:', products);
+        featuredListings = [];
+        return;
+      }
+
       featuredListings = products.slice(0, 6).map(product => ({
         id: product.id,
         title: product.title,
         description: product.description,
         category: product.category,
         dailyPrice: product.dailyPrice,
+        weeklyPrice: product.weeklyPrice,
+        monthlyPrice: product.monthlyPrice,
         images: product.images || [],
-        primaryImage: product.images?.[0] || "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        location: product.location,
+        location: product.location, // Keep the object structure for UniverseCard
+        avgRating: product.reviews.length > 0
+          ? product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length
+          : 4.5,
         averageRating: product.reviews.length > 0
           ? product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length
           : 4.5,
-        reviewCount: product.reviews.length || 12,
-        price: `$${product.dailyPrice}/day`
+        // Add required Listing fields for compatibility
+        ownerId: product.owner.id,
+        ownerUid: product.owner.id,
+        condition: product.condition,
+        securityDeposit: product.securityDeposit,
+        features: product.features,
+        unavailableDates: [],
+        createdAt: Timestamp.fromDate(new Date()),
+        updatedAt: Timestamp.fromDate(new Date()),
+        isActive: true,
+        views: 0,
+        bookingsCount: 0
       }));
-      console.log('Featured listings created:', featuredListings.length);
+      console.log('✅ Featured listings created:', featuredListings.length);
+
+      // Force a reactive update
+      featuredListings = [...featuredListings];
     } catch (error) {
-      console.error('Error loading featured listings:', error);
+      console.error('❌ Error loading featured listings:', error);
       // Fallback to empty array if loading fails
       featuredListings = [];
     }
@@ -145,7 +169,7 @@
           <div class="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto mb-12">
             {#if featuredListings.length > 0}
               {#each featuredListings as listing}
-                <UniverseCard {listing} onClick={() => handleCardClick(listing)} width="220px" height="280px" />
+                <UniverseCard listing={listing} onClick={() => handleCardClick(listing)} width="220px" height="280px" />
               {/each}
             {:else}
             <div class="text-white text-center p-8">
@@ -162,12 +186,22 @@
                   listing={{
                     id: 'test-1',
                     title: 'Mountain Bike',
+                    description: 'High-quality mountain bike perfect for trails',
                     category: 'biking',
+                    condition: 'Excellent',
                     dailyPrice: 35,
+                    securityDeposit: 100,
                     images: ['https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
-                    location: { city: 'Denver', state: 'CO' },
-                    averageRating: 4.8,
-                    reviewCount: 15
+                    location: { city: 'Denver', state: 'CO', zipCode: '80202' },
+                    features: ['Lightweight', 'All-terrain'],
+                    unavailableDates: [],
+                    ownerId: 'test-owner',
+                    ownerUid: 'test-owner',
+                    createdAt: Timestamp.fromDate(new Date()),
+                    updatedAt: Timestamp.fromDate(new Date()),
+                    isActive: true,
+                    avgRating: 4.8,
+                    averageRating: 4.8
                   }}
                   onClick={() => console.log('Test card clicked')}
                   width="220px"

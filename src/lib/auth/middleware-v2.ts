@@ -45,46 +45,18 @@ export class AuthMiddlewareV2 {
     if (!isFirebaseAdminAvailable()) {
       console.error('❌ Firebase Admin SDK not available');
 
-      // TEMPORARY: For payment endpoints, try to decode the token client-side
-      // This is a temporary workaround while we fix Firebase Admin initialization
-      try {
-        // Import Firebase client-side auth to verify token
-        const { auth } = await import('$lib/firebase/client');
-        const { onAuthStateChanged } = await import('firebase/auth');
-
-        // Return a temporary success for now - this should be replaced with proper Firebase Admin
-        console.log('🔧 TEMPORARY: Using client-side token validation fallback');
-        return {
-          success: true,
-          userId: 'temp-user-id', // This should be extracted from the actual token
-          email: 'temp@example.com',
-          isAdmin: false,
-          debugInfo: {
-            firebaseAdminAvailable: false,
-            temporaryFallback: true,
-            environmentCheck: {
-              FIREBASE_PROJECT_ID: !!process.env.FIREBASE_PROJECT_ID,
-              FIREBASE_ADMIN_CLIENT_EMAIL: !!process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-              FIREBASE_ADMIN_PRIVATE_KEY: !!process.env.FIREBASE_ADMIN_PRIVATE_KEY
-            }
+      return {
+        success: false,
+        error: 'Firebase Admin SDK not initialized',
+        debugInfo: {
+          firebaseAdminAvailable: false,
+          environmentCheck: {
+            FIREBASE_PROJECT_ID: !!process.env.FIREBASE_PROJECT_ID,
+            FIREBASE_ADMIN_CLIENT_EMAIL: !!process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+            FIREBASE_ADMIN_PRIVATE_KEY: !!process.env.FIREBASE_ADMIN_PRIVATE_KEY
           }
-        };
-      } catch (fallbackError) {
-        console.error('❌ Fallback token validation also failed:', fallbackError);
-        return {
-          success: false,
-          error: 'Firebase Admin SDK not initialized and fallback failed',
-          debugInfo: {
-            firebaseAdminAvailable: false,
-            fallbackError: fallbackError.message,
-            environmentCheck: {
-              FIREBASE_PROJECT_ID: !!process.env.FIREBASE_PROJECT_ID,
-              FIREBASE_ADMIN_CLIENT_EMAIL: !!process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-              FIREBASE_ADMIN_PRIVATE_KEY: !!process.env.FIREBASE_ADMIN_PRIVATE_KEY
-            }
-          }
-        };
-      }
+        }
+      };
     }
 
     try {

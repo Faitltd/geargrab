@@ -40,7 +40,7 @@
     // Simulate form submission
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    console.log('Contact form submitted:', formData);
+    // Form submitted successfully
     submitted = true;
     isSubmitting = false;
 

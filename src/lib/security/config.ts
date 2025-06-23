@@ -65,7 +65,7 @@ export const SECURITY_CONFIG = {
     allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
     allowedDocumentTypes: ['application/pdf', 'text/plain'],
     allowedVideoTypes: [], // No video uploads for now
-    scanForMalware: false, // TODO: Implement malware scanning
+    scanForMalware: false, // Malware scanning not implemented
     quarantineDirectory: 'quarantine/',
     virusScanTimeout: 30000, // 30 seconds
     
@@ -132,7 +132,7 @@ export const SECURITY_CONFIG = {
       defaultSrc: ["'self'"],
       scriptSrc: [
         "'self'",
-        "'unsafe-inline'", // TODO: Remove and use nonces
+        "'unsafe-inline'" // Consider using nonces for better security
         "https://js.stripe.com",
         "https://www.gstatic.com",
         "https://apis.google.com",
@@ -140,7 +140,7 @@ export const SECURITY_CONFIG = {
       ],
       styleSrc: [
         "'self'",
-        "'unsafe-inline'", // TODO: Remove and use nonces
+        "'unsafe-inline'" // Consider using nonces for better security
         "https://fonts.googleapis.com"
       ],
       fontSrc: [
@@ -215,10 +215,10 @@ export const SECURITY_CONFIG = {
 
   // IP blocking and geolocation
   ipSecurity: {
-    enableGeoBlocking: false, // TODO: Implement geolocation blocking
+    enableGeoBlocking: false, // Geolocation blocking not implemented
     blockedCountries: [], // ISO country codes
     allowedCountries: [], // If specified, only these countries are allowed
-    enableVPNDetection: false, // TODO: Implement VPN/proxy detection
+    enableVPNDetection: false, // VPN/proxy detection not implemented
     blockKnownVPNs: false,
     blockTorNodes: true,
     

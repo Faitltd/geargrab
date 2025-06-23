@@ -355,39 +355,23 @@
   $: totalBookingCost = upfrontFees + laterFees;
   $: calculatedTotal = Math.max(0.50, upfrontFees); // Charge only upfront fees now
 
-  // Debug pricing calculation
+  // Pricing validation
   $: {
-    console.log('🔧 Full Payment Pricing Debug:', {
-      listing: listing ? 'loaded' : 'null',
-      listingId,
-      listingTitle: listing?.title || 'unknown',
-      dailyPrice: listing?.dailyPrice || 0,
-      days,
-      basePrice,
-      serviceFee,
-      deliveryMethod,
-      deliveryFee,
-      insuranceTier,
-      insuranceFee,
-      upfrontFees,
-      laterFees,
-      totalBookingCost,
-      calculatedTotal,
-      calculatedTotalInCents: Math.round(calculatedTotal * 100),
-      isValidAmount: calculatedTotal >= 0.50,
-      startDate,
-      endDate,
-      startDateParsed: new Date(startDate),
-      endDateParsed: new Date(endDate),
-      timeDiff: new Date(endDate).getTime() - new Date(startDate).getTime(),
-      daysCalculated: Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))
-    });
+    // Development-only pricing debug
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+      console.log('🔧 Payment Pricing Debug:', {
+        listing: listing ? 'loaded' : 'null',
+        dailyPrice: listing?.dailyPrice || 0,
+        days,
+        calculatedTotal,
+        isValidAmount: calculatedTotal >= 0.50
+      });
+    }
 
-    // If dailyPrice is 0 or missing, show a warning
+    // Production warning for pricing issues
     if (!listing?.dailyPrice || listing.dailyPrice === 0) {
       console.warn('⚠️ PRICING ISSUE: Listing has no daily price!', {
         listingId,
-        listing: listing ? 'exists' : 'null',
         dailyPrice: listing?.dailyPrice
       });
     }

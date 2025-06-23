@@ -35,7 +35,11 @@ export interface Listing {
   weeklyPrice?: number;
   monthlyPrice?: number;
   securityDeposit: number;
-  location: string;
+  location: {
+    city: string;
+    state: string;
+    zipCode: string;
+  };
   coordinates?: {
     latitude: number;
     longitude: number;
@@ -53,6 +57,7 @@ export interface Listing {
   views?: number;
   bookingsCount?: number;
   avgRating?: number;
+  averageRating?: number; // For component compatibility
 }
 
 export interface Booking {
