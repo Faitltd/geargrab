@@ -213,8 +213,8 @@
             error="{errors.dailyPrice}"
             className="pl-8"
           />
-          <!-- Dollar sign overlay for price field -->
-          <span class="absolute left-4 top-[2.75rem] text-gray-300 pointer-events-none text-base">$</span>
+          <!-- Dollar sign overlay for price field - responsive positioning -->
+          <span class="price-dollar-sign absolute text-gray-300 pointer-events-none text-base font-medium z-10">$</span>
         </div>
 
         <!-- Location Fields -->
@@ -274,3 +274,20 @@
     </FormContainer>
   </ScrollLinkedAnimator>
 </div>
+
+<style>
+  /* Mobile-specific adjustments for dollar sign positioning */
+  @media (max-width: 640px) {
+    .price-dollar-sign {
+      left: 0.75rem; /* left-3 */
+      top: 2.75rem;
+    }
+  }
+
+  @media (min-width: 641px) {
+    .price-dollar-sign {
+      left: 1rem; /* left-4 */
+      top: 2.75rem;
+    }
+  }
+</style>
