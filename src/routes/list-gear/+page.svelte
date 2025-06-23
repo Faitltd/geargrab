@@ -214,7 +214,7 @@
             className="pl-8"
           />
           <!-- Dollar sign overlay for price field -->
-          <span class="absolute left-7 top-11 text-gray-300 pointer-events-none">$</span>
+          <span class="absolute left-4 top-[2.75rem] text-gray-300 pointer-events-none text-base">$</span>
         </div>
 
         <!-- Location Fields -->
