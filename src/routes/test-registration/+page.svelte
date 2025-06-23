@@ -1,6 +1,6 @@
 <script lang="ts">
   import RegistrationForm from '$lib/components/RegistrationForm.svelte';
-  import { registrationSchema, getPasswordStrength } from '$lib/validation/registration';
+  import { getPasswordStrength } from '$lib/validation/registration';
   
   /**
    * Test page for the Registration Form with Zod validation
@@ -14,13 +14,13 @@
 
   let showValidationDemo = false;
   let testPassword = '';
-  let passwordStrength = { score: 0, feedback: [], isStrong: false };
+  let passwordStrength = { score: 0, feedback: [] as string[], isStrong: false };
 
   // Update password strength in real-time
   $: if (testPassword) {
     passwordStrength = getPasswordStrength(testPassword);
   } else {
-    passwordStrength = { score: 0, feedback: [], isStrong: false };
+    passwordStrength = { score: 0, feedback: [] as string[], isStrong: false };
   }
 
   // Test data for quick form filling

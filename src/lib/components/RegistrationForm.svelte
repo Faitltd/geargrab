@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { registrationSchema, getPasswordStrength } from '$lib/validation/registration';
+  import { validateRegistration, getPasswordStrength, type RegistrationData } from '$lib/validation/registration';
   
   // Form data
   let formData = {
@@ -17,38 +17,53 @@
   };
   
   // Form state
-  let errors = {};
+  let errors: Record<string, string> = {};
   let isSubmitting = false;
-  let passwordStrength = { score: 0, feedback: [], isStrong: false };
-  
+  let passwordStrength = { score: 0, feedback: [] as string[], isStrong: false };
+
   // Update password strength in real-time
   $: if (formData.password) {
     passwordStrength = getPasswordStrength(formData.password);
   } else {
-    passwordStrength = { score: 0, feedback: [], isStrong: false };
+    passwordStrength = { score: 0, feedback: [] as string[], isStrong: false };
   }
-  
+
   async function handleSubmit() {
     isSubmitting = true;
     errors = {};
-    
+
     try {
-      // Validate with Zod schema
-      const validatedData = registrationSchema.parse(formData);
-      console.log('✅ Form validation passed:', validatedData);
-      
+      // Convert form data to proper types
+      const registrationData: RegistrationData = {
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        username: formData.username || undefined,
+        phoneNumber: formData.phoneNumber || undefined,
+        age: formData.age ? Number(formData.age) : undefined,
+        gender: formData.gender as any || undefined,
+        agreeToTerms: formData.agreeToTerms,
+        agreeToPrivacy: formData.agreeToPrivacy
+      };
+
+      // Validate with our custom validation
+      const validationResult = validateRegistration(registrationData);
+
+      if (!validationResult.success) {
+        errors.general = validationResult.error || 'Validation failed';
+        return;
+      }
+
+      console.log('✅ Form validation passed:', registrationData);
+
       // Here you would typically send the data to your API
       alert('Registration form submitted successfully! (This is a test component)');
-      
+
     } catch (error) {
       console.error('❌ Validation failed:', error);
-      
-      if (error.errors) {
-        // Zod validation errors
-        error.errors.forEach(err => {
-          errors[err.path[0]] = err.message;
-        });
-      }
+      errors.general = 'An unexpected error occurred';
     } finally {
       isSubmitting = false;
     }

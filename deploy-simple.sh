@@ -22,14 +22,12 @@ gcloud run deploy geargrab \
     --platform managed \
     --allow-unauthenticated \
     --port 8080 \
-    --memory 1Gi \
-    --cpu 1 \
+    --memory 2Gi \
+    --cpu 2 \
     --max-instances 10 \
     --timeout 300 \
     --concurrency 80 \
-    --set-env-vars NODE_ENV=production \
-    --set-env-vars VITE_USE_EMULATORS=false \
-    --set-env-vars VITE_APP_URL=https://geargrab.co \
+    --set-env-vars="$(cat .env | grep -v '^#' | grep -v '^$' | tr '\n' ',')" \
     --quiet
 
 if [ $? -eq 0 ]; then

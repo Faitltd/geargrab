@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 // Password strength calculation
 export function getPasswordStrength(password: string) {
   let score = 0;
@@ -58,154 +56,185 @@ export function getPasswordStrength(password: string) {
   };
 }
 
-// Registration schema
-export const registrationSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email is required')
-    .email('Please enter a valid email address')
-    .max(254, 'Email is too long')
-    .toLowerCase()
-    .refine(
-      (email) => !email.includes('+'),
-      'Email addresses with + symbols are not allowed'
-    ),
-  
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters long')
-    .refine(
-      (password) => /[A-Z]/.test(password),
-      'Password must contain at least one uppercase letter'
-    )
-    .refine(
-      (password) => /[a-z]/.test(password),
-      'Password must contain at least one lowercase letter'
-    )
-    .refine(
-      (password) => /\d/.test(password),
-      'Password must contain at least one number'
-    )
-    .refine(
-      (password) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
-      'Password must contain at least one special character'
-    ),
-  
-  confirmPassword: z.string().min(1, 'Please confirm your password'),
-  
-  firstName: z
-    .string()
-    .min(1, 'First name is required')
-    .min(2, 'First name must be at least 2 characters')
-    .max(50, 'First name is too long')
-    .regex(/^[a-zA-Z\s'-]+$/, 'First name can only contain letters, spaces, hyphens, and apostrophes'),
-  
-  lastName: z
-    .string()
-    .min(1, 'Last name is required')
-    .min(2, 'Last name must be at least 2 characters')
-    .max(50, 'Last name is too long')
-    .regex(/^[a-zA-Z\s'-]+$/, 'Last name can only contain letters, spaces, hyphens, and apostrophes'),
-  
-  username: z
-    .string()
-    .optional()
-    .refine(
-      (username) => !username || (username.length >= 3 && username.length <= 30),
-      'Username must be between 3 and 30 characters'
-    )
-    .refine(
-      (username) => !username || /^[a-zA-Z0-9_-]+$/.test(username),
-      'Username can only contain letters, numbers, underscores, and hyphens'
-    ),
-  
-  phoneNumber: z
-    .string()
-    .optional()
-    .refine(
-      (phone) => !phone || /^\(\d{3}\) \d{3}-\d{4}$/.test(phone),
-      'Phone number must be in format (555) 123-4567'
-    ),
-  
-  age: z
-    .union([z.string(), z.number()])
-    .optional()
-    .transform((val) => val ? Number(val) : undefined)
-    .refine(
-      (age) => !age || (age >= 13 && age <= 120),
-      'Age must be between 13 and 120'
-    ),
-  
-  gender: z
-    .enum(['male', 'female', 'other', 'prefer-not-to-say', ''])
-    .optional()
-    .transform((val) => val === '' ? undefined : val),
-  
-  agreeToTerms: z
-    .boolean()
-    .refine((val) => val === true, 'You must agree to the Terms of Service'),
-  
-  agreeToPrivacy: z
-    .boolean()
-    .refine((val) => val === true, 'You must agree to the Privacy Policy')
-}).refine(
-  (data) => data.password === data.confirmPassword,
-  {
-    message: 'Passwords do not match',
-    path: ['confirmPassword']
-  }
-);
+// Registration data type
+export interface RegistrationData {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  firstName: string;
+  lastName: string;
+  username?: string;
+  phoneNumber?: string;
+  age?: number;
+  gender?: 'male' | 'female' | 'other' | 'prefer-not-to-say';
+  agreeToTerms: boolean;
+  agreeToPrivacy: boolean;
+}
 
-// Individual field validation schemas for real-time validation
-export const emailSchema = registrationSchema.pick({ email: true });
-export const passwordSchema = registrationSchema.pick({ password: true });
-export const nameSchema = registrationSchema.pick({ firstName: true, lastName: true });
-export const usernameSchema = registrationSchema.pick({ username: true });
-export const phoneSchema = registrationSchema.pick({ phoneNumber: true });
-export const ageSchema = registrationSchema.pick({ age: true });
+// Validation result type
+export interface ValidationResult {
+  success: boolean;
+  error?: string;
+}
+
+// Individual field validation functions
+export function validateEmail(email: string): ValidationResult {
+  if (!email) {
+    return { success: false, error: 'Email is required' };
+  }
+  if (email.length > 254) {
+    return { success: false, error: 'Email is too long' };
+  }
+  if (!validationPatterns.email.test(email)) {
+    return { success: false, error: 'Please enter a valid email address' };
+  }
+  if (email.includes('+')) {
+    return { success: false, error: 'Email addresses with + symbols are not allowed' };
+  }
+  return { success: true };
+}
+
+export function validatePassword(password: string): ValidationResult {
+  if (!password) {
+    return { success: false, error: 'Password is required' };
+  }
+  if (password.length < 8) {
+    return { success: false, error: 'Password must be at least 8 characters long' };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { success: false, error: 'Password must contain at least one uppercase letter' };
+  }
+  if (!/[a-z]/.test(password)) {
+    return { success: false, error: 'Password must contain at least one lowercase letter' };
+  }
+  if (!/\d/.test(password)) {
+    return { success: false, error: 'Password must contain at least one number' };
+  }
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    return { success: false, error: 'Password must contain at least one special character' };
+  }
+  return { success: true };
+}
+
+export function validateName(name: string, fieldName: string): ValidationResult {
+  if (!name) {
+    return { success: false, error: `${fieldName} is required` };
+  }
+  if (name.length < 2) {
+    return { success: false, error: `${fieldName} must be at least 2 characters` };
+  }
+  if (name.length > 50) {
+    return { success: false, error: `${fieldName} is too long` };
+  }
+  if (!validationPatterns.name.test(name)) {
+    return { success: false, error: `${fieldName} can only contain letters, spaces, hyphens, and apostrophes` };
+  }
+  return { success: true };
+}
+
+export function validateUsername(username?: string): ValidationResult {
+  if (!username) return { success: true };
+  if (username.length < 3 || username.length > 30) {
+    return { success: false, error: 'Username must be between 3 and 30 characters' };
+  }
+  if (!validationPatterns.username.test(username)) {
+    return { success: false, error: 'Username can only contain letters, numbers, underscores, and hyphens' };
+  }
+  return { success: true };
+}
+
+export function validatePhoneNumber(phone?: string): ValidationResult {
+  if (!phone) return { success: true };
+  if (!validationPatterns.phone.test(phone)) {
+    return { success: false, error: 'Phone number must be in format (555) 123-4567' };
+  }
+  return { success: true };
+}
+
+export function validateAge(age?: number): ValidationResult {
+  if (age === undefined) return { success: true };
+  if (age < 13 || age > 120) {
+    return { success: false, error: 'Age must be between 13 and 120' };
+  }
+  return { success: true };
+}
 
 // Type inference
-export type RegistrationData = z.infer<typeof registrationSchema>;
 export type PasswordStrength = ReturnType<typeof getPasswordStrength>;
 
-// Validation helper functions
-export function validateField(fieldName: keyof RegistrationData, value: any) {
-  try {
-    switch (fieldName) {
-      case 'email':
-        emailSchema.parse({ email: value });
-        break;
-      case 'password':
-        passwordSchema.parse({ password: value });
-        break;
-      case 'firstName':
-      case 'lastName':
-        nameSchema.parse({ [fieldName]: value });
-        break;
-      case 'username':
-        usernameSchema.parse({ username: value });
-        break;
-      case 'phoneNumber':
-        phoneSchema.parse({ phoneNumber: value });
-        break;
-      case 'age':
-        ageSchema.parse({ age: value });
-        break;
-      default:
-        return { success: true };
-    }
-    return { success: true };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        error: error.errors[0]?.message || 'Validation failed'
-      };
-    }
-    return {
-      success: false,
-      error: 'Validation failed'
-    };
+// Complete registration validation
+export function validateRegistration(data: RegistrationData): ValidationResult {
+  // Email validation
+  const emailResult = validateEmail(data.email);
+  if (!emailResult.success) return emailResult;
+
+  // Password validation
+  const passwordResult = validatePassword(data.password);
+  if (!passwordResult.success) return passwordResult;
+
+  // Confirm password validation
+  if (!data.confirmPassword) {
+    return { success: false, error: 'Please confirm your password' };
+  }
+  if (data.password !== data.confirmPassword) {
+    return { success: false, error: 'Passwords do not match' };
+  }
+
+  // First name validation
+  const firstNameResult = validateName(data.firstName, 'First name');
+  if (!firstNameResult.success) return firstNameResult;
+
+  // Last name validation
+  const lastNameResult = validateName(data.lastName, 'Last name');
+  if (!lastNameResult.success) return lastNameResult;
+
+  // Optional field validations
+  const usernameResult = validateUsername(data.username);
+  if (!usernameResult.success) return usernameResult;
+
+  const phoneResult = validatePhoneNumber(data.phoneNumber);
+  if (!phoneResult.success) return phoneResult;
+
+  const ageResult = validateAge(data.age);
+  if (!ageResult.success) return ageResult;
+
+  // Terms and privacy validation
+  if (!data.agreeToTerms) {
+    return { success: false, error: 'You must agree to the Terms of Service' };
+  }
+  if (!data.agreeToPrivacy) {
+    return { success: false, error: 'You must agree to the Privacy Policy' };
+  }
+
+  return { success: true };
+}
+
+// Validation helper function for individual fields
+export function validateField(fieldName: keyof RegistrationData, value: any): ValidationResult {
+  switch (fieldName) {
+    case 'email':
+      return validateEmail(value);
+    case 'password':
+      return validatePassword(value);
+    case 'firstName':
+      return validateName(value, 'First name');
+    case 'lastName':
+      return validateName(value, 'Last name');
+    case 'username':
+      return validateUsername(value);
+    case 'phoneNumber':
+      return validatePhoneNumber(value);
+    case 'age':
+      return validateAge(value);
+    case 'confirmPassword':
+      if (!value) return { success: false, error: 'Please confirm your password' };
+      return { success: true };
+    case 'agreeToTerms':
+      return value ? { success: true } : { success: false, error: 'You must agree to the Terms of Service' };
+    case 'agreeToPrivacy':
+      return value ? { success: true } : { success: false, error: 'You must agree to the Privacy Policy' };
+    default:
+      return { success: true };
   }
 }
 
