@@ -5,16 +5,21 @@ import { BookingStatus, isValidStatusTransition } from '$lib/types/booking-statu
 import Stripe from 'stripe';
 import { env } from '$env/dynamic/private';
 
-const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16'
-});
-
 // Approve or deny a booking request
 export const POST: RequestHandler = async ({ params, request, locals }) => {
   // Check if user is authenticated
   if (!locals.userId) {
     return json({ error: 'Unauthorized' }, { status: 401 });
   }
+
+  // Initialize Stripe client at runtime
+  if (!env.STRIPE_SECRET_KEY) {
+    return json({ error: 'Stripe configuration missing' }, { status: 500 });
+  }
+
+  const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+    apiVersion: '2023-10-16'
+  });
   
   try {
     const { action, reason } = await request.json();
