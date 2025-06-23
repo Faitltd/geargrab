@@ -1,9 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { authStore } from '$lib/stores/auth';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import { createListing } from '$lib/firebase/db/listings';
   import { toastNotifications } from '$lib/stores/notifications';
+
+  // Get the auth state store
+  $: authState = simpleAuth.authState;
   import VideoBackground from '$lib/components/layout/video-background.svelte';
   import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
   import FormContainer from '$lib/components/forms/form-container.svelte';
@@ -81,7 +84,7 @@
   async function handleSubmit() {
     if (!validateForm()) return;
 
-    if (!$authStore.user) {
+    if (!$authState.isAuthenticated || !$authState.user) {
       toastNotifications.error('Please sign in to list your gear.');
       goto('/auth/login');
       return;
@@ -91,7 +94,8 @@
 
     try {
       const listingData = {
-        ownerUid: $authStore.user.uid,
+        ownerUid: $authState.user.uid,
+        ownerId: $authState.user.uid,
         title: formData.title,
         description: formData.description,
         category: formData.category,
@@ -105,10 +109,8 @@
         features: [],
         specifications: {},
         deliveryOptions: {
-          pickup: true,
-          dropoff: false,
-          shipping: false,
-          pickupLocation: `${formData.city}, ${formData.state}`
+          dropoffDistance: 0,
+          shippingFee: 0
         },
         availabilityCalendar: {},
         status: 'active' as const,
@@ -117,7 +119,9 @@
         weeklyPrice: 0,
         monthlyPrice: 0,
         includesInsurance: false,
-        insuranceDetails: ''
+        insuranceDetails: '',
+        unavailableDates: [],
+        isActive: true
       };
 
       await createListing(listingData);
