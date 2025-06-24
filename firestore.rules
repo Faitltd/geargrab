@@ -51,10 +51,10 @@ service cloud.firestore {
         request.auth.uid == request.resource.data.ownerUid &&
         isValidString(request.resource.data.title, 5, 100) &&
         isValidString(request.resource.data.description, 20, 2000) &&
-        isValidPrice(request.resource.data.pricePerDay) &&
-        request.resource.data.category in ['camping', 'hiking', 'skiing', 'climbing', 'water-sports', 'other'] &&
-        request.resource.data.keys().hasAll(['title', 'description', 'pricePerDay', 'category', 'ownerUid', 'createdAt']) &&
-        request.resource.data.keys().hasOnly(['title', 'description', 'pricePerDay', 'category', 'location', 'images', 'ownerUid', 'isActive', 'createdAt', 'updatedAt']);
+        isValidPrice(request.resource.data.dailyPrice) &&
+        request.resource.data.category in ['camping', 'hiking', 'skiing', 'climbing', 'water-sports', 'biking', 'other'] &&
+        request.resource.data.keys().hasAll(['title', 'description', 'dailyPrice', 'category', 'ownerUid', 'createdAt']) &&
+        request.resource.data.keys().hasOnly(['title', 'description', 'dailyPrice', 'category', 'condition', 'securityDeposit', 'location', 'images', 'features', 'unavailableDates', 'ownerUid', 'ownerId', 'isActive', 'createdAt', 'updatedAt']);
 
       allow update: if isAuthenticated() &&
         request.auth.uid == resource.data.ownerUid &&

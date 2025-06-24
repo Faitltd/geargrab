@@ -99,7 +99,9 @@
         title: formData.title,
         description: formData.description,
         category: formData.category,
+        condition: 'Good' as const,
         dailyPrice: formData.dailyPrice,
+        securityDeposit: 0,
         location: {
           city: formData.city,
           state: formData.state,
@@ -107,19 +109,6 @@
         },
         images: [],
         features: [],
-        specifications: {},
-        deliveryOptions: {
-          dropoffDistance: 0,
-          shippingFee: 0
-        },
-        availabilityCalendar: {},
-        status: 'active' as const,
-        condition: 'Good' as const,
-        securityDeposit: 0,
-        weeklyPrice: 0,
-        monthlyPrice: 0,
-        includesInsurance: false,
-        insuranceDetails: '',
         unavailableDates: [],
         isActive: true
       };
