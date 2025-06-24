@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { chatService, type ChatConversation } from '$lib/services/chat';
   import { simpleAuth } from '$lib/auth/simple-auth';
+  import { page } from '$app/stores';
 
   export let selectedConversationId: string | null = null;
   export let onConversationSelect: (conversation: ChatConversation) => void;
@@ -28,6 +29,16 @@
     try {
       conversations = await chatService.getRecentConversations($authState.user.uid);
       loading = false;
+
+      // Check if we need to auto-select a conversation from URL
+      const conversationId = $page.url.searchParams.get('conversation');
+      if (conversationId && conversations.length > 0) {
+        const targetConversation = conversations.find(c => c.id === conversationId);
+        if (targetConversation) {
+          console.log('Auto-selecting conversation:', targetConversation);
+          onConversationSelect(targetConversation);
+        }
+      }
     } catch (error) {
       console.error('Error loading conversations:', error);
       loading = false;
@@ -64,7 +75,7 @@
 
   function getUnreadCount(conversation: ChatConversation): number {
     if (!$authState.user) return 0;
-    return conversation.unreadCount[$authStore.user.uid] || 0;
+    return conversation.unreadCount[$authState.user.uid] || 0;
   }
 
   function truncateMessage(message: string, maxLength: number = 50): string {

@@ -5,6 +5,7 @@
   import { chatService, type ChatConversation } from '$lib/services/chat';
   import { simpleAuth } from '$lib/auth/simple-auth';
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
   import { notifications } from '$lib/stores/notifications';
 
   let selectedConversation: ChatConversation | null = null;
@@ -20,6 +21,14 @@
     if (!$authState.isAuthenticated || !$authState.user) {
         goto("/auth/login?redirectTo=/messages");
       return;
+    }
+
+    // Check if there's a conversation ID in the URL
+    const conversationId = $page.url.searchParams.get('conversation');
+    if (conversationId) {
+      console.log('Auto-selecting conversation from URL:', conversationId);
+      // We'll need to wait for the conversation list to load and then select it
+      // This will be handled by the ConversationList component
     }
   });
 

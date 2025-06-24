@@ -1,8 +1,11 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
+
   // Sample data for display
   let messages = [
     {
       id: '1',
+      conversationId: 'conv_1',
       from: 'John Smith',
       subject: 'Question about Mountain Bike rental',
       preview: 'Hi, I\'m interested in renting your Trek X-Caliber for the weekend...',
@@ -12,6 +15,7 @@
     },
     {
       id: '2',
+      conversationId: 'conv_2',
       from: 'Sarah Johnson',
       subject: 'Booking confirmation needed',
       preview: 'Please confirm the pickup time for the camping tent rental...',
@@ -20,6 +24,13 @@
       avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"
     }
   ];
+
+  // Function to handle clicking on a message
+  function openMessage(message: any) {
+    console.log('Opening message:', message);
+    // Navigate to the main messages page with the conversation selected
+    goto(`/messages?conversation=${message.conversationId}`);
+  }
 </script>
 
 <svelte:head>
@@ -117,7 +128,13 @@
       {:else}
         <div class="space-y-4">
           {#each messages as message}
-            <div class="border border-white/20 rounded-lg p-4 hover:bg-white/5 transition-all bg-white/5 cursor-pointer">
+            <div
+              class="border border-white/20 rounded-lg p-4 hover:bg-white/5 transition-all bg-white/5 cursor-pointer"
+              on:click={() => openMessage(message)}
+              on:keydown={(e) => e.key === 'Enter' && openMessage(message)}
+              role="button"
+              tabindex="0"
+            >
               <div class="flex items-center space-x-4">
                 <div class="flex-shrink-0">
                   <img class="h-12 w-12 rounded-full" src="{message.avatar}" alt="{message.from}" />
