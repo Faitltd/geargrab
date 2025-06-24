@@ -4,43 +4,11 @@
   import { simpleAuth } from '$lib/auth/simple-auth';
   import { BookingStatus, getStatusDisplay } from '$lib/types/booking-status';
   import { notifications } from '$lib/stores/notifications';
+  import { firestore } from '$lib/firebase/client';
+  import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 
-  // Sample listings data - in a real app, this would come from Firebase
-  let listings = [
-    {
-      id: '1',
-      title: 'Premium 4-Person Camping Tent',
-      description: 'Spacious and waterproof tent perfect for family camping trips.',
-      dailyPrice: 25,
-      status: 'active',
-      image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80",
-      views: 45,
-      bookings: 3,
-      earnings: 150
-    },
-    {
-      id: '2',
-      title: 'Professional Hiking Backpack',
-      description: '65L backpack with advanced suspension system for multi-day hikes.',
-      dailyPrice: 15,
-      status: 'active',
-      image: "https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80",
-      views: 32,
-      bookings: 2,
-      earnings: 90
-    },
-    {
-      id: '3',
-      title: 'Mountain Climbing Gear Set',
-      description: 'Complete climbing gear including harness, helmet, and ropes.',
-      dailyPrice: 40,
-      status: 'pending',
-      image: "https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80",
-      views: 18,
-      bookings: 0,
-      earnings: 0
-    }
-  ];
+  // Real listings data from Firebase
+  let listings = [];
 
   let loading = false;
   let totalEarnings = 0;
@@ -54,11 +22,66 @@
 
   $: authState = simpleAuth.authState;
 
+  // Load user's listings from Firebase
+  async function loadUserListings() {
+    if (!$authState.isAuthenticated || !$authState.user || !firestore) {
+      console.log('User not authenticated or firestore not available, cannot load listings');
+      return;
+    }
+
+    try {
+      loading = true;
+      console.log('Loading listings for user:', $authState.user.uid);
+
+      const listingsQuery = query(
+        collection(firestore, 'listings'),
+        where('ownerUid', '==', $authState.user.uid),
+        orderBy('createdAt', 'desc')
+      );
+
+      const querySnapshot = await getDocs(listingsQuery);
+
+      listings = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title,
+          description: data.description,
+          dailyPrice: data.dailyPrice,
+          status: data.status || 'active',
+          image: data.images?.[0] || "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
+          views: 0, // TODO: Implement view tracking
+          bookings: 0, // TODO: Implement booking counting
+          earnings: 0, // TODO: Calculate from bookings
+          category: data.category,
+          condition: data.condition,
+          location: data.location,
+          isActive: data.isActive,
+          createdAt: data.createdAt
+        };
+      });
+
+      console.log(`Loaded ${listings.length} listings:`, listings);
+
+      // Calculate totals (placeholder values for now)
+      totalEarnings = listings.reduce((sum, listing) => sum + (listing.earnings || 0), 0);
+      totalBookings = listings.reduce((sum, listing) => sum + (listing.bookings || 0), 0);
+      totalViews = listings.reduce((sum, listing) => sum + (listing.views || 0), 0);
+
+    } catch (error) {
+      console.error('Error loading listings:', error);
+      notifications.add({
+        type: 'error',
+        message: 'Failed to load your listings. Please try again.'
+      });
+    } finally {
+      loading = false;
+    }
+  }
+
   onMount(async () => {
-    // Calculate totals
-    totalEarnings = listings.reduce((sum, listing) => sum + listing.earnings, 0);
-    totalBookings = listings.reduce((sum, listing) => sum + listing.bookings, 0);
-    totalViews = listings.reduce((sum, listing) => sum + listing.views, 0);
+    // Load user's listings first
+    await loadUserListings();
 
     // Load pending bookings if authenticated
     if ($authState.isAuthenticated) {
