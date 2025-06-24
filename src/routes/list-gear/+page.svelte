@@ -200,38 +200,17 @@
           error="{errors.description}"
         />
 
-        <!-- Custom Price Input with Proper Dollar Sign -->
-        <div class="form-field mb-6">
-          <label for="dailyPrice" class="block text-sm font-medium text-white mb-2">
-            Daily Price
-            <span class="text-red-400 ml-1" aria-label="required">*</span>
-          </label>
-
-          <div class="price-input-container">
-            <!-- Dollar sign prefix -->
-            <div class="price-prefix">
-              $
-            </div>
-
-            <!-- Price input -->
-            <input
-              id="dailyPrice"
-              type="number"
-              bind:value="{formData.dailyPrice}"
-              placeholder="25.00"
-              min="1"
-              step="0.01"
-              required
-              class="price-input {errors.dailyPrice ? 'error-state' : ''}"
-              aria-label="Daily Price"
-              aria-invalid="{errors.dailyPrice ? 'true' : 'false'}"
-            />
-          </div>
-
-          {#if errors.dailyPrice}
-            <p class="mt-1 text-sm text-red-400" role="alert" aria-live="polite">{errors.dailyPrice}</p>
-          {/if}
-        </div>
+        <FormField
+          id="dailyPrice"
+          label="Daily Price ($)"
+          type="number"
+          bind:value="{formData.dailyPrice}"
+          placeholder="25.00"
+          min="{1}"
+          step="{0.01}"
+          required
+          error="{errors.dailyPrice}"
+        />
 
         <!-- Location Fields -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -291,69 +270,4 @@
   </ScrollLinkedAnimator>
 </div>
 
-<style>
-  /* Custom price input styling for perfect dollar sign positioning */
-  .price-input-container {
-    position: relative;
-    display: flex;
-    align-items: stretch;
-  }
 
-  .price-prefix {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 2.5rem;
-    background-color: rgba(31, 41, 55, 0.7);
-    border: 1px solid rgb(75, 85, 99);
-    border-right: none;
-    border-radius: 0.5rem 0 0 0.5rem;
-    color: rgb(209, 213, 219);
-    font-weight: 500;
-    font-size: 1rem;
-    user-select: none;
-    pointer-events: none;
-  }
-
-  .price-input {
-    flex: 1 !important;
-    padding-left: 0.5rem !important;
-    padding-right: 1rem !important;
-    padding-top: 0.75rem !important;
-    padding-bottom: 0.75rem !important;
-    border-radius: 0 0.5rem 0.5rem 0 !important;
-    border-left: none !important;
-    background-color: rgba(31, 41, 55, 0.7) !important;
-    border-color: rgb(75, 85, 99) !important;
-    color: white !important;
-    width: auto !important;
-  }
-
-  /* Mobile responsive adjustments */
-  @media (max-width: 640px) {
-    .price-prefix {
-      min-width: 2.25rem !important;
-      font-size: 0.9rem !important;
-    }
-
-    .price-input {
-      padding-left: 0.375rem !important;
-    }
-  }
-
-  /* Focus state for the entire input group */
-  .price-input:focus {
-    border-color: rgb(34, 197, 94) !important;
-    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2) !important;
-  }
-
-  /* Error state */
-  .price-input.error-state {
-    border-color: rgb(239, 68, 68) !important;
-  }
-
-  .price-input.error-state:focus {
-    border-color: rgb(239, 68, 68) !important;
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
-  }
-</style>
