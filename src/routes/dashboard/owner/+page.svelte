@@ -35,8 +35,7 @@
 
       const listingsQuery = query(
         collection(firestore, 'listings'),
-        where('ownerUid', '==', $authState.user.uid),
-        orderBy('createdAt', 'desc')
+        where('ownerUid', '==', $authState.user.uid)
       );
 
       const querySnapshot = await getDocs(listingsQuery);
