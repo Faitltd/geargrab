@@ -22,16 +22,22 @@
   onMount(async () => {
     try {
       loading = true;
-      console.log('Loading listing with ID:', listingId);
+      console.log('🔍 Loading listing with ID:', listingId);
+      console.log('🔍 Firestore available:', !!firestore);
 
       // Try to load from Firestore first
       if (firestore) {
         try {
+          console.log('🔍 Attempting Firestore query for listing:', listingId);
           const listingRef = doc(firestore, 'listings', listingId);
           const listingSnap = await getDoc(listingRef);
 
+          console.log('🔍 Firestore document exists:', listingSnap.exists());
+
           if (listingSnap.exists()) {
             const listingData = listingSnap.data();
+            console.log('🔍 Raw Firestore data:', listingData);
+
             listing = {
               id: listingSnap.id,
               ...listingData,
@@ -59,13 +65,17 @@
                 dropoffDistance: 25
               }
             };
-            console.log('✅ Loaded from Firestore:', listing.title);
+            console.log('✅ Successfully loaded from Firestore:', listing.title);
             loading = false;
             return;
+          } else {
+            console.log('❌ Document does not exist in Firestore for ID:', listingId);
           }
         } catch (firestoreError) {
-          console.warn('Firestore load failed, trying fallback:', firestoreError);
+          console.error('❌ Firestore load failed:', firestoreError);
         }
+      } else {
+        console.log('❌ Firestore not available');
       }
 
       // Fallback: try to find the listing in the products array

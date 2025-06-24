@@ -147,6 +147,7 @@
   }
 
   function viewListing(listingId: string) {
+    console.log('Navigating to listing detail for ID:', listingId);
     goto(`/listing/${listingId}`);
   }
 
