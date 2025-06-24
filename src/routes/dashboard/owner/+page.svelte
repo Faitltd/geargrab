@@ -143,7 +143,7 @@
   }
 
   function editListing(listingId: string) {
-    goto(`/list-gear?edit=${listingId}`);
+    goto(`/edit-listing/${listingId}`);
   }
 
   function viewListing(listingId: string) {
