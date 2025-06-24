@@ -3,7 +3,7 @@
   import ConversationList from '$lib/components/chat/conversation-list.svelte';
   import ChatWindow from '$lib/components/chat/chat-window.svelte';
   import { chatService, type ChatConversation } from '$lib/services/chat';
-  import { authStore } from '$lib/stores/auth';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import { goto } from '$app/navigation';
   import { notifications } from '$lib/stores/notifications';
 
@@ -12,9 +12,12 @@
   let showMobileChat = false;
   let searchQuery = '';
 
+  // Get the auth state store
+  $: authState = simpleAuth.authState;
+
   onMount(() => {
     // Redirect if not authenticated
-    if (!$authStore.user) {
+    if (!$authState.isAuthenticated || !$authState.user) {
         goto("/auth/login?redirectTo=/messages");
       return;
     }
@@ -25,8 +28,8 @@
     showMobileChat = true;
 
     // Find the other participant
-    if ($authStore.user) {
-      const other = conversation.participants.find(p => p.id !== $authStore.user?.uid);
+    if ($authState.user) {
+      const other = conversation.participants.find(p => p.id !== $authState.user?.uid);
       if (other) {
         otherUser = other;
       }

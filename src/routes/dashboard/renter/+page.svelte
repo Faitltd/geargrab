@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { chatService } from '$lib/services/chat';
-  import { authStore } from '$lib/stores/auth';
+  import { simpleAuth } from '$lib/auth/simple-auth';
 
   // Sample data for display
   let bookings = [
@@ -35,9 +35,12 @@
     }
   ];
 
+  // Get the auth state store
+  $: authState = simpleAuth.authState;
+
   // Function to handle messaging the owner
   async function messageOwner(booking: any) {
-    if (!$authStore.user) {
+    if (!$authState.isAuthenticated || !$authState.user) {
       alert('Please sign in to send messages');
       return;
     }
@@ -45,7 +48,7 @@
     try {
       // Create or find existing conversation
       const conversationId = await chatService.getOrCreateConversation(
-        $authStore.user.uid,
+        $authState.user.uid,
         booking.ownerId,
         booking.id, // bookingId
         booking.listingId,

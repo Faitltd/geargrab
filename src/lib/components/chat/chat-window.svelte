@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, afterUpdate } from 'svelte';
   import { chatService, type ChatMessage } from '$lib/services/chat';
-  import { authStore } from '$lib/stores/auth';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import { notifications } from '$lib/stores/notifications';
 
   export let conversationId: string;
@@ -20,6 +20,9 @@
   let fileInput: HTMLInputElement;
   let uploadingFile = false;
 
+  // Get the auth state store
+  $: authState = simpleAuth.authState;
+
   onMount(() => {
     if (conversationId) {
       loadMessages();
@@ -28,8 +31,8 @@
       const interval = setInterval(loadMessages, 3000); // Refresh every 3 seconds
 
       // Mark messages as read when conversation is opened
-      if ($authStore.user) {
-        chatService.markMessagesAsRead(conversationId, $authStore.user.uid);
+      if ($authState.user) {
+        chatService.markMessagesAsRead(conversationId, $authState.user.uid);
       }
 
       // Clean up interval on destroy
@@ -63,13 +66,13 @@
   });
 
   async function sendMessage() {
-    if (!newMessage.trim() || !$authStore.user || sending) return;
+    if (!newMessage.trim() || !$authState.user || sending) return;
 
     sending = true;
     try {
       await chatService.sendMessage(
         conversationId,
-        $authStore.user.uid,
+        $authState.user.uid,
         newMessage.trim()
       );
       newMessage = '';
@@ -163,7 +166,7 @@
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate upload
 
       const fileMessage = `📎 Shared a file: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-      await chatService.sendMessage(conversationId, $authStore.user!.uid, fileMessage);
+      await chatService.sendMessage(conversationId, $authState.user!.uid, fileMessage);
 
       notifications.add({
         type: 'success',
@@ -240,26 +243,26 @@
         {/if}
 
         <!-- Message -->
-        <div class="flex {message.senderId === $authStore.user?.uid ? 'justify-end' : 'justify-start'}">
+        <div class="flex {message.senderId === $authState.user?.uid ? 'justify-end' : 'justify-start'}">
           <div class="flex items-end space-x-2 max-w-xs lg:max-w-md">
-            {#if message.senderId !== $authStore.user?.uid}
-              <img 
+            {#if message.senderId !== $authState.user?.uid}
+              <img
                 src={otherUser.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'}
                 alt={otherUser.name}
                 class="w-6 h-6 rounded-full object-cover"
               />
             {/if}
-            
+
             <div class="flex flex-col">
               <div class="px-4 py-2 rounded-2xl {
-                message.senderId === $authStore.user?.uid 
-                  ? 'bg-green-600 text-white' 
+                message.senderId === $authState.user?.uid
+                  ? 'bg-green-600 text-white'
                   : 'bg-white/20 text-white'
               }">
                 <p class="text-sm">{message.content}</p>
               </div>
               <span class="text-xs text-gray-400 mt-1 {
-                message.senderId === $authStore.user?.uid ? 'text-right' : 'text-left'
+                message.senderId === $authState.user?.uid ? 'text-right' : 'text-left'
               }">
                 {formatTime(message.timestamp)}
               </span>
