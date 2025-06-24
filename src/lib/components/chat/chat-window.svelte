@@ -38,13 +38,26 @@
       // Clean up interval on destroy
       return () => clearInterval(interval);
     }
+
+    // Return empty cleanup function if no conversationId
+    return () => {};
   });
 
   async function loadMessages() {
-    if (!conversationId) return;
+    if (!conversationId || !$authState.user) return;
 
     try {
-      const response = await fetch(`/api/conversations/${conversationId}/messages?limit=50`);
+      // Get auth token for API request
+      const token = await $authState.user.getIdToken();
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+
+      const response = await fetch(`/api/conversations/${conversationId}/messages?limit=50`, {
+        headers
+      });
+
       if (response.ok) {
         const result = await response.json();
         messages = result.messages;

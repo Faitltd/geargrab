@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { chatService, type ChatConversation } from '$lib/services/chat';
-  import { authStore } from '$lib/stores/auth';
+  import { simpleAuth } from '$lib/auth/simple-auth';
 
   export let selectedConversationId: string | null = null;
   export let onConversationSelect: (conversation: ChatConversation) => void;
@@ -10,8 +10,11 @@
   let refreshInterval: number | null = null;
   let loading = true;
 
+  // Get the auth state store
+  $: authState = simpleAuth.authState;
+
   onMount(() => {
-    if ($authStore.user) {
+    if ($authState.user) {
       loadConversations();
 
       // Set up periodic refresh for real-time updates
@@ -20,10 +23,10 @@
   });
 
   async function loadConversations() {
-    if (!$authStore.user) return;
+    if (!$authState.user) return;
 
     try {
-      conversations = await chatService.getRecentConversations($authStore.user.uid);
+      conversations = await chatService.getRecentConversations($authState.user.uid);
       loading = false;
     } catch (error) {
       console.error('Error loading conversations:', error);
@@ -55,12 +58,12 @@
   }
 
   function getOtherParticipant(conversation: ChatConversation): any {
-    if (!$authStore.user) return null;
-    return conversation.participants.find(p => p.id !== $authStore.user?.uid);
+    if (!$authState.user) return null;
+    return conversation.participants.find(p => p.id !== $authState.user?.uid);
   }
 
   function getUnreadCount(conversation: ChatConversation): number {
-    if (!$authStore.user) return 0;
+    if (!$authState.user) return 0;
     return conversation.unreadCount[$authStore.user.uid] || 0;
   }
 
@@ -147,7 +150,7 @@
               <!-- Last Message -->
               {#if conversation.lastMessage}
                 <p class="text-sm text-gray-300 truncate mt-1">
-                  {#if conversation.lastMessage.senderId === $authStore.user?.uid}
+                  {#if conversation.lastMessage.senderId === $authState.user?.uid}
                     <span class="text-gray-400">You: </span>
                   {/if}
                   {truncateMessage(conversation.lastMessage.content)}

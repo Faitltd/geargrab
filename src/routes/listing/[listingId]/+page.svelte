@@ -7,7 +7,8 @@
   import ScrollLinkedSequential from '$lib/components/layout/scroll-linked-sequential.svelte';
   import AuthGuard from '$lib/components/auth/auth-guard.svelte';
   import { products } from '$lib/data/products';
-  // import { getListing } from '$lib/firebase/db/listings'; // Temporarily disabled
+  import { firestore } from '$lib/firebase/client';
+  import { doc, getDoc } from 'firebase/firestore';
 
   // Get the listing ID from the URL
   const listingId = $page.params.listingId;
@@ -23,7 +24,51 @@
       loading = true;
       console.log('Loading listing with ID:', listingId);
 
-      // First try to find the listing in the products array
+      // Try to load from Firestore first
+      if (firestore) {
+        try {
+          const listingRef = doc(firestore, 'listings', listingId);
+          const listingSnap = await getDoc(listingRef);
+
+          if (listingSnap.exists()) {
+            const listingData = listingSnap.data();
+            listing = {
+              id: listingSnap.id,
+              ...listingData,
+              // Ensure we have all required fields with defaults
+              views: listingData.views || 0,
+              bookings: listingData.bookings || 0,
+              earnings: listingData.earnings || 0,
+              averageRating: listingData.averageRating || 4.5,
+              totalReviews: listingData.totalReviews || 0,
+              reviews: listingData.reviews || [],
+              features: listingData.features || [],
+              specifications: listingData.specifications || {},
+              availabilityCalendar: listingData.availabilityCalendar || {
+                unavailableDates: [],
+                minimumRental: 1,
+                maximumRental: 30
+              },
+              includesInsurance: listingData.includesInsurance !== false,
+              insuranceDetails: listingData.insuranceDetails || 'Basic damage coverage included',
+              deliveryOptions: listingData.deliveryOptions || {
+                pickup: true,
+                dropoff: true,
+                shipping: false,
+                pickupLocation: `${listingData.location?.city}, ${listingData.location?.state}`,
+                dropoffDistance: 25
+              }
+            };
+            console.log('✅ Loaded from Firestore:', listing.title);
+            loading = false;
+            return;
+          }
+        } catch (firestoreError) {
+          console.warn('Firestore load failed, trying fallback:', firestoreError);
+        }
+      }
+
+      // Fallback: try to find the listing in the products array
       const productListing = products.find(product => product.id === listingId);
 
       if (productListing) {

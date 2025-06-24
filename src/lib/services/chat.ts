@@ -1,20 +1,21 @@
 // Real-time chat service using Firebase Firestore
 import { firestore } from '$lib/firebase/client';
-import { 
-  collection, 
-  doc, 
-  addDoc, 
-  query, 
-  where, 
-  orderBy, 
-  onSnapshot, 
-  updateDoc, 
+import {
+  collection,
+  doc,
+  addDoc,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  updateDoc,
   serverTimestamp,
   type Unsubscribe,
   getDocs,
   limit
 } from 'firebase/firestore';
 import type { Message, Conversation } from '$lib/types/firestore';
+import { simpleAuth } from '$lib/auth/simple-auth';
 
 export interface ChatMessage {
   id: string;
@@ -51,6 +52,36 @@ export interface ChatConversation {
 
 class ChatService {
   private messageListeners: Map<string, Unsubscribe> = new Map();
+
+  // Helper to get authentication headers
+  private async getAuthHeaders(): Promise<Record<string, string>> {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Get the current auth state
+    const authState = simpleAuth.authState;
+    const currentAuthState = authState.subscribe ? authState : { subscribe: () => {} };
+
+    return new Promise((resolve) => {
+      const unsubscribe = simpleAuth.authState.subscribe((state) => {
+        if (state.isAuthenticated && state.user) {
+          // Get the ID token for authentication
+          state.user.getIdToken().then((token) => {
+            headers['Authorization'] = `Bearer ${token}`;
+            resolve(headers);
+            unsubscribe();
+          }).catch(() => {
+            resolve(headers);
+            unsubscribe();
+          });
+        } else {
+          resolve(headers);
+          unsubscribe();
+        }
+      });
+    });
+  }
   private conversationListeners: Map<string, Unsubscribe> = new Map();
 
   // Get or create conversation between two users
@@ -63,11 +94,11 @@ class ChatService {
   ): Promise<string> {
     try {
       // Use API endpoint to create or get conversation
+      const headers = await this.getAuthHeaders();
+
       const response = await fetch('/api/conversations', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           otherUserId,
           bookingId,
@@ -97,11 +128,11 @@ class ChatService {
     attachments?: string[]
   ): Promise<void> {
     try {
+      const headers = await this.getAuthHeaders();
+
       const response = await fetch(`/api/conversations/${conversationId}/messages`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           content,
           type,
@@ -217,11 +248,11 @@ class ChatService {
   // Get recent conversations
   async getRecentConversations(userId: string, limitCount: number = 20): Promise<ChatConversation[]> {
     try {
+      const headers = await this.getAuthHeaders();
+
       const response = await fetch(`/api/conversations?limit=${limitCount}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
+        headers
       });
 
       if (!response.ok) {
