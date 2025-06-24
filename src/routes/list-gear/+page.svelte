@@ -145,7 +145,7 @@
 
 <!-- Video Background -->
 <VideoBackground
-  videoSrc="/Stars.mp4"
+  videoSrc="/1877846-hd_1920_1080_30fps.mp4"
   imageSrc="/pexels-bianca-gasparoto-834990-1752951.jpg"
 />
 
