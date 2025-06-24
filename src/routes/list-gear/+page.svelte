@@ -200,21 +200,37 @@
           error="{errors.description}"
         />
 
-        <div class="relative">
-          <FormField
-            id="dailyPrice"
-            label="Daily Price"
-            type="number"
-            bind:value="{formData.dailyPrice}"
-            placeholder="25.00"
-            min="{1}"
-            step="{0.01}"
-            required
-            error="{errors.dailyPrice}"
-            className="!pl-10 pr-4 text-left"
-          />
-          <!-- Dollar sign overlay for price field - positioned to the left of input text -->
-          <span class="absolute left-4 top-[3.2rem] text-gray-300 pointer-events-none text-base font-medium z-10">$</span>
+        <!-- Custom Price Input with Proper Dollar Sign -->
+        <div class="form-field mb-6">
+          <label for="dailyPrice" class="block text-sm font-medium text-white mb-2">
+            Daily Price
+            <span class="text-red-400 ml-1" aria-label="required">*</span>
+          </label>
+
+          <div class="price-input-container">
+            <!-- Dollar sign prefix -->
+            <div class="price-prefix">
+              $
+            </div>
+
+            <!-- Price input -->
+            <input
+              id="dailyPrice"
+              type="number"
+              bind:value="{formData.dailyPrice}"
+              placeholder="25.00"
+              min="1"
+              step="0.01"
+              required
+              class="price-input w-full pr-4 py-3 bg-gray-800/70 border border-gray-600 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200 {errors.dailyPrice ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}"
+              aria-label="Daily Price"
+              aria-invalid="{errors.dailyPrice ? 'true' : 'false'}"
+            />
+          </div>
+
+          {#if errors.dailyPrice}
+            <p class="mt-1 text-sm text-red-400" role="alert" aria-live="polite">{errors.dailyPrice}</p>
+          {/if}
         </div>
 
         <!-- Location Fields -->
@@ -275,4 +291,53 @@
   </ScrollLinkedAnimator>
 </div>
 
+<style>
+  /* Custom price input styling for perfect dollar sign positioning */
+  .price-input-container {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+  }
 
+  .price-prefix {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    background-color: rgba(31, 41, 55, 0.7);
+    border: 1px solid rgb(75, 85, 99);
+    border-right: none;
+    border-radius: 0.5rem 0 0 0.5rem;
+    color: rgb(209, 213, 219);
+    font-weight: 500;
+    font-size: 1rem;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .price-input {
+    flex: 1;
+    padding-left: 0.5rem !important;
+    border-radius: 0 0.5rem 0.5rem 0 !important;
+    border-left: none !important;
+  }
+
+  /* Mobile responsive adjustments */
+  @media (max-width: 640px) {
+    .price-prefix {
+      min-width: 2.25rem;
+      font-size: 0.9rem;
+    }
+
+    .price-input {
+      padding-left: 0.375rem !important;
+    }
+  }
+
+  /* Focus state for the entire input group */
+  .price-input:focus + .price-prefix,
+  .price-input:focus {
+    border-color: rgb(34, 197, 94);
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+  }
+</style>
