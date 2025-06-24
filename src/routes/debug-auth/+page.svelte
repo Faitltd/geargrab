@@ -35,16 +35,22 @@
     }
 
     loading = true;
-    testResult = '🔄 Testing listing creation...';
+    testResult = '🔄 Testing listing creation...\n';
 
     try {
+      // Get ID token first to verify authentication
+      testResult += '1. Getting ID token...\n';
+      const idToken = await authState.user.getIdToken();
+      testResult += `✅ ID Token: ${idToken.substring(0, 50)}...\n\n`;
+
+      // Test the exact data structure
       const testListing = {
         ownerUid: authState.user.uid,
         ownerId: authState.user.uid,
         title: 'Debug Test Listing',
         description: 'This is a test listing created from the debug page to verify Firebase permissions.',
         category: 'camping',
-        condition: 'Good' as const,
+        condition: 'Good',
         dailyPrice: 25,
         securityDeposit: 50,
         location: {
@@ -58,20 +64,40 @@
         isActive: true
       };
 
+      testResult += '2. Test listing data:\n';
+      testResult += JSON.stringify(testListing, null, 2) + '\n\n';
+
+      testResult += '3. Attempting to create listing...\n';
       console.log('🧪 Attempting to create test listing:', testListing);
-      
+      console.log('🔑 User UID:', authState.user.uid);
+      console.log('🔑 User Email:', authState.user.email);
+
       const listingId = await createListing(testListing);
-      
-      testResult = `✅ Success! Created listing with ID: ${listingId}`;
+
+      testResult += `✅ Success! Created listing with ID: ${listingId}`;
       console.log('✅ Test listing created successfully:', listingId);
-      
+
     } catch (error: any) {
       console.error('❌ Test listing creation failed:', error);
-      testResult = `❌ Error: ${error.message || error.code || 'Unknown error'}`;
-      
+      console.error('❌ Full error object:', error);
+
+      testResult += `❌ Error Details:\n`;
+      testResult += `Code: ${error.code || 'No code'}\n`;
+      testResult += `Message: ${error.message || 'No message'}\n`;
+
       if (error.code === 'permission-denied') {
-        testResult += '\n\n🔍 This suggests a Firestore rules issue or authentication problem.';
+        testResult += '\n🔍 Permission denied suggests:\n';
+        testResult += '- Firestore rules are blocking the write\n';
+        testResult += '- Authentication token not properly passed\n';
+        testResult += '- Field validation failing in rules\n';
+        testResult += '- User UID mismatch with ownerUid\n';
       }
+
+      // Additional debugging info
+      testResult += `\n📊 Debug Info:\n`;
+      testResult += `User authenticated: ${authState.isAuthenticated}\n`;
+      testResult += `User UID: ${authState.user?.uid || 'None'}\n`;
+      testResult += `User email: ${authState.user?.email || 'None'}\n`;
     } finally {
       loading = false;
     }
@@ -90,6 +116,53 @@
     } catch (error: any) {
       console.error('❌ Token error:', error);
       testResult = `❌ Token Error: ${error.message}`;
+    }
+  }
+
+  async function testFirebaseConnection() {
+    loading = true;
+    testResult = '🔄 Testing Firebase connection...\n';
+
+    try {
+      // Import Firebase modules
+      const { firestore } = await import('$lib/firebase/client');
+      const { collection, doc, setDoc } = await import('firebase/firestore');
+
+      if (!firestore) {
+        testResult += '❌ Firestore not initialized\n';
+        return;
+      }
+
+      testResult += '✅ Firestore client available\n';
+
+      if (!authState.user) {
+        testResult += '❌ No authenticated user\n';
+        return;
+      }
+
+      testResult += `✅ User authenticated: ${authState.user.email}\n`;
+      testResult += `✅ User UID: ${authState.user.uid}\n`;
+
+      // Test a simple write operation to a test collection
+      const testDocRef = doc(collection(firestore, 'debug-test'), 'test-doc');
+      const testData = {
+        message: 'Test from debug page',
+        timestamp: new Date(),
+        userUid: authState.user.uid
+      };
+
+      testResult += '\n🧪 Testing simple write operation...\n';
+      await setDoc(testDocRef, testData);
+      testResult += '✅ Simple write successful!\n';
+
+      testResult += '\n🎯 Firebase connection is working. The issue is specific to listings collection rules.';
+
+    } catch (error: any) {
+      console.error('❌ Firebase connection test failed:', error);
+      testResult += `❌ Connection Error: ${error.message}\n`;
+      testResult += `Code: ${error.code || 'No code'}\n`;
+    } finally {
+      loading = false;
     }
   }
 </script>
@@ -123,7 +196,15 @@
           >
             Get ID Token
           </button>
-          
+
+          <button
+            on:click={testFirebaseConnection}
+            disabled={!authState?.isAuthenticated || loading}
+            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            {loading ? '🔄 Testing...' : 'Test Firebase Connection'}
+          </button>
+
           <button
             on:click={testListingCreation}
             disabled={!authState?.isAuthenticated || loading}
