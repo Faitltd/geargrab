@@ -448,7 +448,7 @@
         <div class="grid grid-cols-1 gap-6 p-6">
           {#each listings as listing}
             <div class="border border-white/20 rounded-lg p-6 hover:bg-white/5 transition-all bg-white/5">
-              <div class="flex items-start space-x-4">
+              <div class="flex flex-col sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
                 <!-- Image -->
                 <div class="flex-shrink-0">
                   <img
@@ -459,15 +459,29 @@
 
                 <!-- Content -->
                 <div class="flex-1 min-w-0">
-                  <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                      <h3 class="text-lg font-medium text-white truncate">
-                        {listing.title}
-                      </h3>
-                      <p class="text-sm text-gray-300 mt-1 line-clamp-2">
-                        {listing.description}
-                      </p>
-                      <div class="flex items-center mt-2 space-x-4 text-sm text-gray-300">
+                  <div class="space-y-3">
+                    <!-- Title and Status Row -->
+                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                      <div class="flex-1 min-w-0">
+                        <h3 class="text-lg font-medium text-white break-words">
+                          {listing.title}
+                        </h3>
+                      </div>
+                      <div class="flex-shrink-0">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {getStatusColor(listing.status)}">
+                          {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="text-sm text-gray-300 line-clamp-2">
+                      {listing.description}
+                    </p>
+
+                    <!-- Stats and Actions Row -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div class="flex items-center space-x-4 text-sm text-gray-300">
                         <span>${listing.dailyPrice}/day</span>
                         <span>•</span>
                         <span>{listing.views} views</span>
@@ -476,24 +490,18 @@
                         <span>•</span>
                         <span>${listing.earnings} earned</span>
                       </div>
-                    </div>
 
-                    <!-- Status and Actions -->
-                    <div class="flex flex-col items-end space-y-2">
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {getStatusColor(listing.status)}">
-                        {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
-                      </span>
-
-                      <div class="flex space-x-2">
+                      <!-- Actions - Always Visible -->
+                      <div class="flex space-x-3 flex-shrink-0">
                         <button
                           on:click={() => viewListing(listing.id)}
-                          class="text-green-600 hover:text-green-700 text-sm font-medium"
+                          class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors"
                         >
                           View
                         </button>
                         <button
                           on:click={() => editListing(listing.id)}
-                          class="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                          class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors"
                         >
                           Edit
                         </button>
