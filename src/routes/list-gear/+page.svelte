@@ -222,7 +222,7 @@
               min="1"
               step="0.01"
               required
-              class="price-input w-full pr-4 py-3 bg-gray-800/70 border border-gray-600 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200 {errors.dailyPrice ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}"
+              class="price-input {errors.dailyPrice ? 'error-state' : ''}"
               aria-label="Daily Price"
               aria-invalid="{errors.dailyPrice ? 'true' : 'false'}"
             />
@@ -316,17 +316,24 @@
   }
 
   .price-input {
-    flex: 1;
+    flex: 1 !important;
     padding-left: 0.5rem !important;
+    padding-right: 1rem !important;
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
     border-radius: 0 0.5rem 0.5rem 0 !important;
     border-left: none !important;
+    background-color: rgba(31, 41, 55, 0.7) !important;
+    border-color: rgb(75, 85, 99) !important;
+    color: white !important;
+    width: auto !important;
   }
 
   /* Mobile responsive adjustments */
   @media (max-width: 640px) {
     .price-prefix {
-      min-width: 2.25rem;
-      font-size: 0.9rem;
+      min-width: 2.25rem !important;
+      font-size: 0.9rem !important;
     }
 
     .price-input {
@@ -335,9 +342,18 @@
   }
 
   /* Focus state for the entire input group */
-  .price-input:focus + .price-prefix,
   .price-input:focus {
-    border-color: rgb(34, 197, 94);
-    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+    border-color: rgb(34, 197, 94) !important;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2) !important;
+  }
+
+  /* Error state */
+  .price-input.error-state {
+    border-color: rgb(239, 68, 68) !important;
+  }
+
+  .price-input.error-state:focus {
+    border-color: rgb(239, 68, 68) !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
   }
 </style>
