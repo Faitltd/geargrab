@@ -2,6 +2,7 @@
   import { onMount, afterUpdate } from 'svelte';
   import { chatService, type ChatMessage } from '$lib/services/chat';
   import { simpleAuth } from '$lib/auth/simple-auth';
+  import RealTimeChat from './real-time-chat.svelte';
   import { notifications } from '$lib/stores/notifications';
 
   export let conversationId: string;
@@ -201,7 +202,13 @@
   }
 </script>
 
+<!-- Real-Time Chat Window -->
 <div class="flex flex-col h-full bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+  <RealTimeChat {conversationId} {otherUser} />
+</div>
+
+<!-- Fallback: Original Chat Window (hidden) -->
+<div class="hidden flex-col h-full bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
   <!-- Chat Header -->
   <div class="flex items-center justify-between p-4 border-b border-white/20">
     <div class="flex items-center space-x-3">
