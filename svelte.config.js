@@ -19,7 +19,7 @@ const config = {
 
   kit: {
     adapter: adapter({
-      precompress: false,
+      precompress: true, // Enable GZIP/Brotli compression
       envPrefix: ''
     }),
     alias

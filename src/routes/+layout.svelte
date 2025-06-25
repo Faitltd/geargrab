@@ -8,6 +8,7 @@
   import Footer from '$lib/components/layout/Footer.svelte';
   import PageTransition from '$lib/components/layout/page-transition.svelte';
   import ToastNotifications from '$lib/components/ui/toast-notifications.svelte';
+  import WebVitals from '$lib/components/performance/web-vitals.svelte';
 
   // Use the simple auth system for testing
   $: authState = simpleAuth.authState;
@@ -77,3 +78,6 @@
 
 <!-- Toast Notifications -->
 <ToastNotifications />
+
+<!-- Performance Monitoring (dev/debug only) -->
+<WebVitals />

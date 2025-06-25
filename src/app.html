@@ -16,11 +16,13 @@
         <meta name="apple-mobile-web-app-title" content="GearGrab" />
         <link rel="apple-touch-icon" href="%sveltekit.assets%/geargrab-logo.png" />
 
-        <!-- Aggressive cache busting v3.0.0 -->
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0" />
-        <meta http-equiv="Pragma" content="no-cache" />
-        <meta http-equiv="Expires" content="0" />
-        <meta name="cache-bust" content="v3.0.0-20241221-1730" />
+        <!-- Performance optimizations -->
+        <meta name="cache-bust" content="v5.0.0-performance" />
+
+        <!-- Resource hints for better performance -->
+        <link rel="preload" href="%sveltekit.assets%/fonts/inter.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="modulepreload" href="%sveltekit.assets%/_app/immutable/entry/start.js" />
+        <link rel="modulepreload" href="%sveltekit.assets%/_app/immutable/entry/app.js" />
 
         <!-- COOP header removed for development to avoid popup issues -->
 
@@ -49,8 +51,9 @@
         <link rel="dns-prefetch" href="//facebook.com" />
         <link rel="dns-prefetch" href="//appleid.apple.com" />
 
-        <!-- Font Awesome for icons -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+        <!-- Font Awesome for icons - optimized loading -->
+        <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+        <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" /></noscript>
 
         <style>
             /* Global smooth scrolling */
