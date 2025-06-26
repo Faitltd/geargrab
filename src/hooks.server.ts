@@ -17,46 +17,55 @@ export const handle: Handle = async ({ event, resolve }) => {
   const sessionCookie = event.cookies.get('__session');
 
   // Check if Firebase Admin is available
-  if (isFirebaseAdminAvailable()) {
-    if (sessionCookie) {
-      try {
-        // Verify the session cookie
-        const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
+  try {
+    if (isFirebaseAdminAvailable()) {
+      if (sessionCookie) {
+        try {
+          // Verify the session cookie
+          const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
 
-        // Set user information in locals
-        event.locals.userId = decodedClaims.uid;
-        event.locals.user = {
-          uid: decodedClaims.uid,
-          email: decodedClaims.email,
-          emailVerified: decodedClaims.email_verified,
-          displayName: decodedClaims.name,
-          photoURL: decodedClaims.picture
-        };
+          // Set user information in locals
+          event.locals.userId = decodedClaims.uid;
+          event.locals.user = {
+            uid: decodedClaims.uid,
+            email: decodedClaims.email,
+            emailVerified: decodedClaims.email_verified,
+            displayName: decodedClaims.name,
+            photoURL: decodedClaims.picture
+          };
 
-      } catch (error) {
-        // Invalid session cookie - clear it
-        if (!dev) {
-          console.warn('Invalid session cookie:', error.message);
+        } catch (error) {
+          // Invalid session cookie - clear it
+          if (!dev) {
+            console.warn('Invalid session cookie:', error.message);
+          }
+          event.cookies.delete('__session', { path: '/' });
         }
-        event.cookies.delete('__session', { path: '/' });
       }
-    }
 
-    // Try alternative authentication method if session cookie failed
-    if (!event.locals.user) {
-      const auth = await SecurityMiddleware.authenticateUser(event);
-      if (auth) {
-        event.locals.userId = auth.userId;
-        event.locals.user = {
-          uid: auth.userId,
-          email: '', // TODO: Get from user document
-          emailVerified: false, // TODO: Get from user document
-          isAdmin: auth.isAdmin
-        };
+      // Try alternative authentication method if session cookie failed
+      if (!event.locals.user) {
+        try {
+          const auth = await SecurityMiddleware.authenticateUser(event);
+          if (auth) {
+            event.locals.userId = auth.userId;
+            event.locals.user = {
+              uid: auth.userId,
+              email: '', // TODO: Get from user document
+              emailVerified: false, // TODO: Get from user document
+              isAdmin: auth.isAdmin
+            };
+          }
+        } catch (authError) {
+          console.warn('Alternative authentication failed:', authError.message);
+        }
       }
+    } else {
+      console.log('⚠️ Firebase Admin not available, skipping authentication');
     }
-  } else {
-    console.log('⚠️ Firebase Admin not available, skipping authentication');
+  } catch (firebaseError) {
+    console.error('Firebase authentication error:', firebaseError.message);
+    // Continue without authentication rather than failing the entire request
   }
 
   // Add security headers
