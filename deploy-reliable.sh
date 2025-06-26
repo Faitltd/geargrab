@@ -58,7 +58,7 @@ echo "✅ Build completed successfully"
 
 # Build Docker image
 echo "🐳 Building Docker image..."
-docker build -t $IMAGE_TAG .
+docker build --platform linux/amd64 -t $IMAGE_TAG .
 
 # Push Docker image
 echo "📤 Pushing Docker image..."
@@ -74,11 +74,10 @@ gcloud run deploy $SERVICE_NAME \
     --port 8080 \
     --memory 2Gi \
     --cpu 2 \
-    --max-instances 10 \
+    --max-instances 5 \
     --timeout 300 \
     --concurrency 80 \
     --set-env-vars NODE_ENV=production \
-    --set-env-vars PORT=8080 \
     --set-env-vars HOST=0.0.0.0 \
     --quiet
 
