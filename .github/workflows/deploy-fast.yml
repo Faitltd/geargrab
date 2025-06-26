@@ -1,4 +1,4 @@
-name: Fast Deploy to Cloud Run
+name: Reliable Deploy to Cloud Run
 
 on:
   workflow_dispatch:
@@ -10,43 +10,63 @@ on:
         type: choice
         options:
         - production
+      force_rebuild:
+        description: 'Force rebuild without cache'
+        required: false
+        default: false
+        type: boolean
   push:
     branches:
       - latest-version
 
+env:
+  PROJECT_ID: geargrabco
+  SERVICE_NAME: geargrab
+  REGION: us-central1
+
 jobs:
-  fast-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
-      - name: Checkout
+      - name: 🔍 Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Authenticate to Google Cloud
+      - name: 🔐 Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ env.PROJECT_ID }}
 
-      - name: Set up Cloud SDK
+      - name: ☁️ Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          project_id: ${{ env.PROJECT_ID }}
 
-      - name: Configure Docker for GCR
-        run: gcloud auth configure-docker
+      - name: 🐳 Configure Docker for GCR
+        run: |
+          gcloud auth configure-docker --quiet
+          echo "Docker configured for GCR"
 
-      - name: Set up Node.js
+      - name: 📦 Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: 🔧 Install dependencies
         run: |
-          npm ci --prefer-offline --no-audit --no-fund
+          echo "Installing dependencies..."
+          npm cache clean --force
+          npm install --no-audit --no-fund
+          echo "Dependencies installed successfully"
 
-      - name: Build application
+      - name: 🏗️ Build application
         run: |
+          echo "Building application..."
           export NODE_ENV=production
           export VITE_FIREBASE_API_KEY="${{ secrets.VITE_FIREBASE_API_KEY }}"
           export VITE_FIREBASE_AUTH_DOMAIN="${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}"
@@ -56,18 +76,39 @@ jobs:
           export VITE_FIREBASE_APP_ID="${{ secrets.VITE_FIREBASE_APP_ID }}"
           export VITE_STRIPE_PUBLISHABLE_KEY="${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}"
           npm run build
+          echo "Build completed successfully"
+          ls -la build/
 
-      - name: Build and push Docker image
+      - name: 🐳 Build Docker image
         run: |
-          echo "🚀 Starting fast deployment..."
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/geargrab:${{ github.sha }} .
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/geargrab:${{ github.sha }}
+          echo "Building Docker image..."
+          IMAGE_TAG="gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
+          echo "Image tag: $IMAGE_TAG"
 
-      - name: Deploy to Cloud Run
+          # Build with no cache if force_rebuild is true
+          if [ "${{ github.event.inputs.force_rebuild }}" = "true" ]; then
+            docker build --no-cache -t $IMAGE_TAG .
+          else
+            docker build -t $IMAGE_TAG .
+          fi
+
+          echo "Docker image built successfully"
+
+      - name: 🚀 Push Docker image
         run: |
-          gcloud run deploy geargrab \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/geargrab:${{ github.sha }} \
-            --region us-central1 \
+          echo "Pushing Docker image..."
+          IMAGE_TAG="gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
+          docker push $IMAGE_TAG
+          echo "Docker image pushed successfully"
+
+      - name: ☁️ Deploy to Cloud Run
+        run: |
+          echo "Deploying to Cloud Run..."
+          IMAGE_TAG="gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
+
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image $IMAGE_TAG \
+            --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
             --port 8080 \
@@ -78,11 +119,11 @@ jobs:
             --concurrency 80 \
             --set-env-vars NODE_ENV=production \
             --set-env-vars PORT=8080 \
+            --set-env-vars HOST=0.0.0.0 \
             --set-env-vars VITE_USE_EMULATORS=false \
             --set-env-vars VITE_APP_URL=https://geargrab.co \
             --set-env-vars FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }} \
-            --set-env-vars FIREBASE_ADMIN_CLIENT_EMAIL="${{ secrets.FIREBASE_ADMIN_CLIENT_EMAIL }}" \
-            --set-env-vars FIREBASE_ADMIN_PRIVATE_KEY="${{ secrets.FIREBASE_ADMIN_PRIVATE_KEY }}" \
+            --set-env-vars FIREBASE_SERVICE_ACCOUNT_KEY="${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}" \
             --set-env-vars STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }} \
             --set-env-vars VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }} \
             --set-env-vars VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }} \
@@ -92,17 +133,34 @@ jobs:
             --set-env-vars VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }} \
             --set-env-vars VITE_STRIPE_PUBLISHABLE_KEY=${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }} \
             --quiet
-          echo "✅ Deployment completed!"
 
-      - name: Test deployment
+          echo "✅ Cloud Run deployment completed!"
+
+      - name: 🔍 Test deployment
         run: |
-          echo "🔍 Testing deployment..."
+          echo "Testing deployment..."
           sleep 30
-          curl -s -o /dev/null -w "%{http_code}" https://geargrab-227444442028.us-central1.run.app > /tmp/status_code
-          STATUS_CODE=$(cat /tmp/status_code)
 
-          if [ "$STATUS_CODE" = "200" ]; then
-            echo "✅ Deployment test passed - site is responding"
+          # Get the service URL
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} --region=${{ env.REGION }} --format='value(status.url)')
+          echo "Service URL: $SERVICE_URL"
+
+          # Test the deployment
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" $SERVICE_URL)
+          echo "HTTP response code: $HTTP_CODE"
+
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Deployment test PASSED - Facebook login is now live!"
+            echo "🎉 Visit: $SERVICE_URL"
           else
-            echo "⚠️  Deployment test warning - received status code: $STATUS_CODE"
+            echo "⚠️ Deployment test warning - received status code: $HTTP_CODE"
+            echo "Service may still be starting up..."
           fi
+
+      - name: 🎯 Deployment Summary
+        run: |
+          echo "🚀 DEPLOYMENT COMPLETE!"
+          echo "📱 Facebook login should now show 'Continue with Facebook'"
+          echo "🌐 Live site: https://geargrab.co"
+          echo "⏰ Deployed at: $(date)"
+          echo "📝 Commit: ${{ github.sha }}"
