@@ -6,11 +6,12 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
+  import { isCurrentUserAdmin } from '$lib/auth/admin';
 
 
   let isMenuOpen = false;
   let isDropdownOpen = false;
-
+  let isAdmin = false;
 
   // Use simple auth system for testing
   $: authState = simpleAuth.authState;
@@ -45,6 +46,16 @@
         } catch (error) {
           console.error('Error processing auth data:', error);
         }
+      }
+    }
+
+    // Check admin status if user is logged in
+    await simpleAuth.waitForAuthReady();
+    if (simpleAuth.user) {
+      try {
+        isAdmin = await isCurrentUserAdmin();
+      } catch (error) {
+        console.error('Error checking admin status:', error);
       }
     }
   });
@@ -216,6 +227,12 @@
                 <a href="/faq" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   FAQ
                 </a>
+                {#if $authState.user && isAdmin}
+                  <div class="border-t border-white/20 my-1"></div>
+                  <a href="/admin" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10 transition-colors font-medium">
+                    🔧 Admin Console
+                  </a>
+                {/if}
               </div>
             </div>
           {/if}
@@ -226,6 +243,11 @@
           <a href="/dashboard" class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
             Dashboard
           </a>
+          {#if isAdmin}
+            <a href="/admin" class="text-yellow-400 hover:text-yellow-300 px-3 py-2 rounded-md text-sm font-medium">
+              Admin
+            </a>
+          {/if}
           <button
             on:click="{handleSignOut}"
             class="text-white/90 hover:text-white px-3 py-2 rounded-md text-sm font-medium disabled:opacity-50"
@@ -327,6 +349,11 @@
             <a href="/dashboard" on:click="{handleMobileNavClick}" class="block px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10">
               Dashboard
             </a>
+            {#if isAdmin}
+              <a href="/admin" on:click="{handleMobileNavClick}" class="block px-4 py-2 text-base font-medium text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10">
+                🔧 Admin Console
+              </a>
+            {/if}
             <button
               on:click="{handleSignOut}"
               class="block w-full text-left px-4 py-2 text-base font-medium text-white/90 hover:text-white hover:bg-white/10 disabled:opacity-50"

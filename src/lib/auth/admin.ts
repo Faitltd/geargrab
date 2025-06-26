@@ -11,6 +11,8 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 const ADMIN_EMAILS = [
   '126212038+Faitltd@users.noreply.github.com', // Your GitHub email
   'faitltd@gmail.com', // Add your personal email if different
+  'ray@itsfait.com', // Ray's admin email
+  'Ray@itsfait.com', // Ray's admin email (case variation)
   // Add other admin emails as needed
 ];
 
