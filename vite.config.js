@@ -11,14 +11,6 @@ export default defineConfig({
     include: ['@stripe/stripe-js']
   },
   build: {
-    rollupOptions: {
-      output: {
-        // Optimize for caching with content-based hashes
-        chunkFileNames: '_app/immutable/chunks/[name]-[hash].js',
-        entryFileNames: '_app/immutable/entry/[name]-[hash].js',
-        assetFileNames: '_app/immutable/assets/[name]-[hash].[ext]'
-      }
-    },
     // Enable minification and tree-shaking
     minify: 'terser',
     terserOptions: {
