@@ -1,12 +1,29 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { onMount } from 'svelte';
   import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
   import ScrollLinkedSequential from '$lib/components/layout/scroll-linked-sequential.svelte';
+  import { simpleAuth } from '$lib/auth/simple-auth';
+  import { isCurrentUserAdmin } from '$lib/auth/admin';
+
+  let isAdmin = false;
 
   // Navigate to create listing
   function goToCreateListing() {
     goto('/list-gear');
   }
+
+  // Check admin status
+  onMount(async () => {
+    try {
+      await simpleAuth.waitForAuthReady();
+      if (simpleAuth.user) {
+        isAdmin = await isCurrentUserAdmin();
+      }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+    }
+  });
 </script>
 
 <div class="space-y-8">
@@ -78,6 +95,60 @@
         </div>
       </div>
     </ScrollLinkedSequential>
+
+  <!-- Admin Section (only visible to admins) -->
+  {#if isAdmin}
+    <ScrollLinkedAnimator animation="fade-up" startOffset="{0.15}" endOffset="{0.65}">
+      <div class="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-sm rounded-2xl border border-yellow-500/30 shadow-lg">
+        <div class="px-6 py-4 border-b border-yellow-500/20">
+          <h2 class="text-lg font-medium text-yellow-400 drop-shadow-lg flex items-center">
+            ⚡ Admin Panel
+            <span class="ml-2 text-xs bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded-full">ADMIN</span>
+          </h2>
+        </div>
+        <div class="p-6">
+          <ScrollLinkedSequential animation="fade-up" baseDelay="{0.1}" incrementDelay="{0.1}" className="grid grid-cols-1 md:grid-cols-4 gap-4" startOffset="{0.1}" endOffset="{0.8}">
+            <a
+              href="/admin"
+              class="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-3 px-4 rounded-xl transition-all duration-300 inline-flex items-center justify-center shadow-lg hover:transform hover:scale-105"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+              Admin Dashboard
+            </a>
+            <a
+              href="/admin/users"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 inline-flex items-center justify-center shadow-lg hover:transform hover:scale-105"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+              </svg>
+              Manage Users
+            </a>
+            <a
+              href="/admin/listings"
+              class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 inline-flex items-center justify-center shadow-lg hover:transform hover:scale-105"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+              </svg>
+              Manage Listings
+            </a>
+            <a
+              href="/admin/bookings"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 inline-flex items-center justify-center shadow-lg hover:transform hover:scale-105"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              Manage Bookings
+            </a>
+          </ScrollLinkedSequential>
+        </div>
+      </div>
+    </ScrollLinkedAnimator>
+  {/if}
 
   <!-- Quick Actions -->
   <ScrollLinkedAnimator animation="fade-up" startOffset="{0.2}" endOffset="{0.7}">

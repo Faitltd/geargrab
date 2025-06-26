@@ -95,14 +95,34 @@
       const response = await fetch("/api/bookings?role=owner&status=pending_owner_approval");
 
       if (!response.ok) {
-        throw new Error('Failed to load bookings');
+        // Check if it's an authentication error
+        if (response.status === 401) {
+          bookingsError = 'Please log in to view your bookings';
+          return;
+        }
+
+        // For other errors, check if it's a server error vs no data
+        const errorData = await response.json().catch(() => ({}));
+        if (response.status === 500 && errorData.error?.includes('No matching documents')) {
+          // This means no bookings found, not an error
+          pendingBookings = [];
+          return;
+        }
+
+        throw new Error(errorData.error || 'Failed to load bookings');
       }
 
       const data = await response.json();
       pendingBookings = data.bookings || [];
     } catch (err: any) {
-      bookingsError = err.message || 'Failed to load pending bookings';
-      console.error('Error loading pending bookings:', err);
+      // Only show error if it's not a "no bookings" situation
+      if (!err.message?.includes('No matching documents')) {
+        bookingsError = err.message || 'Failed to load pending bookings';
+        console.error('Error loading pending bookings:', err);
+      } else {
+        // No bookings found - this is normal, not an error
+        pendingBookings = [];
+      }
     } finally {
       bookingsLoading = false;
     }
@@ -321,10 +341,16 @@
       {:else if bookingsError}
         <div class="p-6">
           <div class="bg-red-500/20 border border-red-500/50 rounded-lg p-4">
-            <p class="text-red-200">{bookingsError}</p>
+            <div class="flex items-center mb-2">
+              <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+              <p class="text-red-200 font-medium">Unable to load booking requests</p>
+            </div>
+            <p class="text-red-300 text-sm mb-3">{bookingsError}</p>
             <button
               on:click="{loadPendingBookings}"
-              class="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
+              class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium"
             >
               Try Again
             </button>

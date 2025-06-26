@@ -37,14 +37,18 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     
     // Execute query
     const snapshot = await query.get();
-    
+
     // Process results
     const bookings: Booking[] = [];
     snapshot.forEach((doc) => {
       bookings.push({ id: doc.id, ...doc.data() } as Booking);
     });
-    
-    return json({ bookings });
+
+    return json({
+      bookings,
+      count: bookings.length,
+      message: bookings.length === 0 ? 'No bookings found' : `Found ${bookings.length} booking(s)`
+    });
   } catch (error) {
     console.error('Error getting bookings:', error);
     return json({ error: 'Failed to get bookings' }, { status: 500 });

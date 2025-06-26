@@ -13,6 +13,8 @@ const ADMIN_EMAILS = [
   'faitltd@gmail.com', // Add your personal email if different
   'ray@itsfait.com', // Ray's admin email
   'Ray@itsfait.com', // Ray's admin email (case variation)
+  'admin@itsfait.com', // Admin email
+  'Admin@itsfait.com', // Admin email (case variation)
   // Add other admin emails as needed
 ];
 
