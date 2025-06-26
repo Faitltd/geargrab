@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createSecureHandler } from '$lib/security/middleware';
-import { adminFirestore } from '$lib/firebase/server';
+import { adminFirestore, isFirebaseAdminAvailable } from '$lib/firebase/server';
 import { auditLog } from '$lib/security/audit';
 
 // Get messages for a conversation
@@ -14,6 +14,17 @@ export const GET: RequestHandler = createSecureHandler(
     const conversationId = params.conversationId;
     if (!conversationId) {
       return json({ error: 'Conversation ID is required' }, { status: 400 });
+    }
+
+    // Check if Firebase Admin is available
+    if (!isFirebaseAdminAvailable()) {
+      return json({
+        success: true,
+        messages: [],
+        hasMore: false,
+        conversationId,
+        message: 'Firebase Admin not configured - using client-side data only'
+      });
     }
 
     try {
@@ -123,6 +134,11 @@ export const POST: RequestHandler = createSecureHandler(
     const conversationId = params.conversationId;
     if (!conversationId) {
       return json({ error: 'Conversation ID is required' }, { status: 400 });
+    }
+
+    // Check if Firebase Admin is available
+    if (!isFirebaseAdminAvailable()) {
+      return json({ error: 'Server configuration error - cannot send messages' }, { status: 500 });
     }
 
     try {

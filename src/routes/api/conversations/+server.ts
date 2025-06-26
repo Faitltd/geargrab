@@ -19,8 +19,11 @@ export const GET: RequestHandler = createSecureHandler(
       // Require Firebase Admin for conversations
       if (!adminFirestore) {
         return json({
-          error: 'Service temporarily unavailable'
-        }, { status: 503 });
+          success: true,
+          conversations: [],
+          totalCount: 0,
+          message: 'Firebase Admin not configured - using client-side data only'
+        });
       }
 
       // Get conversations where user is a participant
@@ -137,9 +140,7 @@ export const POST: RequestHandler = createSecureHandler(
 
       // Require Firebase Admin for conversations
       if (!adminFirestore) {
-        return json({
-          error: 'Service temporarily unavailable'
-        }, { status: 503 });
+        return json({ error: 'Server configuration error - cannot create conversations' }, { status: 500 });
       }
 
       // Check if conversation already exists

@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { adminFirestore } from '$firebase/server';
+import { adminFirestore, isFirebaseAdminAvailable } from '$firebase/server';
 import type { Booking } from '$types/firestore';
 import { BookingStatus } from '$lib/types/booking-status';
 
@@ -10,7 +10,17 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   if (!locals.userId) {
     return json({ error: 'Unauthorized' }, { status: 401 });
   }
-  
+
+  // Check if Firebase Admin is available
+  if (!isFirebaseAdminAvailable()) {
+    console.log('Firebase Admin not available for bookings API');
+    return json({
+      bookings: [],
+      count: 0,
+      message: 'Firebase Admin not configured - using client-side data only'
+    });
+  }
+
   try {
     // Get query parameters
     const role = url.searchParams.get('role') || 'renter';
@@ -61,7 +71,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.userId) {
     return json({ error: 'Unauthorized' }, { status: 401 });
   }
-  
+
+  // Check if Firebase Admin is available
+  if (!isFirebaseAdminAvailable()) {
+    return json({ error: 'Server configuration error - cannot create bookings' }, { status: 500 });
+  }
+
   try {
     const bookingData = await request.json();
     

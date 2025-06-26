@@ -137,9 +137,20 @@
     if (!confirm('Are you sure you want to delete this listing? This action cannot be undone.')) {
       return;
     }
-    
+
     try {
-      await deleteDoc(doc(firestore, 'listings', listingId));
+      const response = await fetch(`/api/listings/${listingId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete listing');
+      }
+
       notifications.add({
         type: 'success',
         message: 'Listing deleted successfully',
@@ -150,7 +161,7 @@
       console.error('Error deleting listing:', error);
       notifications.add({
         type: 'error',
-        message: 'Failed to delete listing',
+        message: error.message || 'Failed to delete listing',
         timeout: 5000
       });
     }

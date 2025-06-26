@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { adminFirestore } from '$lib/firebase/server';
+import { adminFirestore, isFirebaseAdminAvailable } from '$lib/firebase/server';
+import { isCurrentUserAdmin } from '$lib/auth/admin';
 import type { Listing } from '$types/firestore';
 
 // Get a specific listing by ID
@@ -100,23 +101,31 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
     }
 
     const listingId = params.listingId;
-    
+
     if (!listingId) {
       return json({ error: 'Listing ID is required' }, { status: 400 });
     }
 
+    // Check if Firebase Admin is available
+    if (!isFirebaseAdminAvailable()) {
+      return json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
     // Get existing listing to check ownership
     const existingDoc = await adminFirestore.collection('listings').doc(listingId).get();
-    
+
     if (!existingDoc.exists) {
       return json({ error: 'Listing not found' }, { status: 404 });
     }
 
     const existingListing = existingDoc.data();
-    
-    // Check if user owns the listing
-    if (existingListing?.ownerUid !== locals.userId) {
-      return json({ error: 'Unauthorized - you can only delete your own listings' }, { status: 403 });
+
+    // Check if user is admin or owns the listing
+    const isAdmin = await isCurrentUserAdmin(locals.userId);
+    const isOwner = existingListing?.ownerUid === locals.userId;
+
+    if (!isAdmin && !isOwner) {
+      return json({ error: 'Unauthorized - you can only delete your own listings or must be an admin' }, { status: 403 });
     }
 
     // Check if listing has active bookings
