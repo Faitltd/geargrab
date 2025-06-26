@@ -10,14 +10,17 @@ on:
         type: choice
         options:
         - production
+  push:
+    branches:
+      - latest-version
 
 jobs:
   fast-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -31,14 +34,15 @@ jobs:
 
       - name: Deploy to Cloud Run (Source-based)
         run: |
+          echo "🚀 Starting fast deployment..."
           gcloud run deploy geargrab \
             --source . \
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated \
             --port 8080 \
-            --memory 1Gi \
-            --cpu 1 \
+            --memory 2Gi \
+            --cpu 2 \
             --max-instances 10 \
             --timeout 300 \
             --concurrency 80 \
@@ -58,14 +62,15 @@ jobs:
             --set-env-vars VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }} \
             --set-env-vars VITE_STRIPE_PUBLISHABLE_KEY=${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }} \
             --quiet
+          echo "✅ Deployment completed!"
 
       - name: Test deployment
         run: |
-          echo "Testing deployment..."
+          echo "🔍 Testing deployment..."
           sleep 30
           curl -s -o /dev/null -w "%{http_code}" https://geargrab-227444442028.us-central1.run.app > /tmp/status_code
           STATUS_CODE=$(cat /tmp/status_code)
-          
+
           if [ "$STATUS_CODE" = "200" ]; then
             echo "✅ Deployment test passed - site is responding"
           else
