@@ -64,3 +64,37 @@ export const products: Product[] = [
 export const featuredGear: any[] = [
   // No static test data - all featured gear should come from the database
 ];
+
+// Categories for homepage
+export const categories = [
+  {
+    name: 'Camping',
+    icon: '🏕️',
+    description: 'Tents, sleeping bags, and outdoor essentials'
+  },
+  {
+    name: 'Biking',
+    icon: '🚴',
+    description: 'Mountain bikes, road bikes, and cycling gear'
+  },
+  {
+    name: 'Water Sports',
+    icon: '🏄',
+    description: 'Kayaks, surfboards, and water equipment'
+  },
+  {
+    name: 'Winter Sports',
+    icon: '⛷️',
+    description: 'Skis, snowboards, and winter gear'
+  },
+  {
+    name: 'Climbing',
+    icon: '🧗',
+    description: 'Ropes, harnesses, and climbing equipment'
+  },
+  {
+    name: 'Photography',
+    icon: '📸',
+    description: 'Cameras, lenses, and photo equipment'
+  }
+];

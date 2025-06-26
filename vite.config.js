@@ -16,13 +16,7 @@ export default defineConfig({
         // Optimize for caching with content-based hashes
         chunkFileNames: '_app/immutable/chunks/[name]-[hash].js',
         entryFileNames: '_app/immutable/entry/[name]-[hash].js',
-        assetFileNames: '_app/immutable/assets/[name]-[hash].[ext]',
-        // Bundle smaller chunks together for fewer requests
-        manualChunks: {
-          vendor: ['svelte', '@sveltejs/kit'],
-          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
-          ui: ['lucide-svelte']
-        }
+        assetFileNames: '_app/immutable/assets/[name]-[hash].[ext]'
       }
     },
     // Enable minification and tree-shaking

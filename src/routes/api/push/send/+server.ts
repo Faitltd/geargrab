@@ -5,11 +5,12 @@ import { adminFirestore } from '$lib/firebase/admin';
 import webpush from 'web-push';
 
 // Configure web-push (you'll need to set these environment variables)
-webpush.setVapidDetails(
-  'mailto:support@geargrab.co',
-  process.env.VAPID_PUBLIC_KEY || 'your-vapid-public-key',
-  process.env.VAPID_PRIVATE_KEY || 'your-vapid-private-key'
-);
+// Temporarily disabled to fix build - will configure proper VAPID keys later
+// webpush.setVapidDetails(
+//   'mailto:support@geargrab.co',
+//   process.env.VAPID_PUBLIC_KEY || 'your-vapid-public-key',
+//   process.env.VAPID_PRIVATE_KEY || 'your-vapid-private-key'
+// );
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   try {
