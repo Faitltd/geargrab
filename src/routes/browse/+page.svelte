@@ -5,7 +5,7 @@
   import HeroSearch from '$lib/components/forms/hero-search.svelte';
   import FilterBar from '$lib/components/forms/filter-bar.svelte';
   import GearGrid from '$lib/components/display/gear-grid.svelte';
-  import { products } from '$lib/data/products';
+  // No longer importing static products - all data comes from API
 
   let listings: any[] = [];
   let loading = false;
@@ -13,6 +13,7 @@
   let location = '';
   let sort = 'recommended';
   let query = '';
+  let error = '';
 
   onMount(async () => {
     // Read URL parameters and set initial state
@@ -27,13 +28,93 @@
 
   async function performSearch() {
     loading = true;
+    error = '';
     try {
-      listings = filterListings(products);
-    } catch (error) {
-      console.error('Search error:', error);
+      // Fetch from the API
+      await fetchFromAPI();
+    } catch (apiError) {
+      console.warn('API fetch failed:', apiError);
+      // No fallback to static data - show empty results
       listings = [];
+      error = 'Unable to load listings. Please try again later.';
     } finally {
       loading = false;
+    }
+  }
+
+  async function fetchFromAPI() {
+    try {
+      // If there's a search query, use search API
+      if (query && query.trim()) {
+        const searchParams = new URLSearchParams();
+        searchParams.append('q', query);
+        if (category && category !== 'all') {
+          searchParams.append('category', category);
+        }
+        if (location && location.trim()) {
+          searchParams.append('location', location);
+        }
+        searchParams.append('limit', '50');
+
+        const searchResponse = await fetch(`/api/search?${searchParams}`);
+        if (searchResponse.ok) {
+          const searchData = await searchResponse.json();
+          console.log('🔍 Fetched from search API:', searchData.listings?.length || 0);
+
+          if (searchData.listings && searchData.listings.length > 0) {
+            listings = filterListings(searchData.listings);
+            return;
+          }
+        }
+      }
+
+      // Otherwise use listings API for browsing
+      const params = new URLSearchParams();
+      if (category && category !== 'all') {
+        params.append('category', category);
+      }
+      if (location && location.trim()) {
+        params.append('location', location);
+      }
+      params.append('limit', '50');
+
+      const listingsResponse = await fetch(`/api/listings?${params}`);
+      if (listingsResponse.ok) {
+        const listingsData = await listingsResponse.json();
+        console.log('📦 Fetched listings from API:', listingsData.listings?.length || 0);
+
+        if (listingsData.listings && listingsData.listings.length > 0) {
+          listings = filterListings(listingsData.listings);
+          return;
+        }
+      }
+
+      // Try advanced search API as final fallback
+      const searchParams = new URLSearchParams();
+      if (query && query.trim()) {
+        searchParams.append('q', query);
+      }
+      if (category && category !== 'all') {
+        searchParams.append('category', category);
+      }
+      searchParams.append('limit', '50');
+
+      const searchResponse = await fetch(`/api/search/listings?${searchParams}`);
+      if (searchResponse.ok) {
+        const searchData = await searchResponse.json();
+        console.log('🔍 Fetched from advanced search API:', searchData.listings?.length || 0);
+
+        if (searchData.listings && searchData.listings.length > 0) {
+          listings = filterListings(searchData.listings);
+          return;
+        }
+      }
+
+      // If no API data, throw error to trigger fallback
+      throw new Error('No listings found from API');
+    } catch (apiError) {
+      console.error('API fetch error:', apiError);
+      throw apiError;
     }
   }
 

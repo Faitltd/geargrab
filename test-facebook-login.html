@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Facebook Login - GearGrab</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .facebook {
+            background: #1877F2;
+            color: white;
+        }
+        .facebook:hover {
+            background: #166FE5;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Facebook Login Test</h1>
+        <p>This page tests the Facebook login functionality for GearGrab.</p>
+        
+        <button id="facebook-btn" class="button facebook">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            Test Facebook Login
+        </button>
+        
+        <div id="status" class="status"></div>
+        
+        <h3>📋 Test Results:</h3>
+        <ul id="results">
+            <li>✅ Facebook button rendered</li>
+        </ul>
+        
+        <h3>🔧 Configuration Check:</h3>
+        <ul>
+            <li><strong>Firebase Project:</strong> geargrabco</li>
+            <li><strong>Auth Domain:</strong> geargrabco.firebaseapp.com</li>
+            <li><strong>Facebook Provider:</strong> <span id="facebook-status">Checking...</span></li>
+        </ul>
+        
+        <h3>📝 Configuration Steps:</h3>
+        <ol>
+            <li>✅ <strong>Add Authorized Domains in Firebase:</strong>
+                <ul>
+                    <li>Go to Firebase Console → Authentication → Settings → Authorized domains</li>
+                    <li>Add: localhost, 127.0.0.1, geargrab.co, www.geargrab.co</li>
+                </ul>
+            </li>
+            <li>🔧 <strong>Configure Facebook Provider in Firebase:</strong>
+                <ul>
+                    <li>Go to Firebase Console → Authentication → Sign-in method</li>
+                    <li>Enable Facebook provider</li>
+                    <li>Add Facebook App ID and App Secret</li>
+                </ul>
+            </li>
+            <li>📱 <strong>Create/Configure Facebook App:</strong>
+                <ul>
+                    <li>Go to Facebook Developer Console</li>
+                    <li>Create app or use existing GearGrab app</li>
+                    <li>Add Facebook Login product</li>
+                    <li>Add OAuth redirect URIs: https://geargrabco.firebaseapp.com/__/auth/handler</li>
+                </ul>
+            </li>
+            <li>🧪 <strong>Test the login flow</strong></li>
+        </ol>
+
+        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 15px 0;">
+            <strong>⚠️ Current Issue:</strong> auth/unauthorized-domain<br>
+            <strong>Solution:</strong> Add localhost and geargrab.co to Firebase authorized domains (Step 1 above)
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, FacebookAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyANV1v2FhD2ktXxBUsfGrDm9442dGGCuYs",
+            authDomain: "geargrabco.firebaseapp.com",
+            projectId: "geargrabco",
+            storageBucket: "geargrabco.firebasestorage.app",
+            messagingSenderId: "227444442028",
+            appId: "1:227444442028:web:6eeaed1e136d07f5b73009"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Status display functions
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+        }
+
+        function addResult(message, success = true) {
+            const results = document.getElementById('results');
+            const li = document.createElement('li');
+            li.textContent = (success ? '✅ ' : '❌ ') + message;
+            results.appendChild(li);
+        }
+
+        // Test Facebook provider availability
+        try {
+            const provider = new FacebookAuthProvider();
+            document.getElementById('facebook-status').textContent = 'Available ✅';
+            addResult('Facebook provider initialized successfully');
+        } catch (error) {
+            document.getElementById('facebook-status').textContent = 'Error ❌';
+            addResult('Facebook provider initialization failed: ' + error.message, false);
+        }
+
+        // Facebook login test
+        document.getElementById('facebook-btn').addEventListener('click', async () => {
+            showStatus('Testing Facebook login...', 'info');
+            
+            try {
+                const provider = new FacebookAuthProvider();
+                provider.addScope('email');
+                provider.addScope('public_profile');
+                
+                addResult('Facebook provider configured with scopes');
+                
+                const result = await signInWithPopup(auth, provider);
+                
+                showStatus(`✅ Facebook login successful! Welcome ${result.user.displayName || result.user.email}`, 'success');
+                addResult(`Login successful for user: ${result.user.email}`);
+                addResult(`User ID: ${result.user.uid}`);
+                addResult(`Display Name: ${result.user.displayName || 'Not provided'}`);
+                
+            } catch (error) {
+                console.error('Facebook login error:', error);
+                showStatus(`❌ Facebook login failed: ${error.message}`, 'error');
+                addResult(`Login failed: ${error.code} - ${error.message}`, false);
+                
+                if (error.code === 'auth/operation-not-allowed') {
+                    addResult('Facebook provider is not enabled in Firebase Console', false);
+                } else if (error.code === 'auth/popup-blocked') {
+                    addResult('Popup was blocked by browser', false);
+                } else if (error.code === 'auth/popup-closed-by-user') {
+                    addResult('User closed the popup', false);
+                }
+            }
+        });
+
+        // Check auth state
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                addResult(`User is signed in: ${user.email}`);
+            } else {
+                addResult('No user is currently signed in');
+            }
+        });
+    </script>
+</body>
+</html>

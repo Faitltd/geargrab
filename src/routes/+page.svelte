@@ -5,7 +5,7 @@
   import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
   import ScrollLinkedSequential from '$lib/components/layout/scroll-linked-sequential.svelte';
   import UniverseCard from '$lib/components/cards/universe-card.svelte';
-  import { categories, products } from '$lib/data/products';
+  import { categories } from '$lib/data/products';
   import type { Listing } from '$lib/types/firestore';
   import { Timestamp } from 'firebase/firestore';
 
@@ -50,52 +50,51 @@
     window.location.href = `/listing/${listing.id}`;
   }
 
-  onMount(() => {
+  onMount(async () => {
     try {
-      console.log('🔍 Loading products:', products?.length || 'undefined');
+      // Fetch featured listings from API
+      const response = await fetch('/api/listings?featured=true&limit=6');
+      if (response.ok) {
+        const data = await response.json();
+        console.log('📦 Fetched featured listings:', data.listings?.length || 0);
 
-      if (!products || !Array.isArray(products)) {
-        console.error('❌ Products is not an array:', products);
+        if (data.listings && data.listings.length > 0) {
+          featuredListings = data.listings.map((listing: any) => ({
+            id: listing.id,
+            title: listing.title,
+            description: listing.description,
+            category: listing.category,
+            dailyPrice: listing.dailyPrice,
+            weeklyPrice: listing.weeklyPrice,
+            monthlyPrice: listing.monthlyPrice,
+            images: listing.images || [],
+            location: listing.location,
+            averageRating: listing.averageRating || 4.5,
+            reviewCount: listing.reviewCount || 0,
+            owner: listing.owner || { name: 'GearGrab User' },
+            // Add required Listing fields for compatibility
+            ownerId: listing.ownerId || listing.ownerUid,
+            ownerUid: listing.ownerUid || listing.ownerId,
+            condition: listing.condition,
+            securityDeposit: listing.securityDeposit,
+            features: listing.features || [],
+            unavailableDates: listing.unavailableDates || [],
+            createdAt: listing.createdAt || Timestamp.fromDate(new Date()),
+            updatedAt: listing.updatedAt || Timestamp.fromDate(new Date()),
+            isActive: listing.isActive !== false,
+            views: listing.views || 0,
+            bookingsCount: listing.bookingsCount || 0
+          }));
+        } else {
+          console.log('⚠️ No featured listings found');
+          featuredListings = [];
+        }
+      } else {
+        console.warn('Failed to fetch featured listings:', response.status);
         featuredListings = [];
-        return;
       }
-
-      featuredListings = products.slice(0, 6).map(product => ({
-        id: product.id,
-        title: product.title,
-        description: product.description,
-        category: product.category,
-        dailyPrice: product.dailyPrice,
-        weeklyPrice: product.weeklyPrice,
-        monthlyPrice: product.monthlyPrice,
-        images: product.images || [],
-        location: product.location, // Keep the object structure for UniverseCard
-        avgRating: product.reviews.length > 0
-          ? product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length
-          : 4.5,
-        averageRating: product.reviews.length > 0
-          ? product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length
-          : 4.5,
-        // Add required Listing fields for compatibility
-        ownerId: product.owner.id,
-        ownerUid: product.owner.id,
-        condition: product.condition,
-        securityDeposit: product.securityDeposit,
-        features: product.features,
-        unavailableDates: [],
-        createdAt: Timestamp.fromDate(new Date()),
-        updatedAt: Timestamp.fromDate(new Date()),
-        isActive: true,
-        views: 0,
-        bookingsCount: 0
-      }));
-      console.log('✅ Featured listings created:', featuredListings.length);
-
-      // Force a reactive update
-      featuredListings = [...featuredListings];
     } catch (error) {
-      console.error('❌ Error loading featured listings:', error);
-      // Fallback to empty array if loading fails
+      console.error('Error fetching featured listings:', error);
       featuredListings = [];
     }
   });

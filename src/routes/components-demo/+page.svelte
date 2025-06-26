@@ -5,26 +5,10 @@
   import ContactSection from '$lib/components/forms/contact-section.svelte';
   import { smoothScrollWithNavOffset } from '$lib/utils/smooth-scroll';
 
-  // Sample gear data for demo
-  const sampleGear = [
-    {
-      imageSrc: '/pexels-josh-hild-1270765-2422265.jpg',
-      title: 'Professional Camping Tent',
-      subtitle: 'By Outdoor Gear Co | Available Now',
-      description: 'High-quality 4-person tent perfect for all weather conditions. Includes rain fly and footprint.'
-    },
-    {
-      imageSrc: '/pexels-eric-dekker-3334048.jpg',
-      title: 'Mountain Hiking Backpack',
-      subtitle: 'By Adventure Gear | Available Now',
-      description: 'Spacious 65L backpack with multiple compartments and hydration system compatibility.'
-    },
-    {
-      imageSrc: '/pexels-harshit-nandu-1286798-2873086.jpg',
-      title: 'Portable Camping Stove',
-      subtitle: 'By Camp Chef | Available Now',
-      description: 'Lightweight and efficient camping stove with wind-resistant design and easy ignition.'
-    }
+  // Sample gear data for demo (development only)
+  const sampleGear: any[] = [
+    // Note: This is demo data for component testing only
+    // In production, this should be fetched from the database
   ];
 
   const services = [
@@ -114,16 +98,23 @@
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {#each sampleGear as gear}
-          <HoverCard
-            imageSrc="{gear.imageSrc}"
-            imageAlt="{gear.title}"
-            title="{gear.title}"
-            subtitle="{gear.subtitle}"
-            description="{gear.description}"
-            href="/browse"
-          />
-        {/each}
+        {#if sampleGear.length > 0}
+          {#each sampleGear as gear}
+            <HoverCard
+              imageSrc="{gear.imageSrc}"
+              imageAlt="{gear.title}"
+              title="{gear.title}"
+              subtitle="{gear.subtitle}"
+              description="{gear.description}"
+              href="/browse"
+            />
+          {/each}
+        {:else}
+          <div class="col-span-full text-center text-gray-400">
+            <p>No sample gear data - this is a demo component page</p>
+            <p class="text-sm mt-2">In production, gear data would be fetched from the database</p>
+          </div>
+        {/if}
       </div>
     </div>
   </section>

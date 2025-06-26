@@ -173,162 +173,6 @@ class SearchService {
     try {
       // Use the new search API endpoint
       return await this.searchAPI(filters);
-      
-      const sampleResults: SearchResult[] = [
-        {
-          id: 'listing_001',
-          title: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
-          description: 'Spacious 4-person tent perfect for family camping adventures',
-          category: 'camping',
-          subcategory: 'Tents',
-          dailyPrice: 45,
-          weeklyPrice: 250,
-          monthlyPrice: 800,
-          images: [
-            'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-          ],
-          location: {
-            city: 'Salt Lake City',
-            state: 'UT',
-            coordinates: { lat: 40.7608, lng: -111.8910 }
-          },
-          owner: {
-            id: 'owner_001',
-            name: 'David Wilson',
-            avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-            rating: 4.9,
-            reviewCount: 127,
-            isVerified: true
-          },
-          features: ['Waterproof', 'Quick Setup', 'Family Friendly', 'Spacious'],
-          condition: 'excellent',
-          rating: 4.8,
-          reviewCount: 89,
-          distance: 2.3,
-          availability: {
-            instantBook: true,
-            deliveryOptions: ['pickup', 'delivery'],
-            nextAvailable: new Date('2024-02-01')
-          },
-          insurance: {
-            required: false,
-            tiers: ['basic', 'standard', 'premium']
-          },
-          createdAt: new Date('2023-06-15'),
-          lastBooked: new Date('2024-01-10'),
-          isPromoted: true
-        },
-        {
-          id: 'listing_002',
-          title: 'Osprey Atmos 65L Backpack - Ultralight Hiking Pack',
-          description: 'Professional-grade hiking backpack for multi-day adventures',
-          category: 'hiking',
-          subcategory: 'Backpacks',
-          dailyPrice: 25,
-          weeklyPrice: 140,
-          monthlyPrice: 450,
-          images: [
-            'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-          ],
-          location: {
-            city: 'Park City',
-            state: 'UT',
-            coordinates: { lat: 40.6461, lng: -111.4980 }
-          },
-          owner: {
-            id: 'owner_002',
-            name: 'Sarah Johnson',
-            avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-            rating: 4.7,
-            reviewCount: 93,
-            isVerified: true
-          },
-          features: ['Lightweight', 'Ergonomic', 'Ventilated', 'Durable'],
-          condition: 'good',
-          rating: 4.6,
-          reviewCount: 45,
-          distance: 15.7,
-          availability: {
-            instantBook: false,
-            deliveryOptions: ['pickup', 'shipping'],
-            nextAvailable: new Date('2024-02-05')
-          },
-          insurance: {
-            required: true,
-            tiers: ['standard', 'premium']
-          },
-          createdAt: new Date('2023-08-22'),
-          lastBooked: new Date('2024-01-08')
-        }
-      ];
-
-      // Apply filters to sample data
-      let filteredResults = sampleResults;
-
-      if (filters.query) {
-        const queryLower = filters.query.toLowerCase();
-        filteredResults = filteredResults.filter(item =>
-          item.title.toLowerCase().includes(queryLower) ||
-          item.description.toLowerCase().includes(queryLower) ||
-          item.features.some(feature => feature.toLowerCase().includes(queryLower))
-        );
-      }
-
-      if (filters.category) {
-        filteredResults = filteredResults.filter(item => item.category === filters.category);
-      }
-
-      if (filters.priceRange) {
-        filteredResults = filteredResults.filter(item => {
-          const price = filters.priceRange!.period === 'day' ? item.dailyPrice :
-                       filters.priceRange!.period === 'week' ? (item.weeklyPrice || item.dailyPrice * 7) :
-                       (item.monthlyPrice || item.dailyPrice * 30);
-          return price >= filters.priceRange!.min && price <= filters.priceRange!.max;
-        });
-      }
-
-      if (filters.verifiedOwners) {
-        filteredResults = filteredResults.filter(item => item.owner.isVerified);
-      }
-
-      if (filters.minRating) {
-        filteredResults = filteredResults.filter(item => item.rating >= filters.minRating!);
-      }
-
-      if (filters.instantBook) {
-        filteredResults = filteredResults.filter(item => item.availability.instantBook);
-      }
-
-      // Apply sorting
-      if (filters.sortBy) {
-        filteredResults.sort((a, b) => {
-          switch (filters.sortBy) {
-            case 'price_low':
-              return a.dailyPrice - b.dailyPrice;
-            case 'price_high':
-              return b.dailyPrice - a.dailyPrice;
-            case 'rating':
-              return b.rating - a.rating;
-            case 'distance':
-              return (a.distance || 0) - (b.distance || 0);
-            case 'newest':
-              return b.createdAt.getTime() - a.createdAt.getTime();
-            default:
-              return 0;
-          }
-        });
-      }
-
-      // Apply pagination
-      const pageSize = filters.limit || 20;
-      const paginatedResults = filteredResults.slice(0, pageSize);
-
-      return {
-        results: paginatedResults,
-        totalCount: filteredResults.length,
-        hasMore: filteredResults.length > pageSize,
-        suggestions: this.generateSuggestions(filters.query)
-      };
 
     } catch (error) {
       console.error('Error performing search:', error);
@@ -425,8 +269,13 @@ class SearchService {
 
     } catch (error) {
       console.error('Error searching via API:', error);
-      // Fall back to mock data if API fails
-      return this.searchMockData(filters);
+      // Return empty results if API fails
+      return {
+        results: [],
+        totalCount: 0,
+        hasMore: false,
+        suggestions: this.generateSuggestions(filters.query)
+      };
     }
   }
 
@@ -619,70 +468,17 @@ class SearchService {
 
     } catch (error) {
       console.error('Error searching Firestore:', error);
-      // Fall back to mock data if Firestore fails
-      return this.searchMockData(filters);
+      // Return empty results if Firestore fails
+      return {
+        results: [],
+        totalCount: 0,
+        hasMore: false,
+        suggestions: this.generateSuggestions(filters.query)
+      };
     }
   }
 
-  // Keep the original mock data search as fallback
-  private async searchMockData(filters: SearchFilters): Promise<{
-    results: SearchResult[];
-    totalCount: number;
-    hasMore: boolean;
-    suggestions?: SearchSuggestion[];
-  }> {
-    // Return mock data for fallback
-    const mockResults: SearchResult[] = [
-      {
-        id: 'mock-1',
-        title: 'Professional DSLR Camera',
-        description: 'High-quality camera perfect for outdoor photography',
-        category: 'photography',
-        subcategory: 'Cameras',
-        dailyPrice: 45,
-        weeklyPrice: 250,
-        monthlyPrice: 800,
-        images: ['https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=400'],
-        location: {
-          city: 'San Francisco',
-          state: 'CA',
-          coordinates: { lat: 37.7749, lng: -122.4194 }
-        },
-        owner: {
-          id: 'owner-1',
-          name: 'Sarah Johnson',
-          avatar: 'https://randomuser.me/api/portraits/women/32.jpg',
-          rating: 4.9,
-          reviewCount: 45,
-          isVerified: true
-        },
-        features: ['Weather Resistant', 'Professional Grade'],
-        condition: 'excellent',
-        rating: 4.8,
-        reviewCount: 24,
-        distance: 2.5,
-        availability: {
-          instantBook: true,
-          deliveryOptions: ['pickup', 'delivery'],
-          nextAvailable: new Date()
-        },
-        insurance: {
-          required: false,
-          tiers: ['basic', 'standard']
-        },
-        createdAt: new Date('2023-06-15'),
-        lastBooked: new Date('2024-01-10'),
-        isPromoted: false
-      }
-    ];
-
-    return {
-      results: mockResults,
-      totalCount: mockResults.length,
-      hasMore: false,
-      suggestions: this.generateSuggestions(filters.query)
-    };
-  }
+  // Mock data method removed - all search results come from the database
 
   // Get search suggestions
   generateSuggestions(query?: string): SearchSuggestion[] {

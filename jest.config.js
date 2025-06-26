@@ -8,10 +8,19 @@ export default {
     '**/?(*.)+(spec|test).ts'
   ],
   transform: {
-    '^.+\\.ts$': 'ts-jest'
+    '^.+\\.ts$': ['ts-jest', {
+      tsconfig: 'tsconfig.jest.json'
+    }]
   },
   moduleFileExtensions: ['ts', 'js', 'json'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+  moduleNameMapper: {
+    '^helmet$': '<rootDir>/tests/mocks/helmet.js',
+    '^morgan$': '<rootDir>/tests/mocks/morgan.js',
+    '^\\$app/(.*)$': '<rootDir>/tests/mocks/$app/$1',
+    '^\\$lib/(.*)$': '<rootDir>/src/lib/$1',
+    '^\\$env/(.*)$': '<rootDir>/tests/mocks/$env/$1'
+  },
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts',

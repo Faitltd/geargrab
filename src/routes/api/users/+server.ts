@@ -237,84 +237,20 @@ export const POST: RequestHandler = async (event) => {
 
 /**
  * Generate mock users for demonstration
- * 
- * @returns Array of mock UserProfile objects
+ * NOTE: Returns empty array - all users should come from the database
  */
 function generateMockUsers(): UserProfile[] {
-  const mockUsers: UserProfile[] = [
-    {
-      id: 'user_001',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      roles: [UserRole.USER],
-      createdAt: new Date('2024-01-15T10:30:00Z'),
-      firstName: 'John',
-      lastName: 'Doe',
-      username: 'johndoe',
-      avatarUrl: 'https://example.com/avatars/john.jpg',
-      phoneNumber: '+1-555-123-4567',
-      dateOfBirth: new Date('1990-05-15'),
-      bio: 'Software developer passionate about TypeScript',
-      status: UserStatus.ACTIVE,
-      emailVerified: true,
-      lastLoginAt: new Date('2024-06-18T14:30:00Z'),
-      updatedAt: new Date('2024-06-18T10:15:00Z')
-    },
-    {
-      id: 'user_002',
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      roles: [UserRole.USER, UserRole.EDITOR],
-      createdAt: new Date('2024-02-20T09:15:00Z'),
-      firstName: 'Jane',
-      lastName: 'Smith',
-      username: 'janesmith',
-      avatarUrl: null,
-      phoneNumber: null,
-      dateOfBirth: new Date('1985-08-22'),
-      bio: 'Content creator and editor',
-      status: UserStatus.ACTIVE,
-      emailVerified: true,
-      lastLoginAt: new Date('2024-06-17T16:45:00Z'),
-      updatedAt: new Date('2024-06-17T12:30:00Z')
-    },
-    {
-      id: 'user_003',
-      name: 'Mike Johnson',
-      email: 'mike.johnson@example.com',
-      roles: [UserRole.ADMIN],
-      createdAt: new Date('2024-01-01T08:00:00Z'),
-      firstName: 'Mike',
-      lastName: 'Johnson',
-      username: 'mikejohnson',
-      avatarUrl: 'https://example.com/avatars/mike.jpg',
-      phoneNumber: '+1-555-987-6543',
-      dateOfBirth: new Date('1980-12-10'),
-      bio: 'System administrator',
-      status: UserStatus.ACTIVE,
-      emailVerified: true,
-      lastLoginAt: new Date('2024-06-18T08:00:00Z'),
-      updatedAt: new Date('2024-06-18T08:00:00Z')
-    }
-  ];
-
-  return mockUsers;
+  console.warn('generateMockUsers called - should use real database in production');
+  return [];
 }
 
 /**
  * Mock function to check if email exists
- * 
- * @param email - Email to check
- * @returns True if email exists
+ * NOTE: Always returns false - should use real database in production
  */
 function mockCheckEmailExists(email: string): boolean {
-  const existingEmails = [
-    'john.doe@example.com',
-    'jane.smith@example.com',
-    'mike.johnson@example.com'
-  ];
-  
-  return existingEmails.includes(email.toLowerCase());
+  console.warn('mockCheckEmailExists called - should use real database in production');
+  return false;
 }
 
 /**

@@ -132,11 +132,53 @@ export async function createListing(listingData: Omit<Listing, 'id' | 'createdAt
     ...listingData,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
-    status: 'active'
+    status: 'active',
+    isActive: true,
+    viewCount: 0,
+    favoriteCount: 0,
+    averageRating: 0,
+    reviewCount: 0,
+    // Add search terms for better text search
+    searchTerms: generateSearchTerms(listingData)
   };
-  
+
   const docRef = await addDoc(collection(firestore, LISTINGS_COLLECTION), listingWithTimestamps);
+  console.log('✅ Created listing with ID:', docRef.id);
   return docRef.id;
+}
+
+// Generate search terms for better text search
+function generateSearchTerms(listing: any): string[] {
+  const terms: string[] = [];
+
+  // Add title words
+  if (listing.title) {
+    terms.push(...listing.title.toLowerCase().split(/\s+/));
+  }
+
+  // Add description words (first 100 words)
+  if (listing.description) {
+    const descWords = listing.description.toLowerCase().split(/\s+/).slice(0, 100);
+    terms.push(...descWords);
+  }
+
+  // Add category and subcategory
+  if (listing.category) terms.push(listing.category.toLowerCase());
+  if (listing.subcategory) terms.push(listing.subcategory.toLowerCase());
+
+  // Add brand and model
+  if (listing.brand) terms.push(listing.brand.toLowerCase());
+  if (listing.model) terms.push(listing.model.toLowerCase());
+
+  // Add features
+  if (listing.features && Array.isArray(listing.features)) {
+    listing.features.forEach((feature: string) => {
+      terms.push(...feature.toLowerCase().split(/\s+/));
+    });
+  }
+
+  // Remove duplicates and empty strings
+  return [...new Set(terms.filter(term => term.length > 2))];
 }
 
 // Update an existing listing

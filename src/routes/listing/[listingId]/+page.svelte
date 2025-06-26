@@ -9,6 +9,8 @@
   import { products } from '$lib/data/products';
   import { firestore } from '$lib/firebase/client';
   import { doc, getDoc } from 'firebase/firestore';
+  import { simpleAuth } from '$lib/auth/simple-auth';
+  import { chatService } from '$lib/services/chat';
 
   // Get the listing ID from the URL
   const listingId = $page.params.listingId;
@@ -140,10 +142,6 @@
           }
         };
         console.log('Using product listing:', listing.title);
-      } else if (fallbackListing) {
-        // Fall back to dummy data if product not found
-        listing = fallbackListing;
-        console.log('Using dummy listing:', listing.title);
       } else {
         error = 'Listing not found';
       }
@@ -156,356 +154,10 @@
     }
   });
 
-  // Dummy listings data (enhanced version) - keeping as fallback
-  const dummyListings = [
-    {
-      id: '1',
-      title: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
-      description: 'Experience the great outdoors with this spacious and reliable 4-person tent from REI Co-op. The Half Dome 4 Plus is perfect for family camping adventures, featuring a generous interior space, easy setup, and excellent weather protection. This tent has been meticulously maintained and is in like-new condition.\n\nKey Features:\n• Spacious interior with 60 sq ft of floor space\n• Two large doors for easy entry/exit\n• Large vestibule for gear storage (35 sq ft)\n• Color-coded poles for quick setup\n• Excellent ventilation with mesh panels\n• Waterproof rainfly with 1,500mm coating\n• Durable 70D nylon floor\n• Freestanding design - no guylines required\n\nThis tent has been used on only 3 camping trips and has been professionally cleaned and waterproofed. Perfect for families, groups of friends, or anyone who values comfort and reliability in the outdoors.',
-      category: 'camping',
-      subcategory: 'tents',
-      brand: 'REI Co-op',
-      model: 'Half Dome 4 Plus',
-      condition: 'Like New',
-      ageInYears: 1,
-      dailyPrice: 45,
-      weeklyPrice: 270,
-      monthlyPrice: 900,
-      securityDeposit: 150,
-      location: {
-        city: 'Salt Lake City',
-        state: 'UT',
-        zipCode: '84101'
-      },
-      deliveryOptions: {
-        pickup: true,
-        dropoff: true,
-        shipping: false,
-        pickupLocation: '2100 S State St, Salt Lake City, UT (REI Store)',
-        dropoffDistance: 30
-      },
-      images: [
-          "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-          "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-          "https://images.unsplash.com/photo-1487730116645-74489c95b41b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-          "https://images.unsplash.com/photo-1571863533956-01c88e79957e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-          "https://images.unsplash.com/photo-1445308394109-4ec2920981b1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
-      ],
-      features: [
-        'Waterproof (1,500mm coating)',
-        'Easy Setup (10 minutes)',
-        'Spacious Interior (60 sq ft)',
-        'Two Large Doors',
-        'Large Vestibule (35 sq ft)',
-        'Color-coded Poles',
-        'Mesh Windows & Roof',
-        'Freestanding Design',
-        'Gear Loft Included',
-        'Footprint Included',
-        'Recently Waterproofed',
-        'Professional Cleaning'
-      ],
-      specifications: {
-        'Capacity': '4 people',
-        'Floor Area': '60 sq ft',
-        'Vestibule Area': '35 sq ft',
-        'Peak Height': '6 ft 2 in',
-        'Packed Weight': '9.2 lbs',
-        'Packed Size': '25 x 9 inches',
-        'Seasons': '3-season',
-        'Setup Time': '10 minutes',
-        'Doors': '2 large doors',
-        'Vestibules': '1 large vestibule',
-        'Floor Material': '70D nylon',
-        'Rainfly Material': '75D polyester',
-        'Pole Material': 'DAC Featherlite NSL aluminum',
-        'Waterproof Rating': '1,500mm',
-        'Wind Rating': '35+ mph'
-      },
-      includesInsurance: true,
-      insuranceDetails: 'Basic damage coverage included',
-      availabilityCalendar: {
-        unavailableDates: [
-          '2023-07-15',
-          '2023-07-16',
-          '2023-07-17',
-          '2023-07-25',
-          '2023-07-26'
-        ]
-      },
-      createdAt: { seconds: 1625097600, nanoseconds: 0 },
-      updatedAt: { seconds: 1625097600, nanoseconds: 0 },
-      status: 'active',
-      averageRating: 4.8,
-      reviewCount: 5,
-      reviews: [
-        {
-          id: '101',
-          userId: 'user123',
-          userName: 'Sarah Johnson',
-          userImage: 'https://randomuser.me/api/portraits/women/32.jpg',
-          rating: 5,
-          date: '2024-01-15',
-          comment: 'Outstanding tent for our family camping trip to Zion! The setup was incredibly easy with the color-coded poles - took us less than 10 minutes even in windy conditions. The two doors were perfect for our family of four, and the vestibule gave us plenty of space for our gear. We had a surprise thunderstorm and stayed completely dry. The mesh roof panels provided great ventilation during the day. David was super responsive and even included a footprint and gear loft. Highly recommend!'
-        },
-        {
-          id: '102',
-          userId: 'user456',
-          userName: 'Michael Chen',
-          userImage: 'https://randomuser.me/api/portraits/men/44.jpg',
-          rating: 5,
-          date: '2024-01-08',
-          comment: 'Rented this tent for a weekend at Moab and it exceeded expectations. The quality is top-notch - you can tell it\'s been well-maintained. The interior space is generous, easily fit our sleeping bags and gear. The large vestibule was perfect for cooking and storing our bikes. David met us at the REI store for pickup which was super convenient. The tent was clean and came with everything we needed. Will definitely rent from David again!'
-        },
-        {
-          id: '103',
-          userId: 'user789',
-          userName: 'Emily Rodriguez',
-          userImage: 'https://randomuser.me/api/portraits/women/68.jpg',
-          rating: 5,
-          date: '2024-01-02',
-          comment: 'Perfect tent for our New Year\'s camping trip! We were worried about the cold but this tent handled everything beautifully. The freestanding design made it easy to set up on rocky ground. The two large doors meant no one had to crawl over anyone to get out at night. The gear loft kept our small items organized. David provided excellent instructions and was available for questions. The tent was spotless and smelled fresh. Great value for the price!'
-        },
-        {
-          id: '104',
-          userId: 'user890',
-          userName: 'Jake Thompson',
-          userImage: 'https://randomuser.me/api/portraits/men/25.jpg',
-          rating: 4,
-          date: '2023-12-20',
-          comment: 'Really solid tent! Used it for a 3-day camping trip in the Uintas. Setup was straightforward and the tent felt very stable in moderate winds. The interior space is exactly as advertised - plenty of room for 4 people. Only minor issue was one of the zipper pulls was a bit stiff, but it didn\'t affect functionality. The waterproofing is excellent - we had some light rain and stayed completely dry. David was great to work with and very accommodating with pickup times.'
-        },
-        {
-          id: '105',
-          userId: 'user567',
-          userName: 'Lisa Park',
-          userImage: 'https://randomuser.me/api/portraits/women/41.jpg',
-          rating: 5,
-          date: '2023-12-10',
-          comment: 'This tent is amazing! We\'re new to camping and David was incredibly helpful with setup tips and camping advice. The tent is so much roomier than we expected - we had space for our air mattresses plus room to move around. The mesh windows provided great airflow during the day and the rainfly kept us cozy at night. The included footprint protected the tent floor perfectly. Pickup and return were seamless. We\'re already planning our next trip and will definitely rent this tent again!'
-        }
-      ],
-      owner: {
-        uid: 'owner123',
-        name: 'David Wilson',
-        image: 'https://randomuser.me/api/portraits/men/32.jpg',
-        joinedDate: '2022-03-15',
-        responseRate: 98,
-        responseTime: 'within an hour',
-        listings: 8,
-        reviews: 67,
-        averageRating: 4.9,
-        bio: 'Outdoor enthusiast and gear expert with 15+ years of camping experience. I love sharing quality gear with fellow adventurers! All my equipment is professionally maintained and comes with detailed setup instructions. Happy to provide camping tips and local recommendations for the Salt Lake City area.',
-        verified: true,
-        languages: ['English'],
-        location: 'Salt Lake City, UT'
-      }
-    },
-    {
-      id: '2',
-      title: 'Mountain Bike - Trek X-Caliber 8',
-      description: 'High-quality mountain bike for trail riding. This Trek X-Caliber 8 is perfect for intermediate riders looking to explore mountain trails. Features hydraulic disc brakes for reliable stopping power, front suspension for a smooth ride, and Shimano components for precise shifting. The bike is well-maintained and regularly serviced.',
-      category: 'biking',
-      subcategory: 'mountain bikes',
-      brand: 'Trek',
-      model: 'X-Caliber 8',
-      condition: 'Good',
-      ageInYears: 2,
-      dailyPrice: 45,
-      weeklyPrice: 270,
-      monthlyPrice: 900,
-      securityDeposit: 200,
-      location: {
-        city: 'Boulder',
-        state: 'CO',
-        zipCode: '80302'
-      },
-      deliveryOptions: {
-        pickup: true,
-        dropoff: false,
-        shipping: false,
-        pickupLocation: 'North Boulder'
-      },
-      images: [
-        "https://images.unsplash.com/photo-1511994298241-608e28f14fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-        "https://images.unsplash.com/photo-1575585269294-7d28dd912db8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
-      ],
-      features: [
-        'Hydraulic disc brakes',
-        'Front suspension',
-        'Shimano components',
-        'Tubeless-ready wheels',
-        'Includes helmet',
-        'Includes repair kit'
-      ],
-      specifications: {
-        'Frame Size': 'Medium (17.5")',
-        'Wheel Size': '29"',
-        'Gears': '18-speed',
-        'Weight': '28 lbs',
-        'Frame Material': 'Aluminum'
-      },
-      includesInsurance: true,
-      insuranceDetails: 'Covers mechanical failures',
-      availabilityCalendar: {
-        unavailableDates: [
-          '2023-07-10',
-          '2023-07-11',
-          '2023-07-12',
-          '2023-07-20',
-          '2023-07-21'
-        ]
-      },
-      createdAt: { seconds: 1625184000, nanoseconds: 0 },
-      updatedAt: { seconds: 1625184000, nanoseconds: 0 },
-      status: 'active',
-      averageRating: 4.6,
-      reviewCount: 8,
-      reviews: [
-        {
-          id: '201',
-          userId: 'user234',
-          userName: 'Alex Thompson',
-          userImage: 'https://randomuser.me/api/portraits/men/22.jpg',
-          rating: 5,
-          date: '2023-06-10',
-          comment: 'Excellent mountain bike! Handled the trails at Valmont Bike Park perfectly. Gears shifted smoothly and the brakes were responsive.'
-        },
-        {
-          id: '202',
-          userId: 'user567',
-          userName: 'Jessica Lee',
-          userImage: 'https://randomuser.me/api/portraits/women/45.jpg',
-          rating: 4,
-          date: '2023-05-28',
-          comment: 'Great bike for trail riding. The owner provided a helmet and repair kit which came in handy. Would rent again.'
-        }
-      ],
-      owner: {
-        uid: 'owner456',
-        name: 'Lisa Martinez',
-        image: 'https://randomuser.me/api/portraits/women/22.jpg',
-        joinedDate: '2022-01-10',
-        responseRate: 95,
-        responseTime: 'within a day',
-        listings: 3,
-        reviews: 27,
-        averageRating: 4.7
-      }
-    },
-    {
-      id: '3',
-      title: 'Kayak - Wilderness Systems Pungo 120',
-      description: 'Stable and comfortable kayak for lake adventures. The Wilderness Systems Pungo 120 is a versatile recreational kayak that offers excellent stability and tracking. Perfect for beginners and experienced paddlers alike, this kayak features a comfortable seat, adjustable footrests, and ample storage compartments for day trips. Includes paddle and life vest.',
-      category: 'water-sports',
-      subcategory: 'kayaks',
-      brand: 'Wilderness Systems',
-      model: 'Pungo 120',
-      condition: 'Good',
-      ageInYears: 3,
-      dailyPrice: 50,
-      weeklyPrice: 300,
-      monthlyPrice: 1000,
-      securityDeposit: 150,
-      location: {
-        city: 'Fort Collins',
-        state: 'CO',
-        zipCode: '80525'
-      },
-      deliveryOptions: {
-        pickup: true,
-        dropoff: true,
-        shipping: false,
-        pickupLocation: 'South Fort Collins',
-        dropoffDistance: 20
-      },
-      images: [
-        "https://images.unsplash.com/photo-1604537466158-719b1972feb8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80",
-        "https://images.unsplash.com/photo-1542834291-c514e77b215f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80"
-      ],
-      features: [
-        'Comfortable seat',
-        'Adjustable footrests',
-        'Storage compartments',
-        'Cup holder',
-        'Includes paddle',
-        'Includes life vest'
-      ],
-      specifications: {
-        'Length': '12 feet',
-        'Width': '29 inches',
-        'Weight': '49 lbs',
-        'Capacity': '325 lbs',
-        'Material': 'Polyethylene'
-      },
-      includesInsurance: true,
-      insuranceDetails: 'Covers damage and loss',
-      availabilityCalendar: {
-        unavailableDates: [
-          '2023-07-01',
-          '2023-07-02',
-          '2023-07-03',
-          '2023-07-04',
-          '2023-07-30',
-          '2023-07-31'
-        ]
-      },
-      createdAt: { seconds: 1625270400, nanoseconds: 0 },
-      updatedAt: { seconds: 1625270400, nanoseconds: 0 },
-      status: 'active',
-      averageRating: 4.9,
-      reviewCount: 15,
-      reviews: [
-        {
-          id: '301',
-          userId: 'user345',
-          userName: 'Ryan Miller',
-          userImage: 'https://randomuser.me/api/portraits/men/55.jpg',
-          rating: 5,
-          date: '2023-06-20',
-          comment: 'This kayak is amazing! Very stable and tracks well. Spent a full day on Horsetooth Reservoir and it was perfect. The included paddle and life vest were in great condition.'
-        },
-        {
-          id: '302',
-          userId: 'user678',
-          userName: 'Amanda Wilson',
-          userImage: 'https://randomuser.me/api/portraits/women/33.jpg',
-          rating: 5,
-          date: '2023-06-05',
-          comment: 'Excellent kayak for beginners. I had never kayaked before and felt very comfortable and secure. The owner gave great tips for getting started.'
-        },
-        {
-          id: '303',
-          userId: 'user901',
-          userName: 'Daniel Brown',
-          userImage: 'https://randomuser.me/api/portraits/men/36.jpg',
-          rating: 4,
-          date: '2023-05-15',
-          comment: 'Great kayak, very comfortable seat. The owner delivered it right to the lake for us which was super convenient.'
-        }
-      ],
-      owner: {
-        uid: 'owner789',
-        name: 'James Taylor',
-        image: 'https://randomuser.me/api/portraits/men/62.jpg',
-        joinedDate: '2021-08-22',
-        responseRate: 100,
-        responseTime: 'within hours',
-        listings: 8,
-        reviews: 63,
-        averageRating: 4.9
-      }
-    }
-  ];
+  // No dummy listings - all data should come from the database
 
-  // Find the listing with the matching ID from dummy data as fallback
-  $: fallbackListing = dummyListings.find(item => item.id === listingId);
 
-  // Ensure we always have listing data to prevent blank page
-  $: if (!listing && fallbackListing) {
-    listing = fallbackListing;
-    console.log('⚠️ Using dummy data for ID:', listingId, 'Title:', listing?.title);
-  }
+  // No fallback listings - all data should come from the database
 
   // UI state
   let activeImageIndex = 0;
@@ -574,10 +226,8 @@
     }).format(date);
   }
 
-  // Get similar listings
-  $: similarListings = dummyListings
-    .filter(item => item.id !== listing?.id && item.category === listing?.category)
-    .slice(0, 3);
+  // Similar listings should come from the database
+  $: similarListings = [];
 
   // Handle booking
   function handleBooking() {
@@ -599,9 +249,43 @@
     goto(`/book/confirm?${bookingParams.toString()}`);
   }
 
+  // Get auth state
+  $: authState = simpleAuth.authState;
+
   // Handle message owner
-  function handleMessageOwner() {
-    alert(`Messaging functionality would be implemented here. You would be able to message ${listing?.owner?.name}.`);
+  async function handleMessageOwner() {
+    if (!$authState.isAuthenticated || !$authState.user) {
+      alert('Please sign in to send messages');
+      return;
+    }
+
+    if (!listing?.owner?.uid && !listing?.owner?.id) {
+      alert('Owner information not available');
+      return;
+    }
+
+    const ownerId = listing.owner.uid || listing.owner.id;
+    if (ownerId === $authState.user.uid) {
+      alert('You cannot message yourself');
+      return;
+    }
+
+    try {
+      // Create or find existing conversation
+      const conversationId = await chatService.getOrCreateConversation(
+        $authState.user.uid,
+        ownerId,
+        undefined, // no booking ID yet
+        listing.id,
+        listing.title
+      );
+
+      // Navigate to messages page with the conversation
+      goto(`/messages?conversation=${conversationId}`);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      alert('Unable to start conversation. Please try again.');
+    }
   }
 
   // Handle date picker clicks to show calendar

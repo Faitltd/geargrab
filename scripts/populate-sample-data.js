@@ -79,6 +79,10 @@ async function populateSampleData() {
       }
     ];
 
+    // WARNING: This script is for development/testing only
+    // Do not run in production - it will populate the database with test data
+    console.warn('⚠️  DEVELOPMENT ONLY: Populating database with sample data');
+
     // Sample listings - New realistic outdoor gear listing
     const listings = [
       {

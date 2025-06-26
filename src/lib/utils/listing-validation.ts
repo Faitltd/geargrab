@@ -167,8 +167,11 @@ function getDefaultImageForCategory(category: string): string {
 
 /**
  * Generates a sample listing with proper structure for testing
+ * NOTE: This is for development/testing only - production should use real data
  */
 export function generateSampleListing(overrides: Partial<any> = {}): any {
+  console.warn('generateSampleListing is for development only - use real data in production');
+
   const defaultListing = {
     id: `sample-${Date.now()}`,
     title: 'Sample Outdoor Gear',

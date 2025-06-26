@@ -2,6 +2,10 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
+  import { simpleAuth } from '$lib/auth/simple-auth';
+
+  // Get auth state
+  $: authState = simpleAuth.authState;
 
   let bookingId = '';
   let loading = true;
@@ -132,8 +136,36 @@
     goto('/dashboard/renter');
   }
 
-  function handleMessageOwner() {
-    goto('/messages');
+  async function handleMessageOwner() {
+    if (!$authState.isAuthenticated || !$authState.user) {
+      alert('Please sign in to send messages');
+      return;
+    }
+
+    if (!booking?.owner?.uid) {
+      alert('Owner information not available');
+      return;
+    }
+
+    try {
+      // Import chat service
+      const { chatService } = await import('$lib/services/chat');
+
+      // Create or find existing conversation
+      const conversationId = await chatService.getOrCreateConversation(
+        $authState.user.uid,
+        booking.owner.uid,
+        booking.id,
+        booking.listingId,
+        booking.listingTitle
+      );
+
+      // Navigate to messages page with the conversation
+      goto(`/messages?conversation=${conversationId}`);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      alert('Unable to start conversation. Please try again.');
+    }
   }
 </script>
 

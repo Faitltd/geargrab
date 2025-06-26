@@ -101,11 +101,7 @@
     }
   });
 
-  // Dummy listings data (enhanced version) - keeping as fallback
-  const dummyListings = [
-    {
-      id: '1',
-      title: 'REI Co-op Half Dome 4 Plus Tent - Premium Family Camping',
+  // No dummy listings - all data should come from the database
       description: 'Experience the great outdoors with this spacious and reliable 4-person tent from REI Co-op. The Half Dome 4 Plus is perfect for family camping adventures, featuring a generous interior space, easy setup, and excellent weather protection. This tent has been meticulously maintained and is in like-new condition.\n\nKey Features:\n• Spacious interior with 60 sq ft of floor space\n• Two large doors for easy entry/exit\n• Large vestibule for gear storage (35 sq ft)\n• Color-coded poles for quick setup\n• Excellent ventilation with mesh panels\n• Waterproof rainfly with 1,500mm coating\n• Durable 70D nylon floor\n• Freestanding design - no guylines required\n\nThis tent has been used on only 3 camping trips and has been professionally cleaned and waterproofed. Perfect for families, groups of friends, or anyone who values comfort and reliability in the outdoors.',
       category: 'camping',
       subcategory: 'tents',
