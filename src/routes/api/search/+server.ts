@@ -1,6 +1,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { adminFirestore, isFirebaseAdminAvailable } from '$lib/firebase/admin';
+// Temporarily disable admin Firebase to fix deployment
+// import { adminFirestore, isFirebaseAdminAvailable } from '$lib/firebase/admin';
+
+// Temporary fallback functions for deployment
+const isFirebaseAdminAvailable = () => false;
+const adminFirestore = null;
 
 export const GET: RequestHandler = async ({ url }) => {
     try {
