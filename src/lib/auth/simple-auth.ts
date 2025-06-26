@@ -99,20 +99,45 @@ class SimpleAuthService {
     }
   }
 
-  async refreshAuth() {
+  async refreshAuth(): Promise<void> {
+    console.log('🔄 Simple Auth: Refreshing auth state...');
+
     try {
       const { auth } = await import('$lib/firebase/client');
 
-      if (auth?.currentUser) {
-        console.log('✅ Simple Auth: Refresh found user:', auth.currentUser.email);
-        this.currentUser = auth.currentUser;
-        this.authStore.set({
-          user: auth.currentUser,
-          loading: false,
-          isAuthenticated: true
-        });
+      if (!auth) {
+        console.log('❌ Firebase auth not available');
+        return;
+      }
+
+      // Wait for auth to be ready and get current user
+      await auth.authStateReady();
+      const currentUser = auth.currentUser;
+
+      if (currentUser) {
+        // Force refresh the token to ensure it's valid
+        try {
+          await currentUser.getIdToken(true);
+          console.log('✅ Simple Auth: Refresh successful for:', currentUser.email);
+
+          this.currentUser = currentUser;
+          this.authStore.set({
+            user: currentUser,
+            loading: false,
+            isAuthenticated: true
+          });
+        } catch (tokenError) {
+          console.error('❌ Token refresh failed:', tokenError);
+          // Token refresh failed, user might be logged out
+          this.currentUser = null;
+          this.authStore.set({
+            user: null,
+            loading: false,
+            isAuthenticated: false
+          });
+        }
       } else {
-        console.log('❌ Simple Auth: Refresh found no user');
+        console.log('❌ Simple Auth: No current user found during refresh');
         this.currentUser = null;
         this.authStore.set({
           user: null,
@@ -122,6 +147,12 @@ class SimpleAuthService {
       }
     } catch (error: any) {
       console.error('❌ Simple Auth: Refresh error:', error);
+      this.currentUser = null;
+      this.authStore.set({
+        user: null,
+        loading: false,
+        isAuthenticated: false
+      });
     }
   }
 

@@ -439,8 +439,25 @@
       return;
     }
 
-    // Check if user is authenticated
-    if (!$authState.user || !$authState.isAuthenticated) {
+    // Force refresh auth state before checking
+    console.log('🔄 Refreshing auth state before checkout...');
+    await simpleAuth.refreshAuth();
+
+    // Wait a moment for the auth state to update
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Check if user is authenticated with multiple verification methods
+    const isUserAuthenticated = $authState.user && $authState.isAuthenticated;
+    const hasFirebaseUser = simpleAuth.user;
+
+    console.log('🔐 Auth check results:', {
+      authStateUser: !!$authState.user,
+      authStateAuthenticated: $authState.isAuthenticated,
+      simpleAuthUser: !!hasFirebaseUser,
+      userEmail: $authState.user?.email || hasFirebaseUser?.email
+    });
+
+    if (!isUserAuthenticated || !hasFirebaseUser) {
       console.log('🔐 User not authenticated, saving context and showing login modal');
 
       // Save complete booking context before authentication
@@ -452,6 +469,7 @@
       return;
     }
 
+    console.log('✅ User authenticated, proceeding to payment');
     // User is authenticated, proceed to payment
     proceedToPayment();
   }
@@ -543,9 +561,23 @@
   }
 
   // Login modal event handlers
-  function handleLoginSuccess() {
-    console.log('✅ Login successful, proceeding to payment');
+  async function handleLoginSuccess() {
+    console.log('✅ Login successful, refreshing auth and proceeding to payment');
     showLoginModal = false;
+
+    // Force refresh auth state after login and wait for it to complete
+    await simpleAuth.refreshAuth();
+
+    // Wait a moment for the state to propagate
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    // Verify authentication worked
+    console.log('🔐 Post-login auth verification:', {
+      authStateUser: !!$authState.user,
+      authStateAuthenticated: $authState.isAuthenticated,
+      simpleAuthUser: !!simpleAuth.user,
+      userEmail: $authState.user?.email || simpleAuth.user?.email
+    });
 
     // Populate user info after successful login
     populateUserInfo();

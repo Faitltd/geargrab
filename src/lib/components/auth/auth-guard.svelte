@@ -26,11 +26,21 @@
     // Wait for auth to be ready
     await simpleAuth.waitForAuthReady();
 
-    console.log('🔐 Auth Guard: Auth state ready:', {
+    // Double-check authentication state
+    const finalAuthState = {
       isAuthenticated: $authState.isAuthenticated,
       hasUser: !!$authState.user,
-      userEmail: $authState.user?.email
-    });
+      userEmail: $authState.user?.email,
+      simpleAuthUser: !!simpleAuth.user
+    };
+
+    console.log('🔐 Auth Guard: Final auth state:', finalAuthState);
+
+    // If there's a mismatch, try one more refresh
+    if ($authState.isAuthenticated !== !!simpleAuth.user) {
+      console.log('⚠️ Auth state mismatch detected, doing final refresh...');
+      await simpleAuth.refreshAuth();
+    }
   });
 
   function handleLogin() {
