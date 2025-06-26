@@ -6,7 +6,7 @@ import { getFirestore, type Firestore, Timestamp } from 'firebase-admin/firestor
 import { dev } from '$app/environment';
 
 let adminApp: App | null = null;
-let adminFirestore: Firestore | null = null;
+let adminFirestoreInstance: Firestore | null = null;
 
 /**
  * Initialize Firebase Admin SDK
@@ -56,14 +56,14 @@ function initializeFirebaseAdmin(): App | null {
  */
 function getAdminFirestore(): Firestore | null {
   try {
-    if (!adminFirestore) {
+    if (!adminFirestoreInstance) {
       const app = initializeFirebaseAdmin();
       if (!app) {
         return null;
       }
-      adminFirestore = getFirestore(app);
+      adminFirestoreInstance = getFirestore(app);
     }
-    return adminFirestore;
+    return adminFirestoreInstance;
   } catch (error) {
     console.error('❌ Failed to get admin Firestore:', error);
     return null;
