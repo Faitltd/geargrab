@@ -1,8 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
   import { collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where } from 'firebase/firestore';
   import { firestore } from '$lib/firebase/client';
   import { notifications } from '$lib/stores/notifications';
+  import { simpleAuth } from '$lib/auth/simple-auth';
+  import { isCurrentUserAdmin, initializeAdminUser } from '$lib/auth/admin';
 
   let listings = [];
   let filteredListings = [];
@@ -11,6 +14,7 @@
   let statusFilter = 'all';
   let selectedListing = null;
   let showEditModal = false;
+  let isAdmin = false;
 
   const statusOptions = [
     { value: 'all', label: 'All Listings' },
@@ -21,8 +25,40 @@
   ];
 
   onMount(async () => {
-    await loadListings();
+    await checkAdminAccess();
+    if (isAdmin) {
+      await loadListings();
+    }
   });
+
+  async function checkAdminAccess() {
+    try {
+      // Wait for auth to be ready
+      await simpleAuth.waitForAuthReady();
+
+      if (!simpleAuth.user) {
+        goto('/auth/login?redirectTo=/admin/listings');
+        return;
+      }
+
+      // Initialize admin user if needed
+      await initializeAdminUser();
+
+      // Check admin status
+      isAdmin = await isCurrentUserAdmin();
+
+      if (!isAdmin) {
+        console.warn('🚫 User is not admin:', simpleAuth.user.email);
+        goto('/?error=admin_required');
+        return;
+      }
+
+      console.log('✅ Admin access granted for listings management:', simpleAuth.user.email);
+    } catch (error) {
+      console.error('Error checking admin access:', error);
+      goto('/?error=admin_check_failed');
+    }
+  }
 
   async function loadListings() {
     try {

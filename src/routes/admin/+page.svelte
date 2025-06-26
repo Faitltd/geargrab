@@ -1,7 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
   import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
   import { firestore } from '$lib/firebase/client';
+  import { simpleAuth } from '$lib/auth/simple-auth';
+  import { isCurrentUserAdmin, initializeAdminUser } from '$lib/auth/admin';
 
   let stats = {
     totalUsers: 0,
@@ -14,10 +17,43 @@
 
   let recentActivity = [];
   let loading = true;
+  let isAdmin = false;
 
   onMount(async () => {
-    await loadDashboardData();
+    await checkAdminAccess();
+    if (isAdmin) {
+      await loadDashboardData();
+    }
   });
+
+  async function checkAdminAccess() {
+    try {
+      // Wait for auth to be ready
+      await simpleAuth.waitForAuthReady();
+
+      if (!simpleAuth.user) {
+        goto('/auth/login?redirectTo=/admin');
+        return;
+      }
+
+      // Initialize admin user if needed (this will set you as admin if your email is in the list)
+      await initializeAdminUser();
+
+      // Check admin status
+      isAdmin = await isCurrentUserAdmin();
+
+      if (!isAdmin) {
+        console.warn('🚫 User is not admin:', simpleAuth.user.email);
+        goto('/?error=admin_required');
+        return;
+      }
+
+      console.log('✅ Admin access granted for:', simpleAuth.user.email);
+    } catch (error) {
+      console.error('Error checking admin access:', error);
+      goto('/?error=admin_check_failed');
+    }
+  }
 
   async function loadDashboardData() {
     try {
