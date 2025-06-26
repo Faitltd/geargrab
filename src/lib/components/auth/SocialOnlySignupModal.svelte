@@ -142,7 +142,7 @@
           {loading ? 'Creating account...' : 'Sign up with Apple'}
         </button>
 
-        <!-- Facebook Auth -->
+        <!-- Facebook Auth - ACTIVE & FUNCTIONAL - Updated 2025-06-26 -->
         <button
           on:click={() => handleSocialAuth('facebook')}
           disabled={loading}
