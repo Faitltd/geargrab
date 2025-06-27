@@ -1,22 +1,29 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { getSales } from '$lib/firebase/db/sales';
-  import { GEAR_CATEGORIES } from '$lib/constants';
+  import { browser } from '$app/environment';
   import type { Sale } from '$lib/types/firestore';
   import VideoBackground from '$lib/components/layout/video-background.svelte';
   import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
 
+  // Import constants dynamically to avoid SSR issues
+  let GEAR_CATEGORIES: any[] = [];
+
+  onMount(async () => {
+    if (browser) {
+      const constants = await import('$lib/constants');
+      GEAR_CATEGORIES = [...constants.GEAR_CATEGORIES];
+    }
+  });
+
   let sales: Sale[] = [];
   let loading = true;
   let error: string | null = null;
-  let heroVisible = false;
 
   // Filter state
   let selectedCategory = '';
   let selectedCondition = '';
   let minPrice = '';
   let maxPrice = '';
-  let searchLocation = '';
 
   // Load sales on mount
   onMount(async () => {
@@ -28,16 +35,23 @@
       loading = true;
       error = null;
 
+      if (!browser) {
+        return;
+      }
+
+      // Dynamic import to avoid SSR issues
+      const { getSales } = await import('$lib/firebase/db/sales');
+
       const filters: any = {};
-      
+
       if (selectedCategory) {
         filters.category = selectedCategory;
       }
-      
+
       if (selectedCondition) {
         filters.condition = [selectedCondition];
       }
-      
+
       if (minPrice || maxPrice) {
         filters.priceRange = {};
         if (minPrice) filters.priceRange.min = parseFloat(minPrice);
@@ -99,7 +113,7 @@
 />
 
 <!-- Hero Section -->
-<ScrollLinkedAnimator bind:isVisible={heroVisible}>
+<ScrollLinkedAnimator>
   <section class="relative min-h-[50vh] flex items-center justify-center text-center text-white">
     <div class="relative z-10 max-w-4xl mx-auto px-4">
       <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">

@@ -25,7 +25,6 @@
     }
   });
 
-  let heroVisible = false;
   let loading = false;
   let errors: Record<string, string> = {};
 
@@ -206,7 +205,7 @@
 />
 
 <!-- Hero Section -->
-<ScrollLinkedAnimator bind:isVisible={heroVisible}>
+<ScrollLinkedAnimator>
   <section class="relative min-h-[50vh] flex items-center justify-center text-center text-white">
     <div class="relative z-10 max-w-4xl mx-auto px-4">
       <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">

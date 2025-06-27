@@ -1,15 +1,23 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { getGuides } from '$lib/firebase/db/guides';
-  import { GUIDE_SPECIALTIES } from '$lib/constants';
+  import { browser } from '$app/environment';
   import type { Guide } from '$lib/types/firestore';
   import VideoBackground from '$lib/components/layout/video-background.svelte';
   import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
 
+  // Import constants dynamically to avoid SSR issues
+  let GUIDE_SPECIALTIES: any[] = [];
+
+  onMount(async () => {
+    if (browser) {
+      const constants = await import('$lib/constants');
+      GUIDE_SPECIALTIES = [...constants.GUIDE_SPECIALTIES];
+    }
+  });
+
   let guides: Guide[] = [];
   let loading = true;
   let error: string | null = null;
-
 
   // Filter state
   let selectedSpecialty = '';
@@ -27,16 +35,23 @@
       loading = true;
       error = null;
 
+      if (!browser) {
+        return;
+      }
+
+      // Dynamic import to avoid SSR issues
+      const { getGuides } = await import('$lib/firebase/db/guides');
+
       const filters: any = {};
-      
+
       if (selectedSpecialty) {
         filters.specialty = selectedSpecialty;
       }
-      
+
       if (verifiedOnly) {
         filters.isVerified = true;
       }
-      
+
       if (minRate || maxRate) {
         filters.rateRange = {};
         if (minRate) filters.rateRange.min = parseFloat(minRate);

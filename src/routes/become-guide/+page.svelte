@@ -1,20 +1,30 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
+  import { browser } from '$app/environment';
   import { simpleAuth } from '$lib/auth/simple-auth';
-  import { createGuide } from '$lib/firebase/db/guides';
   import { toastNotifications } from '$lib/stores/notifications';
-
-  // Get the auth state store
-  $: authState = simpleAuth.authState;
   import VideoBackground from '$lib/components/layout/video-background.svelte';
   import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
   import FormContainer from '$lib/components/forms/form-container.svelte';
   import FormField from '$lib/components/forms/form-field.svelte';
   import FormButton from '$lib/components/forms/form-button.svelte';
-  import { GUIDE_SPECIALTIES, SUCCESS_MESSAGES } from '$lib/constants';
 
-  let heroVisible = false;
+  // Get the auth state store
+  $: authState = simpleAuth.authState;
+
+  // Import constants dynamically to avoid SSR issues
+  let GUIDE_SPECIALTIES: any[] = [];
+  let SUCCESS_MESSAGES: any = {};
+
+  onMount(async () => {
+    if (browser) {
+      const constants = await import('$lib/constants');
+      GUIDE_SPECIALTIES = [...constants.GUIDE_SPECIALTIES];
+      SUCCESS_MESSAGES = {...constants.SUCCESS_MESSAGES};
+    }
+  });
+
   let loading = false;
   let errors: Record<string, string> = {};
 
@@ -185,9 +195,16 @@
       return;
     }
 
+    if (!browser) {
+      toastNotifications.error('This feature is not available on the server');
+      return;
+    }
+
     loading = true;
 
     try {
+      // Dynamic import to avoid SSR issues
+      const { createGuide } = await import('$lib/firebase/db/guides');
       const guideData = {
         guideId: $authState.user.uid,
         guideUid: $authState.user.uid,
@@ -247,7 +264,7 @@
 />
 
 <!-- Hero Section -->
-<ScrollLinkedAnimator bind:isVisible={heroVisible}>
+<ScrollLinkedAnimator>
   <section class="relative min-h-[50vh] flex items-center justify-center text-center text-white">
     <div class="relative z-10 max-w-4xl mx-auto px-4">
       <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
