@@ -47,20 +47,10 @@ export const GET: RequestHandler = async () => {
       },
       timestamp: new Date().toISOString()
     });
-      
-    } catch (searchError) {
-      return json({
-        success: false,
-        message: 'Search system using fallback',
-        service: 'Mock',
-        error: searchError.message,
-        timestamp: new Date().toISOString()
-      });
-    }
 
   } catch (error) {
     console.error('Search health check failed:', error);
-    
+
     return json({
       success: false,
       error: 'Search health check failed',

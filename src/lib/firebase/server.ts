@@ -123,7 +123,7 @@ try {
 }
 
 // Export Firebase Admin services with safe fallbacks
-export { adminApp, adminAuth, adminFirestore, adminStorage };
+export { adminApp, adminAuth, adminFirestore, adminStorage, isAdminInitialized };
 
 // Helper function to check if Firebase Admin is available
 export function isFirebaseAdminAvailable(): boolean {
