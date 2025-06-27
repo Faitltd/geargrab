@@ -1,18 +1,29 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
+  import { browser } from '$app/environment';
   import { simpleAuth } from '$lib/auth/simple-auth';
-  import { createSale } from '$lib/firebase/db/sales';
   import { toastNotifications } from '$lib/stores/notifications';
-
-  // Get the auth state store
-  $: authState = simpleAuth.authState;
   import VideoBackground from '$lib/components/layout/video-background.svelte';
   import ScrollLinkedAnimator from '$lib/components/layout/scroll-linked-animator.svelte';
   import FormContainer from '$lib/components/forms/form-container.svelte';
   import FormField from '$lib/components/forms/form-field.svelte';
   import FormButton from '$lib/components/forms/form-button.svelte';
-  import { GEAR_CATEGORIES, SUCCESS_MESSAGES } from '$lib/constants';
+
+  // Get the auth state store
+  $: authState = simpleAuth.authState;
+
+  // Import constants dynamically to avoid SSR issues
+  let GEAR_CATEGORIES: any[] = [];
+  let SUCCESS_MESSAGES: any = {};
+
+  onMount(async () => {
+    if (browser) {
+      const constants = await import('$lib/constants');
+      GEAR_CATEGORIES = [...constants.GEAR_CATEGORIES];
+      SUCCESS_MESSAGES = {...constants.SUCCESS_MESSAGES};
+    }
+  });
 
   let heroVisible = false;
   let loading = false;
@@ -109,9 +120,16 @@
       return;
     }
 
+    if (!browser) {
+      toastNotifications.error('This feature is not available on the server');
+      return;
+    }
+
     loading = true;
 
     try {
+      // Dynamic import to avoid SSR issues
+      const { createSale } = await import('$lib/firebase/db/sales');
       const saleData = {
         sellerId: $authState.user.uid,
         sellerUid: $authState.user.uid,

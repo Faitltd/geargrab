@@ -1,16 +1,17 @@
+import { browser } from '$app/environment';
 import { firestore } from '../client';
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where, 
-  orderBy, 
-  limit, 
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  limit,
   startAfter,
   serverTimestamp,
   type DocumentSnapshot,
@@ -23,13 +24,17 @@ const GUIDE_BOOKINGS_COLLECTION = 'guideBookings';
 
 // Get a single guide by ID
 export async function getGuide(id: string): Promise<Guide | null> {
+  if (!browser || !firestore) {
+    throw new Error('Firebase not available on server side');
+  }
+
   const docRef = doc(firestore, GUIDES_COLLECTION, id);
   const docSnap = await getDoc(docRef);
-  
+
   if (docSnap.exists()) {
     return { id: docSnap.id, ...docSnap.data() } as Guide;
   }
-  
+
   return null;
 }
 

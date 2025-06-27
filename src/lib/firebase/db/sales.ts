@@ -1,16 +1,17 @@
+import { browser } from '$app/environment';
 import { firestore } from '../client';
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where, 
-  orderBy, 
-  limit, 
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  limit,
   startAfter,
   serverTimestamp,
   type DocumentSnapshot,
@@ -23,13 +24,17 @@ const SALE_PURCHASES_COLLECTION = 'salePurchases';
 
 // Get a single sale by ID
 export async function getSale(id: string): Promise<Sale | null> {
+  if (!browser || !firestore) {
+    throw new Error('Firebase not available on server side');
+  }
+
   const docRef = doc(firestore, SALES_COLLECTION, id);
   const docSnap = await getDoc(docRef);
-  
+
   if (docSnap.exists()) {
     return { id: docSnap.id, ...docSnap.data() } as Sale;
   }
-  
+
   return null;
 }
 
@@ -55,6 +60,10 @@ export async function getSales(
   pageSize: number = 20,
   lastVisible?: DocumentSnapshot
 ): Promise<{ sales: Sale[]; lastVisible: DocumentSnapshot | null }> {
+  if (!browser || !firestore) {
+    throw new Error('Firebase not available on server side');
+  }
+
   // Build query constraints
   const constraints: QueryConstraint[] = [];
 
@@ -143,6 +152,10 @@ export async function getSales(
 
 // Create a new sale listing
 export async function createSale(saleData: Omit<Sale, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+  if (!browser || !firestore) {
+    throw new Error('Firebase not available on server side');
+  }
+
   const saleWithTimestamps = {
     ...saleData,
     createdAt: serverTimestamp(),
@@ -200,6 +213,10 @@ function generateSearchTerms(saleData: Omit<Sale, 'id' | 'createdAt' | 'updatedA
 
 // Update an existing sale
 export async function updateSale(id: string, updates: Partial<Sale>): Promise<void> {
+  if (!browser || !firestore) {
+    throw new Error('Firebase not available on server side');
+  }
+
   const docRef = doc(firestore, SALES_COLLECTION, id);
   
   // Add updated timestamp
