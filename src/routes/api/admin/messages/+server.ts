@@ -111,7 +111,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
     // Update message
     await adminFirestore.collection('messages').doc(messageId).update({
       ...updates,
-      updatedAt: adminFirestore.Timestamp.now()
+      updatedAt: new Date()
     });
 
     return json({ 

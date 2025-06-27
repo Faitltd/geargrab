@@ -77,7 +77,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
     // Update booking
     const updateData = {
       status,
-      updatedAt: adminFirestore.Timestamp.now(),
+      updatedAt: new Date(),
       adminUpdated: true
     };
 

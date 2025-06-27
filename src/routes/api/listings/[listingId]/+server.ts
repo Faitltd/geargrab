@@ -46,7 +46,7 @@ export const GET: RequestHandler = async ({ params }) => {
     try {
       await adminFirestore.collection('listings').doc(listingId).update({
         views: (listing.views || 0) + 1,
-        updatedAt: adminFirestore.Timestamp.now()
+        updatedAt: new Date()
       });
     } catch (error) {
       console.warn('Failed to increment view count:', error);
@@ -97,7 +97,7 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
     delete updateData.bookingCount;
 
     // Add updated timestamp
-    updateData.updatedAt = adminFirestore.Timestamp.now();
+    updateData.updatedAt = new Date();
 
     // Update listing
     await adminFirestore.collection('listings').doc(listingId).update(updateData);
@@ -163,8 +163,8 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
     // Soft delete by updating status
     await adminFirestore.collection('listings').doc(listingId).update({
       status: 'deleted',
-      deletedAt: adminFirestore.Timestamp.now(),
-      updatedAt: adminFirestore.Timestamp.now()
+      deletedAt: new Date(),
+      updatedAt: new Date()
     });
 
     return json({

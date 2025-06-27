@@ -106,7 +106,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     // Add timestamps and default values
-    const now = adminFirestore.Timestamp.now();
+    const now = new Date();
     const listingWithTimestamps = {
       ...listingData,
       createdAt: now,
