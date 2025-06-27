@@ -1,17 +1,132 @@
 <script lang="ts">
-  // Sample user data
+  import { onMount } from 'svelte';
+  import { simpleAuth } from '$lib/auth/simple-auth';
+  import { notifications } from '$lib/stores/notifications';
+  import ProfilePhotoUploader from '$lib/components/profile-photo-uploader.svelte';
+  import { firestore } from '$lib/firebase/client';
+  import { doc, getDoc, updateDoc } from 'firebase/firestore';
+
+  // User data
   let user = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    location: 'Salt Lake City, UT',
-    bio: 'Outdoor enthusiast who loves hiking, camping, and mountain biking.',
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
-    verified: true,
-    memberSince: 'January 2024'
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    bio: '',
+    avatar: '',
+    verified: false,
+    memberSince: ''
   };
 
   let editing = false;
+  let loading = true;
+  let saving = false;
+
+  onMount(async () => {
+    await loadUserProfile();
+  });
+
+  async function loadUserProfile() {
+    try {
+      loading = true;
+
+      // Wait for auth to be ready
+      await simpleAuth.waitForAuthReady();
+
+      if (!simpleAuth.user) {
+        notifications.add({
+          type: 'error',
+          message: 'Please log in to view your profile',
+          timeout: 5000
+        });
+        return;
+      }
+
+      // Get user data from Firestore
+      const userDoc = await getDoc(doc(firestore, 'users', simpleAuth.user.uid));
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        user = {
+          name: userData.displayName || simpleAuth.user.displayName || '',
+          email: userData.email || simpleAuth.user.email || '',
+          phone: userData.phoneNumber || simpleAuth.user.phoneNumber || '',
+          location: userData.location || '',
+          bio: userData.bio || '',
+          avatar: userData.photoURL || simpleAuth.user.photoURL || '',
+          verified: userData.isVerified || false,
+          memberSince: userData.createdAt ? new Date(userData.createdAt.seconds * 1000).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently'
+        };
+      } else {
+        // Use Firebase Auth data as fallback
+        user = {
+          name: simpleAuth.user.displayName || '',
+          email: simpleAuth.user.email || '',
+          phone: simpleAuth.user.phoneNumber || '',
+          location: '',
+          bio: '',
+          avatar: simpleAuth.user.photoURL || '',
+          verified: simpleAuth.user.emailVerified || false,
+          memberSince: 'Recently'
+        };
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+      notifications.add({
+        type: 'error',
+        message: 'Failed to load profile data',
+        timeout: 5000
+      });
+    } finally {
+      loading = false;
+    }
+  }
+
+  async function saveProfile() {
+    if (!simpleAuth.user) return;
+
+    try {
+      saving = true;
+
+      // Update Firestore document
+      await updateDoc(doc(firestore, 'users', simpleAuth.user.uid), {
+        displayName: user.name,
+        phoneNumber: user.phone,
+        location: user.location,
+        bio: user.bio,
+        updatedAt: new Date()
+      });
+
+      notifications.add({
+        type: 'success',
+        message: 'Profile updated successfully!',
+        timeout: 3000
+      });
+
+      editing = false;
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      notifications.add({
+        type: 'error',
+        message: 'Failed to save profile changes',
+        timeout: 5000
+      });
+    } finally {
+      saving = false;
+    }
+  }
+
+  function handlePhotoUploaded(event) {
+    user.avatar = event.detail.photoURL;
+    // Trigger reactivity
+    user = { ...user };
+  }
+
+  function handlePhotoDeleted() {
+    user.avatar = '';
+    // Trigger reactivity
+    user = { ...user };
+  }
 </script>
 
 <svelte:head>
@@ -26,21 +141,52 @@
         <h1 class="text-2xl font-bold text-white">Profile Settings</h1>
         <p class="text-gray-300 mt-1">Manage your account information and preferences</p>
       </div>
-      <button
-        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-        on:click={() => editing = !editing}
-      >
-        {editing ? 'Save Changes' : 'Edit Profile'}
-      </button>
+      {#if editing}
+        <div class="flex space-x-3">
+          <button
+            class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+            on:click={() => editing = false}
+            disabled={saving}
+          >
+            Cancel
+          </button>
+          <button
+            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
+            on:click={saveProfile}
+            disabled={saving}
+          >
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
+      {:else}
+        <button
+          class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+          on:click={() => editing = true}
+        >
+          Edit Profile
+        </button>
+      {/if}
     </div>
   </div>
 
   <!-- Profile Overview -->
   <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6">
-    <div class="flex items-center space-x-6">
-      <div class="flex-shrink-0">
-        <img class="h-24 w-24 rounded-full border-4 border-white/20" src="{user.avatar}" alt="{user.name}" />
+    {#if loading}
+      <div class="flex items-center justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
+        <span class="ml-3 text-gray-300">Loading profile...</span>
       </div>
+    {:else}
+      <div class="flex items-center space-x-6">
+        <div class="flex-shrink-0">
+          <ProfilePhotoUploader
+            currentPhotoURL={user.avatar}
+            userName={user.name}
+            size="large"
+            on:uploaded={handlePhotoUploaded}
+            on:deleted={handlePhotoDeleted}
+          />
+        </div>
       <div class="flex-1">
         <div class="flex items-center space-x-2">
           <h2 class="text-2xl font-bold text-white">{user.name}</h2>
@@ -57,13 +203,15 @@
         <p class="text-gray-400 text-sm">Member since {user.memberSince}</p>
       </div>
     </div>
+    {/if}
   </div>
 
   <!-- Profile Details -->
-  <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-    <div class="px-6 py-4 border-b border-white/20">
-      <h2 class="text-lg font-medium text-white">Personal Information</h2>
-    </div>
+  {#if !loading}
+    <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+      <div class="px-6 py-4 border-b border-white/20">
+        <h2 class="text-lg font-medium text-white">Personal Information</h2>
+      </div>
     <div class="p-6 space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
@@ -163,4 +311,5 @@
       </div>
     </div>
   </div>
+  {/if}
 </div>
