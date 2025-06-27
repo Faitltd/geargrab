@@ -5,31 +5,48 @@ export const GET: RequestHandler = async () => {
   try {
     // Check search functionality
     const isDevelopment = process.env.NODE_ENV === 'development';
-    
-    // Test search service availability
-    try {
-      const testResponse = await fetch('/api/search?q=test&limit=1');
-      const searchWorking = testResponse.ok;
-      
-      return json({
-        success: true,
-        message: 'Search system operational',
-        service: searchWorking ? 'Firestore' : 'Mock',
-        collections: ['listings'],
-        features: [
-          'Text search',
-          'Category filtering',
-          'Price range filtering',
-          'Location filtering',
-          'Sorting options',
-          'Pagination'
-        ],
-        configuration: {
-          isDevelopment,
-          usingMockData: !searchWorking || isDevelopment
-        },
-        timestamp: new Date().toISOString()
-      });
+    const hasFirebaseAdmin = !!(process.env.FIREBASE_ADMIN_CLIENT_EMAIL && process.env.FIREBASE_ADMIN_PRIVATE_KEY);
+
+    // Determine search service status
+    let searchService = 'Mock';
+    let searchWorking = false;
+    let statusMessage = 'Using fallback search';
+
+    if (hasFirebaseAdmin && !isDevelopment) {
+      // Test search service availability
+      try {
+        const testResponse = await fetch('/api/search/listings?q=test&limit=1');
+        searchWorking = testResponse.ok;
+        if (searchWorking) {
+          searchService = 'Firestore';
+          statusMessage = 'Search system operational';
+        }
+      } catch (error) {
+        console.log('Search test failed:', error.message);
+      }
+    }
+
+    return json({
+      success: true,
+      message: statusMessage,
+      service: searchService,
+      collections: ['listings'],
+      features: [
+        'Text search',
+        'Category filtering',
+        'Price range filtering',
+        'Location filtering',
+        'Sorting options',
+        'Pagination'
+      ],
+      configuration: {
+        isDevelopment,
+        hasFirebaseAdmin,
+        usingMockData: !searchWorking || isDevelopment,
+        realSearchConfigured: hasFirebaseAdmin && !isDevelopment
+      },
+      timestamp: new Date().toISOString()
+    });
       
     } catch (searchError) {
       return json({
