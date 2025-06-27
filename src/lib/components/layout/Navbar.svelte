@@ -207,6 +207,19 @@
                 <a href="/list-gear" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   List Gear
                 </a>
+                <a href="/sell-gear" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  Sell Gear
+                </a>
+                <a href="/browse-sales" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  Browse Sales
+                </a>
+                <div class="border-t border-white/20 my-1"></div>
+                <a href="/browse-guides" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  Browse Guides
+                </a>
+                <a href="/become-guide" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  Become a Guide
+                </a>
                 <a href="/how-it-works" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   How It Works
                 </a>
@@ -311,6 +324,18 @@
         </a>
         <a href="/list-gear" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           List Gear
+        </a>
+        <a href="/sell-gear" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+          Sell Gear
+        </a>
+        <a href="/browse-sales" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+          Browse Sales
+        </a>
+        <a href="/browse-guides" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+          Browse Guides
+        </a>
+        <a href="/become-guide" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+          Become a Guide
         </a>
         <a href="/how-it-works" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           How It Works

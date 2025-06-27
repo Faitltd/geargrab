@@ -28,7 +28,7 @@
 
 <div class="space-y-8">
   <!-- Dashboard Overview -->
-  <ScrollLinkedSequential animation="fade-up" baseDelay="{0.1}" incrementDelay="{0.15}" className="grid grid-cols-1 md:grid-cols-3 gap-6" startOffset="{0}" endOffset="{0.6}">
+  <ScrollLinkedSequential animation="fade-up" baseDelay="{0.1}" incrementDelay="{0.15}" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" startOffset="{0}" endOffset="{0.6}">
       <!-- Active Bookings Card -->
       <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 shadow-lg hover:bg-white/20 transition-all duration-300">
         <div class="flex items-center">
@@ -70,6 +70,50 @@
         </div>
         <div class="mt-4">
           <a href="/dashboard/owner" class="text-green-400 hover:text-green-300 text-sm font-medium drop-shadow-lg">View all listings →</a>
+        </div>
+      </div>
+
+      <!-- Active Sales Card -->
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 shadow-lg hover:bg-white/20 transition-all duration-300">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-12 h-12 bg-blue-500/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-blue-500/30 shadow-lg">
+              <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-300 truncate drop-shadow-lg">Active Sales</dt>
+              <dd class="text-2xl font-bold text-white drop-shadow-lg">1</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="mt-4">
+          <a href="/dashboard/sales" class="text-blue-400 hover:text-blue-300 text-sm font-medium drop-shadow-lg">View all sales →</a>
+        </div>
+      </div>
+
+      <!-- Guide Profiles Card -->
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 shadow-lg hover:bg-white/20 transition-all duration-300">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-12 h-12 bg-purple-500/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-purple-500/30 shadow-lg">
+              <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-300 truncate drop-shadow-lg">Guide Profiles</dt>
+              <dd class="text-2xl font-bold text-white drop-shadow-lg">0</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="mt-4">
+          <a href="/dashboard/guides" class="text-purple-400 hover:text-purple-300 text-sm font-medium drop-shadow-lg">View guide profiles →</a>
         </div>
       </div>
 
@@ -157,7 +201,7 @@
         <h2 class="text-lg font-medium text-white drop-shadow-lg">Quick Actions</h2>
       </div>
       <div class="p-6">
-        <ScrollLinkedSequential animation="fade-up" baseDelay="{0.1}" incrementDelay="{0.1}" className="grid grid-cols-1 md:grid-cols-3 gap-4" startOffset="{0.1}" endOffset="{0.8}">
+        <ScrollLinkedSequential animation="fade-up" baseDelay="{0.1}" incrementDelay="{0.1}" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4" startOffset="{0.1}" endOffset="{0.8}">
           <button
             class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 inline-flex items-center justify-center shadow-lg hover:transform hover:scale-105"
             on:click="{goToCreateListing}"
@@ -167,6 +211,18 @@
             </svg>
             List New Gear
           </button>
+          <a href="/sell-gear" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 inline-flex items-center justify-center shadow-lg hover:transform hover:scale-105">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            </svg>
+            Sell Gear
+          </a>
+          <a href="/become-guide" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 inline-flex items-center justify-center shadow-lg hover:transform hover:scale-105">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+            Become Guide
+          </a>
           <a href="/browse" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 inline-flex items-center justify-center shadow-lg hover:transform hover:scale-105">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>

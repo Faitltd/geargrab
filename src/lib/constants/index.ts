@@ -10,6 +10,10 @@ export const ROUTES = {
   HOME: '/',
   SEARCH: '/search',
   LIST_GEAR: '/list-gear',
+  SELL_GEAR: '/sell-gear',
+  BROWSE_SALES: '/browse-sales',
+  BECOME_GUIDE: '/become-guide',
+  BROWSE_GUIDES: '/browse-guides',
   DASHBOARD: '/dashboard',
   PROFILE: '/profile',
   LOGIN: '/auth/login',
@@ -83,6 +87,82 @@ export const CANCELLATION_POLICIES = [
   { value: 'strict', label: 'Strict', description: 'Full refund 14 days before' }
 ] as const;
 
+// Sale Statuses
+export const SALE_STATUSES = [
+  'active',
+  'sold',
+  'inactive',
+  'pending'
+] as const;
+
+// Sale Purchase Statuses
+export const SALE_PURCHASE_STATUSES = [
+  'pending',
+  'confirmed',
+  'shipped',
+  'delivered',
+  'completed',
+  'cancelled'
+] as const;
+
+// Sale Delivery Methods
+export const SALE_DELIVERY_METHODS = [
+  { value: 'pickup', label: 'Pickup', description: 'Pick up from seller location' },
+  { value: 'shipping', label: 'Shipping', description: 'Shipped via carrier' },
+  { value: 'local_delivery', label: 'Local Delivery', description: 'Seller delivers locally' }
+] as const;
+
+// Guide Specialties
+export const GUIDE_SPECIALTIES = [
+  { id: 'rock-climbing', name: 'Rock Climbing', icon: '🧗' },
+  { id: 'mountaineering', name: 'Mountaineering', icon: '⛰️' },
+  { id: 'hiking', name: 'Hiking & Backpacking', icon: '🥾' },
+  { id: 'skiing', name: 'Skiing & Snowboarding', icon: '⛷️' },
+  { id: 'kayaking', name: 'Kayaking & Canoeing', icon: '🛶' },
+  { id: 'surfing', name: 'Surfing', icon: '🏄' },
+  { id: 'mountain-biking', name: 'Mountain Biking', icon: '🚵' },
+  { id: 'photography', name: 'Outdoor Photography', icon: '📸' },
+  { id: 'fishing', name: 'Fishing & Fly Fishing', icon: '🎣' },
+  { id: 'camping', name: 'Camping & Survival', icon: '⛺' },
+  { id: 'wildlife', name: 'Wildlife Watching', icon: '🦅' },
+  { id: 'navigation', name: 'Navigation & Orienteering', icon: '🧭' }
+] as const;
+
+// Guide Service Types
+export const GUIDE_SERVICE_TYPES = [
+  { value: 'instruction', label: 'Instruction', description: 'Learn new skills and techniques' },
+  { value: 'guided_tour', label: 'Guided Tour', description: 'Explore with an expert guide' },
+  { value: 'consultation', label: 'Consultation', description: 'Get expert advice and planning' },
+  { value: 'equipment_demo', label: 'Equipment Demo', description: 'Learn about gear and equipment' },
+  { value: 'custom', label: 'Custom Service', description: 'Tailored to your specific needs' }
+] as const;
+
+// Guide Skill Levels
+export const GUIDE_SKILL_LEVELS = [
+  { value: 'beginner', label: 'Beginner', description: 'New to the activity' },
+  { value: 'intermediate', label: 'Intermediate', description: 'Some experience' },
+  { value: 'advanced', label: 'Advanced', description: 'Experienced and skilled' },
+  { value: 'mixed', label: 'Mixed Group', description: 'Various skill levels' }
+] as const;
+
+// Guide Booking Statuses
+export const GUIDE_BOOKING_STATUSES = [
+  'pending',
+  'confirmed',
+  'in_progress',
+  'completed',
+  'cancelled',
+  'no_show'
+] as const;
+
+// Guide Statuses
+export const GUIDE_STATUSES = [
+  'active',
+  'inactive',
+  'pending',
+  'suspended'
+] as const;
+
 // Validation Rules
 export const VALIDATION_RULES = {
   EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -138,6 +218,16 @@ export const SUCCESS_MESSAGES = {
   LISTING_CREATED: 'Your gear has been listed successfully!',
   LISTING_UPDATED: 'Listing updated successfully!',
   LISTING_DELETED: 'Listing deleted successfully!',
+  SALE_CREATED: 'Your gear has been listed for sale successfully!',
+  SALE_UPDATED: 'Sale listing updated successfully!',
+  SALE_DELETED: 'Sale listing deleted successfully!',
+  SALE_PURCHASED: 'Purchase completed successfully!',
+  GUIDE_PROFILE_CREATED: 'Your guide profile has been created successfully!',
+  GUIDE_PROFILE_UPDATED: 'Guide profile updated successfully!',
+  GUIDE_PROFILE_DELETED: 'Guide profile deleted successfully!',
+  GUIDE_BOOKING_CREATED: 'Guide booking request sent successfully!',
+  GUIDE_BOOKING_CONFIRMED: 'Guide booking confirmed!',
+  GUIDE_BOOKING_CANCELLED: 'Guide booking cancelled successfully!',
   BOOKING_CREATED: 'Booking request sent successfully!',
   BOOKING_CONFIRMED: 'Booking confirmed!',
   BOOKING_CANCELLED: 'Booking cancelled successfully!',
@@ -173,3 +263,11 @@ export type PaymentStatus = typeof PAYMENT_STATUSES[number];
 export type DeliveryMethod = typeof DELIVERY_METHODS[number]['value'];
 export type InsuranceTier = typeof INSURANCE_TIERS[number]['value'];
 export type CancellationPolicy = typeof CANCELLATION_POLICIES[number]['value'];
+export type SaleStatus = typeof SALE_STATUSES[number];
+export type SalePurchaseStatus = typeof SALE_PURCHASE_STATUSES[number];
+export type SaleDeliveryMethod = typeof SALE_DELIVERY_METHODS[number]['value'];
+export type GuideSpecialty = typeof GUIDE_SPECIALTIES[number]['id'];
+export type GuideServiceType = typeof GUIDE_SERVICE_TYPES[number]['value'];
+export type GuideSkillLevel = typeof GUIDE_SKILL_LEVELS[number]['value'];
+export type GuideBookingStatus = typeof GUIDE_BOOKING_STATUSES[number];
+export type GuideStatus = typeof GUIDE_STATUSES[number];

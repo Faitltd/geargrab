@@ -63,6 +63,8 @@
   const tabs = [
     { id: 'overview', label: 'Overview', href: '/dashboard' },
     { id: 'owner', label: 'My Listings', href: '/dashboard/owner' },
+    { id: 'sales', label: 'My Sales', href: '/dashboard/sales' },
+    { id: 'guides', label: 'My Guides', href: '/dashboard/guides' },
     { id: 'renter', label: 'My Bookings', href: '/dashboard/renter' },
     { id: 'messages', label: 'Messages', href: '/dashboard/messages' },
     { id: 'profile', label: 'Profile', href: '/dashboard/profile' }

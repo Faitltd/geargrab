@@ -135,6 +135,169 @@ export interface Conversation {
   unreadCount: Record<string, number>;
   bookingId?: string;
   listingId?: string;
+  saleId?: string;
+  guideBookingId?: string;
+  guideId?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
+}
+
+export interface Sale {
+  id: string;
+  sellerId: string;
+  sellerUid: string; // Legacy compatibility
+  title: string;
+  description: string;
+  category: string;
+  condition: string;
+  brand?: string;
+  model?: string;
+  price: number;
+  originalPrice?: number;
+  location: {
+    city: string;
+    state: string;
+    zipCode: string;
+  };
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
+  deliveryOptions?: {
+    pickup: boolean;
+    shipping: boolean;
+    localDelivery: boolean;
+    shippingFee?: number;
+    localDeliveryFee?: number;
+  };
+  images: string[];
+  features: string[];
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  isActive: boolean;
+  isSold: boolean;
+  views?: number;
+  favoritesCount?: number;
+  avgRating?: number;
+  averageRating?: number; // For component compatibility
+  status: 'active' | 'sold' | 'inactive' | 'pending';
+}
+
+export interface SalePurchase {
+  id: string;
+  saleId: string;
+  saleTitle: string;
+  saleImage: string;
+  sellerId: string;
+  sellerUid: string; // Legacy compatibility
+  buyerId: string;
+  buyerUid: string; // Legacy compatibility
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'completed' | 'cancelled';
+  totalPrice: number;
+  paymentStatus: 'pending' | 'paid' | 'refunded';
+  paymentIntentId?: string;
+  deliveryMethod: 'pickup' | 'shipping' | 'local_delivery';
+  deliveryDetails?: any;
+  shippingAddress?: {
+    name: string;
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
+  trackingNumber?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  paidAt?: Timestamp;
+  shippedAt?: Timestamp;
+  deliveredAt?: Timestamp;
+  sellerReviewed?: boolean;
+  buyerReviewed?: boolean;
+}
+
+export interface Guide {
+  id: string;
+  guideId: string;
+  guideUid: string; // Legacy compatibility
+  displayName: string;
+  bio: string;
+  specialties: string[];
+  certifications: string[];
+  experience: string; // e.g., "5+ years"
+  hourlyRate: number;
+  dayRate?: number;
+  location: {
+    city: string;
+    state: string;
+    zipCode: string;
+  };
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
+  serviceArea: {
+    radius: number; // miles
+    travelFee?: number;
+  };
+  availability: {
+    daysOfWeek: string[]; // ['monday', 'tuesday', etc.]
+    timeSlots: string[]; // ['morning', 'afternoon', 'evening']
+    advanceBooking: number; // minimum days in advance
+  };
+  images: string[];
+  languages: string[];
+  equipment?: string[]; // equipment they provide
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  isActive: boolean;
+  isVerified: boolean;
+  totalBookings?: number;
+  avgRating?: number;
+  averageRating?: number; // For component compatibility
+  reviewCount?: number;
+  responseTime?: string; // e.g., "within 2 hours"
+  status: 'active' | 'inactive' | 'pending' | 'suspended';
+}
+
+export interface GuideBooking {
+  id: string;
+  guideId: string;
+  guideName: string;
+  guideImage: string;
+  guideUid: string; // Legacy compatibility
+  clientId: string;
+  clientUid: string; // Legacy compatibility
+  serviceDate: Timestamp;
+  startTime: string;
+  endTime: string;
+  duration: number; // hours
+  serviceType: 'instruction' | 'guided_tour' | 'consultation' | 'equipment_demo' | 'custom';
+  specialty: string;
+  location: {
+    type: 'guide_location' | 'client_location' | 'meet_point';
+    address?: string;
+    coordinates?: {
+      latitude: number;
+      longitude: number;
+    };
+    details?: string;
+  };
+  groupSize: number;
+  skillLevel: 'beginner' | 'intermediate' | 'advanced' | 'mixed';
+  specialRequests?: string;
+  status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
+  totalPrice: number;
+  hourlyRate: number;
+  travelFee?: number;
+  paymentStatus: 'pending' | 'paid' | 'refunded';
+  paymentIntentId?: string;
+  cancellationPolicy?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  confirmedAt?: Timestamp;
+  completedAt?: Timestamp;
+  paidAt?: Timestamp;
+  guideReviewed?: boolean;
+  clientReviewed?: boolean;
 }
