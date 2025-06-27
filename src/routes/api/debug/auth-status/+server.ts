@@ -6,11 +6,14 @@ export const GET: RequestHandler = async ({ locals, cookies }) => {
   try {
     const sessionCookie = cookies.get('__session');
     const sessionId = cookies.get('__session_id');
-    
+    const testSessionCookie = cookies.get('__session_test');
+
     const authStatus = {
       hasSessionCookie: !!sessionCookie,
       hasSessionId: !!sessionId,
+      hasTestSessionCookie: !!testSessionCookie,
       sessionCookieLength: sessionCookie?.length || 0,
+      testSessionCookieLength: testSessionCookie?.length || 0,
       localsUserId: locals.userId,
       localsUser: locals.user,
       firebaseAdminAvailable: isFirebaseAdminAvailable(),
@@ -39,7 +42,8 @@ export const GET: RequestHandler = async ({ locals, cookies }) => {
       adminStatus,
       cookies: {
         sessionCookie: sessionCookie ? `${sessionCookie.substring(0, 20)}...` : null,
-        sessionId
+        sessionId,
+        testSessionCookie: testSessionCookie ? `${testSessionCookie.substring(0, 50)}...` : null
       }
     });
 
