@@ -230,11 +230,22 @@
   <div class="results-section relative z-20 bg-gradient-to-b from-transparent to-gray-900/80 px-2 py-8">
     <!-- Filter Bar -->
     <div class="mb-8 relative z-10">
-      <FilterBar
-        selectedCategory="{category}"
-        selectedSort="{sort}"
-        on:filter="{handleFilterChange}"
-      />
+      <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <FilterBar
+          selectedCategory="{category}"
+          selectedSort="{sort}"
+          on:filter="{handleFilterChange}"
+        />
+
+        <!-- Map Search Link -->
+        <a
+          href="/search/map"
+          class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap"
+        >
+          <span>🗺️</span>
+          <span>Map Search</span>
+        </a>
+      </div>
     </div>
 
     <!-- Results Header -->

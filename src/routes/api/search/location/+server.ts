@@ -37,8 +37,18 @@ export const GET: RequestHandler = async ({ url }) => {
     const limit = parseInt(url.searchParams.get('limit') || '50');
 
     // Validate required parameters
-    if (!lat || !lng) {
-      return json({ error: 'Latitude and longitude are required' }, { status: 400 });
+    if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+      return json({ error: 'Valid latitude and longitude are required' }, { status: 400 });
+    }
+
+    // Validate coordinate ranges
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      return json({ error: 'Invalid coordinate values' }, { status: 400 });
+    }
+
+    // Validate radius
+    if (radius < 0 || radius > 1000) {
+      return json({ error: 'Radius must be between 0 and 1000 km' }, { status: 400 });
     }
 
     console.log(`🔍 Location search: ${lat}, ${lng} within ${radius}km`);
@@ -61,18 +71,39 @@ export const GET: RequestHandler = async ({ url }) => {
       query = query.where('dailyPrice', '<=', priceMax);
     }
 
-    // Execute query
-    const snapshot = await query.limit(limit * 2).get(); // Get more to filter by distance
+    // Execute query with error handling
+    let snapshot;
+    try {
+      snapshot = await query.limit(Math.min(limit * 3, 500)).get(); // Get more to filter by distance, but cap at 500
+    } catch (firestoreError) {
+      console.error('Firestore query error:', firestoreError);
+      return json({ error: 'Database query failed' }, { status: 500 });
+    }
 
     const results = [];
     const userLocation = { lat, lng };
+    let processedCount = 0;
 
     // Process results and calculate distances
     for (const doc of snapshot.docs) {
+      processedCount++;
+
+      // Prevent processing too many documents for performance
+      if (processedCount > 1000) {
+        console.warn('Processed maximum documents limit (1000)');
+        break;
+      }
+
       const data = doc.data();
-      
-      // Skip if no location data
-      if (!data.location?.lat || !data.location?.lng) {
+
+      // Skip if no location data or invalid coordinates
+      if (!data.location?.lat || !data.location?.lng ||
+          isNaN(data.location.lat) || isNaN(data.location.lng)) {
+        continue;
+      }
+
+      // Skip inactive listings
+      if (data.status !== 'active' || data.isActive !== true) {
         continue;
       }
 

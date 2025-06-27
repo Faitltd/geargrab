@@ -3,7 +3,9 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { searchService, GEAR_CATEGORIES, GEAR_FEATURES, type SearchFilters, type SearchResult } from '$lib/services/search';
+  import { locationSearchService, userLocation } from '$lib/services/location-search';
   import VideoBackground from '$lib/components/layout/video-background.svelte';
+  import InteractiveMap from '$lib/components/search/interactive-map.svelte';
   // import Checkbox from '$lib/components/ui/checkbox.svelte'; // Temporarily disabled for deployment
   import UniverseCard from '$lib/components/cards/universe-card.svelte';
 
@@ -11,6 +13,7 @@
   let results: SearchResult[] = [];
   let loading = false;
   let showFilters = false;
+  let showMapView = false;
   let totalCount = 0;
   let hasMore = false;
 
@@ -138,16 +141,28 @@
           </form>
         </div>
 
-        <!-- Filter Toggle -->
-        <button
-          class="px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white transition-colors flex items-center space-x-2"
-          on:click={() => showFilters = !showFilters}
-        >
-          <span>Filters</span>
-          <svg class="w-4 h-4 transform {showFilters ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </button>
+        <!-- View Toggle Buttons -->
+        <div class="flex space-x-2">
+          <!-- Map View Toggle -->
+          <button
+            class="px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white transition-colors flex items-center space-x-2"
+            on:click={() => showMapView = !showMapView}
+          >
+            <span>{showMapView ? '📋' : '🗺️'}</span>
+            <span>{showMapView ? 'List' : 'Map'}</span>
+          </button>
+
+          <!-- Filter Toggle -->
+          <button
+            class="px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white transition-colors flex items-center space-x-2"
+            on:click={() => showFilters = !showFilters}
+          >
+            <span>Filters</span>
+            <svg class="w-4 h-4 transform {showFilters ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- Results Summary -->
@@ -290,7 +305,36 @@
             <p class="mt-1 text-gray-300">Try adjusting your search or filters</p>
           </div>
         </div>
+      {:else if showMapView}
+        <!-- Map View -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-4">
+          <div class="h-[600px] rounded-lg overflow-hidden">
+            <InteractiveMap
+              searchResults={results.map(r => ({
+                ...r,
+                location: r.location || { lat: 0, lng: 0, city: '', state: '', address: '' },
+                distance: r.distance || 0,
+                owner: r.owner || { name: 'Unknown', rating: 0, avatar: null },
+                totalReviews: r.totalReviews || 0
+              }))}
+              center={$userLocation}
+              zoom={10}
+              onMarkerClick={(result) => handleCardClick(result)}
+            />
+          </div>
+
+          <!-- Map View Actions -->
+          <div class="mt-4 text-center">
+            <a
+              href="/search/map?q={encodeURIComponent(searchQuery)}"
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors inline-block"
+            >
+              Open Full Map Search
+            </a>
+          </div>
+        </div>
       {:else}
+        <!-- List View -->
         <div class="flex flex-wrap justify-center gap-6">
           {#each results as item}
             <UniverseCard listing={item} onClick={() => handleCardClick(item)} width="220px" height="280px" />
