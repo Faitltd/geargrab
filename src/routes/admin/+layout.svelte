@@ -46,7 +46,7 @@
           message: 'Please log in to access admin features.',
           timeout: 5000
         });
-        goto('/auth/login?redirectTo=/admin');
+        goto('/admin/login?redirectTo=/admin');
         return;
       }
 

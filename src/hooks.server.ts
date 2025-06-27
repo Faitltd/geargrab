@@ -8,11 +8,13 @@ export const handle: Handle = async ({ event, resolve }) => {
   event.locals.user = null;
   event.locals.userId = null;
 
-  // Extract session cookie
+  // Extract session cookies
   const sessionCookie = event.cookies.get('__session');
+  const testSessionCookie = event.cookies.get('__session_test');
 
   // Check if Firebase Admin is available
   if (isFirebaseAdminAvailable()) {
+    // Try regular session cookie first
     if (sessionCookie) {
       try {
         // Verify the session cookie
@@ -36,6 +38,33 @@ export const handle: Handle = async ({ event, resolve }) => {
           console.warn('Invalid session cookie:', error.message);
         }
         event.cookies.delete('__session', { path: '/' });
+      }
+    }
+
+    // Try test session cookie if regular session failed
+    if (!event.locals.userId && testSessionCookie) {
+      try {
+        const sessionData = JSON.parse(testSessionCookie);
+
+        // Check if session is still valid
+        if (sessionData.exp > Math.floor(Date.now() / 1000)) {
+          event.locals.userId = sessionData.uid;
+          event.locals.user = {
+            uid: sessionData.uid,
+            email: sessionData.email,
+            emailVerified: true,
+            displayName: 'Admin User (Test)',
+            photoURL: null
+          };
+
+          console.log(`✅ Test authenticated user: ${sessionData.email} (${sessionData.uid})`);
+        } else {
+          // Expired test session
+          event.cookies.delete('__session_test', { path: '/' });
+        }
+      } catch (error) {
+        console.warn('Invalid test session cookie:', error.message);
+        event.cookies.delete('__session_test', { path: '/' });
       }
     }
   } else {
