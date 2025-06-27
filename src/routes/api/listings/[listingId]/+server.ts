@@ -1,8 +1,28 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { adminFirestore, isFirebaseAdminAvailable } from '$lib/firebase/server';
-import { isCurrentUserAdmin } from '$lib/auth/admin';
 import type { Listing } from '$types/firestore';
+
+// Server-side admin check function
+async function isUserAdminServer(userId: string): Promise<boolean> {
+  try {
+    if (!isFirebaseAdminAvailable() || !adminFirestore) {
+      return false;
+    }
+
+    // Check admin collection in Firestore using server-side Firebase
+    const adminDoc = await adminFirestore.collection('adminUsers').doc(userId).get();
+    if (adminDoc.exists) {
+      const adminData = adminDoc.data();
+      return adminData?.isAdmin === true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Error checking admin status:', error);
+    return false;
+  }
+}
 
 // Get a specific listing by ID
 export const GET: RequestHandler = async ({ params }) => {
@@ -121,7 +141,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
     const existingListing = existingDoc.data();
 
     // Check if user is admin or owns the listing
-    const isAdmin = await isCurrentUserAdmin(locals.userId);
+    const isAdmin = await isUserAdminServer(locals.userId);
     const isOwner = existingListing?.ownerUid === locals.userId;
 
     if (!isAdmin && !isOwner) {

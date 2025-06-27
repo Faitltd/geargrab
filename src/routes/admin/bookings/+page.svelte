@@ -29,23 +29,24 @@
   async function loadBookings() {
     try {
       loading = true;
-      const bookingsRef = collection(firestore, 'bookings');
-      const bookingsSnap = await getDocs(query(bookingsRef, orderBy('createdAt', 'desc')));
-      
-      bookings = bookingsSnap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-        startDate: doc.data().startDate?.toDate() || new Date(),
-        endDate: doc.data().endDate?.toDate() || new Date()
-      }));
-      
+
+      // Load bookings using API endpoint
+      const response = await fetch(`/api/admin/bookings?status=${statusFilter}&limit=100`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to load bookings');
+      }
+
+      const data = await response.json();
+      bookings = data.bookings || [];
       filterBookings();
+
     } catch (error) {
       console.error('Error loading bookings:', error);
       notifications.add({
         type: 'error',
-        message: 'Failed to load bookings',
+        message: error.message || 'Failed to load bookings',
         timeout: 5000
       });
     } finally {
@@ -74,25 +75,34 @@
 
   async function updateBookingStatus(bookingId: string, newStatus: string) {
     try {
-      const bookingRef = doc(firestore, 'bookings', bookingId);
-      await updateDoc(bookingRef, { 
-        status: newStatus,
-        updatedAt: new Date(),
-        adminUpdated: true
+      const response = await fetch('/api/admin/bookings', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          bookingId,
+          status: newStatus
+        })
       });
-      
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update booking');
+      }
+
       notifications.add({
         type: 'success',
         message: `Booking ${newStatus} successfully`,
         timeout: 3000
       });
-      
+
       await loadBookings();
     } catch (error) {
       console.error('Error updating booking:', error);
       notifications.add({
         type: 'error',
-        message: 'Failed to update booking',
+        message: error.message || 'Failed to update booking',
         timeout: 5000
       });
     }

@@ -31,49 +31,17 @@
   async function loadConversations() {
     try {
       loading = true;
-      
-      // Load messages/conversations
-      const messagesRef = collection(firestore, 'messages');
-      const messagesSnap = await getDocs(query(messagesRef, orderBy('createdAt', 'desc')));
-      
-      // Group messages by conversation
-      const conversationMap = new Map();
-      
-      messagesSnap.docs.forEach(doc => {
-        const message = {
-          id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt?.toDate() || new Date()
-        };
-        
-        // Create conversation ID from participants
-        const participants = message.participants || [];
-        const conversationId = participants.sort().join('_');
-        
-        if (!conversationMap.has(conversationId)) {
-          conversationMap.set(conversationId, {
-            id: conversationId,
-            participants: participants,
-            messages: [],
-            lastMessage: message,
-            lastActivity: message.createdAt,
-            status: message.flagged ? 'flagged' : 'active',
-            messageCount: 0
-          });
-        }
-        
-        const conversation = conversationMap.get(conversationId);
-        conversation.messages.push(message);
-        conversation.messageCount++;
-        
-        if (message.createdAt > conversation.lastActivity) {
-          conversation.lastMessage = message;
-          conversation.lastActivity = message.createdAt;
-        }
-      });
-      
-      conversations = Array.from(conversationMap.values());
-      filterConversations();
+
+      // Load messages/conversations using API endpoint
+      const response = await fetch(`/api/admin/messages?status=${statusFilter}&limit=100`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to load messages');
+      }
+
+      const data = await response.json();
+      conversations = data.conversations || [];
       
     } catch (error) {
       console.error('Error loading conversations:', error);
