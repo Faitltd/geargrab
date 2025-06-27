@@ -12,6 +12,10 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    function isAdmin() {
+      return isAuthenticated() && get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.isAdmin == true;
+    }
+
     function isValidString(field, minLen, maxLen) {
       return field is string && field.size() >= minLen && field.size() <= maxLen;
     }
@@ -26,15 +30,16 @@ service cloud.firestore {
 
     // Users collection - strict validation
     match /users/{userId} {
-      allow read: if isOwner(userId);
+      allow read: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId) &&
         isValidString(request.resource.data.name, 2, 50) &&
         isValidEmail(request.resource.data.email) &&
         request.resource.data.keys().hasAll(['name', 'email', 'createdAt']) &&
         request.resource.data.keys().hasOnly(['name', 'email', 'phone', 'bio', 'avatar', 'createdAt', 'updatedAt']);
-      allow update: if isOwner(userId) &&
+      allow update: if (isOwner(userId) || isAdmin()) &&
         (!('email' in request.resource.data.diff(resource.data).affectedKeys())) && // Prevent email changes
         request.resource.data.updatedAt == request.time;
+      allow delete: if isAdmin();
     }
 
     // Private user data
@@ -57,9 +62,10 @@ service cloud.firestore {
         request.auth.uid == request.resource.data.ownerUid;
 
       allow update: if isAuthenticated() &&
-        request.auth.uid == resource.data.ownerUid;
+        (request.auth.uid == resource.data.ownerUid || isAdmin());
 
-      allow delete: if isAuthenticated() && request.auth.uid == resource.data.ownerUid;
+      allow delete: if isAuthenticated() &&
+        (request.auth.uid == resource.data.ownerUid || isAdmin());
     }
 
     // Bookings - strict access control

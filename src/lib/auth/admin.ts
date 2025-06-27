@@ -62,7 +62,7 @@ export async function isUserAdmin(uid: string, email?: string): Promise<boolean>
     }
 
     // Check admin collection in Firestore
-    const adminDoc = await getDoc(doc(firestore, 'admins', uid));
+    const adminDoc = await getDoc(doc(firestore, 'adminUsers', uid));
     if (adminDoc.exists()) {
       const adminData = adminDoc.data();
       return adminData.isAdmin === true;
@@ -80,7 +80,7 @@ export async function isUserAdmin(uid: string, email?: string): Promise<boolean>
  */
 export async function getAdminUser(uid: string): Promise<AdminUser | null> {
   try {
-    const adminDoc = await getDoc(doc(firestore, 'admins', uid));
+    const adminDoc = await getDoc(doc(firestore, 'adminUsers', uid));
     if (adminDoc.exists()) {
       return adminDoc.data() as AdminUser;
     }
@@ -104,7 +104,7 @@ export async function setUserAsAdmin(uid: string, email: string, adminLevel: 'su
       permissions: getPermissionsForLevel(adminLevel)
     };
 
-    await setDoc(doc(firestore, 'admins', uid), adminData);
+    await setDoc(doc(firestore, 'adminUsers', uid), adminData);
     console.log('✅ User set as admin:', email);
   } catch (error) {
     console.error('Error setting user as admin:', error);

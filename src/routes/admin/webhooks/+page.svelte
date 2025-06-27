@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { authStore } from '$lib/stores/auth';
-  import { isCurrentUserAdmin } from '$lib/firebase/auth';
+  import { simpleAuth } from '$lib/auth/simple-auth';
+  import { isCurrentUserAdmin, initializeAdminUser } from '$lib/auth/admin';
   import { notifications } from '$lib/stores/notifications';
   import { goto } from '$app/navigation';
 
@@ -24,24 +24,34 @@
 
   onMount(async () => {
     try {
-      if (!$authStore.user) {
-          goto("/auth/login?redirectTo=/admin/webhooks");
+      // Wait for auth to be ready
+      await simpleAuth.waitForAuthReady();
+
+      if (!simpleAuth.user) {
+        goto('/auth/login?redirectTo=/admin/webhooks');
         return;
       }
 
+      // Initialize admin user if needed
+      await initializeAdminUser();
+
+      // Check admin status
       isAdmin = await isCurrentUserAdmin();
       if (!isAdmin) {
-        goto('/dashboard');
+        console.warn('🚫 User is not admin:', simpleAuth.user.email);
+        goto('/?error=admin_required');
         return;
       }
+
+      console.log('✅ Admin access granted for webhook testing:', simpleAuth.user.email);
 
       // Set default values
       webhookTest.paymentIntentId = 'pi_test_example_payment_intent_id';
-      webhookTest.metadata.userId = $authStore.user.uid;
-      
+      webhookTest.metadata.userId = simpleAuth.user.uid;
+
     } catch (error) {
-      console.error('Error checking admin status:', error);
-      goto('/dashboard');
+      console.error('Error checking admin access:', error);
+      goto('/?error=admin_check_failed');
     } finally {
       loading = false;
     }

@@ -60,7 +60,7 @@ async function main() {
       console.log(`\n🔄 Setting up admin for UID: ${userUid.trim()}`);
       
       // Create admin document
-      const adminRef = doc(db, 'admins', userUid.trim());
+      const adminRef = doc(db, 'adminUsers', userUid.trim());
       await setDoc(adminRef, {
         uid: userUid.trim(),
         email: adminEmail.toLowerCase(),

@@ -3,6 +3,7 @@
 
   let loading = true;
   let timeRange = '30d';
+  let lastUpdated = '';
   let analytics = {
     overview: {
       totalUsers: 1247,
@@ -51,12 +52,51 @@
   async function loadAnalytics() {
     try {
       loading = true;
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // In a real app, this would fetch from your analytics service
-      // analytics = await fetchAnalytics(timeRange);
-      
+      console.log('📊 Loading analytics for time range:', timeRange);
+
+      // Simulate API call with different data based on time range
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // Generate different data based on time range
+      const multiplier = getTimeRangeMultiplier(timeRange);
+
+      analytics = {
+        overview: {
+          totalUsers: Math.floor(1247 * multiplier),
+          totalListings: Math.floor(892 * multiplier),
+          totalBookings: Math.floor(456 * multiplier),
+          totalRevenue: Math.floor(45670 * multiplier),
+          growthRate: 12.5 + (Math.random() - 0.5) * 5
+        },
+        userMetrics: {
+          newUsers: Math.floor(89 * multiplier),
+          activeUsers: Math.floor(567 * multiplier),
+          retentionRate: 78.5 + (Math.random() - 0.5) * 10,
+          averageSessionTime: '12m 34s'
+        },
+        listingMetrics: {
+          newListings: Math.floor(34 * multiplier),
+          averagePrice: 125 + Math.floor((Math.random() - 0.5) * 50),
+          topCategory: 'Photography',
+          conversionRate: 23.4 + (Math.random() - 0.5) * 5
+        },
+        bookingMetrics: {
+          newBookings: Math.floor(67 * multiplier),
+          completedBookings: Math.floor(89 * multiplier),
+          cancelledBookings: Math.floor(12 * multiplier),
+          averageBookingValue: 187 + Math.floor((Math.random() - 0.5) * 40)
+        },
+        revenueMetrics: {
+          totalRevenue: Math.floor(45670 * multiplier),
+          platformFees: Math.floor(4567 * multiplier),
+          averageOrderValue: 187 + Math.floor((Math.random() - 0.5) * 40),
+          monthlyGrowth: 15.2 + (Math.random() - 0.5) * 8
+        }
+      };
+
+      console.log('✅ Analytics loaded successfully for', timeRange);
+      lastUpdated = new Date().toLocaleString();
+
     } catch (error) {
       console.error('Error loading analytics:', error);
     } finally {
@@ -64,8 +104,18 @@
     }
   }
 
-  $: {
-    timeRange;
+  function getTimeRangeMultiplier(range: string): number {
+    switch (range) {
+      case '7d': return 0.2;
+      case '30d': return 1.0;
+      case '90d': return 2.5;
+      case '1y': return 12.0;
+      default: return 1.0;
+    }
+  }
+
+  // Reactive statement to reload analytics when time range changes
+  $: if (timeRange) {
     loadAnalytics();
   }
 
@@ -91,16 +141,26 @@
     <div>
       <h1 class="text-3xl font-bold text-white">Analytics Dashboard</h1>
       <p class="text-gray-400 mt-1">Platform performance and insights</p>
+      {#if lastUpdated}
+        <p class="text-gray-500 text-sm mt-1">Last updated: {lastUpdated}</p>
+      {/if}
     </div>
-    <div>
+    <div class="flex items-center space-x-3">
       <select
         bind:value="{timeRange}"
-        class="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+        disabled={loading}
+        class="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {#each timeRangeOptions as option}
           <option value="{option.value}">{option.label}</option>
         {/each}
       </select>
+      {#if loading}
+        <div class="flex items-center space-x-2 text-yellow-400">
+          <div class="w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-sm">Updating...</span>
+        </div>
+      {/if}
     </div>
   </div>
 
