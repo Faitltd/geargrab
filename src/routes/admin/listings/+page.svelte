@@ -18,6 +18,7 @@
 
   const statusOptions = [
     { value: 'all', label: 'All Listings' },
+    { value: 'active', label: 'Active' },
     { value: 'published', label: 'Published' },
     { value: 'draft', label: 'Draft' },
     { value: 'suspended', label: 'Suspended' },
@@ -64,14 +65,23 @@
     try {
       loading = true;
       const listingsRef = collection(firestore, 'listings');
-      const listingsSnap = await getDocs(query(listingsRef, orderBy('createdAt', 'desc')));
-      
+
+      // Query to exclude deleted listings by default
+      const listingsQuery = query(
+        listingsRef,
+        where('status', '!=', 'deleted'),
+        orderBy('status'),
+        orderBy('createdAt', 'desc')
+      );
+
+      const listingsSnap = await getDocs(listingsQuery);
+
       listings = listingsSnap.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate() || new Date()
       }));
-      
+
       filterListings();
     } catch (error) {
       console.error('Error loading listings:', error);
@@ -90,13 +100,15 @@
       const matchesSearch = listing.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            listing.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            listing.ownerEmail?.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesStatus = statusFilter === 'all' || 
+
+      const matchesStatus = statusFilter === 'all' ||
+                           (statusFilter === 'active' && listing.status === 'active') ||
                            (statusFilter === 'published' && listing.isPublished) ||
                            (statusFilter === 'draft' && !listing.isPublished) ||
                            (statusFilter === 'suspended' && listing.status === 'suspended') ||
+                           (statusFilter === 'deleted' && listing.status === 'deleted') ||
                            (statusFilter === 'flagged' && listing.flagged);
-      
+
       return matchesSearch && matchesStatus;
     });
   }
@@ -209,8 +221,10 @@
   }
 
   function getStatusBadge(listing) {
+    if (listing.status === 'deleted') return { class: 'bg-red-600/20 text-red-400 border-red-600/30', text: 'Deleted' };
     if (listing.flagged) return { class: 'bg-red-500/20 text-red-300 border-red-500/30', text: 'Flagged' };
     if (listing.status === 'suspended') return { class: 'bg-orange-500/20 text-orange-300 border-orange-500/30', text: 'Suspended' };
+    if (listing.status === 'active') return { class: 'bg-green-500/20 text-green-300 border-green-500/30', text: 'Active' };
     if (listing.isPublished) return { class: 'bg-green-500/20 text-green-300 border-green-500/30', text: 'Published' };
     return { class: 'bg-gray-500/20 text-gray-300 border-gray-500/30', text: 'Draft' };
   }
