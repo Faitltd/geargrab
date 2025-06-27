@@ -132,7 +132,7 @@ export const SECURITY_CONFIG = {
       defaultSrc: ["'self'"],
       scriptSrc: [
         "'self'",
-        "'unsafe-inline'" // Consider using nonces for better security
+        "'unsafe-inline'", // Consider using nonces for better security
         "https://js.stripe.com",
         "https://www.gstatic.com",
         "https://apis.google.com",
@@ -140,7 +140,7 @@ export const SECURITY_CONFIG = {
       ],
       styleSrc: [
         "'self'",
-        "'unsafe-inline'" // Consider using nonces for better security
+        "'unsafe-inline'", // Consider using nonces for better security
         "https://fonts.googleapis.com"
       ],
       fontSrc: [

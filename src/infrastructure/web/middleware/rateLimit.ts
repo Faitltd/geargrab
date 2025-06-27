@@ -70,10 +70,21 @@ class MemoryStore {
 
 const store = new MemoryStore();
 
-// Cleanup expired entries every 10 minutes
-setInterval(() => {
-  store.cleanup();
-}, 10 * 60 * 1000);
+// Cleanup expired entries every 10 minutes (only in production)
+let cleanupInterval: NodeJS.Timeout | null = null;
+if (process.env.NODE_ENV !== 'test') {
+  cleanupInterval = setInterval(() => {
+    store.cleanup();
+  }, 10 * 60 * 1000);
+}
+
+// Export cleanup function for testing
+export const cleanupRateLimit = () => {
+  if (cleanupInterval) {
+    clearInterval(cleanupInterval);
+    cleanupInterval = null;
+  }
+};
 
 /**
  * Default key generator - uses IP address

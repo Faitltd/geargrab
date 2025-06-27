@@ -44,12 +44,12 @@ export interface SearchResult {
 }
 
 class LocationSearchService {
-  private googleMaps: typeof google.maps | null = null;
+  private googleMaps: any = null;
   private loader: Loader;
 
   constructor() {
     this.loader = new Loader({
-      apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'your-google-maps-api-key',
+      apiKey: (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY || 'your-google-maps-api-key',
       version: 'weekly',
       libraries: ['places', 'geometry']
     });
@@ -62,7 +62,7 @@ class LocationSearchService {
   private async initialize() {
     try {
       // Load Google Maps API
-      this.googleMaps = await this.loader.load();
+      this.googleMaps = (await this.loader.load()).maps;
       mapLoaded.set(true);
       console.log('✅ Google Maps API loaded');
 

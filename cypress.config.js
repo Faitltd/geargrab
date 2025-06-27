@@ -1,6 +1,18 @@
 import { defineConfig } from 'cypress'
 
 export default defineConfig({
+  // TypeScript configuration
+  typescript: {
+    compilerOptions: {
+      target: 'es2020',
+      module: 'commonjs',
+      moduleResolution: 'node',
+      skipLibCheck: true,
+      strict: false,
+      esModuleInterop: true,
+      allowSyntheticDefaultImports: true
+    }
+  },
   e2e: {
     baseUrl: 'https://geargrab.co',
     specPattern: 'cypress/e2e/**/*.{cy,spec}.{js,ts}',

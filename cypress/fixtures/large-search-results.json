@@ -1,0 +1,62 @@
+{
+  "results": [
+    {
+      "id": "1",
+      "title": "Professional Camping Tent",
+      "dailyPrice": 25,
+      "images": ["/tent1.jpg"],
+      "location": {
+        "lat": 39.7392,
+        "lng": -104.9903,
+        "city": "Denver",
+        "state": "CO"
+      },
+      "distance": 2.5,
+      "owner": {
+        "name": "John Doe",
+        "rating": 4.8,
+        "avatar": "/avatar1.jpg"
+      },
+      "totalReviews": 15
+    },
+    {
+      "id": "2",
+      "title": "Hiking Backpack 65L",
+      "dailyPrice": 15,
+      "images": ["/backpack1.jpg"],
+      "location": {
+        "lat": 39.7519,
+        "lng": -104.9962,
+        "city": "Denver",
+        "state": "CO"
+      },
+      "distance": 3.2,
+      "owner": {
+        "name": "Jane Smith",
+        "rating": 4.9,
+        "avatar": "/avatar2.jpg"
+      },
+      "totalReviews": 22
+    },
+    {
+      "id": "3",
+      "title": "Sleeping Bag Winter",
+      "dailyPrice": 20,
+      "images": ["/sleeping-bag1.jpg"],
+      "location": {
+        "lat": 39.7294,
+        "lng": -104.9319,
+        "city": "Denver",
+        "state": "CO"
+      },
+      "distance": 5.1,
+      "owner": {
+        "name": "Mike Johnson",
+        "rating": 4.7,
+        "avatar": "/avatar3.jpg"
+      },
+      "totalReviews": 8
+    }
+  ],
+  "total": 3
+}

@@ -101,7 +101,8 @@ export const validatePagination = (req: Request, res: Response, next: NextFuncti
     return;
   }
   
-  req.query = value;
+  // Update query parameters with validated values
+  Object.assign(req.query, value);
   next();
 };
 
