@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { authStore } from '$lib/stores/auth';
-  import { isCurrentUserAdmin } from '$lib/firebase/auth';
+  import { simpleAuth } from '$lib/auth/simple-auth';
+  import { isCurrentUserAdmin } from '$lib/auth/admin';
   import { notifications } from '$lib/stores/notifications';
   import { goto } from '$app/navigation';
 
@@ -46,21 +46,34 @@
 
   onMount(async () => {
     try {
-      if (!$authStore.user) {
-        goto("/auth/login?redirectTo=/admin/settings");
+      // Wait for auth to be ready
+      await simpleAuth.waitForAuthReady();
+
+      if (!simpleAuth.user) {
+        goto("/admin/login?redirectTo=/admin/settings");
         return;
       }
 
       isAdmin = await isCurrentUserAdmin();
       if (!isAdmin) {
+        notifications.add({
+          type: 'error',
+          message: 'Access denied. Admin privileges required.',
+          timeout: 5000
+        });
         goto('/dashboard');
         return;
       }
 
       await loadSettings();
-      
+
     } catch (error) {
       console.error('Error checking admin status:', error);
+      notifications.add({
+        type: 'error',
+        message: 'Error loading admin settings',
+        timeout: 5000
+      });
       goto('/dashboard');
     } finally {
       loading = false;
