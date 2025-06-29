@@ -1,5 +1,8 @@
-import { adminFirestore } from '$firebase/server';
-import { FieldValue } from 'firebase-admin/firestore';
+import { adminFirestore } from '$lib/firebase/server';
+import admin from 'firebase-admin';
+
+// Use admin.firestore.FieldValue instead of direct import
+const FieldValue = admin.firestore.FieldValue;
 
 // Audit event types
 export type AuditEventType = 

@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createSecureHandler } from '$lib/security/middleware';
 import { auditLog } from '$lib/security/audit';
-import { adminFirestore } from '$firebase/server';
+import { adminFirestore } from '$lib/firebase/server';
 
 export const GET: RequestHandler = createSecureHandler(
   async ({ getClientAddress }, { auth }) => {
