@@ -2,6 +2,9 @@
   import { createEventDispatcher } from 'svelte';
   import type { UniverseCardProps } from '$lib/types/components';
   import type { Listing } from '$lib/types/firestore';
+  import { simpleAuth } from '$lib/auth/simple-auth';
+  import { chatService } from '$lib/services/chat';
+  import { goto } from '$app/navigation';
 
   // Props with TypeScript interface
   export let listing: UniverseCardProps['listing'];
@@ -14,12 +17,53 @@
   const dispatch = createEventDispatcher<{
     click: Listing;
   }>();
-  
+
+  // Get auth state
+  $: authState = simpleAuth.authState;
+
   function handleClick() {
     if (onClick) {
       onClick();
     } else {
       dispatch('click', listing);
+    }
+  }
+
+  // Handle messaging the owner
+  async function handleMessageOwner(event: Event) {
+    event.stopPropagation(); // Prevent card click
+
+    if (!$authState.isAuthenticated || !$authState.user) {
+      alert('Please sign in to send messages');
+      return;
+    }
+
+    if (!listing?.ownerUid && !listing?.ownerId) {
+      alert('Owner information not available');
+      return;
+    }
+
+    const ownerId = listing.ownerUid || listing.ownerId;
+    if (ownerId === $authState.user.uid) {
+      alert('You cannot message yourself');
+      return;
+    }
+
+    try {
+      // Create or find existing conversation
+      const conversationId = await chatService.getOrCreateConversation(
+        $authState.user.uid,
+        ownerId,
+        undefined, // no booking ID yet
+        listing.id,
+        listing.title
+      );
+
+      // Navigate to messages page with the conversation
+      goto(`/messages?conversation=${conversationId}`);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      alert('Unable to start conversation. Please try again.');
     }
   }
   
@@ -137,8 +181,20 @@
           </div>
         {/if}
 
-        <!-- View Button -->
-        <button class="view-button" type="button">View Details</button>
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button class="view-button" type="button">View Details</button>
+          <button
+            class="message-button"
+            type="button"
+            on:click={handleMessageOwner}
+            title="Contact Owner"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -341,6 +397,13 @@
     color: white;
   }
 
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+  }
+
   .view-button {
     background: rgba(255, 255, 255, 0.2);
     color: white;
@@ -352,6 +415,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
+    flex: 1;
   }
 
   .view-button:hover {
@@ -359,6 +423,29 @@
     border-color: rgba(255, 255, 255, 0.5);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .message-button {
+    background: rgba(34, 197, 94, 0.3);
+    color: white;
+    border: 1px solid rgba(34, 197, 94, 0.5);
+    padding: 0.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+  }
+
+  .message-button:hover {
+    background: rgba(34, 197, 94, 0.5);
+    border-color: rgba(34, 197, 94, 0.7);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
   }
 
   /* Focus styles for accessibility */
@@ -369,6 +456,11 @@
 
   .view-button:focus {
     outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline-offset: 2px;
+  }
+
+  .message-button:focus {
+    outline: 2px solid rgba(34, 197, 94, 0.8);
     outline-offset: 2px;
   }
 

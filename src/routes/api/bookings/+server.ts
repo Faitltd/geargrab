@@ -3,6 +3,53 @@ import type { RequestHandler } from './$types';
 import { adminFirestore, isFirebaseAdminAvailable } from '$firebase/server';
 import type { Booking } from '$types/firestore';
 import { BookingStatus } from '$lib/types/booking-status';
+import { sendBookingEmails } from '$lib/services/email';
+
+// Helper function to send owner notification
+async function sendOwnerNotification(bookingId: string, bookingData: any, listing: any) {
+  try {
+    // Get owner user data
+    const ownerDoc = await adminFirestore.collection('users').doc(listing.ownerUid).get();
+    const ownerData = ownerDoc.data();
+
+    if (!ownerData?.email) {
+      console.warn('Owner email not found for notification');
+      return;
+    }
+
+    // Get renter user data
+    const renterDoc = await adminFirestore.collection('users').doc(bookingData.renterUid).get();
+    const renterData = renterDoc.data();
+
+    // Format dates for email
+    const startDate = bookingData.startDate.toDate().toLocaleDateString();
+    const endDate = bookingData.endDate.toDate().toLocaleDateString();
+
+    // Prepare email data
+    const emailData = {
+      bookingId,
+      confirmationNumber: bookingId.substring(0, 8).toUpperCase(),
+      listingTitle: listing.title,
+      listingImage: listing.images?.[0] || '',
+      startDate,
+      endDate,
+      totalPrice: bookingData.totalPrice || 0,
+      renterName: renterData?.displayName || 'Guest',
+      renterEmail: renterData?.email || '',
+      ownerName: ownerData?.displayName || 'Owner',
+      ownerEmail: ownerData.email,
+      deliveryMethod: bookingData.deliveryMethod || 'pickup'
+    };
+
+    // Send notification emails
+    await sendBookingEmails(emailData);
+
+    console.log('✅ Owner notification sent for booking:', bookingId);
+  } catch (error) {
+    console.error('❌ Failed to send owner notification:', error);
+    throw error;
+  }
+}
 
 // Get bookings for the current user
 export const GET: RequestHandler = async ({ url, locals }) => {
@@ -114,8 +161,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     
     // Create booking
     const docRef = await adminFirestore.collection('bookings').add(bookingWithTimestamps);
-    
-    return json({ id: docRef.id });
+
+    // Send notification to owner about new booking request
+    try {
+      await sendOwnerNotification(docRef.id, bookingWithTimestamps, listing);
+    } catch (notificationError) {
+      console.error('Failed to send owner notification:', notificationError);
+      // Don't fail the booking if notification fails
+    }
+
+    return json({
+      id: docRef.id,
+      status: BookingStatus.PENDING_OWNER_APPROVAL,
+      message: 'Booking created successfully. Owner will be notified.'
+    });
   } catch (error) {
     console.error('Error creating booking:', error);
     return json({ error: 'Failed to create booking' }, { status: 500 });

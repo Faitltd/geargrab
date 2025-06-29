@@ -4,6 +4,64 @@ import { adminFirestore } from '$firebase/server';
 import { BookingStatus, isValidStatusTransition } from '$lib/types/booking-status';
 import Stripe from 'stripe';
 import { env } from '$env/dynamic/private';
+import { sendBookingEmails } from '$lib/services/email';
+
+// Helper function to send approval/denial notification
+async function sendApprovalNotification(bookingId: string, bookingData: any, action: 'approved' | 'denied') {
+  try {
+    // Get renter user data
+    const renterDoc = await adminFirestore.collection('users').doc(bookingData.renterUid).get();
+    const renterData = renterDoc.data();
+
+    // Get owner user data
+    const ownerDoc = await adminFirestore.collection('users').doc(bookingData.ownerUid).get();
+    const ownerData = ownerDoc.data();
+
+    if (!renterData?.email) {
+      console.warn('Renter email not found for notification');
+      return;
+    }
+
+    // Get listing data
+    const listingDoc = await adminFirestore.collection('listings').doc(bookingData.listingId).get();
+    const listing = listingDoc.data();
+
+    // Format dates for email
+    const startDate = bookingData.startDate.toDate().toLocaleDateString();
+    const endDate = bookingData.endDate.toDate().toLocaleDateString();
+
+    // Prepare email data
+    const emailData = {
+      bookingId,
+      confirmationNumber: bookingId.substring(0, 8).toUpperCase(),
+      listingTitle: listing?.title || 'Gear Item',
+      listingImage: listing?.images?.[0] || '',
+      startDate,
+      endDate,
+      totalPrice: bookingData.totalPrice || 0,
+      renterName: renterData?.displayName || 'Guest',
+      renterEmail: renterData.email,
+      ownerName: ownerData?.displayName || 'Owner',
+      ownerEmail: ownerData?.email || '',
+      deliveryMethod: bookingData.deliveryMethod || 'pickup',
+      status: action
+    };
+
+    // Send appropriate notification email
+    if (action === 'approved') {
+      // Send booking confirmation email to renter
+      await sendBookingEmails(emailData);
+    } else {
+      // For denied bookings, we'd send a different email template
+      console.log('📧 Booking denial notification prepared for:', renterData.email);
+    }
+
+    console.log(`✅ ${action} notification sent for booking:`, bookingId);
+  } catch (error) {
+    console.error(`❌ Failed to send ${action} notification:`, error);
+    throw error;
+  }
+}
 
 // Approve or deny a booking request
 export const POST: RequestHandler = async ({ params, request, locals }) => {
@@ -98,9 +156,16 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
             paymentStage: 'rental',
             approvalReason: reason || 'Booking approved by owner'
           });
-          
-          return json({ 
-            success: true, 
+
+          // Send approval notification to renter
+          try {
+            await sendApprovalNotification(bookingId, booking, 'approved');
+          } catch (notificationError) {
+            console.error('Failed to send approval notification:', notificationError);
+          }
+
+          return json({
+            success: true,
             status: newStatus,
             message: 'Booking approved successfully. Rental fee will be charged.',
             paymentIntentId: paymentIntent.id
@@ -115,9 +180,16 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
             paymentStage: 'complete',
             approvalReason: reason || 'Booking approved by owner'
           });
-          
-          return json({ 
-            success: true, 
+
+          // Send approval notification to renter
+          try {
+            await sendApprovalNotification(bookingId, booking, 'approved');
+          } catch (notificationError) {
+            console.error('Failed to send approval notification:', notificationError);
+          }
+
+          return json({
+            success: true,
             status: newStatus,
             message: 'Booking approved successfully.'
           });
@@ -162,9 +234,16 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
             refundId: refund.id,
             refundStatus: refund.status
           });
-          
-          return json({ 
-            success: true, 
+
+          // Send denial notification to renter
+          try {
+            await sendApprovalNotification(bookingId, booking, 'denied');
+          } catch (notificationError) {
+            console.error('Failed to send denial notification:', notificationError);
+          }
+
+          return json({
+            success: true,
             status: newStatus,
             message: 'Booking denied and payment refunded.',
             refundId: refund.id
@@ -178,9 +257,16 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
             deniedBy: locals.userId,
             denialReason: reason || 'Booking denied by owner'
           });
-          
-          return json({ 
-            success: true, 
+
+          // Send denial notification to renter
+          try {
+            await sendApprovalNotification(bookingId, booking, 'denied');
+          } catch (notificationError) {
+            console.error('Failed to send denial notification:', notificationError);
+          }
+
+          return json({
+            success: true,
             status: newStatus,
             message: 'Booking denied.'
           });

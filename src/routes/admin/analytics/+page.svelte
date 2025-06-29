@@ -1,7 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+  import { collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
+  import { firestore } from '$lib/firebase/client';
+  import { simpleAuth } from '$lib/auth/simple-auth';
+  import { isCurrentUserAdmin } from '$lib/auth/admin';
+  import { notifications } from '$lib/stores/notifications';
 
   let loading = true;
+  let isAdmin = false;
   let timeRange = '30d';
   let lastUpdated = '';
   let analytics = {
@@ -46,8 +53,37 @@
   ];
 
   onMount(async () => {
-    await loadAnalytics();
+    await checkAdminAccess();
+    if (isAdmin) {
+      await loadAnalytics();
+    }
   });
+
+  async function checkAdminAccess() {
+    try {
+      await simpleAuth.waitForAuthReady();
+
+      if (!simpleAuth.user) {
+        goto('/auth/login');
+        return;
+      }
+
+      isAdmin = await isCurrentUserAdmin();
+
+      if (!isAdmin) {
+        notifications.add({
+          type: 'error',
+          message: 'Admin access required',
+          timeout: 5000
+        });
+        goto('/dashboard');
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking admin access:', error);
+      goto('/dashboard');
+    }
+  }
 
   async function loadAnalytics() {
     try {

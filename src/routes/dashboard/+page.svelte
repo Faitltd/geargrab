@@ -5,6 +5,7 @@
   import ScrollLinkedSequential from '$lib/components/layout/scroll-linked-sequential.svelte';
   import { simpleAuth } from '$lib/auth/simple-auth';
   import { isCurrentUserAdmin } from '$lib/auth/admin';
+  import ProfileCompletionWidget from '$lib/components/profile/profile-completion-widget.svelte';
 
   let isAdmin = false;
 
@@ -27,6 +28,9 @@
 </script>
 
 <div class="space-y-8">
+  <!-- Profile Completion Widget -->
+  <ProfileCompletionWidget compact={true} />
+
   <!-- Dashboard Overview -->
   <ScrollLinkedSequential animation="fade-up" baseDelay="{0.1}" incrementDelay="{0.15}" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" startOffset="{0}" endOffset="{0.6}">
       <!-- Active Bookings Card -->

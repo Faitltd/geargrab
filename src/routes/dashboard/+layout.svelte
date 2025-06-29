@@ -86,7 +86,7 @@
 
 <div class="min-h-screen relative z-10">
 
-  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="relative z-10 max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
     {#if $authState.loading || !authCheckComplete}
       <div class="flex justify-center items-center h-64">
         <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8 text-center shadow-lg">
@@ -101,7 +101,7 @@
       <!-- Dashboard Header -->
       <ScrollLinkedAnimator animation="fade-up" startOffset="{0}" endOffset="{0.4}">
         <div class="mb-8">
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 shadow-lg">
+          <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-3 sm:p-6 shadow-lg">
             <h1 class="text-3xl font-bold text-white drop-shadow-lg">Dashboard</h1>
             <p class="text-gray-200 drop-shadow-lg">Welcome back, {$authState.user?.displayName || 'User'}!</p>
           </div>
@@ -118,7 +118,7 @@
                 class="{currentTab === tab.id
                   ? 'bg-green-600 text-white shadow-lg transform scale-105'
                   : 'text-white/90 hover:text-white hover:bg-white/10 hover:transform hover:scale-102'}
-                  whitespace-nowrap py-3 px-4 rounded-xl font-medium text-sm transition-all duration-300 drop-shadow-lg"
+                  whitespace-nowrap py-2 sm:py-3 px-2 sm:px-4 rounded-xl font-medium text-xs sm:text-sm transition-all duration-300 drop-shadow-lg"
               >
                 {tab.label}
               </a>
@@ -137,7 +137,7 @@
       <!-- Fallback for when store is not initialized or user is not logged in -->
       <ScrollLinkedAnimator animation="fade-up" startOffset="{0}" endOffset="{0.5}">
         <div class="flex justify-center items-center h-64">
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8 text-center shadow-lg">
+          <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-4 sm:p-8 text-center shadow-lg">
             <h2 class="text-xl font-semibold text-white mb-2 drop-shadow-lg">Access Restricted</h2>
             <p class="text-gray-200 mb-4 drop-shadow-lg">Please log in to access the dashboard.</p>
             <a href="/auth/login" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-lg">

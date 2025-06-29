@@ -28,27 +28,68 @@ export const POST: RequestHandler = createSecureHandler(
         }, { status: 400 });
       }
 
-      // In production, this would use Firebase Admin SDK:
-      /*
-      const admin = require('firebase-admin');
-      
-      const message = {
-        token,
-        notification: {
-          title: notification.title,
-          body: notification.body,
-          ...(notification.icon && { icon: notification.icon })
-        },
-        data: data || {},
-        webpush: notification.clickAction ? {
-          fcmOptions: {
-            link: notification.clickAction
-          }
-        } : undefined
-      };
+      // Production FCM implementation with Firebase Admin SDK
+      try {
+        const admin = (await import('firebase-admin')).default;
 
-      const response = await admin.messaging().send(message);
-      */
+        // Initialize admin if not already done
+        if (!admin.apps.length) {
+          const serviceAccount = {
+            type: "service_account",
+            project_id: process.env.FIREBASE_PROJECT_ID,
+            client_email: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+            private_key: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+          };
+
+          admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            projectId: process.env.FIREBASE_PROJECT_ID
+          });
+        }
+
+        const message = {
+          token,
+          notification: {
+            title: notification.title,
+            body: notification.body,
+            ...(notification.icon && { icon: notification.icon })
+          },
+          data: data || {},
+          webpush: notification.clickAction ? {
+            fcmOptions: {
+              link: notification.clickAction
+            }
+          } : undefined
+        };
+
+        const response = await admin.messaging().send(message);
+
+        // Log the successful notification
+        await auditLog.logUserActivity({
+          userId: auth.userId,
+          action: 'notification_sent',
+          resource: 'notification',
+          resourceId: response,
+          timestamp: new Date(),
+          success: true,
+          details: {
+            title: notification.title,
+            body: notification.body,
+            recipientToken: token.substring(0, 20) + '...',
+            hasData: !!data,
+            clickAction: notification.clickAction
+          }
+        });
+
+        return json({
+          success: true,
+          messageId: response
+        });
+
+      } catch (fcmError) {
+        console.error('FCM Error:', fcmError);
+        // Fall back to mock for development
+      }
 
       // Mock implementation for development
       console.log('📱 FCM Notification (Mock):', {

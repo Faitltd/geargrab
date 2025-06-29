@@ -78,6 +78,123 @@ main {
   background-attachment: fixed;
 }
 
+/* Mobile-responsive spacing utilities */
+@media (max-width: 768px) {
+  /* Reduce excessive padding on mobile */
+  .py-16 {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  .py-20 {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+
+  .py-24 {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+
+  .p-8 {
+    padding: 1.5rem !important;
+  }
+
+  .p-6 {
+    padding: 1rem !important;
+  }
+
+  .px-8 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Reduce margins on mobile */
+  .my-8 {
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .my-12 {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .mb-8 {
+    margin-bottom: 1rem !important;
+  }
+
+  .mb-12 {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .mt-8 {
+    margin-top: 1rem !important;
+  }
+
+  .mt-12 {
+    margin-top: 1.5rem !important;
+  }
+
+  /* Reduce text sizes on mobile for better fit */
+  .text-4xl {
+    font-size: 2rem !important;
+    line-height: 2.5rem !important;
+  }
+
+  .text-5xl {
+    font-size: 2.5rem !important;
+    line-height: 3rem !important;
+  }
+
+  .text-3xl {
+    font-size: 1.75rem !important;
+    line-height: 2.25rem !important;
+  }
+
+  /* Improve mobile container spacing */
+  .max-w-4xl,
+  .max-w-3xl,
+  .max-w-2xl {
+    margin-left: 0.5rem !important;
+    margin-right: 0.5rem !important;
+  }
+
+  /* Reduce grid gaps on mobile */
+  .gap-8 {
+    gap: 1rem !important;
+  }
+
+  .gap-6 {
+    gap: 0.75rem !important;
+  }
+
+  .gap-4 {
+    gap: 0.5rem !important;
+  }
+
+  /* Improve mobile hero sections */
+  .min-h-\[50vh\] {
+    min-height: 40vh !important;
+  }
+
+  /* Better mobile button spacing */
+  .py-3 {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
+  .px-8 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
 /* Parallax layers with different speeds */
 .parallax-slow {
   transform: translateZ(-1px) scale(2);

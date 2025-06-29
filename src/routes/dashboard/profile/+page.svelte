@@ -3,6 +3,7 @@
   import { simpleAuth } from '$lib/auth/simple-auth';
   import { notifications } from '$lib/stores/notifications';
   import ProfilePhotoUploader from '$lib/components/profile-photo-uploader.svelte';
+  import UserRatingDisplay from '$lib/components/profile/user-rating-display.svelte';
   import { firestore } from '$lib/firebase/client';
   import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
@@ -311,5 +312,10 @@
       </div>
     </div>
   </div>
+
+  <!-- User Rating & Reviews -->
+  {#if simpleAuth.user}
+    <UserRatingDisplay userId={simpleAuth.user.uid} />
+  {/if}
   {/if}
 </div>

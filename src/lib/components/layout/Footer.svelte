@@ -19,6 +19,7 @@
         <li><a href="/browse">Browse Gear</a></li>
         <li><a href="/list-gear">List Your Gear</a></li>
         <li><a href="/how-it-works">How It Works</a></li>
+        <li><a href="/guarantee">🛡️ Guarantee</a></li>
         <li><a href="/safety-trust">Safety & Trust</a></li>
       </ul>
     </div>

@@ -5,8 +5,10 @@
   import { simpleAuth } from '$lib/auth/simple-auth';
   import { authStore } from '$lib/stores/auth';
   import { BookingContextManager } from '$lib/utils/booking-context';
-  import StripePaymentForm from '$lib/components/payments/stripe-payment-form.svelte';
+  import BookingSummary from '$lib/components/booking/booking-summary.svelte';
+  import BookingPayment from '$lib/components/booking/booking-payment.svelte';
   import SocialOnlyLoginModal from '$lib/components/auth/SocialOnlyLoginModal.svelte';
+  import StripePaymentForm from '$lib/components/payments/stripe-payment-form.svelte';
   import { firestore } from '$lib/firebase/client';
   import { doc, getDoc } from 'firebase/firestore';
 

@@ -5,30 +5,33 @@
  * This script adds sample data to Firestore for testing the admin dashboard
  */
 
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import admin from 'firebase-admin';
 import { config } from 'dotenv';
 
 // Load environment variables
 config();
 
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: process.env.VITE_FIREBASE_API_KEY,
-  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.VITE_FIREBASE_APP_ID
-};
+// Initialize Firebase Admin SDK
+if (!admin.apps.length) {
+  const serviceAccount = {
+    type: "service_account",
+    project_id: process.env.FIREBASE_PROJECT_ID,
+    client_email: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+    private_key: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  };
+
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    projectId: process.env.FIREBASE_PROJECT_ID
+  });
+}
 
 async function populateSampleData() {
   try {
     console.log('🔄 Populating sample data...');
-    
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+
+    // Get Firestore instance
+    const db = admin.firestore();
 
     // Sample users
     const users = [
@@ -192,9 +195,9 @@ async function populateSampleData() {
     // Add users to Firestore
     console.log('👥 Adding users...');
     for (const user of users) {
-      await setDoc(doc(db, 'users', user.uid), {
+      await db.collection('users').doc(user.uid).set({
         ...user,
-        createdAt: user.createdAt
+        createdAt: admin.firestore.Timestamp.fromDate(user.createdAt)
       });
     }
     console.log(`✅ Added ${users.length} users`);
@@ -202,9 +205,10 @@ async function populateSampleData() {
     // Add listings to Firestore
     console.log('📦 Adding listings...');
     for (const listing of listings) {
-      await setDoc(doc(db, 'listings', listing.id), {
+      await db.collection('listings').doc(listing.id).set({
         ...listing,
-        createdAt: listing.createdAt
+        createdAt: admin.firestore.Timestamp.fromDate(listing.createdAt),
+        updatedAt: admin.firestore.Timestamp.fromDate(listing.updatedAt)
       });
     }
     console.log(`✅ Added ${listings.length} listings`);
@@ -212,21 +216,21 @@ async function populateSampleData() {
     // Add bookings to Firestore
     console.log('📅 Adding bookings...');
     for (const booking of bookings) {
-      await setDoc(doc(db, 'bookings', booking.id), {
+      await db.collection('bookings').doc(booking.id).set({
         ...booking,
-        createdAt: booking.createdAt,
-        startDate: booking.startDate,
-        endDate: booking.endDate
+        createdAt: admin.firestore.Timestamp.fromDate(booking.createdAt),
+        startDate: admin.firestore.Timestamp.fromDate(booking.startDate),
+        endDate: admin.firestore.Timestamp.fromDate(booking.endDate)
       });
     }
     console.log(`✅ Added ${bookings.length} bookings`);
 
     // Ensure admin user exists
     console.log('👑 Ensuring admin user exists...');
-    await setDoc(doc(db, 'adminUsers', 'NivAg90815PbcmUrbtYOtqX30J02'), {
+    await db.collection('adminUsers').doc('NivAg90815PbcmUrbtYOtqX30J02').set({
       isAdmin: true,
       role: 'admin',
-      createdAt: serverTimestamp(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
       permissions: ['all'],
       createdBy: 'sample-data-script'
     });

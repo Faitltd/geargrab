@@ -105,10 +105,64 @@
           <span class="text-white">{formatCurrency(rentalFees.deliveryFee)}</span>
         </div>
       {/if}
+      <div class="flex justify-between">
+        <span class="text-green-400">🛡️ Standard Coverage:</span>
+        <span class="text-green-400">Included</span>
+      </div>
       <div class="border-t border-white/20 pt-2 mt-2">
         <div class="flex justify-between">
           <span class="text-white font-semibold">Total:</span>
           <span class="text-white font-bold text-xl">{formatCurrency(rentalFees.totalPrice)}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GearGrab Guarantee -->
+  <div class="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-lg border border-green-500/30 p-6">
+    <div class="flex items-start space-x-3">
+      <div class="flex-shrink-0">
+        <div class="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
+          <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="flex-1">
+        <h4 class="text-white font-semibold mb-2">Protected by GearGrab Guarantee</h4>
+        <p class="text-green-200 text-sm mb-3">
+          Your rental includes Standard Coverage with up to 50% repair cost coverage and $200 maximum liability.
+        </p>
+        <div class="grid grid-cols-2 gap-3 text-xs text-green-300">
+          <div class="flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Damage protection
+          </div>
+          <div class="flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Security deposit protection
+          </div>
+          <div class="flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Fast claims processing
+          </div>
+          <div class="flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            24/7 support
+          </div>
+        </div>
+        <div class="mt-3">
+          <a href="/guarantee" target="_blank" class="text-green-400 hover:text-green-300 text-sm font-medium">
+            Learn more about our guarantee →
+          </a>
         </div>
       </div>
     </div>
@@ -132,7 +186,7 @@
     
     <button
       on:click="{handleProceed}"
-      disabled="{!canProceed" || processing}
+      disabled="{!canProceed || processing}"
       class="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors"
     >
       {#if processing}

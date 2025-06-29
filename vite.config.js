@@ -18,6 +18,9 @@ export default defineConfig({
         drop_console: true, // Remove console.logs in production
         drop_debugger: true
       }
+    },
+    rollupOptions: {
+      external: ['web-push'] // Externalize web-push to avoid build errors
     }
   }
 });

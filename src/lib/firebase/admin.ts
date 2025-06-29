@@ -108,6 +108,9 @@ export function getAdminApp(): App | null {
   return initializeFirebaseAdmin();
 }
 
+// Export firestore as an alias for adminFirestore for backward compatibility
+export const firestore = adminFirestore;
+
 // Initialize on module load (but don't throw if it fails)
 try {
   initializeFirebaseAdmin();

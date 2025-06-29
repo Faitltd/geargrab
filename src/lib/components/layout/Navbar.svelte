@@ -223,6 +223,9 @@
                 <a href="/how-it-works" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   How It Works
                 </a>
+                <a href="/guarantee" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
+                  🛡️ Guarantee
+                </a>
                 <div class="border-t border-white/20 my-1"></div>
                 <a href="/blog" on:click="{closeDropdown}" class="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors">
                   Blog
@@ -339,6 +342,9 @@
         </a>
         <a href="/how-it-works" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           How It Works
+        </a>
+        <a href="/guarantee" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
+          🛡️ Guarantee
         </a>
         <a href="/blog" on:click="{handleMobileNavClick}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-white/90 hover:bg-white/10 hover:border-white/30 hover:text-white">
           Blog

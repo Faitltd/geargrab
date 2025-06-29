@@ -1,123 +1,76 @@
 #!/bin/bash
 
-# Update system packages
-sudo apt-get update
+# GearGrab Test Environment Setup Script
+set -e
 
-<<<<<<< HEAD
-# Install Node.js 20 (LTS)
-=======
-# Install Node.js 20 (required for the project)
->>>>>>> beb3d1682105fb60c57c754c76bfdd353748209a
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+echo "🚀 Setting up GearGrab test environment..."
+
+# Update system packages
+sudo apt-get update -y
+
+# Install Node.js 18 (required for SvelteKit)
+echo "📦 Installing Node.js 18..."
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
-# Verify Node.js and npm installation
+# Verify Node.js installation
 node --version
 npm --version
 
-<<<<<<< HEAD
-# Install dependencies for Cypress (GUI dependencies)
+# Install global dependencies
+echo "🔧 Installing global dependencies..."
+sudo npm install -g typescript ts-node
+
+# Navigate to project directory
+cd /mnt/persist/workspace
+
+# Clear npm cache to avoid conflicts
+echo "🧹 Clearing npm cache..."
+npm cache clean --force
+
+# Install project dependencies
+echo "📦 Installing project dependencies..."
+npm install --include=dev --no-audit --no-fund
+
+# Install Cypress dependencies for headless mode
+echo "🎭 Installing Cypress system dependencies..."
 sudo apt-get install -y \
     libgtk2.0-0 \
     libgtk-3-0 \
     libgbm-dev \
     libnotify-dev \
     libgconf-2-4 \
-    libnss3-dev \
+    libnss3 \
     libxss1 \
-    libasound2-dev \
+    libasound2 \
     libxtst6 \
     xauth \
     xvfb
 
-# Navigate to project directory
-cd /mnt/persist/workspace
+# Set up environment variables for testing
+echo "⚙️ Setting up test environment variables..."
+export NODE_ENV=test
+export JWT_SECRET=test-jwt-secret-key-for-testing-only
+export FIREBASE_PROJECT_ID=geargrabco
+export VITE_FIREBASE_PROJECT_ID=geargrabco
 
-# Install project dependencies (using install instead of ci due to lock file sync issues)
-npm install
+# Add environment variables to profile
+echo 'export NODE_ENV=test' >> $HOME/.profile
+echo 'export JWT_SECRET=test-jwt-secret-key-for-testing-only' >> $HOME/.profile
+echo 'export FIREBASE_PROJECT_ID=geargrabco' >> $HOME/.profile
+echo 'export VITE_FIREBASE_PROJECT_ID=geargrabco' >> $HOME/.profile
 
-# Fix TypeScript configuration issues by updating tsconfig.json
-cat > tsconfig.json << 'EOL'
-{
-	"extends": "./.svelte-kit/tsconfig.json",
-	"compilerOptions": {
-		"allowJs": true,
-		"checkJs": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"resolveJsonModule": true,
-		"skipLibCheck": true,
-		"sourceMap": true,
-		"strict": true,
-		"verbatimModuleSyntax": false
-	}
-}
-EOL
+# Create test directories if they don't exist
+echo "📁 Creating test directories..."
+mkdir -p tests/auth tests/unit tests/integration
+mkdir -p cypress/e2e/auth
 
-# Convert Cypress config from TypeScript to JavaScript to avoid compilation issues
-cat > cypress.config.js << 'EOL'
-const { defineConfig } = require('cypress');
+# Verify TypeScript configuration
+echo "🔍 Verifying TypeScript configuration..."
+npx tsc --noEmit --project tsconfig.json
 
-module.exports = defineConfig({
-  e2e: {
-    baseUrl: 'http://localhost:5173',
-    specPattern: 'cypress/e2e/**/*.{cy,spec}.{js,ts}',
-    supportFile: 'cypress/support/e2e.js'
-  }
-});
-EOL
-
-# Remove the TypeScript version of the config
-rm -f cypress.config.ts
-
-# Update Cypress support file to use .js extension
-mv cypress/support/e2e.ts cypress/support/e2e.js 2>/dev/null || true
-=======
-# Add Node.js to PATH in user profile
-echo 'export PATH="/usr/bin:$PATH"' >> $HOME/.profile
-
-# Install project dependencies
-npm ci
-
-# Install Cypress dependencies for headless mode
-sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
->>>>>>> beb3d1682105fb60c57c754c76bfdd353748209a
-
-# Build the SvelteKit application
+# Build the project to ensure everything compiles
+echo "🏗️ Building project..."
 npm run build
 
-<<<<<<< HEAD
-# Add Node.js and npm to PATH in user profile
-echo 'export PATH="/usr/bin:$PATH"' >> $HOME/.profile
-
-# Set environment variables for Cypress
-export CYPRESS_CACHE_FOLDER=/tmp/.cypress
-export DISPLAY=:99
-
-# Start virtual display for headless Cypress
-Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-
-# Wait for Xvfb to start
-sleep 3
-=======
-# Start the development server in background for testing
-npm run dev &
-DEV_PID=$!
-
-# Wait for the development server to start
-echo "Waiting for development server to start..."
-sleep 10
-
-# Check if server is running
-curl -f http://localhost:5173 > /dev/null 2>&1
-if [ $? -eq 0 ]; then
-    echo "Development server is running on port 5173"
-else
-    echo "Development server failed to start"
-    kill $DEV_PID 2>/dev/null
-    exit 1
-fi
-
-# Keep the server running for tests
-echo "Setup complete. Development server is running for tests."
->>>>>>> beb3d1682105fb60c57c754c76bfdd353748209a
+echo "✅ Setup complete! Environment is ready for testing."

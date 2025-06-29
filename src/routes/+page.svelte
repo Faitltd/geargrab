@@ -120,7 +120,7 @@
 
     <!-- Main Hero Content - Centered in remaining space -->
     <div class="flex-1 flex items-center justify-center pt-4">
-      <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 max-w-4xl mx-auto shadow-lg">
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-3 sm:p-6 max-w-4xl mx-2 sm:mx-auto shadow-lg">
         <h2 class="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
           Meet Up. Gear Up. Get Out.
         </h2>
@@ -129,7 +129,7 @@
         </p>
 
         <!-- Search Form -->
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto border border-white/20 shadow-lg">
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 md:p-6 max-w-2xl mx-2 sm:mx-auto border border-white/20 shadow-lg">
           <HeroSearch />
         </div>
       </div>
@@ -171,9 +171,9 @@
                 <UniverseCard listing={listing} onClick={() => handleCardClick(listing)} width="220px" height="280px" />
               {/each}
             {:else}
-            <div class="text-white text-center p-8">
+            <div class="text-white text-center p-4 sm:p-8">
               <p class="text-lg mb-4">Loading featured listings...</p>
-              <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-4 border border-white/20">
+              <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 mb-4 border border-white/20">
                 <p class="text-sm text-gray-300">Debug Info:</p>
                 <p class="text-sm text-gray-300">Featured listings count: {featuredListings.length}</p>
                 <p class="text-sm text-gray-300">Page loaded: {typeof window !== 'undefined' ? 'Yes' : 'No'}</p>
@@ -266,7 +266,7 @@
         <ScrollLinkedSequential animation="fade-up" startOffset="{0.3}" endOffset="{0.9}" incrementDelay="{0.15}">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {#each features as feature}
-              <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 hover:border-green-500 transition-all duration-300 shadow-lg">
+              <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 md:p-8 border border-white/20 hover:border-green-500 transition-all duration-300 shadow-lg">
                 <div class="text-4xl mb-4">{feature.icon}</div>
                 <h3 class="text-xl font-bold text-white mb-4 drop-shadow-lg">{feature.title}</h3>
                 <p class="text-gray-200 drop-shadow-lg">{feature.description}</p>

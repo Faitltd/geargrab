@@ -1,5 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+  import { collection, getDocs, query, orderBy, limit, updateDoc, doc, arrayUnion, serverTimestamp } from 'firebase/firestore';
+  import { firestore } from '$lib/firebase/client';
+  import { simpleAuth } from '$lib/auth/simple-auth';
+  import { isCurrentUserAdmin } from '$lib/auth/admin';
   import { notifications } from '$lib/stores/notifications';
 
   let claims = [];
@@ -26,24 +31,58 @@
   async function loadClaims() {
     try {
       loading = true;
-      
-      // Mock insurance claims data
-      claims = [
-        {
-          id: 'CLM001',
-          bookingId: 'BK123456',
-          claimantEmail: 'john@example.com',
-          claimantType: 'renter',
-          itemName: 'Professional Camera Kit',
-          ownerEmail: 'sarah@example.com',
-          claimType: 'damage',
-          status: 'pending',
-          amount: 1200,
-          description: 'Camera lens was cracked during rental period',
-          submittedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-          evidence: ['damage_photo1.jpg', 'damage_photo2.jpg', 'receipt.pdf'],
-          notes: ''
-        },
+
+      // Check admin access
+      if (!await isCurrentUserAdmin()) {
+        goto('/dashboard');
+        return;
+      }
+
+      // Load real claims from Firebase
+      const claimsQuery = query(
+        collection(firestore, 'insuranceClaims'),
+        orderBy('reportedDate', 'desc'),
+        limit(50)
+      );
+
+      const claimsSnap = await getDocs(claimsQuery);
+      const realClaims = claimsSnap.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          bookingId: data.bookingId,
+          claimantEmail: data.claimantEmail || 'Unknown',
+          claimantType: data.claimantId === data.ownerUid ? 'owner' : 'renter',
+          itemName: data.listingTitle || 'Unknown Item',
+          ownerEmail: data.ownerEmail || 'Unknown',
+          claimType: data.type,
+          status: data.status,
+          amount: data.estimatedCost || 0,
+          description: data.description,
+          submittedAt: data.reportedDate?.toDate() || new Date(),
+          evidence: data.evidence?.photos || [],
+          notes: data.timeline?.[data.timeline.length - 1]?.notes || ''
+        };
+      });
+
+      // Add mock data if no real claims exist
+      if (realClaims.length === 0) {
+        claims = [
+          {
+            id: 'CLM001',
+            bookingId: 'BK123456',
+            claimantEmail: 'john@example.com',
+            claimantType: 'renter',
+            itemName: 'Professional Camera Kit',
+            ownerEmail: 'sarah@example.com',
+            claimType: 'damage',
+            status: 'pending',
+            amount: 1200,
+            description: 'Camera lens was cracked during rental period',
+            submittedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+            evidence: ['damage_photo1.jpg', 'damage_photo2.jpg', 'receipt.pdf'],
+            notes: ''
+          },
         {
           id: 'CLM002',
           bookingId: 'BK789012',
@@ -75,7 +114,10 @@
           notes: 'Approved for medical expenses, brake defect confirmed'
         }
       ];
-      
+      } else {
+        claims = realClaims;
+      }
+
       filterClaims();
     } catch (error) {
       console.error('Error loading claims:', error);

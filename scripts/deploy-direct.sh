@@ -32,24 +32,47 @@ gcloud auth list --filter=status:ACTIVE --format="value(account)" | head -1
 echo "🎯 Setting project..."
 gcloud config set project $PROJECT_ID
 
-# Deploy using source-based deployment
-echo "🚀 Deploying to Cloud Run..."
-gcloud run deploy $SERVICE_NAME \
-  --source . \
+# Try alternative deployment without Docker
+echo "🚀 Attempting deployment without Docker..."
+
+# First, let's try to update the existing service with new environment variables
+echo "📝 Updating environment variables..."
+gcloud run services update $SERVICE_NAME \
   --region $REGION \
-  --platform managed \
-  --allow-unauthenticated \
-  --port 8080 \
-  --memory 2Gi \
-  --cpu 2 \
-  --max-instances 10 \
-  --timeout 300 \
-  --concurrency 80 \
   --set-env-vars NODE_ENV=production \
-  --set-env-vars PORT=8080 \
   --set-env-vars VITE_USE_EMULATORS=false \
   --set-env-vars VITE_APP_URL=https://geargrab.co \
+  --set-env-vars VITE_FIREBASE_API_KEY=AIzaSyANV1v2FhD2ktXxBUsfGrDm9442dGGCuYs \
+  --set-env-vars VITE_FIREBASE_AUTH_DOMAIN=geargrabco.firebaseapp.com \
+  --set-env-vars VITE_FIREBASE_PROJECT_ID=geargrabco \
+  --set-env-vars VITE_FIREBASE_STORAGE_BUCKET=geargrabco.firebasestorage.app \
+  --set-env-vars VITE_FIREBASE_MESSAGING_SENDER_ID=227444442028 \
+  --set-env-vars VITE_FIREBASE_APP_ID=1:227444442028:web:6eeaed1e136d07f5b73009 \
+  --set-env-vars VITE_STRIPE_PUBLISHABLE_KEY=pk_live_51RZXbxBfCDZxMJmHHUzHwNJq1gNdpcMjp4kAJK28n8d5kTXPhI4pnptDiLJmyHybfhJzY7vIVZOaNrzJClCkY3vS00tMlh4lyZ \
   --quiet
+
+if [ $? -eq 0 ]; then
+  echo "✅ Environment variables updated successfully"
+else
+  echo "⚠️ Environment update failed, trying full deployment..."
+
+  # If that fails, try source deployment with buildpacks
+  gcloud run deploy $SERVICE_NAME \
+    --source . \
+    --region $REGION \
+    --platform managed \
+    --allow-unauthenticated \
+    --port 8080 \
+    --memory 2Gi \
+    --cpu 2 \
+    --max-instances 10 \
+    --timeout 300 \
+    --concurrency 80 \
+    --set-env-vars NODE_ENV=production \
+    --set-env-vars VITE_USE_EMULATORS=false \
+    --set-env-vars VITE_APP_URL=https://geargrab.co \
+    --quiet
+fi
 
 echo "✅ Deployment completed!"
 

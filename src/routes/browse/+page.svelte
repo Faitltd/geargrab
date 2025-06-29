@@ -206,9 +206,9 @@
 <!-- Page Content -->
 <div class="relative z-10 min-h-screen">
   <!-- Hero Section -->
-  <div class="relative min-h-[50vh] flex flex-col text-center text-white px-2 pt-20">
+  <div class="relative min-h-[50vh] flex flex-col text-center text-white px-2 pt-16 sm:pt-20">
     <div class="flex-1 flex items-center justify-center relative z-30">
-      <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 max-w-4xl mx-auto shadow-lg">
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-3 sm:p-6 max-w-4xl mx-2 sm:mx-auto shadow-lg">
         <ScrollLinkedAnimator animation="scale-in" startOffset="{0}" endOffset="{0.4}">
           <h1 class="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
             Find Your Perfect Gear
@@ -219,7 +219,7 @@
         </ScrollLinkedAnimator>
 
         <!-- Search Form -->
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 max-w-2xl mx-auto border border-white/20 shadow-lg relative z-40">
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 md:p-6 max-w-2xl mx-2 sm:mx-auto border border-white/20 shadow-lg relative z-40">
           <HeroSearch on:search="{handleSearch}" />
         </div>
       </div>
@@ -227,7 +227,7 @@
   </div>
 
   <!-- Content Section -->
-  <div class="results-section relative z-20 bg-gradient-to-b from-transparent to-gray-900/80 px-2 py-8">
+  <div class="results-section relative z-20 bg-gradient-to-b from-transparent to-gray-900/80 px-2 py-4 sm:py-8">
     <!-- Filter Bar -->
     <div class="mb-8 relative z-10">
       <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
@@ -278,8 +278,8 @@
 
     <!-- Adventure Call-to-Action -->
     <ScrollLinkedAnimator animation="scale-in" startOffset="{0.4}" endOffset="{0.8}">
-      <div class="text-center py-16">
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 max-w-3xl mx-auto border border-white/20 shadow-lg">
+      <div class="text-center py-8 sm:py-12 md:py-16">
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 md:p-8 max-w-3xl mx-2 sm:mx-auto border border-white/20 shadow-lg">
           <h2 class="text-4xl font-bold text-white mb-6 drop-shadow-lg">Ready for Your Next Adventure?</h2>
           <p class="text-xl text-gray-200 mb-8 drop-shadow-lg">
             Join thousands of outdoor enthusiasts who trust GearGrab for their gear needs.
