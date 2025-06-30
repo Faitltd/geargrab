@@ -117,7 +117,7 @@ build_docker_image() {
     log_info "Building Docker image: $IMAGE_TAG"
     
     # Build with proper error handling
-    if docker build -t $IMAGE_TAG . --no-cache; then
+    if docker build --platform linux/amd64 -t $IMAGE_TAG . --no-cache; then
         log_success "Docker image built successfully"
     else
         log_error "Docker build failed"
@@ -157,11 +157,10 @@ deploy_to_cloud_run() {
         --port 8080 \
         --memory 2Gi \
         --cpu 2 \
-        --max-instances 10 \
+        --max-instances 5 \
         --timeout 300 \
         --concurrency 80 \
         --set-env-vars NODE_ENV=production \
-        --set-env-vars PORT=8080 \
         --set-env-vars HOST=0.0.0.0 \
         --set-env-vars VITE_USE_EMULATORS=false \
         --set-env-vars VITE_APP_URL=https://geargrab.co \
