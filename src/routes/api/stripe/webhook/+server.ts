@@ -2,18 +2,17 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import Stripe from 'stripe';
-import { STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { adminFirestore } from '$lib/firebase/admin';
 import admin from 'firebase-admin';
 
 // Use admin.firestore.FieldValue.serverTimestamp() instead of direct import
 const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
 
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2024-06-20'
-});
-
 export const POST: RequestHandler = async ({ request }) => {
+  const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+    apiVersion: '2024-06-20'
+  });
   try {
     const body = await request.text();
     const signature = request.headers.get('stripe-signature');
@@ -26,7 +25,7 @@ export const POST: RequestHandler = async ({ request }) => {
     // Verify webhook signature
     let event: Stripe.Event;
     try {
-      event = stripe.webhooks.constructEvent(body, signature, STRIPE_WEBHOOK_SECRET);
+      event = stripe.webhooks.constructEvent(body, signature, env.STRIPE_WEBHOOK_SECRET);
     } catch (err) {
       console.error('Webhook signature verification failed:', err);
       return json({ error: 'Invalid signature' }, { status: 400 });
