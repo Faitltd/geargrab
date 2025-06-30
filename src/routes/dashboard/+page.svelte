@@ -32,7 +32,7 @@
   <ProfileCompletionWidget compact={true} />
 
   <!-- Dashboard Overview -->
-  <ScrollLinkedSequential animation="fade-up" baseDelay="{0.1}" incrementDelay="{0.15}" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" startOffset="{0}" endOffset="{0.6}">
+  <ScrollLinkedSequential animation="fade-up" baseDelay="{0.1}" incrementDelay="{0.15}" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" startOffset="{0}" endOffset="{0.6}" reverseOnScrollUp="{false}">
       <!-- Active Bookings Card -->
       <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 shadow-lg hover:bg-white/20 transition-all duration-300">
         <div class="flex items-center">
@@ -146,7 +146,7 @@
 
   <!-- Admin Section (only visible to admins) -->
   {#if isAdmin}
-    <ScrollLinkedAnimator animation="fade-up" startOffset="{0.15}" endOffset="{0.65}">
+    <ScrollLinkedAnimator animation="fade-up" startOffset="{0.15}" endOffset="{0.65}" reverseOnScrollUp="{false}">
       <div class="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-sm rounded-2xl border border-yellow-500/30 shadow-lg">
         <div class="px-6 py-4 border-b border-yellow-500/20">
           <h2 class="text-lg font-medium text-yellow-400 drop-shadow-lg flex items-center">
@@ -155,7 +155,7 @@
           </h2>
         </div>
         <div class="p-6">
-          <ScrollLinkedSequential animation="fade-up" baseDelay="{0.1}" incrementDelay="{0.1}" className="grid grid-cols-1 md:grid-cols-4 gap-4" startOffset="{0.1}" endOffset="{0.8}">
+          <ScrollLinkedSequential animation="fade-up" baseDelay="{0.1}" incrementDelay="{0.1}" className="grid grid-cols-1 md:grid-cols-4 gap-4" startOffset="{0.1}" endOffset="{0.8}" reverseOnScrollUp="{false}">
             <a
               href="/admin"
               class="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-3 px-4 rounded-xl transition-all duration-300 inline-flex items-center justify-center shadow-lg hover:transform hover:scale-105"
@@ -199,13 +199,13 @@
   {/if}
 
   <!-- Quick Actions -->
-  <ScrollLinkedAnimator animation="fade-up" startOffset="{0.2}" endOffset="{0.7}">
+  <ScrollLinkedAnimator animation="fade-up" startOffset="{0.2}" endOffset="{0.7}" reverseOnScrollUp="{false}">
     <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg">
       <div class="px-6 py-4 border-b border-white/20">
         <h2 class="text-lg font-medium text-white drop-shadow-lg">Quick Actions</h2>
       </div>
       <div class="p-6">
-        <ScrollLinkedSequential animation="fade-up" baseDelay="{0.1}" incrementDelay="{0.1}" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4" startOffset="{0.1}" endOffset="{0.8}">
+        <ScrollLinkedSequential animation="fade-up" baseDelay="{0.1}" incrementDelay="{0.1}" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4" startOffset="{0.1}" endOffset="{0.8}" reverseOnScrollUp="{false}">
           <button
             class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 inline-flex items-center justify-center shadow-lg hover:transform hover:scale-105"
             on:click="{goToCreateListing}"
