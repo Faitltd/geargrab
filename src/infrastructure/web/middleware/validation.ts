@@ -87,7 +87,7 @@ export const validateUpdateProduct = (req: Request, res: Response, next: NextFun
 
 export const validatePagination = (req: Request, res: Response, next: NextFunction): void => {
   const { error, value } = paginationSchema.validate(req.query);
-  
+
   if (error) {
     res.status(400).json({
       success: false,
@@ -100,9 +100,9 @@ export const validatePagination = (req: Request, res: Response, next: NextFuncti
     });
     return;
   }
-  
-  // Update query parameters with validated values
-  Object.assign(req.query, value);
+
+  // Create a new query object instead of modifying the readonly property
+  req.query = { ...req.query, ...value };
   next();
 };
 
