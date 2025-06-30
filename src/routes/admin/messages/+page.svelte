@@ -4,8 +4,8 @@
   import { firestore } from '$lib/firebase/client';
   import { notifications } from '$lib/stores/notifications';
   import { chatService, type ChatConversation } from '$lib/services/chat';
-  import { authStore } from '$lib/stores/auth';
-  import { isCurrentUserAdmin } from '$lib/firebase/auth';
+  import { isCurrentUserAdmin, initializeAdminUser } from '$lib/auth/admin';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import { goto } from '$app/navigation';
 
   let conversations = [];
@@ -25,7 +25,32 @@
   ];
 
   onMount(async () => {
-    await loadConversations();
+    try {
+      // Wait for auth to be ready
+      await simpleAuth.waitForAuthReady();
+
+      if (!simpleAuth.user) {
+        goto('/auth/login?redirectTo=/admin/messages');
+        return;
+      }
+
+      // Initialize admin user if needed
+      await initializeAdminUser();
+
+      // Check admin status
+      const isAdmin = await isCurrentUserAdmin();
+      if (!isAdmin) {
+        console.warn('🚫 User is not admin:', simpleAuth.user.email);
+        goto('/?error=admin_required');
+        return;
+      }
+
+      console.log('✅ Admin access granted for message management:', simpleAuth.user.email);
+      await loadConversations();
+    } catch (error) {
+      console.error('Error checking admin access:', error);
+      goto('/?error=admin_check_failed');
+    }
   });
 
   async function loadConversations() {

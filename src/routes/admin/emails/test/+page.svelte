@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { authStore } from '$lib/stores/auth';
-  import { isCurrentUserAdmin } from '$lib/firebase/auth';
+  import { isCurrentUserAdmin, initializeAdminUser } from '$lib/auth/admin';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import { notifications } from '$lib/stores/notifications';
   import { goto } from '$app/navigation';
 
@@ -39,26 +39,36 @@
 
   onMount(async () => {
     try {
-      if (!$authStore.user) {
-        goto("/auth/login?redirectTo=/admin/emails/test");
+      // Wait for auth to be ready
+      await simpleAuth.waitForAuthReady();
+
+      if (!simpleAuth.user) {
+        goto('/auth/login?redirectTo=/admin/emails/test');
         return;
       }
 
+      // Initialize admin user if needed
+      await initializeAdminUser();
+
+      // Check admin status
       isAdmin = await isCurrentUserAdmin();
       if (!isAdmin) {
-        goto('/dashboard');
+        console.warn('🚫 User is not admin:', simpleAuth.user.email);
+        goto('/?error=admin_required');
         return;
       }
 
+      console.log('✅ Admin access granted for email testing:', simpleAuth.user.email);
+
       // Set default recipient to current user
-      emailTest.recipient = $authStore.user.email || '';
+      emailTest.recipient = simpleAuth.user.email || '';
 
       // Initialize template data JSON
       templateDataJson = JSON.stringify(emailTest.templateData, null, 2);
 
     } catch (error) {
-      console.error('Error checking admin status:', error);
-      goto('/dashboard');
+      console.error('Error checking admin access:', error);
+      goto('/?error=admin_check_failed');
     } finally {
       loading = false;
     }

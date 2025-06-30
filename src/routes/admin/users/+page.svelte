@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { makeUserAdmin, isCurrentUserAdmin, removeAdminPrivileges } from '$lib/firebase/auth';
+  import { makeUserAdmin, removeAdminPrivileges } from '$lib/firebase/auth';
+  import { isCurrentUserAdmin, initializeAdminUser } from '$lib/auth/admin';
+  import { simpleAuth } from '$lib/auth/simple-auth';
   import { notifications } from '$lib/stores/notifications';
   import { goto } from '$app/navigation';
   import { collection, getDocs } from 'firebase/firestore';
@@ -42,25 +44,30 @@
   onMount(async () => {
     // Check if current user is admin
     try {
-      isAdmin = await isCurrentUserAdmin();
-      if (!isAdmin) {
-        notifications.add({
-          type: 'error',
-          message: 'Access denied. Admin privileges required.',
-          timeout: 5000
-        });
-        goto('/dashboard');
+      // Wait for auth to be ready
+      await simpleAuth.waitForAuthReady();
+
+      if (!simpleAuth.user) {
+        goto('/auth/login?redirectTo=/admin/users');
         return;
       }
+
+      // Initialize admin user if needed
+      await initializeAdminUser();
+
+      // Check admin status
+      isAdmin = await isCurrentUserAdmin();
+      if (!isAdmin) {
+        console.warn('🚫 User is not admin:', simpleAuth.user.email);
+        goto('/?error=admin_required');
+        return;
+      }
+
+      console.log('✅ Admin access granted for user management:', simpleAuth.user.email);
       await loadUsers();
     } catch (error) {
-      console.error('Error checking admin status:', error);
-      notifications.add({
-        type: 'error',
-        message: 'Error checking admin status',
-        timeout: 5000
-      });
-      goto('/dashboard');
+      console.error('Error checking admin access:', error);
+      goto('/?error=admin_check_failed');
       return;
     }
     loading = false;
