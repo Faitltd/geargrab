@@ -68,13 +68,13 @@ jobs:
         run: |
           echo "Building application..."
           export NODE_ENV=production
-          export VITE_FIREBASE_API_KEY="${{ secrets.VITE_FIREBASE_API_KEY }}"
-          export VITE_FIREBASE_AUTH_DOMAIN="${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}"
-          export VITE_FIREBASE_PROJECT_ID="${{ secrets.VITE_FIREBASE_PROJECT_ID }}"
-          export VITE_FIREBASE_STORAGE_BUCKET="${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}"
-          export VITE_FIREBASE_MESSAGING_SENDER_ID="${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}"
-          export VITE_FIREBASE_APP_ID="${{ secrets.VITE_FIREBASE_APP_ID }}"
-          export VITE_STRIPE_PUBLISHABLE_KEY="${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}"
+          export VITE_FIREBASE_API_KEY="${{ secrets.VITE_FIREBASE_API_KEY || 'AIzaSyANV1v2FhD2ktXxBUsfGrDm9442dGGCuYs' }}"
+          export VITE_FIREBASE_AUTH_DOMAIN="${{ secrets.VITE_FIREBASE_AUTH_DOMAIN || 'geargrabco.firebaseapp.com' }}"
+          export VITE_FIREBASE_PROJECT_ID="${{ secrets.VITE_FIREBASE_PROJECT_ID || 'geargrabco' }}"
+          export VITE_FIREBASE_STORAGE_BUCKET="${{ secrets.VITE_FIREBASE_STORAGE_BUCKET || 'geargrabco.firebasestorage.app' }}"
+          export VITE_FIREBASE_MESSAGING_SENDER_ID="${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID || '227444442028' }}"
+          export VITE_FIREBASE_APP_ID="${{ secrets.VITE_FIREBASE_APP_ID || '1:227444442028:web:6eeaed1e136d07f5b73009' }}"
+          export VITE_STRIPE_PUBLISHABLE_KEY="${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_live_51RZXbxBfCDZxMJmHHUzHwNJq1gNdpcMjp4kAJK28n8d5kTXPhI4pnptDiLJmyHybfhJzY7vIVZOaNrzJClCkY3vS00tMlh4lyZ' }}"
           npm run build
           echo "Build completed successfully"
           ls -la build/

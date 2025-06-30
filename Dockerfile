@@ -1,45 +1,48 @@
-# Simplified single-stage build for faster deployment
-FROM node:18-alpine
+# Multi-stage build for reliable deployment
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Install only essential build dependencies
-RUN apk add --no-cache python3 make g++
+# Install build dependencies
+RUN apk add --no-cache python3 make g++ git
 
-# Copy package files
+# Copy package files first for better caching
 COPY package*.json ./
 
-# Install dependencies with simplified approach
-RUN npm install --omit=dev --no-audit --no-fund
+# Install all dependencies (including dev dependencies for build)
+RUN npm ci --no-audit --no-fund
 
 # Copy source code
 COPY . .
 
-# Set environment variables
+# Set build environment variables
 ENV NODE_ENV=production
-ENV PORT=8080
-ENV HOST=0.0.0.0
 ENV VITE_USE_EMULATORS=false
 ENV VITE_APP_URL=https://geargrab.co
 
-# Firebase configuration
-ENV VITE_FIREBASE_API_KEY=AIzaSyANV1v2FhD2ktXxBUsfGrDm9442dGGCuYs
-ENV VITE_FIREBASE_AUTH_DOMAIN=geargrabco.firebaseapp.com
-ENV VITE_FIREBASE_PROJECT_ID=geargrabco
-ENV VITE_FIREBASE_STORAGE_BUCKET=geargrabco.firebasestorage.app
-ENV VITE_FIREBASE_MESSAGING_SENDER_ID=227444442028
-ENV VITE_FIREBASE_APP_ID=1:227444442028:web:6eeaed1e136d07f5b73009
+# Build the application
+RUN npm run build
 
-# Stripe configuration
-ENV VITE_STRIPE_PUBLISHABLE_KEY=pk_live_51RZXbxBfCDZxMJmHHUzHwNJq1gNdpcMjp4kAJK28n8d5kTXPhI4pnptDiLJmyHybfhJzY7vIVZOaNrzJClCkY3vS00tMlh4lyZ
+# Verify build output
+RUN ls -la build/ && test -f build/index.js
 
-# Install dev dependencies and build
-RUN npm install --include=dev --no-audit --no-fund && \
-    npm run build && \
-    npm prune --omit=dev
+# Production stage
+FROM node:18-alpine AS production
 
-# Verify build exists
-RUN ls -la ./build && test -f ./build/index.js || (echo "Build files missing!" && exit 1)
+WORKDIR /app
+
+# Install runtime dependencies only
+RUN apk add --no-cache dumb-init
+
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies only
+RUN npm ci --omit=dev --no-audit --no-fund && npm cache clean --force
+
+# Copy built application from builder stage
+COPY --from=builder /app/build ./build
+COPY --from=builder /app/static ./static
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
@@ -49,12 +52,20 @@ RUN addgroup -g 1001 -S nodejs && \
 # Switch to non-root user
 USER sveltekit
 
+# Set runtime environment variables
+ENV NODE_ENV=production
+ENV PORT=8080
+ENV HOST=0.0.0.0
+
 # Expose port
 EXPOSE 8080
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD node -e "require('http').get('http://localhost:8080/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" || exit 1
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
 
 # Start the application
 CMD ["node", "build/index.js"]
