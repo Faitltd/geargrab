@@ -104,6 +104,11 @@ run_test "Admin Security" "$DOMAIN/admin/security" "200"
 echo -e "${BLUE}🔍 Debug Endpoint Tests${NC}"
 run_test "Debug Current User" "$DOMAIN/api/debug/current-user" "200"
 
+# Messaging API Tests
+echo -e "${BLUE}💬 Messaging API Tests${NC}"
+run_test "Conversations API" "$DOMAIN/api/conversations" "401" "Authentication required"
+run_test "Sample Conversation Creation" "$DOMAIN/api/debug/create-sample-conversation" "200"
+
 # Static Asset Tests
 echo -e "${BLUE}📦 Static Asset Tests${NC}"
 run_test "Favicon" "$DOMAIN/favicon.ico" "200"

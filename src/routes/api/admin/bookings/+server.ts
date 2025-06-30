@@ -2,19 +2,19 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { adminFirestore, isAdminInitialized } from '$lib/firebase/server';
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async (event) => {
   try {
     // Check if Firebase Admin is available
     if (!isAdminInitialized || !adminFirestore) {
-      return json({ 
+      return json({
         error: 'Firebase Admin not initialized',
         details: 'Missing Firebase Admin credentials'
       }, { status: 500 });
     }
 
     // Get query parameters
-    const status = url.searchParams.get('status') || 'all';
-    const limit = parseInt(url.searchParams.get('limit') || '100');
+    const status = event.url.searchParams.get('status') || 'all';
+    const limit = parseInt(event.url.searchParams.get('limit') || '100');
 
     // Build query
     let query = adminFirestore.collection('bookings')
