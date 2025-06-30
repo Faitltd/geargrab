@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { GEAR_CATEGORIES, type SearchFilters } from '$lib/services/search';
-  import Checkbox from '$lib/components/ui/checkbox.svelte';
+  import Checkbox from '$lib/components/ui/Checkbox.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -221,7 +221,7 @@
               <button
                 class="py-2 px-3 text-sm rounded-md border transition-colors {selectedCategory === category.id ? 'bg-green-600/80 border-green-500 text-white' : 'border-gray-600 bg-gray-700/50 text-gray-200 hover:border-gray-500'}"
                 on:click={() => { selectedCategory = category.id; applyFilters(); }}
-                aria-pressed="{selectedCategory" === category.id}
+                aria-pressed="{selectedCategory === category.id}"
               >
                 {category.icon} {category.name}
               </button>
@@ -251,7 +251,7 @@
             </div>
             <div>
               <label for="price-max" class="text-xs text-gray-400">Max: ${priceRange[1]}</label>
-              </input
+              <input
                 id="price-max"
                 type="range"
                 min="0"
@@ -290,7 +290,7 @@
               <Checkbox
                 checked="{selectedDeliveryOptions.includes(option.id)}"
                 label="{option.icon} {option.name}"
-                on:change="{()" => toggleDeliveryOption(option.id)}
+                on:change="{() => toggleDeliveryOption(option.id)}"
               />
             {/each}
           </div>
@@ -318,7 +318,7 @@
           <label for="min-rating" class="block text-sm font-medium text-white mb-3">
             Minimum Rating: {minRating > 0 ? `${minRating}+ stars` : 'Any rating'}
           </label>
-          </input
+          <input
             id="min-rating"
             type="range"
             min="0"

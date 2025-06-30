@@ -3,7 +3,7 @@
   import { authStore } from '$lib/stores/auth';
   import { verificationService } from '$lib/services/verification';
   import { backgroundCheckService, type BackgroundCheckProvider } from '$lib/services/backgroundCheck';
-  import Checkbox from '$lib/components/ui/checkbox.svelte';
+  import Checkbox from '$lib/components/ui/Checkbox.svelte';
   
   export let currentStep: 'consent' | 'provider' | 'payment' | 'processing' | 'complete' = 'consent';
   export let selectedProvider: BackgroundCheckProvider['id'] = 'checkr';
