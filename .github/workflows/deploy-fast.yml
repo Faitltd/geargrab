@@ -74,12 +74,30 @@ jobs:
           echo "Build completed successfully"
           ls -la build/
 
-      - name: ☁️ Deploy to Cloud Run (Source-based)
+      - name: 🐳 Configure Docker for Container Registry
         run: |
-          echo "Deploying to Cloud Run using source-based deployment..."
+          gcloud auth configure-docker --quiet
+
+      - name: 🐳 Build and Push Docker Image
+        run: |
+          echo "Building Docker image..."
+          IMAGE_TAG="gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
+
+          # Build the Docker image
+          docker build -t $IMAGE_TAG .
+
+          # Push to Container Registry (not Artifact Registry)
+          docker push $IMAGE_TAG
+
+          echo "✅ Docker image built and pushed: $IMAGE_TAG"
+
+      - name: ☁️ Deploy to Cloud Run
+        run: |
+          echo "Deploying to Cloud Run using Docker image..."
+          IMAGE_TAG="gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
 
           gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --source . \
+            --image $IMAGE_TAG \
             --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
