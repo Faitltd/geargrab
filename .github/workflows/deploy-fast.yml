@@ -46,11 +46,6 @@ jobs:
         with:
           project_id: ${{ env.PROJECT_ID }}
 
-      - name: 🐳 Configure Docker for GCR
-        run: |
-          gcloud auth configure-docker --quiet
-          echo "Docker configured for GCR"
-
       - name: 📦 Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -79,35 +74,12 @@ jobs:
           echo "Build completed successfully"
           ls -la build/
 
-      - name: 🐳 Build Docker image
+      - name: ☁️ Deploy to Cloud Run (Source-based)
         run: |
-          echo "Building Docker image..."
-          IMAGE_TAG="gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
-          echo "Image tag: $IMAGE_TAG"
-
-          # Build with no cache if force_rebuild is true
-          if [ "${{ github.event.inputs.force_rebuild }}" = "true" ]; then
-            docker build --no-cache -t $IMAGE_TAG .
-          else
-            docker build -t $IMAGE_TAG .
-          fi
-
-          echo "Docker image built successfully"
-
-      - name: 🚀 Push Docker image
-        run: |
-          echo "Pushing Docker image..."
-          IMAGE_TAG="gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
-          docker push $IMAGE_TAG
-          echo "Docker image pushed successfully"
-
-      - name: ☁️ Deploy to Cloud Run
-        run: |
-          echo "Deploying to Cloud Run..."
-          IMAGE_TAG="gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
+          echo "Deploying to Cloud Run using source-based deployment..."
 
           gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image $IMAGE_TAG \
+            --source . \
             --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
