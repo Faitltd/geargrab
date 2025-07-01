@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { adminFirestore } from '$lib/firebase/server';
 import { sendBookingEmails, sendPaymentEmails } from '$lib/services/email';
+import { paymentService } from '$lib/services/payment';
 import crypto from 'crypto';
 import type Stripe from 'stripe';
 
