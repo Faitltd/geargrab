@@ -5,9 +5,13 @@
  * Runs all tests in sequence and generates reports
  */
 
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Test configuration
 const TEST_CONFIG = {
@@ -348,11 +352,11 @@ async function main() {
 }
 
 // Run the test suite
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(error => {
     log(`Fatal error: ${error.message}`, 'red');
     process.exit(1);
   });
 }
 
-module.exports = { runTestSuite, generateReport };
+export { runTestSuite, generateReport };
