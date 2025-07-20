@@ -1,0 +1,650 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions for authentication and authorization
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(ownerId) {
+      return isAuthenticated() && request.auth.uid == ownerId;
+    }
+    
+    function isValidUser() {
+      return isAuthenticated() && 
+             request.auth.token.email_verified == true;
+    }
+    
+    // Listings collection rules
+    match /listings/{listingId} {
+      // Allow read access to all authenticated users for active listings
+      allow read: if isAuthenticated() && 
+                     (resource.data.status == 'active' || 
+                      isOwner(resource.data.ownerId));
+      
+      // Allow create only for authenticated users with valid data
+      allow create: if isAuthenticated() && 
+                       isValidUser() &&
+                       validateListingData() &&
+                       request.resource.data.ownerId == request.auth.uid &&
+                       request.resource.data.ownerEmail == request.auth.token.email;
+      
+      // Allow update only by owner with valid data
+      allow update: if isOwner(resource.data.ownerId) &&
+                       validateListingUpdate() &&
+                       request.resource.data.ownerId == resource.data.ownerId &&
+                       request.resource.data.ownerEmail == resource.data.ownerEmail;
+      
+      // Allow delete only by owner
+      allow delete: if isOwner(resource.data.ownerId);
+      
+      // Validate listing data structure and content
+      function validateListingData() {
+        let data = request.resource.data;
+        return data.keys().hasAll([
+          'title', 'description', 'category', 'location', 
+          'listingType', 'condition', 'ownerId', 'ownerEmail',
+          'status', 'createdAt', 'updatedAt', 'views', 'featured'
+        ]) &&
+        // Title validation
+        data.title is string &&
+        data.title.size() > 0 &&
+        data.title.size() <= 100 &&
+        // Description validation
+        data.description is string &&
+        data.description.size() > 0 &&
+        data.description.size() <= 2000 &&
+        // Category validation
+        data.category is string &&
+        data.category in [
+          'Backpacks & Bags', 'Tents & Shelters', 'Sleeping Bags & Pads',
+          'Hiking & Camping', 'Climbing Gear', 'Water Sports', 'Winter Sports',
+          'Cycling', 'Footwear', 'Clothing', 'Electronics', 
+          'Cooking & Hydration', 'Safety & Navigation', 'Other'
+        ] &&
+        // Location validation
+        data.location is string &&
+        data.location.size() > 0 &&
+        data.location.size() <= 100 &&
+        // Listing type validation
+        data.listingType is string &&
+        data.listingType in ['sale', 'rent'] &&
+        // Condition validation
+        data.condition is string &&
+        data.condition in ['New', 'Excellent', 'Very Good', 'Good', 'Fair', 'Poor'] &&
+        // Status validation
+        data.status is string &&
+        data.status in ['active', 'sold', 'rented', 'inactive'] &&
+        // Owner validation
+        data.ownerId is string &&
+        data.ownerEmail is string &&
+        // Metadata validation
+        data.views is number &&
+        data.views >= 0 &&
+        data.featured is bool &&
+        // Pricing validation
+        validatePricing(data) &&
+        // Optional fields validation
+        validateOptionalFields(data);
+      }
+      
+      // Validate pricing based on listing type
+      function validatePricing(data) {
+        return (data.listingType == 'sale' && 
+                data.get('price', '') is string) ||
+               (data.listingType == 'rent' && 
+                data.get('rentalPrice', '') is string &&
+                data.get('rentalPeriod', 'day') in ['day', 'week', 'month']);
+      }
+      
+      // Validate coordinates object
+      function validateCoordinates(coords) {
+        return coords is map &&
+               coords.keys().hasAll(['latitude', 'longitude']) &&
+               coords.latitude is number &&
+               coords.longitude is number &&
+               coords.latitude >= -90 && coords.latitude <= 90 &&
+               coords.longitude >= -180 && coords.longitude <= 180;
+      }
+
+      // Validate optional fields
+      function validateOptionalFields(data) {
+        return (!('brand' in data) || (data.brand is string && data.brand.size() <= 50)) &&
+               (!('size' in data) || (data.size is string && data.size.size() <= 50)) &&
+               (!('weight' in data) || (data.weight is string && data.weight.size() <= 50)) &&
+               (!('imageUrls' in data) || (data.imageUrls is list && data.imageUrls.size() <= 8)) &&
+               (!('tags' in data) || (data.tags is list && data.tags.size() <= 10)) &&
+               (!('availabilityDates' in data) || (data.availabilityDates is list)) &&
+               (!('coordinates' in data) || validateCoordinates(data.coordinates)) &&
+               (!('geohash' in data) || (data.geohash is string && data.geohash.size() <= 12)) &&
+               (!('geohashPrecision' in data) || (data.geohashPrecision is number && data.geohashPrecision >= 1 && data.geohashPrecision <= 12));
+      }
+      
+      // Validate listing updates (more permissive than create)
+      function validateListingUpdate() {
+        let data = request.resource.data;
+        let existingData = resource.data;
+        
+        // Ensure core fields aren't changed inappropriately
+        return data.ownerId == existingData.ownerId &&
+               data.ownerEmail == existingData.ownerEmail &&
+               data.createdAt == existingData.createdAt &&
+               // Allow status changes for owner
+               (data.status in ['active', 'sold', 'rented', 'inactive']) &&
+               // Validate updated fields if they exist
+               (!('title' in data) || (data.title is string && data.title.size() > 0 && data.title.size() <= 100)) &&
+               (!('description' in data) || (data.description is string && data.description.size() > 0 && data.description.size() <= 2000)) &&
+               (!('category' in data) || (data.category in [
+                 'Backpacks & Bags', 'Tents & Shelters', 'Sleeping Bags & Pads',
+                 'Hiking & Camping', 'Climbing Gear', 'Water Sports', 'Winter Sports',
+                 'Cycling', 'Footwear', 'Clothing', 'Electronics', 
+                 'Cooking & Hydration', 'Safety & Navigation', 'Other'
+               ])) &&
+               (!('condition' in data) || (data.condition in ['New', 'Excellent', 'Very Good', 'Good', 'Fair', 'Poor']));
+      }
+    }
+    
+    // User profiles collection (if needed)
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Messages/conversations (if implemented)
+    match /conversations/{conversationId} {
+      allow read, write: if isAuthenticated() && 
+                            request.auth.uid in resource.data.participants;
+    }
+    
+    // Reviews/ratings (if implemented)
+    match /reviews/{reviewId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+                       request.resource.data.reviewerId == request.auth.uid;
+      allow update, delete: if isAuthenticated() &&
+                               request.auth.uid == resource.data.reviewerId;
+    }
+
+    // Bookings collection
+    match /bookings/{bookingId} {
+      // Allow read access to booking participants (renter and owner)
+      allow read: if isAuthenticated() &&
+                     (request.auth.uid == resource.data.renterId ||
+                      request.auth.uid == resource.data.ownerId);
+
+      // Allow create only by authenticated users as renters
+      allow create: if isAuthenticated() &&
+                       validateBookingData() &&
+                       request.resource.data.renterId == request.auth.uid;
+
+      // Allow updates only by booking participants for status changes
+      allow update: if isAuthenticated() &&
+                       (request.auth.uid == resource.data.renterId ||
+                        request.auth.uid == resource.data.ownerId) &&
+                       validateBookingUpdate();
+
+      // Allow delete only by the renter (to cancel booking)
+      allow delete: if isAuthenticated() &&
+                       request.auth.uid == resource.data.renterId;
+
+      // Validate booking data structure
+      function validateBookingData() {
+        let data = request.resource.data;
+        return data.keys().hasAll([
+          'listingId', 'listingTitle', 'ownerId', 'renterId', 'renterEmail',
+          'dates', 'startDate', 'endDate', 'deliveryOption', 'insuranceOption',
+          'totalCost', 'breakdown', 'status', 'createdAt', 'updatedAt'
+        ]) &&
+        // Basic field validation
+        data.listingId is string &&
+        data.listingTitle is string &&
+        data.ownerId is string &&
+        data.renterId is string &&
+        data.renterEmail is string &&
+        data.dates is list &&
+        data.dates.size() > 0 &&
+        data.startDate is string &&
+        data.endDate is string &&
+        data.deliveryOption in ['pickup', 'delivery'] &&
+        data.insuranceOption is bool &&
+        data.totalCost is number &&
+        data.totalCost > 0 &&
+        data.breakdown is map &&
+        data.status in ['pending', 'confirmed', 'cancelled', 'completed'] &&
+        // Ensure renter is not the owner
+        data.renterId != data.ownerId;
+      }
+
+      // Validate booking updates (mainly status changes)
+      function validateBookingUpdate() {
+        let data = request.resource.data;
+        let existingData = resource.data;
+
+        // Core fields cannot be changed
+        return data.listingId == existingData.listingId &&
+               data.ownerId == existingData.ownerId &&
+               data.renterId == existingData.renterId &&
+               data.dates == existingData.dates &&
+               data.startDate == existingData.startDate &&
+               data.endDate == existingData.endDate &&
+               data.createdAt == existingData.createdAt &&
+               // Status can be updated
+               data.status in ['pending', 'confirmed', 'cancelled', 'completed'];
+      }
+    }
+
+    // Checkout sessions collection
+    match /checkout_sessions/{sessionId} {
+      // Allow read access only to the user who created the session
+      allow read: if isAuthenticated() &&
+                     request.auth.uid == resource.data.userId;
+
+      // Allow create only by authenticated users
+      allow create: if isAuthenticated() &&
+                       validateCheckoutSessionData() &&
+                       request.resource.data.userId == request.auth.uid;
+
+      // Allow updates only by the system (via cloud functions)
+      // In practice, this will be handled by Firebase Functions with admin privileges
+      allow update: if false;
+
+      // No delete allowed
+      allow delete: if false;
+
+      // Validate checkout session data structure
+      function validateCheckoutSessionData() {
+        let data = request.resource.data;
+        return data.keys().hasAll([
+          'sessionId', 'listingId', 'userId', 'ownerId', 'mode', 'status',
+          'amount', 'currency', 'createdAt', 'expiresAt'
+        ]) &&
+        data.sessionId is string &&
+        data.listingId is string &&
+        data.userId is string &&
+        data.ownerId is string &&
+        data.mode in ['rental', 'sale'] &&
+        data.status in ['pending', 'completed', 'expired', 'failed'] &&
+        data.amount is number &&
+        data.amount >= 0 &&
+        data.currency is string &&
+        data.currency == 'usd';
+      }
+    }
+
+    // Rentals collection (primary rental records)
+    match /rentals/{rentalId} {
+      // Allow read access to renter and owner
+      allow read: if isAuthenticated() &&
+                     (request.auth.uid == resource.data.renterId ||
+                      request.auth.uid == resource.data.ownerId);
+
+      // Only allow creation by cloud functions (admin privileges)
+      allow create: if false;
+
+      // Allow updates only by participants for status changes
+      allow update: if isAuthenticated() &&
+                       (request.auth.uid == resource.data.renterId ||
+                        request.auth.uid == resource.data.ownerId) &&
+                       validateRentalUpdate();
+
+      // No delete allowed
+      allow delete: if false;
+
+      // Validate rental updates (limited to status changes)
+      function validateRentalUpdate() {
+        let data = request.resource.data;
+        let existingData = resource.data;
+
+        // Core fields cannot be changed
+        return data.listingId == existingData.listingId &&
+               data.ownerId == existingData.ownerId &&
+               data.renterId == existingData.renterId &&
+               data.dates == existingData.dates &&
+               data.startDate == existingData.startDate &&
+               data.endDate == existingData.endDate &&
+               data.paymentIntentId == existingData.paymentIntentId &&
+               data.createdAt == existingData.createdAt &&
+               // Only allow status updates to specific values
+               data.status in ['confirmed', 'active', 'completed', 'cancelled', 'returned'];
+      }
+    }
+
+    // Sales collection (primary sale records)
+    match /sales/{saleId} {
+      // Allow read access to buyer and seller
+      allow read: if isAuthenticated() &&
+                     (request.auth.uid == resource.data.buyerId ||
+                      request.auth.uid == resource.data.ownerId);
+
+      // Only allow creation by cloud functions (admin privileges)
+      allow create: if false;
+
+      // Allow updates only by participants for limited fields
+      allow update: if isAuthenticated() &&
+                       (request.auth.uid == resource.data.buyerId ||
+                        request.auth.uid == resource.data.ownerId) &&
+                       validateSaleUpdate();
+
+      // No delete allowed
+      allow delete: if false;
+
+      // Validate sale updates (limited to status changes)
+      function validateSaleUpdate() {
+        let data = request.resource.data;
+        let existingData = resource.data;
+
+        // Core fields cannot be changed
+        return data.listingId == existingData.listingId &&
+               data.ownerId == existingData.ownerId &&
+               data.buyerId == existingData.buyerId &&
+               data.amount == existingData.amount &&
+               data.paymentIntentId == existingData.paymentIntentId &&
+               data.createdAt == existingData.createdAt &&
+               // Only allow status updates to specific values
+               data.status in ['confirmed', 'shipped', 'delivered', 'completed', 'cancelled'];
+      }
+    }
+
+    // Purchases collection (for completed sales - backward compatibility)
+    match /purchases/{purchaseId} {
+      // Allow read access to buyer and seller
+      allow read: if isAuthenticated() &&
+                     (request.auth.uid == resource.data.buyerId ||
+                      request.auth.uid == resource.data.ownerId);
+
+      // Only allow creation by cloud functions (admin privileges)
+      allow create: if false;
+
+      // Allow updates only by participants for limited fields
+      allow update: if isAuthenticated() &&
+                       (request.auth.uid == resource.data.buyerId ||
+                        request.auth.uid == resource.data.ownerId) &&
+                       validatePurchaseUpdate();
+
+      // No delete allowed
+      allow delete: if false;
+
+      // Validate purchase updates (limited to status changes)
+      function validatePurchaseUpdate() {
+        let data = request.resource.data;
+        let existingData = resource.data;
+
+        // Core fields cannot be changed
+        return data.listingId == existingData.listingId &&
+               data.ownerId == existingData.ownerId &&
+               data.buyerId == existingData.buyerId &&
+               data.amount == existingData.amount &&
+               data.paymentIntentId == existingData.paymentIntentId &&
+               data.createdAt == existingData.createdAt &&
+               // Only allow status updates to specific values
+               data.status in ['completed', 'shipped', 'delivered', 'cancelled'];
+      }
+    }
+
+    // User profiles and preferences
+    match /users/{userId} {
+      // Users can read and write their own profile
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+
+      // Allow others to read basic profile info (for notifications, etc.)
+      allow read: if isAuthenticated() &&
+                     resource.data.keys().hasAny(['displayName', 'firstName', 'lastName']);
+
+      // Subcollection for user preferences
+      match /preferences/{document} {
+        allow read, write: if isAuthenticated() && request.auth.uid == userId;
+      }
+    }
+
+    // User activity logs (read-only for users)
+    match /user_activity/{activityId} {
+      allow read: if isAuthenticated() && request.auth.uid == resource.data.uid;
+      allow create, update, delete: if false; // Only cloud functions can write
+    }
+
+    // Condition checks collection
+    match /conditionChecks/{conditionCheckId} {
+      // Allow read access to renter and owner
+      allow read: if isAuthenticated() &&
+                     (request.auth.uid == resource.data.renterId ||
+                      request.auth.uid == resource.data.ownerId);
+
+      // Allow creation by authenticated renters for their own rentals
+      allow create: if isAuthenticated() &&
+                       validateConditionCheckData() &&
+                       request.resource.data.renterId == request.auth.uid;
+
+      // Allow updates only by participants for status changes
+      allow update: if isAuthenticated() &&
+                       (request.auth.uid == resource.data.renterId ||
+                        request.auth.uid == resource.data.ownerId) &&
+                       validateConditionCheckUpdate();
+
+      // No delete allowed (for audit trail)
+      allow delete: if false;
+
+      // Validate condition check data structure
+      function validateConditionCheckData() {
+        let data = request.resource.data;
+        return data.keys().hasAll([
+          'rentalId', 'listingId', 'renterId', 'ownerId', 'type', 'status',
+          'photos', 'createdAt', 'updatedAt'
+        ]) &&
+        data.rentalId is string &&
+        data.listingId is string &&
+        data.renterId is string &&
+        data.ownerId is string &&
+        data.type in ['before', 'after'] &&
+        data.status in ['pending', 'completed', 'approved', 'disputed'] &&
+        data.photos is list &&
+        data.photos.size() >= 3 && // Minimum 3 photos required
+        data.photos.size() <= 10; // Maximum 10 photos allowed
+      }
+
+      // Validate condition check updates (limited to status and notes)
+      function validateConditionCheckUpdate() {
+        let data = request.resource.data;
+        let existingData = resource.data;
+
+        // Core fields cannot be changed
+        return data.rentalId == existingData.rentalId &&
+               data.listingId == existingData.listingId &&
+               data.renterId == existingData.renterId &&
+               data.ownerId == existingData.ownerId &&
+               data.type == existingData.type &&
+               data.photos == existingData.photos &&
+               data.createdAt == existingData.createdAt &&
+               // Only allow status and notes updates
+               data.status in ['pending', 'completed', 'approved', 'disputed'];
+      }
+    }
+
+    // Reviews collection (main reviews)
+    match /reviews/{reviewId} {
+      // Allow read access to all authenticated users for active reviews
+      allow read: if isAuthenticated() &&
+                     (resource.data.status == 'active' ||
+                      request.auth.uid == resource.data.reviewerId ||
+                      request.auth.uid == resource.data.revieweeId);
+
+      // Allow creation by authenticated users for their own reviews
+      allow create: if isAuthenticated() &&
+                       validateReviewData() &&
+                       request.resource.data.reviewerId == request.auth.uid;
+
+      // Allow updates by reviewer (for editing) or reviewee (for responses)
+      allow update: if isAuthenticated() &&
+                       ((request.auth.uid == resource.data.reviewerId && validateReviewUpdate()) ||
+                        (request.auth.uid == resource.data.revieweeId && validateReviewResponse()) ||
+                        validateHelpfulVote());
+
+      // No delete allowed (for integrity)
+      allow delete: if false;
+
+      // Validate review data structure
+      function validateReviewData() {
+        let data = request.resource.data;
+        return data.keys().hasAll([
+          'reviewerId', 'revieweeId', 'type', 'rating', 'comment',
+          'helpful', 'helpfulVotes', 'reported', 'reportCount', 'verified',
+          'status', 'createdAt', 'updatedAt'
+        ]) &&
+        data.reviewerId is string &&
+        data.revieweeId is string &&
+        data.type in ['listing', 'renter', 'owner', 'buyer', 'seller'] &&
+        data.rating is number &&
+        data.rating >= 1 && data.rating <= 5 &&
+        data.comment is string &&
+        data.comment.size() >= 10 && data.comment.size() <= 1000 &&
+        data.helpful is number && data.helpful >= 0 &&
+        data.helpfulVotes is list &&
+        data.reported is bool &&
+        data.reportCount is number && data.reportCount >= 0 &&
+        data.verified is bool &&
+        data.status in ['active', 'hidden', 'deleted'] &&
+        (!('title' in data) || (data.title is string && data.title.size() <= 100)) &&
+        (!('photos' in data) || (data.photos is list && data.photos.size() <= 5)) &&
+        (!('tags' in data) || (data.tags is list && data.tags.size() <= 5));
+      }
+
+      // Validate review updates (limited fields)
+      function validateReviewUpdate() {
+        let data = request.resource.data;
+        let existingData = resource.data;
+
+        // Core fields cannot be changed
+        return data.reviewerId == existingData.reviewerId &&
+               data.revieweeId == existingData.revieweeId &&
+               data.type == existingData.type &&
+               data.rating == existingData.rating &&
+               data.verified == existingData.verified &&
+               data.createdAt == existingData.createdAt &&
+               // Allow updating comment, title, photos, tags within limits
+               (!('comment' in data) || (data.comment is string && data.comment.size() >= 10 && data.comment.size() <= 1000)) &&
+               (!('title' in data) || (data.title is string && data.title.size() <= 100));
+      }
+
+      // Validate review response updates
+      function validateReviewResponse() {
+        let data = request.resource.data;
+        let existingData = resource.data;
+
+        // Only allow adding/updating response
+        return data.reviewerId == existingData.reviewerId &&
+               data.revieweeId == existingData.revieweeId &&
+               data.type == existingData.type &&
+               data.rating == existingData.rating &&
+               data.comment == existingData.comment &&
+               data.createdAt == existingData.createdAt &&
+               // Response validation
+               ('response' in data) &&
+               data.response.responderId == request.auth.uid &&
+               data.response.comment is string &&
+               data.response.comment.size() > 0 && data.response.comment.size() <= 500;
+      }
+
+      // Validate helpful vote updates
+      function validateHelpfulVote() {
+        let data = request.resource.data;
+        let existingData = resource.data;
+
+        // Only allow helpful count and votes changes
+        return data.reviewerId == existingData.reviewerId &&
+               data.revieweeId == existingData.revieweeId &&
+               data.type == existingData.type &&
+               data.rating == existingData.rating &&
+               data.comment == existingData.comment &&
+               data.createdAt == existingData.createdAt &&
+               // Helpful vote validation
+               data.helpful is number && data.helpful >= 0 &&
+               data.helpfulVotes is list &&
+               data.helpfulVotes.size() == data.helpful;
+      }
+    }
+
+    // Review requests collection
+    match /review_requests/{requestId} {
+      // Allow read access to the reviewer
+      allow read: if isAuthenticated() &&
+                     request.auth.uid == resource.data.reviewerId;
+
+      // Allow creation by authenticated users (typically by cloud functions after booking completion)
+      allow create: if isAuthenticated() &&
+                       validateReviewRequestData();
+
+      // Allow updates by the reviewer (to mark as completed) or system
+      allow update: if isAuthenticated() &&
+                       request.auth.uid == resource.data.reviewerId &&
+                       validateReviewRequestUpdate();
+
+      // Allow deletion by the reviewer or system
+      allow delete: if isAuthenticated() &&
+                       request.auth.uid == resource.data.reviewerId;
+
+      // Validate review request data structure
+      function validateReviewRequestData() {
+        let data = request.resource.data;
+        return data.keys().hasAll([
+          'bookingId', 'listingId', 'listingTitle', 'reviewerId', 'reviewerName',
+          'revieweeId', 'revieweeName', 'type', 'dueDate', 'remindersSent',
+          'completed', 'createdAt', 'updatedAt'
+        ]) &&
+        data.bookingId is string &&
+        data.listingId is string &&
+        data.listingTitle is string &&
+        data.reviewerId is string &&
+        data.reviewerName is string &&
+        data.revieweeId is string &&
+        data.revieweeName is string &&
+        data.type in ['listing', 'renter', 'owner', 'buyer', 'seller'] &&
+        data.dueDate is timestamp &&
+        data.remindersSent is number && data.remindersSent >= 0 &&
+        data.completed is bool;
+      }
+
+      // Validate review request updates (limited to completion status)
+      function validateReviewRequestUpdate() {
+        let data = request.resource.data;
+        let existingData = resource.data;
+
+        // Core fields cannot be changed, only completion status
+        return data.bookingId == existingData.bookingId &&
+               data.listingId == existingData.listingId &&
+               data.reviewerId == existingData.reviewerId &&
+               data.revieweeId == existingData.revieweeId &&
+               data.type == existingData.type &&
+               data.createdAt == existingData.createdAt &&
+               data.completed is bool;
+      }
+    }
+
+    // Listing reviews subcollection (deprecated - keeping for backward compatibility)
+    match /listings/{listingId}/reviews/{reviewId} {
+      // Allow read access to all authenticated users
+      allow read: if isAuthenticated();
+
+      // Only allow creation by cloud functions or the review system
+      allow create: if false; // Handled by main reviews collection
+
+      // No updates or deletes
+      allow update, delete: if false;
+    }
+
+    // User received reviews subcollection (deprecated - keeping for backward compatibility)
+    match /users/{userId}/receivedReviews/{reviewId} {
+      // Allow read access to the user and authenticated users
+      allow read: if isAuthenticated();
+
+      // Only allow creation by cloud functions or the review system
+      allow create: if false; // Handled by main reviews collection
+
+      // No updates or deletes
+      allow update, delete: if false;
+    }
+
+    // Default deny all other documents
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

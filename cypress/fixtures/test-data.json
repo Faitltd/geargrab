@@ -1,0 +1,128 @@
+{
+  "users": [
+    {
+      "id": "user1",
+      "email": "test@example.com",
+      "password": "TestPassword123!",
+      "name": "Test User",
+      "emailVerified": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "admin1",
+      "email": "admin@example.com",
+      "password": "AdminPassword123!",
+      "name": "Admin User",
+      "role": "admin",
+      "emailVerified": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "listings": [
+    {
+      "id": "listing1",
+      "title": "Professional DSLR Camera",
+      "description": "High-quality camera perfect for photography enthusiasts",
+      "category": "photography",
+      "price": 75,
+      "location": "San Francisco, CA",
+      "condition": "excellent",
+      "brand": "Canon",
+      "model": "EOS 5D Mark IV",
+      "ownerId": "user1",
+      "images": ["camera1.jpg", "camera2.jpg"],
+      "available": true,
+      "createdAt": "2024-01-15T00:00:00Z"
+    },
+    {
+      "id": "listing2",
+      "title": "Mountain Bike",
+      "description": "Great bike for mountain trails",
+      "category": "sports",
+      "price": 100,
+      "location": "Los Angeles, CA",
+      "condition": "good",
+      "brand": "Trek",
+      "ownerId": "user1",
+      "images": ["bike1.jpg"],
+      "available": true,
+      "createdAt": "2024-01-20T00:00:00Z"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "booking1",
+      "listingId": "listing1",
+      "renterId": "user1",
+      "ownerId": "user1",
+      "startDate": "2024-02-01T00:00:00Z",
+      "endDate": "2024-02-05T00:00:00Z",
+      "totalCost": 300,
+      "status": "confirmed",
+      "paymentStatus": "completed",
+      "createdAt": "2024-01-25T00:00:00Z"
+    }
+  ],
+  "disputes": [
+    {
+      "id": "dispute1",
+      "bookingId": "booking1",
+      "type": "condition",
+      "status": "pending",
+      "priority": "high",
+      "description": "Item was damaged upon pickup",
+      "reportedBy": "user1",
+      "evidence": ["damage1.jpg", "damage2.jpg"],
+      "createdAt": "2024-02-02T00:00:00Z"
+    }
+  ],
+  "payments": [
+    {
+      "id": "payment1",
+      "bookingId": "booking1",
+      "amount": 300,
+      "currency": "usd",
+      "status": "completed",
+      "stripePaymentIntentId": "pi_test_123",
+      "createdAt": "2024-01-25T00:00:00Z"
+    }
+  ],
+  "testCards": {
+    "valid": {
+      "number": "4242424242424242",
+      "expiry": "12/25",
+      "cvc": "123",
+      "name": "Test User"
+    },
+    "declined": {
+      "number": "4000000000000002",
+      "expiry": "12/25",
+      "cvc": "123",
+      "name": "Test User"
+    },
+    "insufficientFunds": {
+      "number": "4000000000009995",
+      "expiry": "12/25",
+      "cvc": "123",
+      "name": "Test User"
+    },
+    "expired": {
+      "number": "4000000000000069",
+      "expiry": "12/25",
+      "cvc": "123",
+      "name": "Test User"
+    },
+    "incorrectCvc": {
+      "number": "4000000000000127",
+      "expiry": "12/25",
+      "cvc": "123",
+      "name": "Test User"
+    },
+    "requiresAuthentication": {
+      "number": "4000000000003220",
+      "expiry": "12/25",
+      "cvc": "123",
+      "name": "Test User"
+    }
+  }
+}

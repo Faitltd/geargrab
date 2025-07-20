@@ -1,0 +1,187 @@
+# Cloud Run service configuration for GearGrab
+# This file defines the complete Cloud Run service specification
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: geargrab
+  labels:
+    app: geargrab
+    environment: production
+    version: "1.0"
+  annotations:
+    # Cloud Run specific annotations
+    run.googleapis.com/ingress: all
+    run.googleapis.com/execution-environment: gen2
+    run.googleapis.com/cpu-throttling: "true"
+    
+    # Custom domain mapping (optional)
+    # run.googleapis.com/custom-audiences: "https://your-domain.com"
+    
+    # Binary authorization (optional)
+    # run.googleapis.com/binary-authorization-breakglass: "true"
+    
+spec:
+  template:
+    metadata:
+      labels:
+        app: geargrab
+        environment: production
+      annotations:
+        # Scaling configuration
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "10"
+        
+        # Resource allocation
+        run.googleapis.com/memory: "1Gi"
+        run.googleapis.com/cpu: "1"
+        
+        # Networking
+        run.googleapis.com/vpc-access-connector: ""
+        run.googleapis.com/vpc-access-egress: "private-ranges-only"
+        
+        # Security
+        run.googleapis.com/execution-environment: "gen2"
+        run.googleapis.com/cpu-throttling: "true"
+        
+        # Startup and health checks
+        run.googleapis.com/timeout: "300s"
+        
+    spec:
+      # Service account for the container
+      serviceAccountName: geargrab-cloudrun@PROJECT_ID.iam.gserviceaccount.com
+      
+      # Container concurrency
+      containerConcurrency: 80
+      
+      # Timeout for requests
+      timeoutSeconds: 300
+      
+      containers:
+      - name: geargrab
+        # Image will be replaced during deployment
+        image: gcr.io/PROJECT_ID/geargrab:latest
+        
+        # Container port
+        ports:
+        - name: http1
+          containerPort: 8080
+          protocol: TCP
+        
+        # Environment variables
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "8080"
+        - name: HOST
+          value: "0.0.0.0"
+        
+        # Secrets from Secret Manager
+        - name: FIREBASE_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: firebase-private-key
+              key: latest
+        - name: FIREBASE_CLIENT_EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: firebase-client-email
+              key: latest
+        - name: STRIPE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: stripe-secret-key
+              key: latest
+        - name: STRIPE_WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: stripe-webhook-secret
+              key: latest
+        - name: SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: session-secret
+              key: latest
+        
+        # Resource limits and requests
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+          requests:
+            cpu: "0.5"
+            memory: "512Mi"
+        
+        # Startup probe
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8080
+            httpHeaders:
+            - name: User-Agent
+              value: "GoogleHC/1.0"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        
+        # Liveness probe
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+            httpHeaders:
+            - name: User-Agent
+              value: "GoogleHC/1.0"
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        
+        # Readiness probe
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+            httpHeaders:
+            - name: User-Agent
+              value: "GoogleHC/1.0"
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        
+        # Security context
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+          runAsGroup: 1001
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+        
+        # Volume mounts (if needed)
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: logs
+          mountPath: /app/logs
+      
+      # Volumes
+      volumes:
+      - name: tmp
+        emptyDir:
+          sizeLimit: "100Mi"
+      - name: logs
+        emptyDir:
+          sizeLimit: "500Mi"
+  
+  traffic:
+  - percent: 100
+    latestRevision: true
