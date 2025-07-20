@@ -125,11 +125,11 @@ steps:
 # Substitution variables (can be overridden)
 substitutions:
   _REGION: 'us-central1'
-  _SERVICE_ACCOUNT_EMAIL: 'geargrab-cloudrun@${PROJECT_ID}.iam.gserviceaccount.com'
+  _SERVICE_ACCOUNT_EMAIL: 'geargrab-cloudrun@geargrabco.iam.gserviceaccount.com'
   _PUBLIC_FIREBASE_API_KEY: ''
-  _PUBLIC_FIREBASE_AUTH_DOMAIN: '${PROJECT_ID}.firebaseapp.com'
-  _PUBLIC_FIREBASE_PROJECT_ID: '${PROJECT_ID}'
-  _PUBLIC_FIREBASE_STORAGE_BUCKET: '${PROJECT_ID}.appspot.com'
+  _PUBLIC_FIREBASE_AUTH_DOMAIN: 'geargrabco.firebaseapp.com'
+  _PUBLIC_FIREBASE_PROJECT_ID: 'geargrabco'
+  _PUBLIC_FIREBASE_STORAGE_BUCKET: 'geargrabco.appspot.com'
   _PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ''
   _PUBLIC_FIREBASE_APP_ID: ''
   _PUBLIC_STRIPE_PUBLISHABLE_KEY: ''
@@ -162,4 +162,4 @@ images:
   - 'gcr.io/${PROJECT_ID}/geargrab:latest'
 
 # Service account for Cloud Build
-serviceAccount: 'projects/${PROJECT_ID}/serviceAccounts/geargrab-cloudbuild@${PROJECT_ID}.iam.gserviceaccount.com'
+serviceAccount: 'projects/geargrabco/serviceAccounts/geargrab-cloudbuild@geargrabco.iam.gserviceaccount.com'

@@ -16,14 +16,14 @@ This guide will deploy the GearGrab platform to Google Cloud Run and configure t
 ### 1. Set Up Google Cloud Project
 
 ```bash
-# Create a new project (or use existing)
-gcloud projects create geargrab-production --name="GearGrab Production"
+# Use your existing project
+gcloud config set project geargrabco
 
-# Set as default project
-gcloud config set project geargrab-production
+# Verify project details
+gcloud projects describe geargrabco
 
 # Enable billing (required for Cloud Run)
-# Visit: https://console.cloud.google.com/billing
+# Visit: https://console.cloud.google.com/billing/projects/geargrabco
 ```
 
 ### 2. Enable Required APIs

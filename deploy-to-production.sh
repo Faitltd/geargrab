@@ -14,7 +14,8 @@ PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Configuration
-PROJECT_ID="geargrab-production"  # Replace with your actual project ID
+PROJECT_ID="geargrabco"  # Your actual project ID
+PROJECT_NUMBER="227444442028"  # Your project number
 REGION="us-central1"
 SERVICE_NAME="geargrab"
 DOMAIN="geargrab.co"
