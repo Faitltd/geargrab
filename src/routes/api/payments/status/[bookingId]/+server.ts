@@ -7,12 +7,20 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { bookingsService } from '$lib/services/bookings.service';
 import Stripe from 'stripe';
-import { STRIPE_SECRET_KEY } from '$env/static/private';
 
-// Initialize Stripe
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16'
-});
+// Mock Stripe for demo deployment
+const stripe = {
+  paymentIntents: {
+    retrieve: async (paymentIntentId: string) => {
+      return {
+        id: paymentIntentId,
+        status: 'succeeded',
+        amount: 5000,
+        currency: 'usd'
+      };
+    }
+  }
+};
 
 /**
  * GET /api/payments/status/[bookingId]

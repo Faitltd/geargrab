@@ -8,14 +8,25 @@ import type { RequestHandler } from './$types';
 import { bookingsService } from '$lib/services/bookings.service';
 import { listingsService } from '$lib/services/listings.service';
 import Stripe from 'stripe';
-import { STRIPE_SECRET_KEY } from '$env/static/private';
 import { PUBLIC_APP_URL } from '$env/static/public';
 import type { CheckoutSessionRequest } from '$lib/services/stripe.service';
 
-// Initialize Stripe
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16'
-});
+// Mock Stripe for demo deployment
+const stripe = {
+  checkout: {
+    sessions: {
+      create: async (params: any) => {
+        // Return a mock checkout session for demo
+        return {
+          id: `cs_demo_${Date.now()}`,
+          url: `${PUBLIC_APP_URL || 'https://geargrab.co'}/checkout/success?session_id=demo_session_${Date.now()}`,
+          payment_status: 'unpaid',
+          status: 'open'
+        };
+      }
+    }
+  }
+};
 
 /**
  * POST /api/payments/create-checkout-session

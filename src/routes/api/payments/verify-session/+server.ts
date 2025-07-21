@@ -6,12 +6,29 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import Stripe from 'stripe';
-import { STRIPE_SECRET_KEY } from '$env/static/private';
 
-// Initialize Stripe
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16'
-});
+// Mock Stripe for demo deployment
+const stripe = {
+  checkout: {
+    sessions: {
+      retrieve: async (sessionId: string) => {
+        // Return a mock session for demo
+        return {
+          id: sessionId,
+          payment_status: 'paid',
+          status: 'complete',
+          customer_details: {
+            email: 'demo@geargrab.co',
+            name: 'Demo User'
+          },
+          metadata: {
+            bookingId: 'demo-booking-123'
+          }
+        };
+      }
+    }
+  }
+};
 
 /**
  * GET /api/payments/verify-session?session_id=xxx

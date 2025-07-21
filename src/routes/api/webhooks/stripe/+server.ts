@@ -6,13 +6,29 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import Stripe from 'stripe';
-import { STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET } from '$env/static/private';
 import { bookingsService } from '$lib/services/bookings.service';
 
-// Initialize Stripe
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16'
-});
+// Mock Stripe for demo deployment
+const stripe = {
+  webhooks: {
+    constructEvent: (payload: any, signature: string, secret: string) => {
+      // Return a mock webhook event for demo
+      return {
+        id: 'evt_demo_123',
+        type: 'checkout.session.completed',
+        data: {
+          object: {
+            id: 'cs_demo_123',
+            payment_status: 'paid',
+            metadata: {
+              bookingId: 'demo-booking-123'
+            }
+          }
+        }
+      };
+    }
+  }
+};
 
 /**
  * POST /api/webhooks/stripe
