@@ -21,19 +21,19 @@ const config = {
 			$types: 'src/lib/types'
 		},
 
-		// CSP configuration for security
-		csp: {
-			mode: 'auto',
-			directives: {
-				'default-src': ['self'],
-				'script-src': ['self', 'unsafe-inline', 'https://js.stripe.com', 'https://apis.google.com', 'https://accounts.google.com', 'https://www.gstatic.com'],
-				'style-src': ['self', 'unsafe-inline', 'https://fonts.googleapis.com'],
-				'font-src': ['self', 'https://fonts.gstatic.com'],
-				'img-src': ['self', 'data:', 'https:', 'blob:'],
-				'connect-src': ['self', 'https://api.stripe.com', 'https://*.googleapis.com', 'https://*.firebase.com', 'https://*.firebaseio.com'],
-				'frame-src': ['https://js.stripe.com', 'https://hooks.stripe.com', 'https://accounts.google.com', 'https://www.google.com']
-			}
-		},
+		// CSP configuration disabled for now to fix loading issues
+		// csp: {
+		// 	mode: 'auto',
+		// 	directives: {
+		// 		'default-src': ['self'],
+		// 		'script-src': ['self', 'unsafe-inline', 'https://js.stripe.com', 'https://apis.google.com', 'https://accounts.google.com', 'https://www.gstatic.com'],
+		// 		'style-src': ['self', 'unsafe-inline', 'https://fonts.googleapis.com'],
+		// 		'font-src': ['self', 'https://fonts.gstatic.com'],
+		// 		'img-src': ['self', 'data:', 'https:', 'blob:', '*'],
+		// 		'connect-src': ['self', 'https://api.stripe.com', 'https://*.googleapis.com', 'https://*.firebase.com', 'https://*.firebaseio.com'],
+		// 		'frame-src': ['https://js.stripe.com', 'https://hooks.stripe.com', 'https://accounts.google.com', 'https://www.google.com']
+		// 	}
+		// },
 
 		// Version configuration
 		version: {
