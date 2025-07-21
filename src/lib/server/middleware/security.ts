@@ -197,12 +197,11 @@ function buildContentSecurityPolicy(pathname: string): string {
       'https://fonts.gstatic.com'
     ],
     'img-src': [
-      "'self'",
+      '*',
       'data:',
       'blob:',
       'https:',
-      'https://firebasestorage.googleapis.com',
-      'https://lh3.googleusercontent.com' // Google profile images
+      'http:'
     ],
     'connect-src': [
       "'self'",

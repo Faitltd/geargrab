@@ -135,7 +135,7 @@ function addSecurityHeaders(response: Response, url: string): void {
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.gstatic.com https://apis.google.com https://accounts.google.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' data: https: blob:",
+      "img-src * data: https: http: blob:",
       "connect-src 'self' https://api.stripe.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com",
       "frame-src https://js.stripe.com https://hooks.stripe.com https://accounts.google.com https://www.google.com",
       "object-src 'none'",
