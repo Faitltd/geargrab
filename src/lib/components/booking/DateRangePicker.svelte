@@ -255,7 +255,6 @@
         {/each}
       </div>
     </div>
-  </div>
 
   <!-- Legend -->
   <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 pt-4 border-t border-gray-200">
