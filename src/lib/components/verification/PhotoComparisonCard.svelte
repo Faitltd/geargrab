@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { fade, scale } from 'svelte/transition';
+  import { fade, scale, slide } from 'svelte/transition';
   import type { ConditionCheckPhoto } from '$lib/services/conditionCheck';
 
   export let beforePhoto: ConditionCheckPhoto;

@@ -13,6 +13,9 @@
   let error = '';
   let paymentData: any = null;
   let bookingId = '';
+  let isRental = true;
+  let rentalData: any = null;
+  let redirecting = false;
 
   $: sessionId = $page.url.searchParams.get('session_id');
   $: user = $authStore.data;
