@@ -175,10 +175,40 @@
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none {errors[field.key] ? 'border-red-500' : ''}"
               disabled={field.readonly}
             ></textarea>
+          {:else if field.type === 'email'}
+            <input
+              id={field.key}
+              type="email"
+              bind:value={formData[field.key]}
+              on:input={(e) => handleInput(field, e)}
+              placeholder={field.placeholder}
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent {errors[field.key] ? 'border-red-500' : ''}"
+              disabled={field.readonly}
+            />
+          {:else if field.type === 'tel'}
+            <input
+              id={field.key}
+              type="tel"
+              bind:value={formData[field.key]}
+              on:input={(e) => handleInput(field, e)}
+              placeholder={field.placeholder}
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent {errors[field.key] ? 'border-red-500' : ''}"
+              disabled={field.readonly}
+            />
+          {:else if field.type === 'url'}
+            <input
+              id={field.key}
+              type="url"
+              bind:value={formData[field.key]}
+              on:input={(e) => handleInput(field, e)}
+              placeholder={field.placeholder}
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent {errors[field.key] ? 'border-red-500' : ''}"
+              disabled={field.readonly}
+            />
           {:else}
             <input
               id={field.key}
-              type={field.type}
+              type="text"
               bind:value={formData[field.key]}
               on:input={(e) => handleInput(field, e)}
               placeholder={field.placeholder}
