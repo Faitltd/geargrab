@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
-  import { authStore } from '$lib/stores/auth';
+  import { authStore } from '$lib/stores/auth.store';
   import { getRental, getNextAction, formatRentalDates, getRentalDuration, type RentalData } from '$lib/services/rentals';
   import { getRentalConditionChecks, type ConditionCheck } from '$lib/services/conditionCheck';
   import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';

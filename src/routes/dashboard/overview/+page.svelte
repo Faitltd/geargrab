@@ -3,6 +3,7 @@
   import { goto } from '$app/navigation';
   import { authStore } from '$lib/stores/auth.store';
   import Header from '$lib/components/Header.svelte';
+  import Footer from '$lib/components/Footer.svelte';
   import ReviewRequestsList from '$lib/components/reviews/ReviewRequestsList.svelte';
   import type { Booking } from '$lib/types/bookings';
   import type { ReviewRequest } from '$lib/types/reviews';
@@ -19,6 +20,18 @@
     activeRentals: 0,
     totalEarnings: 0
   };
+
+  // Sample data for missing sections
+  let recentActivity = [
+    { message: 'New booking request for REI Half Dome Tent', time: '2 hours ago' },
+    { message: 'Payment received for Trek Mountain Bike rental', time: '4 hours ago' },
+    { message: 'Gear returned: Black Diamond Harness', time: '1 day ago' }
+  ];
+
+  let upcomingRentals = [
+    { item: 'BOTE SUP Board', price: 35, dates: 'Jul 25-27', status: 'confirmed', renter: 'John D.', startDate: 'Jul 25', endDate: 'Jul 27' },
+    { item: 'Rossignol Skis', price: 45, dates: 'Jul 30-Aug 2', status: 'pending', renter: 'Sarah M.', startDate: 'Jul 30', endDate: 'Aug 2' }
+  ];
 
   $: user = $authStore.data;
 
@@ -257,16 +270,13 @@
         <div class="bg-white rounded-xl shadow-rei p-6">
           <h3 class="text-lg font-bold text-neutral-900 mb-6">Recent Activity</h3>
           <div class="space-y-4">
-            {#each dashboardData.recentActivity as activity}
+            {#each recentActivity as activity}
               <div class="flex items-start space-x-3">
                 <div class="flex-shrink-0 w-2 h-2 bg-primary-500 rounded-full mt-2"></div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm text-neutral-900">{activity.message}</p>
                   <p class="text-xs text-neutral-500 mt-1">{activity.time}</p>
                 </div>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {getStatusColor(activity.status)}">
-                  {activity.status}
-                </span>
               </div>
             {/each}
           </div>
@@ -276,7 +286,7 @@
         <div class="bg-white rounded-xl shadow-rei p-6">
           <h3 class="text-lg font-bold text-neutral-900 mb-6">Upcoming Rentals</h3>
           <div class="space-y-4">
-            {#each dashboardData.upcomingRentals as rental}
+            {#each upcomingRentals as rental}
               <div class="border border-neutral-200 rounded-lg p-4">
                 <div class="flex items-center justify-between mb-2">
                   <h4 class="font-semibold text-neutral-900">{rental.item}</h4>

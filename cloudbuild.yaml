@@ -144,12 +144,9 @@ options:
   env:
     - 'DOCKER_BUILDKIT=1'
   
-  # Increase build timeout
-  timeout: '1200s'
-  
   # Use substitution option
   substitution_option: 'ALLOW_LOOSE'
-  
+
   # Enable logging
   logging: 'CLOUD_LOGGING_ONLY'
 
