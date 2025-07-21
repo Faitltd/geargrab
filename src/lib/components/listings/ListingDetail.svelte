@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { authStore, showToast } from '$lib/stores/auth.store';
+  import { authStore } from '$lib/stores/auth.store';
+  import { showToast } from '$lib/stores/toast.store';
   import ListingActionButton from './ListingActionButton.svelte';
   import ErrorBanner from '$lib/components/ErrorBanner.svelte';
   import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
