@@ -30,7 +30,7 @@ steps:
       '--max-instances', '10',
       '--concurrency', '80',
       '--timeout', '300',
-      '--set-env-vars', 'NODE_ENV=production,PORT=8080,HOST=0.0.0.0,PUBLIC_APP_URL=https://geargrab.co,PUBLIC_FIREBASE_PROJECT_ID=geargrabco'
+      '--set-env-vars', 'NODE_ENV=production,HOST=0.0.0.0,PUBLIC_APP_URL=https://geargrab.co,PUBLIC_FIREBASE_PROJECT_ID=geargrabco'
     ]
 
 # Build timeout
