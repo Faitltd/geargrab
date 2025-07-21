@@ -114,7 +114,7 @@
           disabled:bg-neutral-100 disabled:cursor-not-allowed transition-colors
           appearance-none cursor-pointer pr-8
         "
-        style="background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 4 5\"><path fill=\"%23666\" d=\"M2 0L0 2h4zm0 5L0 3h4z\"/></svg>'); background-repeat: no-repeat; background-position: right 8px center; background-size: 12px;"
+        style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 4 5%22%3E%3Cpath fill=%22%2523666%22 d=%22M2 0L0 2h4zm0 5L0 3h4z%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 8px center; background-size: 12px;"
       >
         {#each radiusOptions as option}
           <option value={option.value}>{option.label}</option>
