@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type { ListingData } from '$lib/services/listings';
-  import { authStore } from '$lib/stores/auth';
+  import { authStore } from '$lib/stores/auth.store';
   import { getListingPermissions } from '$lib/utils/ownership';
   
   export let listing: ListingData;

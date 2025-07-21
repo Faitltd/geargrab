@@ -5,7 +5,7 @@
   import SuccessBanner from '$lib/components/SuccessBanner.svelte';
   import AvailabilityCalendar from './AvailabilityCalendar.svelte';
   import ImageUploader from './ImageUploader.svelte';
-  import { authStore, showToast } from '$lib/stores/auth';
+  import { authStore, showToast } from '$lib/stores/auth.store';
   import { createListing, type ListingData } from '$lib/services/listings';
   
   const dispatch = createEventDispatcher<{

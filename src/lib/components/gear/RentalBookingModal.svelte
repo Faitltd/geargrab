@@ -6,7 +6,7 @@
   import { shakeModal, ensureAnimationKeyframes } from '$lib/utils/animations';
   import InlineAlert from '$lib/components/ui/InlineAlert.svelte';
   import { rentalCheckoutAndRedirect, handleCheckoutError } from '$lib/services/checkout';
-  import { authStore } from '$lib/stores/auth';
+  import { authStore } from '$lib/stores/auth.store';
   
   export let isOpen = false;
   export let listing: ListingData;

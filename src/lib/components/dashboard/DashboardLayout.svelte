@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { authStore } from '$lib/stores/auth';
+  import { authStore } from '$lib/stores/auth.store';
 
   export let title: string = 'Dashboard';
   export let description: string = '';

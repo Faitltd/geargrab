@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
-  import { authStore } from '$lib/stores/auth';
+  import { authStore } from '$lib/stores/auth.store';
   import {
     getSale,
     formatSaleDate,
@@ -13,7 +13,7 @@
     type SaleData
   } from '$lib/services/sales';
   import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
-  import { showToast } from '$lib/stores/toast';
+  import { showToast } from '$lib/stores/toast.store';
 
   // URL parameters
   let saleId: string;

@@ -2,12 +2,12 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
-  import { authStore } from '$lib/stores/auth';
+  import { authStore } from '$lib/stores/auth.store';
   import { doc, getDoc } from 'firebase/firestore';
   import { db } from '$lib/firebase';
   import { submitReview, canUserReview, type ReviewFormData } from '$lib/services/reviews';
   import ReviewForm from '$lib/components/reviews/ReviewForm.svelte';
-  import { showToast } from '$lib/stores/toast';
+  import { showToast } from '$lib/stores/toast.store';
 
   // URL parameters
   let rentalId: string;
