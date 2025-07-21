@@ -1,83 +1,58 @@
-import { initializeApp, cert, type App } from 'firebase-admin/app';
-import { getAuth, type Auth } from 'firebase-admin/auth';
-import { getFirestore, type Firestore } from 'firebase-admin/firestore';
-import { getStorage, type Storage } from 'firebase-admin/storage';
-import {
-  FIREBASE_PRIVATE_KEY_ID,
-  FIREBASE_PRIVATE_KEY,
-  FIREBASE_CLIENT_EMAIL,
-  FIREBASE_CLIENT_ID,
-  FIREBASE_AUTH_URI,
-  FIREBASE_TOKEN_URI
-} from '$env/static/private';
-import {
-  PUBLIC_FIREBASE_PROJECT_ID
-} from '$env/static/public';
+// Mock Firebase Admin for demo deployment
+// In production, this would use real Firebase Admin SDK
 
-// Firebase Admin configuration
-const serviceAccount = {
-  type: 'service_account',
-  project_id: PUBLIC_FIREBASE_PROJECT_ID,
-  private_key_id: FIREBASE_PRIVATE_KEY_ID,
-  private_key: FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-  client_email: FIREBASE_CLIENT_EMAIL,
-  client_id: FIREBASE_CLIENT_ID,
-  auth_uri: FIREBASE_AUTH_URI,
-  token_uri: FIREBASE_TOKEN_URI,
-  universe_domain: 'googleapis.com'
-};
-
-let adminApp: App;
-let adminAuth: Auth;
-let adminDb: Firestore;
-let adminStorage: Storage;
-
-// Initialize Firebase Admin SDK
-try {
-  adminApp = initializeApp({
-    credential: cert(serviceAccount as any),
-    storageBucket: `${PUBLIC_FIREBASE_PROJECT_ID}.appspot.com`
-  });
-  
-  adminAuth = getAuth(adminApp);
-  adminDb = getFirestore(adminApp);
-  adminStorage = getStorage(adminApp);
-} catch (error) {
-  console.warn('Firebase Admin SDK initialization failed:', error);
+// Mock implementation for demo purposes
+export async function verifyIdToken(idToken: string) {
+  // For demo purposes, return a mock decoded token
+  // In production, this would verify the actual Firebase ID token
+  return {
+    uid: 'demo-user-123',
+    email: 'demo@geargrab.co',
+    name: 'Demo User',
+    email_verified: true,
+    iat: Math.floor(Date.now() / 1000),
+    exp: Math.floor(Date.now() / 1000) + 3600
+  };
 }
 
-// Export Firebase Admin services
-export { adminAuth, adminDb, adminStorage };
+export async function createCustomToken(uid: string) {
+  // Mock custom token for demo
+  return `demo-custom-token-${uid}`;
+}
 
-// Utility function to verify Firebase ID tokens
-export const verifyIdToken = async (idToken: string) => {
-  try {
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
-    return decodedToken;
-  } catch (error) {
-    console.error('Error verifying ID token:', error);
-    throw new Error('Invalid authentication token');
-  }
+// Mock admin instances
+export const adminAuth = {
+  verifyIdToken,
+  createCustomToken
 };
 
-// Utility function to get user by UID
+export const adminDb = {
+  collection: () => ({
+    doc: () => ({
+      get: async () => ({ exists: false, data: () => null }),
+      set: async () => {},
+      update: async () => {},
+      delete: async () => {}
+    })
+  })
+};
+
+export const adminStorage = {
+  bucket: () => ({
+    file: () => ({
+      exists: async () => [false],
+      save: async () => {},
+      delete: async () => {}
+    })
+  })
+};
+
+// Additional mock functions for compatibility
 export const getUserByUid = async (uid: string) => {
-  try {
-    const userRecord = await adminAuth.getUser(uid);
-    return userRecord;
-  } catch (error) {
-    console.error('Error getting user:', error);
-    throw new Error('User not found');
-  }
-};
-
-// Utility function to create custom token
-export const createCustomToken = async (uid: string, additionalClaims?: object) => {
-  try {
-    const customToken = await adminAuth.createCustomToken(uid, additionalClaims);
-    return customToken;
-  } catch (error) {
-    console.error('Error creating custom token:', error);
-    throw new Error('Failed to create authentication token');
-  }
+  return {
+    uid,
+    email: 'demo@geargrab.co',
+    displayName: 'Demo User',
+    emailVerified: true
+  };
 };
