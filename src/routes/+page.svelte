@@ -123,7 +123,7 @@
           Get Started
         </a>
         <a
-          href="/listings/browse"
+          href="/gear"
           class="border-2 border-white text-white font-semibold px-8 py-4 rounded-lg hover:bg-white hover:text-primary-600 transition-colors duration-200"
           data-cy="hero-browse-gear-button"
         >
@@ -197,8 +197,8 @@
       </div>
       
       <div class="text-center mt-12">
-        <a 
-          href="/how-it-works"
+        <a
+          href="/help"
           class="inline-flex items-center px-8 py-4 bg-primary-500 text-white font-semibold rounded-lg hover:bg-primary-600 transition-colors duration-200"
         >
           Learn More About Our Process

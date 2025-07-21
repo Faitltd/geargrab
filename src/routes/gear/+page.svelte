@@ -1,17 +1,33 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { browser } from '$app/environment';
   import Header from '$lib/components/Header.svelte';
   import Footer from '$lib/components/Footer.svelte';
-  import GlassCard from '$lib/components/ui/GlassCard.svelte';
   import ModernButton from '$lib/components/ui/ModernButton.svelte';
   import GlassInput from '$lib/components/ui/GlassInput.svelte';
   import ProductCard from '$lib/components/ui/ProductCard.svelte';
-  
+
   let searchQuery = '';
   let selectedCategory = 'all';
   let sortBy = 'relevance';
   let viewMode = 'grid';
   let scrollY = 0;
+
+  // Handle URL parameters on mount
+  onMount(() => {
+    if (browser) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const category = urlParams.get('category');
+      const search = urlParams.get('search');
+
+      if (category) {
+        selectedCategory = category;
+      }
+      if (search) {
+        searchQuery = search;
+      }
+    }
+  });
   
   const categories = [
     { id: 'all', name: 'All Categories', count: 1247 },

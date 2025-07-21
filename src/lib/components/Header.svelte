@@ -36,17 +36,18 @@
   const handleSearch = (e: Event) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Navigate to browse page with search query
-      window.location.href = `/listings/browse?search=${encodeURIComponent(searchQuery)}`;
+      // Navigate to gear page with search query
+      window.location.href = `/gear?search=${encodeURIComponent(searchQuery)}`;
     }
   };
 
   const categories = [
-    { name: 'Camping & Hiking', href: '/listings/browse?category=camping' },
-    { name: 'Sports', href: '/listings/browse?category=sports' },
-    { name: 'Photography', href: '/listings/browse?category=photography' },
-    { name: 'Electronics', href: '/listings/browse?category=electronics' },
-    { name: 'Tools', href: '/listings/browse?category=tools' },
+    { name: 'Camping & Hiking', href: '/gear?category=camping' },
+    { name: 'Climbing', href: '/gear?category=climbing' },
+    { name: 'Cycling', href: '/gear?category=cycling' },
+    { name: 'Water Sports', href: '/gear?category=water-sports' },
+    { name: 'Winter Sports', href: '/gear?category=winter-sports' },
+    { name: 'Travel', href: '/gear?category=travel' },
     { name: 'All Gear', href: '/listings/browse' }
   ];
 </script>
@@ -233,7 +234,7 @@
             bind:value={searchQuery}
             placeholder="Search for gear..."
             class="w-full pl-10 pr-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            autofocus
+
           />
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg class="h-5 w-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

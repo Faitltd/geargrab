@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+
   
   let email = '';
   let isSubscribed = false;
@@ -37,12 +37,12 @@
       { name: 'Accessibility', href: '/accessibility' }
     ],
     gear: [
-      { name: 'Browse All Gear', href: '/browse' },
-      { name: 'List Your Gear', href: '/list-gear' },
+      { name: 'Browse All Gear', href: '/gear' },
+      { name: 'List Your Gear', href: '/listings/new' },
       { name: 'Gear Categories', href: '/categories' },
-      { name: 'Popular Locations', href: '/locations' },
-      { name: 'Gear Guides', href: '/guides' },
-      { name: 'Rental Tips', href: '/tips' }
+      { name: 'Popular Locations', href: '/search' },
+      { name: 'Gear Guides', href: '/help' },
+      { name: 'Rental Tips', href: '/help' }
     ],
     legal: [
       { name: 'Terms of Service', href: '/terms' },
