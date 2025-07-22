@@ -2,14 +2,14 @@
   import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
   import ErrorBanner from '$lib/components/ErrorBanner.svelte';
   import SuccessBanner from '$lib/components/SuccessBanner.svelte';
-  import { authStore, signInWithGoogle } from '$lib/stores/auth.store';
+  import { authStore, signInWithGoogle, signInWithFacebook, signInWithApple } from '$lib/stores/auth.store';
 
   let localError = '';
   let successMessage = '';
   let isSubmitting = false;
 
   $: ({ loading, error } = $authStore);
-  
+
   const handleGoogleSignIn = async () => {
     localError = '';
     successMessage = '';
@@ -29,6 +29,44 @@
       isSubmitting = false;
     }
     // Note: Don't set isSubmitting = false on success since we're redirecting
+  };
+
+  const handleFacebookSignIn = async () => {
+    localError = '';
+    successMessage = '';
+    isSubmitting = true;
+
+    try {
+      const result = await signInWithFacebook();
+
+      if (result) {
+        successMessage = 'Signing you in...';
+        // Auth store will handle redirect to onboarding or dashboard
+      }
+
+    } catch (error: any) {
+      localError = error.message || 'Failed to sign in with Facebook';
+      isSubmitting = false;
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    localError = '';
+    successMessage = '';
+    isSubmitting = true;
+
+    try {
+      const result = await signInWithApple();
+
+      if (result) {
+        successMessage = 'Signing you in...';
+        // Auth store will handle redirect to onboarding or dashboard
+      }
+
+    } catch (error: any) {
+      localError = error.message || 'Failed to sign in with Apple';
+      isSubmitting = false;
+    }
   };
 </script>
 
@@ -64,7 +102,7 @@
       type="button"
       data-cy="google-signin-button"
       on:click={handleGoogleSignIn}
-      disabled={loading !== 'idle' || isSubmitting}
+      disabled={loading === 'loading' || isSubmitting}
       class="w-full bg-white border-2 border-neutral-300 text-neutral-700 font-medium py-4 px-6 rounded-lg hover:border-primary-500 hover:text-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-3"
     >
       {#if isSubmitting}
@@ -81,15 +119,43 @@
       {/if}
     </button>
 
-    <!-- Future social providers can be added here -->
-    <!-- 
-    <button class="w-full bg-neutral-900 text-white font-medium py-4 px-6 rounded-lg hover:bg-neutral-800 transition-colors duration-200 flex items-center justify-center space-x-3">
-      <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-      </svg>
-      <span class="text-lg">Continue with GitHub</span>
+    <!-- Facebook Sign-in Button -->
+    <button
+      type="button"
+      data-cy="facebook-signin-button"
+      on:click={handleFacebookSignIn}
+      disabled={loading === 'loading' || isSubmitting}
+      class="w-full bg-[#1877F2] text-white font-medium py-4 px-6 rounded-lg hover:bg-[#166FE5] focus:outline-none focus:ring-2 focus:ring-[#1877F2] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-3"
+    >
+      {#if isSubmitting}
+        <LoadingSpinner size="sm" color="white" />
+        <span>Signing in...</span>
+      {:else}
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>
+        <span class="text-lg">Continue with Facebook</span>
+      {/if}
     </button>
-    -->
+
+    <!-- Apple Sign-in Button -->
+    <button
+      type="button"
+      data-cy="apple-signin-button"
+      on:click={handleAppleSignIn}
+      disabled={loading === 'loading' || isSubmitting}
+      class="w-full bg-black text-white font-medium py-4 px-6 rounded-lg hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-3"
+    >
+      {#if isSubmitting}
+        <LoadingSpinner size="sm" color="white" />
+        <span>Signing in...</span>
+      {:else}
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
+        </svg>
+        <span class="text-lg">Continue with Apple</span>
+      {/if}
+    </button>
   </div>
 
   <!-- Terms and Privacy -->

@@ -5,6 +5,8 @@ import {
   type Auth,
   connectAuthEmulator,
   GoogleAuthProvider,
+  FacebookAuthProvider,
+  OAuthProvider,
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -108,6 +110,8 @@ export { auth, db, storage };
 export {
   // Auth functions
   GoogleAuthProvider,
+  FacebookAuthProvider,
+  OAuthProvider,
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,

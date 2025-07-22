@@ -7,6 +7,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  FacebookAuthProvider,
+  OAuthProvider,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   type User,
@@ -145,6 +147,98 @@ class AuthStore extends BaseStore<User> {
       const idToken = await userCredential.user.getIdToken();
       await setSessionCookie(idToken);
 
+      this.setData(userCredential.user);
+
+      // Handle user profile creation and onboarding
+      await this.handleUserOnboarding(userCredential.user);
+
+      return userCredential;
+    } catch (error: any) {
+      // Ignore common popup/message channel errors that don't affect functionality
+      if (error.code === 'auth/popup-closed-by-user' ||
+          error.code === 'auth/cancelled-popup-request' ||
+          error.message?.includes('message channel closed')) {
+        this.setLoading('idle');
+        return null;
+      }
+
+      const errorMessage = getFirebaseErrorMessage(error);
+      this.setError(errorMessage);
+      showToast('error', errorMessage);
+      return null;
+    } finally {
+      this.setLoading('idle');
+    }
+  }
+
+  /**
+   * Sign in with Facebook
+   */
+  async signInWithFacebook(): Promise<UserCredential | null> {
+    try {
+      this.setLoading('loading');
+      this.clearError();
+
+      if (!auth) {
+        throw new Error('Firebase auth not initialized');
+      }
+
+      const provider = new FacebookAuthProvider();
+      provider.addScope('email');
+      provider.addScope('public_profile');
+
+      // Set custom parameters
+      provider.setCustomParameters({
+        display: 'popup'
+      });
+
+      const userCredential = await signInWithPopup(auth, provider);
+      this.setData(userCredential.user);
+
+      // Handle user profile creation and onboarding
+      await this.handleUserOnboarding(userCredential.user);
+
+      return userCredential;
+    } catch (error: any) {
+      // Ignore common popup/message channel errors that don't affect functionality
+      if (error.code === 'auth/popup-closed-by-user' ||
+          error.code === 'auth/cancelled-popup-request' ||
+          error.message?.includes('message channel closed')) {
+        this.setLoading('idle');
+        return null;
+      }
+
+      const errorMessage = getFirebaseErrorMessage(error);
+      this.setError(errorMessage);
+      showToast('error', errorMessage);
+      return null;
+    } finally {
+      this.setLoading('idle');
+    }
+  }
+
+  /**
+   * Sign in with Apple
+   */
+  async signInWithApple(): Promise<UserCredential | null> {
+    try {
+      this.setLoading('loading');
+      this.clearError();
+
+      if (!auth) {
+        throw new Error('Firebase auth not initialized');
+      }
+
+      const provider = new OAuthProvider('apple.com');
+      provider.addScope('email');
+      provider.addScope('name');
+
+      // Set custom parameters
+      provider.setCustomParameters({
+        locale: 'en'
+      });
+
+      const userCredential = await signInWithPopup(auth, provider);
       this.setData(userCredential.user);
 
       // Handle user profile creation and onboarding
@@ -337,6 +431,8 @@ export const authStore = new AuthStore();
 export const signIn = authStore.signIn.bind(authStore);
 export const signUp = authStore.signUp.bind(authStore);
 export const signInWithGoogle = authStore.signInWithGoogle.bind(authStore);
+export const signInWithFacebook = authStore.signInWithFacebook.bind(authStore);
+export const signInWithApple = authStore.signInWithApple.bind(authStore);
 export const signOut = authStore.signOut.bind(authStore);
 export const getCurrentUser = authStore.getCurrentUser.bind(authStore);
 export const isAuthenticated = authStore.isAuthenticated.bind(authStore);
