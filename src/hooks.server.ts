@@ -51,8 +51,9 @@ const authMiddleware: Handle = async ({ event, resolve }) => {
   return resolve(event);
 };
 
-// Combine middlewares in sequence: security first, then auth
-export const handle = sequence(securityMiddleware, authMiddleware);
+// Combine middlewares in sequence: security disabled for now, only auth
+// export const handle = sequence(securityMiddleware, authMiddleware);
+export const handle = authMiddleware;
 
 // Simple error handler
 export const handleError: HandleServerError = async ({ error, event }) => {
