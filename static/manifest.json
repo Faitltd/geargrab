@@ -1,0 +1,16 @@
+{
+  "name": "GearGrab",
+  "short_name": "GearGrab",
+  "description": "Rent outdoor gear from your community",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#059669",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

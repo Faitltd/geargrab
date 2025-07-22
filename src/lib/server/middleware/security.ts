@@ -126,9 +126,9 @@ function addSecurityHeaders(response: Response, request: Request): void {
     headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   }
 
-  // Content Security Policy
-  const csp = buildContentSecurityPolicy(url.pathname);
-  headers.set('Content-Security-Policy', csp);
+  // Content Security Policy - Disabled for now to fix image loading issues
+  // const csp = buildContentSecurityPolicy(url.pathname);
+  // headers.set('Content-Security-Policy', csp);
 
   // X-Content-Type-Options
   headers.set('X-Content-Type-Options', 'nosniff');
@@ -167,7 +167,7 @@ function addSecurityHeaders(response: Response, request: Request): void {
 
   // Add custom security headers
   headers.set('X-Security-Headers', 'enabled');
-  headers.set('X-Content-Security-Policy', csp); // Legacy support
+  // headers.set('X-Content-Security-Policy', csp); // Legacy support - disabled
 }
 
 /**

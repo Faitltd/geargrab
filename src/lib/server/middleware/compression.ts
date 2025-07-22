@@ -128,22 +128,22 @@ function addSecurityHeaders(response: Response, url: string): void {
   // Referrer Policy
   headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-  // Content Security Policy (basic)
-  if (url.endsWith('.html') || !url.includes('.')) {
-    const csp = [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.gstatic.com https://apis.google.com https://accounts.google.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' https://fonts.gstatic.com",
-      "img-src * data: https: http: blob:",
-      "connect-src 'self' https://api.stripe.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com",
-      "frame-src https://js.stripe.com https://hooks.stripe.com https://accounts.google.com https://www.google.com",
-      "object-src 'none'",
-      "base-uri 'self'"
-    ].join('; ');
+  // Content Security Policy (basic) - Disabled for now to fix image loading issues
+  // if (url.endsWith('.html') || !url.includes('.')) {
+  //   const csp = [
+  //     "default-src 'self'",
+  //     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.gstatic.com https://apis.google.com https://accounts.google.com",
+  //     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  //     "font-src 'self' https://fonts.gstatic.com",
+  //     "img-src * data: https: http: blob:",
+  //     "connect-src 'self' https://api.stripe.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com",
+  //     "frame-src https://js.stripe.com https://hooks.stripe.com https://accounts.google.com https://www.google.com",
+  //     "object-src 'none'",
+  //     "base-uri 'self'"
+  //   ].join('; ');
 
-    headers.set('Content-Security-Policy', csp);
-  }
+  //   headers.set('Content-Security-Policy', csp);
+  // }
 
   // Permissions Policy
   headers.set('Permissions-Policy', 

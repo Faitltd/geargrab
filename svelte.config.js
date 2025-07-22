@@ -22,12 +22,12 @@ const config = {
 		},
 
 		// CSP completely disabled to fix image loading issues
-		csp: {
-			mode: 'nonce',
-			directives: {
-				'img-src': ['*', 'data:', 'blob:', 'https:', 'http:']
-			}
-		},
+		// csp: {
+		// 	mode: 'nonce',
+		// 	directives: {
+		// 		'img-src': ['*', 'data:', 'blob:', 'https:', 'http:']
+		// 	}
+		// },
 
 		// Version configuration
 		version: {
