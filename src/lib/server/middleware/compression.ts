@@ -199,8 +199,8 @@ export const compressionMiddleware: Handle = async ({ event, resolve }) => {
   // Add Vary header for content negotiation
   modifiedResponse.headers.set('Vary', 'Accept-Encoding, Accept');
 
-  // Add security headers
-  addSecurityHeaders(modifiedResponse, pathname);
+  // Add security headers - Disabled for now to fix CSP issues
+  // addSecurityHeaders(modifiedResponse, pathname);
 
   // Add performance headers
   modifiedResponse.headers.set('X-Response-Time', Date.now().toString());

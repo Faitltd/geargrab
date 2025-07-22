@@ -3,7 +3,7 @@ import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { securityMiddleware } from '$lib/server/middleware/security';
 import { sequence } from '@sveltejs/kit/hooks';
 
-// Authentication middleware
+// Authentication middleware with CSP override
 const authMiddleware: Handle = async ({ event, resolve }) => {
   // Get the session cookie
   const sessionCookie = event.cookies.get('session');
@@ -48,7 +48,26 @@ const authMiddleware: Handle = async ({ event, resolve }) => {
     });
   }
 
-  return resolve(event);
+  // Get response and override CSP
+  const response = await resolve(event);
+
+  // Override any CSP headers that might be set
+  const modifiedResponse = new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: new Headers(response.headers)
+  });
+
+  // Remove any CSP headers
+  modifiedResponse.headers.delete('Content-Security-Policy');
+  modifiedResponse.headers.delete('X-Content-Security-Policy');
+
+  // Set a permissive CSP that allows all images
+  modifiedResponse.headers.set('Content-Security-Policy',
+    "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; img-src * data: blob: 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';"
+  );
+
+  return modifiedResponse;
 };
 
 // Combine middlewares in sequence: security disabled for now, only auth
