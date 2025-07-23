@@ -5,17 +5,21 @@ metadata:
   annotations:
     run.googleapis.com/ingress: all
     run.googleapis.com/ingress-status: all
+    run.googleapis.com/description: "GearGrab - Outdoor Gear Rental Marketplace"
 spec:
   template:
     metadata:
       annotations:
-        autoscaling.knative.dev/maxScale: "10"
-        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "100"
+        autoscaling.knative.dev/minScale: "1"
         run.googleapis.com/cpu-throttling: "false"
         run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/vpc-access-connector: projects/PROJECT_ID/locations/REGION/connectors/CONNECTOR_NAME
+        run.googleapis.com/vpc-access-egress: private-ranges-only
     spec:
-      containerConcurrency: 80
+      containerConcurrency: 1000
       timeoutSeconds: 300
+      serviceAccountName: geargrab-service-account@PROJECT_ID.iam.gserviceaccount.com
       containers:
       - image: gcr.io/PROJECT_ID/geargrab-svelte:latest
         ports:
@@ -28,23 +32,41 @@ spec:
           value: "3000"
         - name: HOST
           value: "0.0.0.0"
+        - name: BASE44_APP_ID
+          valueFrom:
+            secretKeyRef:
+              name: base44-config
+              key: app-id
+        - name: BASE44_SERVER_URL
+          value: "https://base44.app"
+        - name: BASE44_ENV
+          value: "prod"
         resources:
           limits:
+            cpu: 2000m
+            memory: 1Gi
+          requests:
             cpu: 1000m
             memory: 512Mi
         startupProbe:
           httpGet:
             path: /
             port: 3000
+            httpHeaders:
+            - name: User-Agent
+              value: GoogleHC/1.0
           initialDelaySeconds: 0
-          timeoutSeconds: 240
-          periodSeconds: 240
-          failureThreshold: 1
+          timeoutSeconds: 30
+          periodSeconds: 10
+          failureThreshold: 3
         livenessProbe:
           httpGet:
             path: /
             port: 3000
-          initialDelaySeconds: 0
-          timeoutSeconds: 240
-          periodSeconds: 240
-          failureThreshold: 1
+            httpHeaders:
+            - name: User-Agent
+              value: GoogleHC/1.0
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+          periodSeconds: 30
+          failureThreshold: 3

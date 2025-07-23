@@ -1,47 +1,58 @@
-# Use the official Node.js runtime as the base image
-FROM node:18-alpine AS builder
+# Multi-stage build for optimal production image
+FROM node:18-alpine AS base
 
-# Set the working directory in the container
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
-COPY package*.json ./
+# Copy package files
+COPY package.json package-lock.json* ./
+RUN npm ci --only=production && npm cache clean --force
 
-# Install dependencies
-RUN npm ci --only=production --ignore-scripts
+# Build stage
+FROM base AS builder
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci
 
-# Copy the rest of the application code
 COPY . .
-
-# Build the application
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine AS runner
-
-# Set the working directory
+FROM base AS runner
 WORKDIR /app
 
-# Copy built application from builder stage
-COPY --from=builder /app/build ./build
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
 
 # Create a non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S sveltekit -u 1001
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S sveltekit -u 1001
 
-# Change ownership of the app directory to the nodejs user
-RUN chown -R sveltekit:nodejs /app
+# Copy built application
+COPY --from=builder --chown=sveltekit:nodejs /app/build ./build
+COPY --from=deps --chown=sveltekit:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=sveltekit:nodejs /app/package.json ./package.json
+
+# Switch to non-root user
 USER sveltekit
 
-# Expose the port the app runs on
+# Expose port
 EXPOSE 3000
 
 # Set environment variables
-ENV NODE_ENV=production
-ENV PORT=3000
-ENV HOST=0.0.0.0
+ENV NODE_ENV=production \
+    PORT=3000 \
+    HOST=0.0.0.0 \
+    NODE_OPTIONS="--max-old-space-size=512"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
 
 # Start the application
 CMD ["node", "build"]

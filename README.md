@@ -31,7 +31,7 @@ A peer-to-peer outdoor gear rental marketplace built with SvelteKit, Tailwind CS
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/geargrab.git
+git clone https://github.com/Faitltd/geargrab.git
 cd geargrab
 ```
 

@@ -6,7 +6,7 @@
 	"type": "module",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/yourusername/geargrab.git"
+		"url": "https://github.com/Faitltd/geargrab.git"
 	},
 	"homepage": "https://geargrab.co",
 	"scripts": {
