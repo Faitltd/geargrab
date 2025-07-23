@@ -2,9 +2,9 @@ name: Deploy GearGrab to Cloud Run
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ sveltekit-version, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ sveltekit-version ]
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -94,7 +94,7 @@ jobs:
     name: Deploy to Production
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/sveltekit-version'
     environment: production
 
     steps:
