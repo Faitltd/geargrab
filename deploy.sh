@@ -7,7 +7,7 @@ set -e
 
 # Configuration
 ENVIRONMENT=${1:-production}
-PROJECT_ID=${2:-your-project-id}
+PROJECT_ID=${2:-geargrabco}
 SERVICE_NAME="geargrab-svelte"
 REGION="us-central1"
 IMAGE_NAME="gcr.io/$PROJECT_ID/$SERVICE_NAME"
