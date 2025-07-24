@@ -1,0 +1,61 @@
+{
+  "name": "base44-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:e2e": "cypress run",
+    "test:all": "npm run test && npm run test:e2e",
+    "deploy:setup": "chmod +x setup-deployment.sh && ./setup-deployment.sh",
+    "deploy": "chmod +x deploy.sh && ./deploy.sh",
+    "deploy:rollback": "chmod +x rollback.sh && ./rollback.sh",
+    "deploy:monitor": "chmod +x monitor.sh && ./monitor.sh",
+    "deploy:logs": "gcloud run logs tail geargrab --region=us-central1",
+    "deploy:status": "gcloud run services describe geargrab --region=us-central1"
+  },
+  "dependencies": {
+    "@base44/sdk": "^0.1.2",
+    "@hookform/resolvers": "^4.1.2",
+
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.0.0",
+    "date-fns": "^3.6.0",
+    "lucide-svelte": "^0.475.0",
+    "sonner": "^2.0.1",
+    "tailwind-merge": "^3.0.2",
+    "tailwindcss-animate": "^1.0.7",
+    "vaul": "^1.1.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.0",
+
+    "@eslint/js": "^9.19.0",
+    "@flydotio/dockerfile": "^0.7.8",
+    "@types/node": "^22.13.5",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "@testing-library/svelte": "^5.0.0",
+    "svelte": "^5.0.0",
+    "svelte-jester": "^5.0.0",
+    "vitest": "^2.0.0",
+    "autoprefixer": "^10.4.20",
+    "babel-jest": "^30.0.5",
+    "eslint": "^9.19.0",
+    "eslint-plugin-svelte": "^2.46.0",
+    "globals": "^15.14.0",
+    "identity-obj-proxy": "^3.0.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.1.0"
+  }
+}
