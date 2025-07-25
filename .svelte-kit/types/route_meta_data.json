@@ -1,4 +1,7 @@
 {
 	"/": [],
+	"/auth/login": [],
+	"/browse": [],
+	"/list-gear": [],
 	"/listing/[id]": []
 }

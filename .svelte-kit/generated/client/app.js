@@ -4,14 +4,20 @@ export const nodes = [
 	() => import('./nodes/0'),
 	() => import('./nodes/1'),
 	() => import('./nodes/2'),
-	() => import('./nodes/3')
+	() => import('./nodes/3'),
+	() => import('./nodes/4'),
+	() => import('./nodes/5'),
+	() => import('./nodes/6')
 ];
 
 export const server_loads = [];
 
 export const dictionary = {
 		"/": [2],
-		"/listing/[id]": [3]
+		"/auth/login": [3],
+		"/browse": [4],
+		"/list-gear": [5],
+		"/listing/[id]": [6]
 	};
 
 export const hooks = {
@@ -27,4 +33,4 @@ export const hash = false;
 
 export const decode = (type, value) => decoders[type](value);
 
-export { default as root } from '../root.js';
+export { default as root } from '../root.svelte';

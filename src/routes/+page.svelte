@@ -1,43 +1,105 @@
-<script>
-  import TaxInformationForm from '../components/TaxInformationForm.svelte';
-  
-  // Mock user data for demonstration
-  let user = {
-    id: 'user-123',
-    tax_id_type: 'ssn',
-    tax_id_number: '123-45-6789',
-    entity_type: 'individual',
-    business_name: '',
-    tax_address: {
-      street_address: '123 Main St',
-      city: 'Anytown',
-      state: 'CA',
-      zip_code: '12345',
-      country: 'US'
-    },
-    backup_withholding: false,
-    tax_exempt: false,
-    tax_exempt_reason: '',
-    annual_earnings: 1000
-  };
+<script lang="ts">
+  import { onMount } from 'svelte';
 
-  function handleUpdate(updatedData) {
-    console.log('Tax information updated:', updatedData);
-    user = { ...user, ...updatedData };
-  }
+  // Featured categories
+  const categories = [
+    {
+      id: 'camping',
+      name: 'Camping',
+      image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+      description: 'Tents, sleeping bags, cooking equipment, and more'
+    },
+    {
+      id: 'hiking',
+      name: 'Hiking',
+      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+      description: 'Backpacks, footwear, navigation tools, and clothing'
+    },
+    {
+      id: 'water-sports',
+      name: 'Water Sports',
+      image: 'https://images.unsplash.com/photo-1604537466158-719b1972feb8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80',
+      description: 'Kayaks, paddleboards, surfboards, and life vests'
+    },
+    {
+      id: 'biking',
+      name: 'Biking',
+      image: 'https://images.unsplash.com/photo-1511994298241-608e28f14fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+      description: 'Mountain bikes, road bikes, helmets, and accessories'
+    }
+  ];
+
+  // Testimonials
+  const testimonials = [
+    {
+      id: 1,
+      name: 'Sarah Johnson',
+      location: 'Denver, CO',
+      image: 'https://randomuser.me/api/portraits/women/32.jpg',
+      quote: 'GearGrab saved me hundreds of dollars on camping equipment for our family trip. The gear was in perfect condition and the owner was super helpful!'
+    },
+    {
+      id: 2,
+      name: 'Michael Chen',
+      location: 'Boulder, CO',
+      image: 'https://randomuser.me/api/portraits/men/44.jpg',
+      quote: 'As someone who only goes skiing once a year, renting through GearGrab is perfect. I got high-quality equipment for a fraction of the retail price.'
+    },
+    {
+      id: 3,
+      name: 'Emily Rodriguez',
+      location: 'Fort Collins, CO',
+      image: 'https://randomuser.me/api/portraits/women/68.jpg',
+      quote: 'I love being able to try different kayaks before committing to buying one. GearGrab makes it easy and affordable to test out gear.'
+    }
+  ];
+
+  // How it works steps
+  const steps = [
+    {
+      id: 1,
+      title: 'Find Gear',
+      icon: 'search',
+      description: 'Browse thousands of outdoor gear listings from local owners in your area.'
+    },
+    {
+      id: 2,
+      title: 'Book & Pay',
+      icon: 'calendar',
+      description: 'Reserve the gear for your dates and pay securely through our platform.'
+    },
+    {
+      id: 3,
+      title: 'Enjoy Outdoors',
+      icon: 'mountain',
+      description: 'Pick up the gear and enjoy your adventure without the cost of buying.'
+    },
+    {
+      id: 4,
+      title: 'Return & Review',
+      icon: 'star',
+      description: 'Return the gear and share your experience with the community.'
+    }
+  ];
+
+  // Parallax effect
+  let scrollY: number = 0;
+
+  // Initialize parallax effect
+  onMount(() => {
+    const updateParallax = () => {
+      scrollY = window.scrollY;
+      requestAnimationFrame(updateParallax);
+    };
+    updateParallax();
+  });
 </script>
 
 <svelte:head>
-  <title>GearGrab - Gear Rental Marketplace</title>
-  <meta name="description" content="Rent and list outdoor gear with GearGrab" />
+  <title>GearGrab - Rent Outdoor Gear from Local Owners</title>
+  <meta name="description" content="GearGrab is a peer-to-peer marketplace for outdoor gear rentals. Rent camping, hiking, biking, and water sports equipment from local owners." />
 </svelte:head>
 
-<<<<<<< Updated upstream
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-3xl font-bold text-center mb-8 text-gray-900">GearGrab Tax Compliance</h1>
-  <TaxInformationForm {user} onUpdate={handleUpdate} />
-</div>
-=======
 <svelte:window bind:scrollY={scrollY} />
 
 <!-- Hero Section -->
@@ -148,4 +210,3 @@
     </div>
   </div>
 </section>
->>>>>>> Stashed changes

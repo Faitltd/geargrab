@@ -1,0 +1,1 @@
+export { default as component } from "../../../../src/routes/verification/compare/+page.svelte";
