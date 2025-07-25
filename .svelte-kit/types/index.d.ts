@@ -18,4 +18,4 @@ export type Pathname = "/" | "/listing" | `/listing/${string}` & {};
 
 export type ResolvedPathname = `${"" | `/${string}`}${Pathname}`;
 
-export type Asset = never;
+export type Asset = "/favicon.svg";
