@@ -120,7 +120,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
       {#each categories as category}
         <a href="/browse?category={category.id}" class="group">
-          <div class="relative h-64 rounded-lg overflow-hidden shadow-md transition-transform transform group-hover:scale-105">
+          <div class="relative h-64 rounded-2xl overflow-hidden shadow-lg transition-transform transform group-hover:scale-105">
             <img src={category.image} alt={category.name} class="w-full h-full object-cover" />
             <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-70"></div>
             <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
@@ -141,8 +141,8 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
       {#each steps as step}
-        <div class="bg-white/95 backdrop-blur-sm rounded-lg p-6 shadow-lg text-center border border-white/20">
-          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg text-center border border-white/20">
+          <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
             {#if step.icon === 'search'}
               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -184,9 +184,9 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       {#each testimonials as testimonial}
-        <div class="bg-white/95 backdrop-blur-sm rounded-lg p-6 shadow-lg border border-white/20">
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
           <div class="flex items-center mb-4">
-            <img src={testimonial.image} alt={testimonial.name} class="w-12 h-12 rounded-full mr-4" />
+            <img src={testimonial.image} alt={testimonial.name} class="w-12 h-12 rounded-2xl mr-4" />
             <div>
               <h3 class="font-bold">{testimonial.name}</h3>
               <p class="text-sm text-gray-600">{testimonial.location}</p>

@@ -88,16 +88,16 @@ function _page($$payload, $$props) {
   $$payload.out.push(`<div class="min-h-screen"><div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><h1 class="text-3xl font-bold text-white drop-shadow-lg mb-6">List Your Gear</h1> <div class="mb-8"><div class="flex justify-between mb-2"><!--[-->`);
   for (let i = 0, $$length = each_array.length; i < $$length; i++) {
     each_array[i];
-    $$payload.out.push(`<div class="flex flex-col items-center"><div${attr_class(`w-8 h-8 rounded-full flex items-center justify-center ${stringify(i + 1 <= currentStep ? "bg-green-500/90 backdrop-blur-sm text-white shadow-lg" : "bg-white/80 backdrop-blur-sm text-gray-600 shadow-md border border-white/30")}`)}>${escape_html(i + 1)}</div> <div class="text-xs mt-1 text-white drop-shadow-md">${escape_html(i === 0 ? "Basic Info" : i === 1 ? "Details" : i === 2 ? "Images" : i === 3 ? "Pricing & Location" : "Preview")}</div></div> `);
+    $$payload.out.push(`<div class="flex flex-col items-center"><div${attr_class(`w-8 h-8 rounded-xl flex items-center justify-center ${stringify(i + 1 <= currentStep ? "bg-green-500/90 backdrop-blur-sm text-white shadow-lg" : "bg-white/80 backdrop-blur-sm text-gray-600 shadow-md border border-white/30")}`)}>${escape_html(i + 1)}</div> <div class="text-xs mt-1 text-white drop-shadow-md">${escape_html(i === 0 ? "Basic Info" : i === 1 ? "Details" : i === 2 ? "Images" : i === 3 ? "Pricing & Location" : "Preview")}</div></div> `);
     if (i < totalSteps - 1) {
       $$payload.out.push("<!--[-->");
-      $$payload.out.push(`<div class="flex-1 flex items-center"><div${attr_class(`h-1 w-full rounded-full ${stringify(i + 1 < currentStep ? "bg-green-500/80 backdrop-blur-sm shadow-sm" : "bg-white/60 backdrop-blur-sm shadow-sm")}`)}></div></div>`);
+      $$payload.out.push(`<div class="flex-1 flex items-center"><div${attr_class(`h-1 w-full rounded-xl ${stringify(i + 1 < currentStep ? "bg-green-500/80 backdrop-blur-sm shadow-sm" : "bg-white/60 backdrop-blur-sm shadow-sm")}`)}></div></div>`);
     } else {
       $$payload.out.push("<!--[!-->");
     }
     $$payload.out.push(`<!--]-->`);
   }
-  $$payload.out.push(`<!--]--></div></div> <div class="bg-white/95 backdrop-blur-sm rounded-lg border border-white/20 shadow-lg p-6">`);
+  $$payload.out.push(`<!--]--></div></div> <div class="bg-white/95 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-6">`);
   {
     $$payload.out.push("<!--[-->");
     const each_array_1 = ensure_array_like(categories);

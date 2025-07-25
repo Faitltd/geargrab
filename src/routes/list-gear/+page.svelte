@@ -341,7 +341,7 @@
       <div class="flex justify-between mb-2">
         {#each Array(totalSteps) as _, i}
           <div class="flex flex-col items-center">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center {i + 1 <= currentStep ? 'bg-green-500/90 backdrop-blur-sm text-white shadow-lg' : 'bg-white/80 backdrop-blur-sm text-gray-600 shadow-md border border-white/30'}">
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center {i + 1 <= currentStep ? 'bg-green-500/90 backdrop-blur-sm text-white shadow-lg' : 'bg-white/80 backdrop-blur-sm text-gray-600 shadow-md border border-white/30'}">
               {i + 1}
             </div>
             <div class="text-xs mt-1 text-white drop-shadow-md">
@@ -351,7 +351,7 @@
 
           {#if i < totalSteps - 1}
             <div class="flex-1 flex items-center">
-              <div class="h-1 w-full rounded-full {i + 1 < currentStep ? 'bg-green-500/80 backdrop-blur-sm shadow-sm' : 'bg-white/60 backdrop-blur-sm shadow-sm'}"></div>
+              <div class="h-1 w-full rounded-xl {i + 1 < currentStep ? 'bg-green-500/80 backdrop-blur-sm shadow-sm' : 'bg-white/60 backdrop-blur-sm shadow-sm'}"></div>
             </div>
           {/if}
         {/each}
@@ -359,7 +359,7 @@
     </div>
 
     <!-- Form steps -->
-    <div class="bg-white/95 backdrop-blur-sm rounded-lg border border-white/20 shadow-lg p-6">
+    <div class="bg-white/95 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-6">
       <!-- Step 1: Basic Info -->
       {#if currentStep === 1}
         <div>
@@ -841,7 +841,7 @@
               <h3 class="text-lg font-medium mb-2">Availability</h3>
               <p class="text-sm text-gray-500 mb-2">Mark any dates when your gear will not be available for rent.</p>
 
-              <div class="bg-white/90 backdrop-blur-sm border border-white/30 rounded-md p-4 shadow-md">
+              <div class="bg-white/90 backdrop-blur-sm border border-white/30 rounded-2xl p-4 shadow-md">
                 <div class="text-center py-8">
                   <p class="text-gray-500 mb-4">Calendar functionality will be available soon</p>
                   <p class="text-sm text-gray-400">You'll be able to mark unavailable dates here</p>
@@ -853,7 +853,7 @@
                     <h4 class="text-sm font-medium text-gray-700 mb-2">Unavailable Dates:</h4>
                     <div class="flex flex-wrap gap-2">
                       {#each formData.unavailableDates.sort() as date}
-                        <div class="bg-red-100/80 backdrop-blur-sm text-red-800 text-xs px-2 py-1 rounded-full flex items-center shadow-sm border border-red-200/50">
+                        <div class="bg-red-100/80 backdrop-blur-sm text-red-800 text-xs px-2 py-1 rounded-xl flex items-center shadow-sm border border-red-200/50">
                           {new Date(date).toLocaleDateString()}
                           <button
                             type="button"
@@ -955,7 +955,7 @@
               {#if formData.specifications.some(s => s.key && s.value)}
                 <div class="mt-4">
                   <p class="text-sm text-gray-500 mb-2">Specifications</p>
-                  <div class="bg-gray-50/80 backdrop-blur-sm rounded-lg p-4 shadow-sm border border-gray-200/50">
+                  <div class="bg-gray-50/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-gray-200/50">
                     <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
                       {#each formData.specifications.filter(s => s.key && s.value) as spec}
                         <div class="sm:col-span-1">
@@ -979,7 +979,7 @@
                   <p class="text-sm text-gray-500 mb-2">Main Image</p>
                   <div class="relative rounded-lg overflow-hidden" style="max-width: 400px;">
                     <img src={formData.images[0]} alt="Product main view" class="w-full h-auto object-cover" />
-                    <div class="absolute bottom-2 left-2 bg-green-500/90 backdrop-blur-sm text-white text-xs px-2 py-1 rounded shadow-lg border border-green-400/30">
+                    <div class="absolute bottom-2 left-2 bg-green-500/90 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-xl shadow-lg border border-green-400/30">
                       Main Image
                     </div>
                   </div>
@@ -1099,7 +1099,7 @@
                   <p class="text-sm text-gray-500 mb-2">Unavailable Dates</p>
                   <div class="flex flex-wrap gap-2">
                     {#each formData.unavailableDates.sort() as date}
-                      <div class="bg-red-100/80 backdrop-blur-sm text-red-800 text-xs px-2 py-1 rounded-full shadow-sm border border-red-200/50">
+                      <div class="bg-red-100/80 backdrop-blur-sm text-red-800 text-xs px-2 py-1 rounded-xl shadow-sm border border-red-200/50">
                         {new Date(date).toLocaleDateString()}
                       </div>
                     {/each}

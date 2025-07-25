@@ -149,7 +149,7 @@ function _page($$payload, $$props) {
   head($$payload, ($$payload2) => {
     $$payload2.title = `<title>Browse Gear - GearGrab</title>`;
   });
-  $$payload.out.push(`<div class="min-h-screen"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><div class="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-white/20 p-4 mb-6"><div class="grid grid-cols-1 md:grid-cols-4 gap-4"><div><label for="search-query" class="form-label">What gear do you need?</label> <input type="text" id="search-query" class="form-input" placeholder="Tent, kayak, bike..."${attr("value", query)}/></div> <div><label for="category" class="form-label">Category</label> <select id="category" class="form-input">`);
+  $$payload.out.push(`<div class="min-h-screen"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-4 mb-6"><div class="grid grid-cols-1 md:grid-cols-4 gap-4"><div><label for="search-query" class="form-label">What gear do you need?</label> <input type="text" id="search-query" class="form-input" placeholder="Tent, kayak, bike..."${attr("value", query)}/></div> <div><label for="category" class="form-label">Category</label> <select id="category" class="form-input">`);
   $$payload.select_value = category;
   $$payload.out.push(`<!--[-->`);
   for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
@@ -197,14 +197,14 @@ function _page($$payload, $$props) {
   $$payload.out.push(`<!--]--></h1></div></div> `);
   if (listings.length === 0) {
     $$payload.out.push("<!--[-->");
-    $$payload.out.push(`<div class="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-white/20 p-8 text-center"><svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <h3 class="mt-2 text-lg font-medium text-gray-900">No results found</h3> <p class="mt-1 text-gray-500">Try adjusting your search filters or browse all available gear.</p> <div class="mt-6"><button class="btn btn-primary">View All Gear</button></div></div>`);
+    $$payload.out.push(`<div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 text-center"><svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <h3 class="mt-2 text-lg font-medium text-gray-900">No results found</h3> <p class="mt-1 text-gray-500">Try adjusting your search filters or browse all available gear.</p> <div class="mt-6"><button class="btn btn-primary">View All Gear</button></div></div>`);
   } else {
     $$payload.out.push("<!--[!-->");
     const each_array_1 = ensure_array_like(listings);
     $$payload.out.push(`<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"><!--[-->`);
     for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
       let listing = each_array_1[$$index_1];
-      $$payload.out.push(`<a${attr("href", `/listing/${stringify(listing.id)}`)} class="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-white/20 overflow-hidden hover:shadow-xl hover:bg-white/98 transition-all block"><div class="aspect-w-16 aspect-h-9 bg-gray-200"><img${attr("src", listing.images[0])}${attr("alt", listing.title)} class="object-cover w-full h-48"/></div> <div class="p-4"><h3 class="font-medium text-lg mb-1 text-gray-900">${escape_html(listing.title)}</h3> <p class="text-gray-600 text-sm mb-2">${escape_html(listing.location.city)}, ${escape_html(listing.location.state)}</p> <div class="flex justify-between items-center"><p class="font-bold text-green-600">${escape_html(formatCurrency(listing.dailyPrice))}/day</p> <div class="flex items-center text-gray-700"><span class="text-yellow-400 mr-1">★</span> <span>${escape_html(listing.averageRating || "New")}</span> `);
+      $$payload.out.push(`<a${attr("href", `/listing/${stringify(listing.id)}`)} class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl hover:bg-white/98 transition-all block"><div class="aspect-w-16 aspect-h-9 bg-gray-200"><img${attr("src", listing.images[0])}${attr("alt", listing.title)} class="object-cover w-full h-48"/></div> <div class="p-4"><h3 class="font-medium text-lg mb-1 text-gray-900">${escape_html(listing.title)}</h3> <p class="text-gray-600 text-sm mb-2">${escape_html(listing.location.city)}, ${escape_html(listing.location.state)}</p> <div class="flex justify-between items-center"><p class="font-bold text-green-600">${escape_html(formatCurrency(listing.dailyPrice))}/day</p> <div class="flex items-center text-gray-700"><span class="text-yellow-400 mr-1">★</span> <span>${escape_html(listing.averageRating || "New")}</span> `);
       if (listing.reviewCount) {
         $$payload.out.push("<!--[-->");
         $$payload.out.push(`<span class="text-gray-500 ml-1">(${escape_html(listing.reviewCount)})</span>`);
@@ -214,14 +214,14 @@ function _page($$payload, $$props) {
       $$payload.out.push(`<!--]--></div></div> <div class="mt-2 flex flex-wrap gap-1">`);
       if (listing.category) {
         $$payload.out.push("<!--[-->");
-        $$payload.out.push(`<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100/80 text-green-800 backdrop-blur-sm">${escape_html(listing.category)}</span>`);
+        $$payload.out.push(`<span class="inline-flex items-center px-2.5 py-0.5 rounded-xl text-xs font-medium bg-green-100/80 text-green-800 backdrop-blur-sm">${escape_html(listing.category)}</span>`);
       } else {
         $$payload.out.push("<!--[!-->");
       }
       $$payload.out.push(`<!--]--> `);
       if (listing.condition) {
         $$payload.out.push("<!--[-->");
-        $$payload.out.push(`<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100/80 text-gray-800 backdrop-blur-sm">${escape_html(listing.condition)}</span>`);
+        $$payload.out.push(`<span class="inline-flex items-center px-2.5 py-0.5 rounded-xl text-xs font-medium bg-gray-100/80 text-gray-800 backdrop-blur-sm">${escape_html(listing.condition)}</span>`);
       } else {
         $$payload.out.push("<!--[!-->");
       }

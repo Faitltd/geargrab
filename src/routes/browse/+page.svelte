@@ -197,7 +197,7 @@
 <div class="min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Search and Filters -->
-    <div class="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-white/20 p-4 mb-6">
+    <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-4 mb-6">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
           <label for="search-query" class="form-label">What gear do you need?</label>
@@ -296,7 +296,7 @@
 
     <!-- Results Grid -->
     {#if listings.length === 0}
-      <div class="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-white/20 p-8 text-center">
+      <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 text-center">
         <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
@@ -318,7 +318,7 @@
     {:else}
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {#each listings as listing}
-          <a href="/listing/{listing.id}" class="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-white/20 overflow-hidden hover:shadow-xl hover:bg-white/98 transition-all block">
+          <a href="/listing/{listing.id}" class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl hover:bg-white/98 transition-all block">
             <div class="aspect-w-16 aspect-h-9 bg-gray-200">
               <img src={listing.images[0]} alt={listing.title} class="object-cover w-full h-48" />
             </div>
@@ -337,12 +337,12 @@
               </div>
               <div class="mt-2 flex flex-wrap gap-1">
                 {#if listing.category}
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100/80 text-green-800 backdrop-blur-sm">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-xl text-xs font-medium bg-green-100/80 text-green-800 backdrop-blur-sm">
                     {listing.category}
                   </span>
                 {/if}
                 {#if listing.condition}
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100/80 text-gray-800 backdrop-blur-sm">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-xl text-xs font-medium bg-gray-100/80 text-gray-800 backdrop-blur-sm">
                     {listing.condition}
                   </span>
                 {/if}

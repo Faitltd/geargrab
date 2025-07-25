@@ -21,7 +21,7 @@
 </svelte:head>
 
 <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-md w-full space-y-8 bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl p-8 border border-white/20">
+  <div class="max-w-md w-full space-y-8 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20">
     <div>
       <h1 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
         Create your account
@@ -39,7 +39,7 @@
       <!-- Google Sign Up -->
       <button 
         type="button" 
-        class="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+        class="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
         on:click={handleGoogleSignUp}
         disabled={loading}
       >
