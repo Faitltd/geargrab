@@ -1,6 +1,7 @@
 {
 	"/": [],
 	"/auth/login": [],
+	"/auth/signup": [],
 	"/browse": [],
 	"/list-gear": [],
 	"/listing/[id]": []

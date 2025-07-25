@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Calendar from '$lib/components/Calendar.svelte';
-  import ImageUploader from '$lib/components/ImageUploader.svelte';
+  // import ImageUploader from '$lib/components/ImageUploader.svelte';
 
   // Define types for form data
   type Specification = {
@@ -640,11 +639,10 @@
                 <p class="text-red-500 text-sm mb-2">{errors.images}</p>
               {/if}
 
-              <ImageUploader
-                images={formData.images}
-                maxImages={5}
-                on:change={handleImagesChange}
-              />
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <p class="text-gray-500">Image upload functionality will be available soon</p>
+                <button type="button" class="mt-2 btn btn-secondary">Choose Images</button>
+              </div>
             </div>
           </div>
         </div>
@@ -844,11 +842,11 @@
               <p class="text-sm text-gray-500 mb-2">Mark any dates when your gear will not be available for rent.</p>
 
               <div class="bg-white/90 backdrop-blur-sm border border-white/30 rounded-md p-4 shadow-md">
-                <Calendar
-                  selectedDates={formData.unavailableDates}
-                  on:dateSelect={toggleDateAvailability}
-                  monthsToShow={2}
-                />
+                <div class="text-center py-8">
+                  <p class="text-gray-500 mb-4">Calendar functionality will be available soon</p>
+                  <p class="text-sm text-gray-400">You'll be able to mark unavailable dates here</p>
+                </div>
+              </div>
 
                 {#if formData.unavailableDates.length > 0}
                   <div class="mt-4">
@@ -874,7 +872,6 @@
                     </div>
                   </div>
                 {/if}
-              </div>
             </div>
           </div>
         </div>
