@@ -1,0 +1,301 @@
+<div>
+  <style>
+    #div-1 {box-sizing: border-box; height: 2020px; line-height: 24px; overflow-block: visible; overflow-inline: visible; width: 1714px}
+    #div-2 {display: contents}
+    #div-3 {height: 958px; overflow-block: hidden; overflow-inline: hidden; position: fixed; width: 1714px; overflow: hidden}
+    #div-4 {background-image: url("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"); bottom: -190px; height: 1342px; overflow-block: visible; overflow-inline: visible; position: absolute; top: -190px; width: 1714px}
+    #div-5 {height: 958px; overflow-block: visible; overflow-inline: visible; position: absolute; width: 1714px}
+    #div-6 {height: 2020px; position: relative; width: 1714px}
+    #nav-1 {backdrop-filter: blur(4px); border-bottom-width: 2px; height: 66px; width: 1714px; border-color: rgb(229, 231, 235); border-style: solid}
+    #div-7 {height: 64px; max-width: 80rem; padding-left: 1rem; padding-right: 1rem; width: 1280px; margin: auto}
+    #div-8 {height: 4rem; justify-content: space-between; width: 1248px; display: flex}
+    #div-9 {height: 64px; width: 374px; display: flex}
+    #div-10 {align-items: center; height: 64px; width: 118px; display: flex}
+    #a-1 {align-items: center; color: rgb(22, 163, 74); cursor: pointer; font-size: 18px; font-weight: 700; height: 2.5rem; line-height: 28px; padding-bottom: 0.5rem; padding-left: 1rem; padding-right: 1rem; padding-top: 0.5rem; width: 118px; display: flex; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 12px}
+    #div-11 {align-items: center; height: 64px; width: 258px; display: none}
+    #a-2 {align-items: center; background-color: rgba(255, 255, 255, 0.8); color: rgb(55, 65, 81); cursor: pointer; font-size: 14px; font-weight: 500; height: 2.5rem; line-height: 20px; padding-bottom: 0.5rem; padding-left: 0.75rem; padding-right: 0.75rem; padding-top: 0.5rem; width: 66px; display: inline-flex; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 12px}
+    #a-3 {align-items: center; background-color: rgba(255, 255, 255, 0.8); color: rgb(55, 65, 81); cursor: pointer; font-size: 14px; font-weight: 500; height: 2.5rem; line-height: 20px; margin-left: 16px; padding-bottom: 0.5rem; padding-left: 0.75rem; padding-right: 0.75rem; padding-top: 0.5rem; width: 76px; display: inline-flex; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 12px}
+    #a-4 {align-items: center; background-color: rgba(255, 255, 255, 0.8); color: rgb(55, 65, 81); cursor: pointer; font-size: 14px; font-weight: 500; height: 2.5rem; line-height: 20px; margin-left: 16px; padding-bottom: 0.5rem; padding-left: 0.75rem; padding-right: 0.75rem; padding-top: 0.5rem; width: 86px; display: inline-flex; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 12px}
+    #div-12 {height: 64px; width: 144px; display: none}
+    #a-5 {align-items: center; background-color: rgba(255, 255, 255, 0.8); color: rgb(55, 65, 81); cursor: pointer; font-size: 14px; font-weight: 500; height: 2.5rem; line-height: 20px; padding-bottom: 0.5rem; padding-left: 0.75rem; padding-right: 0.75rem; padding-top: 0.5rem; width: 68px; display: flex; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 12px}
+    #a-6 {align-items: center; color: rgb(255, 255, 255); cursor: pointer; font-size: 14px; font-weight: 500; height: 2.5rem; line-height: 20px; padding-bottom: 0.5rem; padding-left: 0.75rem; padding-right: 0.75rem; padding-top: 0.5rem; width: 78px; display: flex; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 12px}
+    #div-13 {align-items: center; height: 64px; width: 42px; display: flex}
+    #button-1 {align-items: center; appearance: button; background-color: rgba(255, 255, 255, 0.8); color: rgb(55, 65, 81); cursor: pointer; height: 42px; justify-content: center; text-align: center; width: 42px; display: inline-flex; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 12px; padding: 0.5rem}
+    #svg-1 {height: 1.5rem; overflow-block: hidden; overflow-inline: hidden; width: 1.5rem; overflow: hidden}
+    #path-1 {overflow-block: visible; overflow-inline: visible}
+    #main-1 {height: 1930px; min-height: 100vh; width: 1714px}
+    #div-14 {align-items: center; color: rgb(255, 255, 255); flex-direction: column; height: 24rem; justify-content: center; padding-left: 1rem; padding-right: 1rem; position: relative; text-align: center; width: 1714px; display: flex}
+    #h1-1 {font-size: 36px; font-weight: 700; height: 40px; line-height: 40px; margin-bottom: 1rem; width: 296px}
+    #p-1 {font-size: 20px; height: 56px; line-height: 28px; margin-bottom: 2rem; max-width: 48rem; width: 768px}
+    #div-15 {flex-direction: column; height: 38px; width: 262px; display: flex; gap: 16px}
+    #a-7 {align-items: center; background-color: rgb(22, 163, 74); cursor: pointer; font-size: 14px; font-weight: 500; height: 38px; justify-content: center; line-height: 20px; padding-bottom: 0.5rem; padding-left: 1rem; padding-right: 1rem; padding-top: 0.5rem; width: 118px; display: inline-flex; border-radius: 12px}
+    #a-8 {align-items: center; background-color: rgb(255, 255, 255); color: rgb(22, 163, 74); cursor: pointer; font-size: 14px; font-weight: 500; height: 38px; justify-content: center; line-height: 20px; padding-bottom: 0.5rem; padding-left: 1rem; padding-right: 1rem; padding-top: 0.5rem; width: 128px; display: inline-flex; border-width: 2px; border-color: rgb(22, 163, 74); border-style: solid; border-radius: 12px}
+    #section-1 {height: 420px; padding-bottom: 4rem; padding-top: 4rem; width: 1714px}
+    #div-16 {height: 292px; padding-left: 1rem; padding-right: 1rem; width: 1714px; margin: auto}
+    #h2-1 {color: rgb(255, 255, 255); font-size: 30px; font-weight: 700; height: 36px; line-height: 36px; text-align: center; width: 1682px}
+    #div-17 {grid-template-columns: 396.25px 396.25px 396.25px 396.25px; grid-template-rows: 256px; height: 256px; width: 1682px; display: grid; gap: 32px}
+    #a-9 {cursor: pointer; height: 256px; width: 398px}
+    #div-18 {height: 16rem; overflow-block: hidden; overflow-inline: hidden; position: relative; width: 398px; border-radius: 16px; overflow: hidden}
+    #img-1 {height: 100%; object-fit: cover; overflow-block: clip; overflow-clip-margin: content-box; overflow-inline: clip; width: 100%; overflow: clip}
+    #div-19 {height: 256px; opacity: 0.7; overflow-block: visible; overflow-inline: visible; position: absolute; width: 398px}
+    #div-20 {color: rgb(255, 255, 255); height: 84px; overflow-block: visible; overflow-inline: visible; position: absolute; top: 172px; width: 398px; padding: 1rem}
+    #h3-1 {font-size: 20px; font-weight: 700; height: 28px; line-height: 28px; margin-bottom: 0.25rem; width: 366px}
+    #p-2 {font-size: 14px; height: 20px; line-height: 20px; opacity: 0.9; width: 366px}
+    #a-10 {cursor: pointer; height: 256px; width: 398px}
+    #div-21 {height: 16rem; overflow-block: hidden; overflow-inline: hidden; position: relative; width: 398px; border-radius: 16px; overflow: hidden}
+    #img-2 {height: 100%; object-fit: cover; overflow-block: clip; overflow-clip-margin: content-box; overflow-inline: clip; width: 100%; overflow: clip}
+    #div-22 {height: 256px; opacity: 0.7; overflow-block: visible; overflow-inline: visible; position: absolute; width: 398px}
+    #div-23 {color: rgb(255, 255, 255); height: 84px; overflow-block: visible; overflow-inline: visible; position: absolute; top: 172px; width: 398px; padding: 1rem}
+    #h3-2 {font-size: 20px; font-weight: 700; height: 28px; line-height: 28px; margin-bottom: 0.25rem; width: 366px}
+    #p-3 {font-size: 14px; height: 20px; line-height: 20px; opacity: 0.9; width: 366px}
+    #a-11 {cursor: pointer; height: 256px; width: 398px}
+    #div-24 {height: 16rem; overflow-block: hidden; overflow-inline: hidden; position: relative; width: 398px; border-radius: 16px; overflow: hidden}
+    #img-3 {height: 100%; object-fit: cover; overflow-block: clip; overflow-clip-margin: content-box; overflow-inline: clip; width: 100%; overflow: clip}
+    #div-25 {height: 256px; opacity: 0.7; overflow-block: visible; overflow-inline: visible; position: absolute; width: 398px}
+    #div-26 {color: rgb(255, 255, 255); height: 84px; overflow-block: visible; overflow-inline: visible; position: absolute; top: 172px; width: 398px; padding: 1rem}
+    #h3-3 {font-size: 20px; font-weight: 700; height: 28px; line-height: 28px; margin-bottom: 0.25rem; width: 366px}
+    #p-4 {font-size: 14px; height: 20px; line-height: 20px; opacity: 0.9; width: 366px}
+    #a-12 {cursor: pointer; height: 256px; width: 398px}
+    #div-27 {height: 16rem; overflow-block: hidden; overflow-inline: hidden; position: relative; width: 398px; border-radius: 16px; overflow: hidden}
+    #img-4 {height: 100%; object-fit: cover; overflow-block: clip; overflow-clip-margin: content-box; overflow-inline: clip; width: 100%; overflow: clip}
+    #div-28 {height: 256px; opacity: 0.7; overflow-block: visible; overflow-inline: visible; position: absolute; width: 398px}
+    #div-29 {color: rgb(255, 255, 255); height: 84px; overflow-block: visible; overflow-inline: visible; position: absolute; top: 172px; width: 398px; padding: 1rem}
+    #h3-4 {font-size: 20px; font-weight: 700; height: 28px; line-height: 28px; margin-bottom: 0.25rem; width: 366px}
+    #p-5 {font-size: 14px; height: 20px; line-height: 20px; opacity: 0.9; width: 366px}
+    #section-2 {height: 378px; padding-bottom: 4rem; padding-top: 4rem; width: 1714px}
+    #div-30 {height: 250px; padding-left: 1rem; padding-right: 1rem; width: 1714px; margin: auto}
+    #h2-2 {color: rgb(255, 255, 255); font-size: 30px; font-weight: 700; height: 36px; line-height: 36px; text-align: center; width: 1682px}
+    #div-31 {grid-template-columns: 396.25px 396.25px 396.25px 396.25px; grid-template-rows: 214px; height: 214px; width: 1682px; display: grid; gap: 32px}
+    #div-32 {backdrop-filter: blur(4px); height: 214px; text-align: center; width: 398px; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 16px; padding: 1.5rem}
+    #div-33 {align-items: center; background-color: rgb(220, 252, 231); height: 4rem; justify-content: center; margin-bottom: 1rem; margin-left: auto; margin-right: auto; width: 4rem; display: flex; border-radius: 16px}
+    #svg-2 {color: rgb(22, 163, 74); height: 2rem; overflow-block: hidden; overflow-inline: hidden; width: 2rem; overflow: hidden}
+    #path-2 {overflow-block: visible; overflow-inline: visible}
+    #h3-5 {font-size: 20px; font-weight: 700; height: 28px; line-height: 28px; margin-bottom: 0.5rem; width: 348px}
+    #p-6 {color: rgb(75, 85, 99); height: 48px; width: 348px}
+    #div-34 {backdrop-filter: blur(4px); height: 214px; text-align: center; width: 398px; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 16px; padding: 1.5rem}
+    #div-35 {align-items: center; background-color: rgb(220, 252, 231); height: 4rem; justify-content: center; margin-bottom: 1rem; margin-left: auto; margin-right: auto; width: 4rem; display: flex; border-radius: 16px}
+    #svg-3 {color: rgb(22, 163, 74); height: 2rem; overflow-block: hidden; overflow-inline: hidden; width: 2rem; overflow: hidden}
+    #path-3 {overflow-block: visible; overflow-inline: visible}
+    #h3-6 {font-size: 20px; font-weight: 700; height: 28px; line-height: 28px; margin-bottom: 0.5rem; width: 348px}
+    #p-7 {color: rgb(75, 85, 99); height: 48px; width: 348px}
+    #div-36 {backdrop-filter: blur(4px); height: 214px; text-align: center; width: 398px; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 16px; padding: 1.5rem}
+    #div-37 {align-items: center; background-color: rgb(220, 252, 231); height: 4rem; justify-content: center; margin-bottom: 1rem; margin-left: auto; margin-right: auto; width: 4rem; display: flex; border-radius: 16px}
+    #svg-4 {color: rgb(22, 163, 74); height: 2rem; overflow-block: hidden; overflow-inline: hidden; width: 2rem; overflow: hidden}
+    #path-4 {overflow-block: visible; overflow-inline: visible}
+    #h3-7 {font-size: 20px; font-weight: 700; height: 28px; line-height: 28px; margin-bottom: 0.5rem; width: 348px}
+    #p-8 {color: rgb(75, 85, 99); height: 48px; width: 348px}
+    #div-38 {backdrop-filter: blur(4px); height: 214px; text-align: center; width: 398px; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 16px; padding: 1.5rem}
+    #div-39 {align-items: center; background-color: rgb(220, 252, 231); height: 4rem; justify-content: center; margin-bottom: 1rem; margin-left: auto; margin-right: auto; width: 4rem; display: flex; border-radius: 16px}
+    #svg-5 {color: rgb(22, 163, 74); height: 2rem; overflow-block: hidden; overflow-inline: hidden; width: 2rem; overflow: hidden}
+    #path-5 {overflow-block: visible; overflow-inline: visible}
+    #h3-8 {font-size: 20px; font-weight: 700; height: 28px; line-height: 28px; margin-bottom: 0.5rem; width: 348px}
+    #p-9 {color: rgb(75, 85, 99); height: 48px; width: 348px}
+    #div-40 {align-items: center; height: 84px; justify-content: center; position: relative; width: 1714px; display: flex}
+    #div-41 {color: rgb(255, 255, 255); height: 84px; padding-left: 1rem; padding-right: 1rem; position: relative; text-align: center; width: 728px}
+    #h2-3 {font-size: 36px; font-weight: 700; height: 40px; line-height: 40px; margin-bottom: 1rem; width: 696px}
+    #p-10 {font-size: 20px; height: 28px; line-height: 28px; max-width: 48rem; width: 696px; margin: auto}
+    #section-3 {height: 350px; padding-bottom: 4rem; padding-top: 4rem; width: 1714px}
+    #div-42 {height: 222px; padding-left: 1rem; padding-right: 1rem; width: 1714px; margin: auto}
+    #h2-4 {color: rgb(255, 255, 255); font-size: 30px; font-weight: 700; height: 36px; line-height: 36px; text-align: center; width: 1682px}
+    #div-43 {grid-template-columns: 539px 539px 539px; grid-template-rows: 186px; height: 186px; width: 1682px; display: grid; gap: 32px}
+    #div-44 {backdrop-filter: blur(4px); height: 186px; width: 540px; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 16px; padding: 1.5rem}
+    #div-45 {align-items: center; height: 48px; margin-bottom: 1rem; width: 490px; display: flex}
+    #img-5 {height: 3rem; max-width: 100%; overflow-block: clip; overflow-clip-margin: content-box; overflow-inline: clip; width: 3rem; border-radius: 16px; overflow: clip}
+    #div-46 {height: 44px; width: 116px}
+    #h3-9 {font-weight: 700; height: 24px; width: 116px}
+    #p-11 {color: rgb(75, 85, 99); font-size: 14px; height: 20px; line-height: 20px; width: 116px}
+    #p-12 {color: rgb(55, 65, 81); height: 72px; width: 490px}
+    #div-47 {backdrop-filter: blur(4px); height: 186px; width: 540px; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 16px; padding: 1.5rem}
+    #div-48 {align-items: center; height: 48px; margin-bottom: 1rem; width: 490px; display: flex}
+    #img-6 {height: 3rem; max-width: 100%; overflow-block: clip; overflow-clip-margin: content-box; overflow-inline: clip; width: 3rem; border-radius: 16px; overflow: clip}
+    #div-49 {height: 44px; width: 106px}
+    #h3-10 {font-weight: 700; height: 24px; width: 106px}
+    #p-13 {color: rgb(75, 85, 99); font-size: 14px; height: 20px; line-height: 20px; width: 106px}
+    #p-14 {color: rgb(55, 65, 81); height: 72px; width: 490px}
+    #div-50 {backdrop-filter: blur(4px); height: 186px; width: 540px; border-width: 2px; border-color: rgb(229, 231, 235); border-style: solid; border-radius: 16px; padding: 1.5rem}
+    #div-51 {align-items: center; height: 48px; margin-bottom: 1rem; width: 490px; display: flex}
+    #img-7 {height: 3rem; max-width: 100%; overflow-block: clip; overflow-clip-margin: content-box; overflow-inline: clip; width: 3rem; border-radius: 16px; overflow: clip}
+    #div-52 {height: 44px; width: 126px}
+    #h3-11 {font-weight: 700; height: 24px; width: 126px}
+    #p-15 {color: rgb(75, 85, 99); font-size: 14px; height: 20px; line-height: 20px; width: 126px}
+    #p-16 {color: rgb(55, 65, 81); height: 72px; width: 490px}
+    #section-4 {color: rgb(255, 255, 255); height: 314px; padding-bottom: 4rem; padding-top: 4rem; width: 1714px}
+    #div-53 {height: 186px; padding-left: 1rem; padding-right: 1rem; text-align: center; width: 1714px; margin: auto}
+    #h2-5 {font-size: 30px; font-weight: 700; height: 36px; line-height: 36px; margin-bottom: 1.5rem; width: 1682px}
+    #p-17 {font-size: 20px; height: 56px; line-height: 28px; margin-bottom: 2rem; margin-left: auto; margin-right: auto; max-width: 48rem; width: 768px}
+    #div-54 {flex-direction: column; height: 38px; justify-content: center; width: 1682px; display: flex; gap: 16px}
+    #a-13 {align-items: center; backdrop-filter: blur(4px); color: rgb(22, 163, 74); cursor: pointer; font-size: 14px; font-weight: 500; height: 38px; justify-content: center; line-height: 20px; padding-bottom: 0.5rem; padding-left: 1rem; padding-right: 1rem; padding-top: 0.5rem; width: 118px; display: inline-flex; border-radius: 12px}
+    #a-14 {align-items: center; backdrop-filter: blur(4px); cursor: pointer; font-size: 14px; font-weight: 500; height: 38px; justify-content: center; line-height: 20px; padding-bottom: 0.5rem; padding-left: 1rem; padding-right: 1rem; padding-top: 0.5rem; width: 128px; display: inline-flex; border-radius: 12px}
+    #footer-1 {backdrop-filter: blur(4px); color: rgb(255, 255, 255); height: 24px; position: relative; width: 1714px}
+    #div-55 {height: 24px; padding-left: 1rem; padding-right: 1rem; width: 1714px; margin: auto}
+    #p-18 {height: 24px; text-align: center; width: 1682px}
+    #div-56 {bottom: 958px; clip: rect(0px, 0px, 0px, 0px); clip-path: inset(50%); height: 2px; overflow-block: hidden; overflow-inline: hidden; position: absolute; right: 1712px; width: 2px; overflow: hidden}
+  </style>
+  <div id="div-1">
+    <div id="div-2">
+      <div id="div-3">
+        <div id="div-4"></div>
+        <div id="div-5"></div>
+      </div>
+      <div id="div-6">
+        <nav id="nav-1">
+          <div id="div-7">
+            <div id="div-8">
+              <div id="div-9">
+                <div id="div-10"><a href="https://geargrab.co/" id="a-1">GearGrab</a></div>
+                <div id="div-11"><a href="https://geargrab.co/" id="a-2">Home</a> <a href="https://geargrab.co/browse" id="a-3">Browse</a> <a href="https://geargrab.co/list-gear" id="a-4">List Gear</a></div>
+              </div>
+              <div id="div-12"><a href="https://geargrab.co/auth/login" id="a-5">Log In</a> <a href="https://geargrab.co/auth/signup" id="a-6">Sign Up</a></div>
+              <div id="div-13">
+                <button id="button-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor" id="svg-1"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="#374151" id="path-1"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </nav>
+        <main id="main-1">
+          <div id="div-14">
+            <h1 id="h1-1">Adventure Awaits</h1>
+            <p id="p-1">Rent outdoor gear from local owners and save money while exploring the great outdoors.</p>
+            <div id="div-15"><a href="https://geargrab.co/browse" id="a-7">Browse Gear</a> <a href="https://geargrab.co/list-gear" id="a-8">List Your Gear</a></div>
+          </div>
+          <section id="section-1">
+            <div id="div-16">
+              <h2 id="h2-1">Explore Gear Categories</h2>
+              <div id="div-17">
+                <a href="https://geargrab.co/browse?category=camping" id="a-9"
+                  ><div id="div-18">
+                    <img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=1170&amp;q=80" id="img-1" />
+                    <div id="div-19"></div>
+                    <div id="div-20">
+                      <h3 id="h3-1">Camping</h3>
+                      <p id="p-2">Tents, sleeping bags, cooking equipment, and more</p>
+                    </div>
+                  </div></a
+                ><a href="https://geargrab.co/browse?category=hiking" id="a-10"
+                  ><div id="div-21">
+                    <img src="https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=1170&amp;q=80" id="img-2" />
+                    <div id="div-22"></div>
+                    <div id="div-23">
+                      <h3 id="h3-2">Hiking</h3>
+                      <p id="p-3">Backpacks, footwear, navigation tools, and clothing</p>
+                    </div>
+                  </div></a
+                ><a href="https://geargrab.co/browse?category=water-sports" id="a-11"
+                  ><div id="div-24">
+                    <img src="https://images.unsplash.com/photo-1604537466158-719b1972feb8?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=1169&amp;q=80" id="img-3" />
+                    <div id="div-25"></div>
+                    <div id="div-26">
+                      <h3 id="h3-3">Water Sports</h3>
+                      <p id="p-4">Kayaks, paddleboards, surfboards, and life vests</p>
+                    </div>
+                  </div></a
+                ><a href="https://geargrab.co/browse?category=biking" id="a-12"
+                  ><div id="div-27">
+                    <img src="https://images.unsplash.com/photo-1511994298241-608e28f14fde?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=1170&amp;q=80" id="img-4" />
+                    <div id="div-28"></div>
+                    <div id="div-29">
+                      <h3 id="h3-4">Biking</h3>
+                      <p id="p-5">Mountain bikes, road bikes, helmets, and accessories</p>
+                    </div>
+                  </div></a
+                >
+              </div>
+            </div>
+          </section>
+          <section id="section-2">
+            <div id="div-30">
+              <h2 id="h2-2">How GearGrab Works</h2>
+              <div id="div-31">
+                <div id="div-32">
+                  <div id="div-33">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor" id="svg-2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" fill="none" stroke="#16a34a" id="path-2"></path></svg>
+                  </div>
+                  <h3 id="h3-5">Find Gear</h3>
+                  <p id="p-6">Browse thousands of outdoor gear listings from local owners in your area.</p>
+                </div>
+                <div id="div-34">
+                  <div id="div-35">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor" id="svg-3"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" fill="none" stroke="#16a34a" id="path-3"></path></svg>
+                  </div>
+                  <h3 id="h3-6">Book &amp; Pay</h3>
+                  <p id="p-7">Reserve the gear for your dates and pay securely through our platform.</p>
+                </div>
+                <div id="div-36">
+                  <div id="div-37">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor" id="svg-4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" fill="none" stroke="#16a34a" id="path-4"></path></svg>
+                  </div>
+                  <h3 id="h3-7">Enjoy Outdoors</h3>
+                  <p id="p-8">Pick up the gear and enjoy your adventure without the cost of buying.</p>
+                </div>
+                <div id="div-38">
+                  <div id="div-39">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor" id="svg-5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" fill="none" stroke="#16a34a" id="path-5"></path></svg>
+                  </div>
+                  <h3 id="h3-8">Return &amp; Review</h3>
+                  <p id="p-9">Return the gear and share your experience with the community.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <div id="div-40">
+            <div id="div-41">
+              <h2 id="h2-3">Save Money. Reduce Waste. Explore More.</h2>
+              <p id="p-10">Renting gear is better for your wallet and the planet.</p>
+            </div>
+          </div>
+          <section id="section-3">
+            <div id="div-42">
+              <h2 id="h2-4">What Our Users Say</h2>
+              <div id="div-43">
+                <div id="div-44">
+                  <div id="div-45">
+                    <img src="https://randomuser.me/api/portraits/women/32.jpg" id="img-5" />
+                    <div id="div-46">
+                      <h3 id="h3-9">Sarah Johnson</h3>
+                      <p id="p-11">Denver, CO</p>
+                    </div>
+                  </div>
+                  <p id="p-12">"GearGrab saved me hundreds of dollars on camping equipment for our family trip. The gear was in perfect condition and the owner was super helpful!"</p>
+                </div>
+                <div id="div-47">
+                  <div id="div-48">
+                    <img src="https://randomuser.me/api/portraits/men/44.jpg" id="img-6" />
+                    <div id="div-49">
+                      <h3 id="h3-10">Michael Chen</h3>
+                      <p id="p-13">Boulder, CO</p>
+                    </div>
+                  </div>
+                  <p id="p-14">"As someone who only goes skiing once a year, renting through GearGrab is perfect. I got high-quality equipment for a fraction of the retail price."</p>
+                </div>
+                <div id="div-50">
+                  <div id="div-51">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" id="img-7" />
+                    <div id="div-52">
+                      <h3 id="h3-11">Emily Rodriguez</h3>
+                      <p id="p-15">Fort Collins, CO</p>
+                    </div>
+                  </div>
+                  <p id="p-16">"I love being able to try different kayaks before committing to buying one. GearGrab makes it easy and affordable to test out gear."</p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="section-4">
+            <div id="div-53">
+              <h2 id="h2-5">Ready to Start Your Adventure?</h2>
+              <p id="p-17">Join thousands of outdoor enthusiasts who are saving money and exploring more with GearGrab.</p>
+              <div id="div-54"><a href="https://geargrab.co/browse" id="a-13">Browse Gear</a> <a href="https://geargrab.co/list-gear" id="a-14">List Your Gear</a></div>
+            </div>
+          </section>
+        </main>
+        <footer id="footer-1">
+          <div id="div-55"><p id="p-18">© 2025 GearGrab. All rights reserved.</p></div>
+        </footer>
+      </div>
+      <div id="div-56"></div>
+    </div>
+  </div>
+</div>
+
