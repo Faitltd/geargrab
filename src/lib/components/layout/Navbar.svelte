@@ -22,9 +22,6 @@
           <a href="/" class="bg-white/90 backdrop-blur-sm text-green-600 font-bold text-lg px-4 py-2 rounded-xl shadow-lg border border-white/30 h-10 flex items-center">GearGrab</a>
         </div>
         <div class="hidden sm:ml-6 sm:flex sm:space-x-4 items-center">
-          <a href="/" class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 inline-flex items-center px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10">
-            Home
-          </a>
           <a href="/browse" class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 inline-flex items-center px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10">
             Browse
           </a>
@@ -73,9 +70,6 @@
   {#if isMenuOpen}
     <div id="mobile-menu" class="sm:hidden backdrop-blur-sm bg-white/10 border-t border-white/20">
       <div class="pt-2 pb-3 space-y-2 px-3">
-        <a href="/" class="bg-white/80 backdrop-blur-sm block px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all">
-          Home
-        </a>
         <a href="/browse" class="bg-white/80 backdrop-blur-sm block px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all">
           Browse
         </a>

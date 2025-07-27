@@ -28,12 +28,14 @@
 
   .background-image {
     background-image: url("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80");
-    bottom: -190px;
-    height: 1342px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100%;
     overflow-block: visible;
     overflow-inline: visible;
     position: absolute;
-    top: -190px;
+    top: 0;
     width: 100%;
   }
 
@@ -90,31 +92,34 @@
   }
 
   .hero-buttons {
-    flex-direction: column;
-    height: 38px;
-    width: 262px;
+    flex-direction: row;
     display: flex;
-    gap: 16px;
+    gap: 24px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
   }
 
   .btn-primary {
     align-items: center;
     background-color: rgb(22, 163, 74);
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    height: 38px;
+    font-size: 18px;
+    font-weight: 600;
+    height: 56px;
     justify-content: center;
-    line-height: 20px;
-    padding-bottom: 0.5rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-top: 0.5rem;
-    width: 118px;
+    line-height: 24px;
+    padding: 16px 32px;
+    min-width: 180px;
     display: inline-flex;
     border-radius: 12px;
     text-decoration: none;
     color: white;
+    transition: background-color 0.2s;
+    flex: 1;
+    max-width: 250px;
   }
 
   .btn-secondary {
@@ -122,28 +127,27 @@
     background-color: rgb(255, 255, 255);
     color: rgb(22, 163, 74);
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    height: 38px;
+    font-size: 18px;
+    font-weight: 600;
+    height: 56px;
     justify-content: center;
-    line-height: 20px;
-    padding-bottom: 0.5rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-top: 0.5rem;
-    width: 128px;
+    line-height: 24px;
+    padding: 16px 32px;
+    min-width: 180px;
     display: inline-flex;
     border-width: 2px;
     border-color: rgb(22, 163, 74);
     border-style: solid;
     border-radius: 12px;
     text-decoration: none;
+    transition: background-color 0.2s;
+    flex: 1;
+    max-width: 250px;
   }
 
   .section {
-    height: 420px;
-    padding-bottom: 4rem;
-    padding-top: 4rem;
+    padding-bottom: 6rem;
+    padding-top: 6rem;
     width: 100%;
   }
 
@@ -159,10 +163,10 @@
     color: rgb(255, 255, 255);
     font-size: 30px;
     font-weight: 700;
-    height: 36px;
     line-height: 36px;
     text-align: center;
     width: 100%;
+    margin-bottom: 3rem;
   }
 
   .categories-grid {
@@ -172,6 +176,7 @@
     width: 100%;
     display: grid;
     gap: 32px;
+    margin-bottom: 3rem;
   }
 
   .category-card {
@@ -239,9 +244,8 @@
   }
 
   .how-it-works-section {
-    height: 378px;
-    padding-bottom: 4rem;
-    padding-top: 4rem;
+    padding-bottom: 6rem;
+    padding-top: 6rem;
     width: 100%;
   }
 
@@ -260,6 +264,7 @@
     width: 100%;
     display: grid;
     gap: 32px;
+    margin-bottom: 3rem;
   }
 
   .how-it-works-card {
@@ -544,8 +549,8 @@
   <div class="content-container">
     <main class="main-content">
       <div class="hero-content">
-        <h1 class="hero-title">Adventure Awaits</h1>
-        <p class="hero-description">Rent outdoor gear from local owners and save money while exploring the great outdoors.</p>
+        <h1 class="hero-title">GearGrab</h1>
+        <p class="hero-description">Meet Up. Gear Up. Get Out.</p>
         <div class="hero-buttons">
           <a href="/browse" class="btn-primary">Browse Gear</a>
           <a href="/list-gear" class="btn-secondary">List Your Gear</a>
