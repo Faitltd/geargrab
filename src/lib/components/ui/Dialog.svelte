@@ -27,6 +27,7 @@
   <div
     class="fixed inset-0 z-50 bg-black/80"
     on:click={handleBackdropClick}
+    tabindex="-1"
     on:keydown={handleKeydown}
     role="dialog"
     aria-modal="true"

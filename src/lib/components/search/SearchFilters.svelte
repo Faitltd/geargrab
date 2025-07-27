@@ -297,7 +297,7 @@
       
       <!-- Delivery Options -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Delivery Options</label>
+        <div class="block text-sm font-medium text-gray-700 mb-2">Delivery Options</div>
         <div class="flex flex-wrap gap-3">
           {#each deliveryOptions as option}
             <label class="flex items-center">
