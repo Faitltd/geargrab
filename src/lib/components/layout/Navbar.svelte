@@ -31,6 +31,9 @@
           <a href="/list-gear" class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 inline-flex items-center px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10">
             List Gear
           </a>
+          <a href="/my-rentals" class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 inline-flex items-center px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10">
+            My Rentals
+          </a>
         </div>
       </div>
       <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-3">
@@ -78,6 +81,9 @@
         </a>
         <a href="/list-gear" class="bg-white/80 backdrop-blur-sm block px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all">
           List Gear
+        </a>
+        <a href="/my-rentals" class="bg-white/80 backdrop-blur-sm block px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all">
+          My Rentals
         </a>
       </div>
       <div class="pt-4 pb-3 border-t border-white/20 px-3">

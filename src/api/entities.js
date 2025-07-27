@@ -190,6 +190,13 @@ export const Rental = {
       method: 'POST',
       body: data
     });
+  },
+
+  async update(id, data) {
+    return apiCall(`/rentals/${id}`, {
+      method: 'PUT',
+      body: data
+    });
   }
 };
 

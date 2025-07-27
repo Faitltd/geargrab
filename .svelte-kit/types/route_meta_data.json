@@ -3,6 +3,8 @@
 	"/auth/login": [],
 	"/auth/signup": [],
 	"/browse": [],
+	"/checkout": [],
 	"/list-gear": [],
-	"/listing/[id]": []
+	"/listing/[id]": [],
+	"/my-rentals": []
 }
