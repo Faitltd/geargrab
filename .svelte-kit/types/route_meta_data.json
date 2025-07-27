@@ -4,7 +4,10 @@
 	"/auth/signup": [],
 	"/browse": [],
 	"/checkout": [],
+	"/checkout/success": [],
+	"/checkout/[rental_id]": [],
 	"/list-gear": [],
 	"/listing/[id]": [],
+	"/messages": [],
 	"/my-rentals": []
 }

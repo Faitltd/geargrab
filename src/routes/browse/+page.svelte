@@ -1,355 +1,287 @@
-<script lang="ts">
-  import { goto } from '$app/navigation';
+<script>
+  import { onMount } from 'svelte';
   import { page } from '$app/stores';
+  import SearchFilters from '../../lib/components/search/SearchFilters.svelte';
 
-  // Dummy listings data
-  const dummyListings = [
-    {
-      id: '1',
-      title: 'Premium Camping Tent (4-Person)',
-      description: 'Spacious 4-person tent, perfect for family camping trips.',
-      category: 'camping',
-      dailyPrice: 35,
-      images: [
-        'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
-      ],
-      location: {
-        city: 'Denver',
-        state: 'CO'
-      },
-      condition: 'Like New',
-      averageRating: 4.8,
-      reviewCount: 12
-    },
-    {
-      id: '2',
-      title: 'Mountain Bike - Trek X-Caliber 8',
-      description: 'High-quality mountain bike for trail riding.',
-      category: 'biking',
-      dailyPrice: 45,
-      images: [
-        'https://images.unsplash.com/photo-1511994298241-608e28f14fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
-      ],
-      location: {
-        city: 'Boulder',
-        state: 'CO'
-      },
-      condition: 'Good',
-      averageRating: 4.6,
-      reviewCount: 8
-    },
-    {
-      id: '3',
-      title: 'Kayak - Wilderness Systems Pungo 120',
-      description: 'Stable and comfortable kayak for lake adventures.',
-      category: 'water-sports',
-      dailyPrice: 50,
-      images: [
-        'https://images.unsplash.com/photo-1604537466158-719b1972feb8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80'
-      ],
-      location: {
-        city: 'Fort Collins',
-        state: 'CO'
-      },
-      condition: 'Good',
-      averageRating: 4.9,
-      reviewCount: 15
-    },
-    {
-      id: '4',
-      title: 'Backpacking Set - Complete Kit',
-      description: 'Complete backpacking kit including tent, sleeping bag, pad, and cooking equipment.',
-      category: 'hiking',
-      dailyPrice: 65,
-      images: [
-        'https://images.unsplash.com/photo-1501554728187-ce583db33af7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
-      ],
-      location: {
-        city: 'Denver',
-        state: 'CO'
-      },
-      condition: 'Good',
-      averageRating: 4.7,
-      reviewCount: 9
-    },
-    {
-      id: '5',
-      title: 'Snowboard Package - Burton Custom',
-      description: 'Complete snowboard package including board, bindings, and boots.',
-      category: 'skiing',
-      dailyPrice: 55,
-      images: [
-        'https://images.unsplash.com/photo-1522056615691-da7b8106c665?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'
-      ],
-      location: {
-        city: 'Breckenridge',
-        state: 'CO'
-      },
-      condition: 'Like New',
-      averageRating: 4.9,
-      reviewCount: 7
-    },
-    {
-      id: '6',
-      title: 'Climbing Gear Set - Harness, Shoes, Rope',
-      description: 'Complete climbing gear set for indoor or outdoor climbing.',
-      category: 'climbing',
-      dailyPrice: 40,
-      images: [
-        'https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1103&q=80'
-      ],
-      location: {
-        city: 'Boulder',
-        state: 'CO'
-      },
-      condition: 'Good',
-      averageRating: 4.8,
-      reviewCount: 11
-    }
-  ];
+  let gearItems = [];
+  let loading = false;
+  let error = null;
+  let totalItems = 0;
+  let currentPage = 1;
+  let totalPages = 0;
+  const itemsPerPage = 20;
 
-  // Categories
-  const categories = [
-    { id: '', name: 'All Categories' },
-    { id: 'camping', name: 'Camping' },
-    { id: 'hiking', name: 'Hiking' },
-    { id: 'skiing', name: 'Skiing' },
-    { id: 'water-sports', name: 'Water Sports' },
-    { id: 'climbing', name: 'Climbing' },
-    { id: 'biking', name: 'Biking' }
-  ];
+  // Initialize filters from URL params
+  let filters = {
+    query: $page.url.searchParams.get('q') || '',
+    category: $page.url.searchParams.get('category') || '',
+    subcategory: $page.url.searchParams.get('subcategory') || '',
+    city: $page.url.searchParams.get('city') || '',
+    state: $page.url.searchParams.get('state') || '',
+    min_price: $page.url.searchParams.get('min_price') || '',
+    max_price: $page.url.searchParams.get('max_price') || '',
+    condition: $page.url.searchParams.get('condition') || '',
+    brand: $page.url.searchParams.get('brand') || '',
+    delivery_options: $page.url.searchParams.get('delivery_options')?.split(',') || [],
+    instant_book: $page.url.searchParams.get('instant_book') === 'true',
+    sort_by: $page.url.searchParams.get('sort_by') || 'created_at',
+    latitude: $page.url.searchParams.get('latitude') ? parseFloat($page.url.searchParams.get('latitude')) : null,
+    longitude: $page.url.searchParams.get('longitude') ? parseFloat($page.url.searchParams.get('longitude')) : null,
+    radius: parseInt($page.url.searchParams.get('radius')) || 50
+  };
 
-  // Filter state for form inputs
-  let query = $page.url.searchParams.get('q') || '';
-  let category = $page.url.searchParams.get('category') || '';
-  let location = $page.url.searchParams.get('location') || '';
-  let minPrice = $page.url.searchParams.get('minPrice') || '';
-  let maxPrice = $page.url.searchParams.get('maxPrice') || '';
-
-  // Filter listings based on URL parameters
-  $: listings = dummyListings.filter(listing => {
-    // Filter by category
-    if (category && listing.category !== category) {
-      return false;
-    }
-
-    // Filter by location
-    if (location) {
-      const locationLower = location.toLowerCase();
-      const cityState = `${listing.location.city}, ${listing.location.state}`.toLowerCase();
-      if (!cityState.includes(locationLower)) {
-        return false;
-      }
-    }
-
-    // Filter by price range
-    if (minPrice && listing.dailyPrice < parseInt(minPrice)) {
-      return false;
-    }
-
-    if (maxPrice && listing.dailyPrice > parseInt(maxPrice)) {
-      return false;
-    }
-
-    // Filter by search query
-    if (query) {
-      const queryLower = query.toLowerCase();
-      return listing.title.toLowerCase().includes(queryLower) ||
-             listing.description.toLowerCase().includes(queryLower) ||
-             listing.category.toLowerCase().includes(queryLower);
-    }
-
-    return true;
+  onMount(() => {
+    searchGear();
   });
 
-  // Handle search form submission
-  function handleSearch() {
-    // Build query parameters
-    const params = new URLSearchParams();
+  async function searchGear(page = 1) {
+    loading = true;
+    error = null;
 
-    if (query) params.set('q', query);
-    if (category) params.set('category', category);
-    if (location) params.set('location', location);
-    if (minPrice) params.set('minPrice', minPrice);
-    if (maxPrice) params.set('maxPrice', maxPrice);
+    try {
+      // Build query parameters
+      const params = new URLSearchParams();
 
-    // Navigate with updated parameters
-    goto(`/browse?${params.toString()}`);
+      if (filters.query) params.set('query', filters.query);
+      if (filters.category) params.set('category', filters.category);
+      if (filters.subcategory) params.set('subcategory', filters.subcategory);
+      if (filters.city) params.set('city', filters.city);
+      if (filters.state) params.set('state', filters.state);
+      if (filters.min_price) params.set('min_price', filters.min_price);
+      if (filters.max_price) params.set('max_price', filters.max_price);
+      if (filters.condition) params.set('condition', filters.condition);
+      if (filters.brand) params.set('brand', filters.brand);
+      if (filters.delivery_options.length > 0) params.set('delivery_options', filters.delivery_options.join(','));
+      if (filters.instant_book) params.set('instant_book', 'true');
+      if (filters.sort_by) params.set('sort_by', filters.sort_by);
+      if (filters.latitude) params.set('latitude', filters.latitude.toString());
+      if (filters.longitude) params.set('longitude', filters.longitude.toString());
+      if (filters.radius) params.set('radius', filters.radius.toString());
+
+      params.set('page', page.toString());
+      params.set('limit', itemsPerPage.toString());
+
+      // Update URL without triggering navigation
+      const newUrl = `/browse?${params.toString()}`;
+      window.history.replaceState({}, '', newUrl);
+
+      // Make API request
+      const response = await fetch(`/api/gear_items?${params.toString()}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to search gear');
+      }
+
+      const data = await response.json();
+
+      gearItems = data.gear_items || [];
+      totalItems = data.total || 0;
+      currentPage = page;
+      totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    } catch (err) {
+      console.error('Search error:', err);
+      error = err.message;
+    } finally {
+      loading = false;
+    }
   }
 
-  // No longer needed since we're using <a> tags
+  function handleSearch(event) {
+    filters = event.detail;
+    searchGear(1);
+  }
 
-  // Format currency
-  function formatCurrency(amount: number): string {
+  function handlePageChange(newPage) {
+    if (newPage >= 1 && newPage <= totalPages) {
+      searchGear(newPage);
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function formatPrice(price) {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    }).format(amount);
+      maximumFractionDigits: 0
+    }).format(price);
+  }
+
+  function getImageUrl(images) {
+    if (!images) return '/placeholder-gear.jpg';
+    const imageArray = Array.isArray(images) ? images : JSON.parse(images || '[]');
+    return imageArray.length > 0 ? imageArray[0] : '/placeholder-gear.jpg';
   }
 </script>
 
 <svelte:head>
   <title>Browse Gear - GearGrab</title>
+  <meta name="description" content="Find and rent outdoor gear from fellow adventurers" />
 </svelte:head>
 
-<div class="min-h-screen">
+<div class="min-h-screen bg-gray-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Search and Filters -->
-    <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-4 mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div>
-          <label for="search-query" class="form-label">What gear do you need?</label>
-          <input
-            type="text"
-            id="search-query"
-            class="form-input"
-            placeholder="Tent, kayak, bike..."
-            bind:value={query}
-          />
-        </div>
-        <div>
-          <label for="category" class="form-label">Category</label>
-          <select id="category" class="form-input" bind:value={category}>
-            {#each categories as cat}
-              <option value={cat.id}>{cat.name}</option>
-            {/each}
-          </select>
-        </div>
-        <div>
-          <label for="location" class="form-label">Location</label>
-          <input
-            type="text"
-            id="location"
-            class="form-input"
-            placeholder="City, state, or zip"
-            bind:value={location}
-          />
-        </div>
-        <div class="flex items-end">
-          <button class="btn btn-primary w-full" on:click={handleSearch}>
-            Search
-          </button>
-        </div>
-      </div>
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Browse Gear</h1>
+      <p class="mt-2 text-lg text-gray-600">
+        Find the perfect outdoor gear for your next adventure
+      </p>
+    </div>
 
-      <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="flex items-center space-x-2">
-          <div class="w-1/2">
-            <label for="min-price" class="form-label">Min Price</label>
-            <input
-              type="number"
-              id="min-price"
-              class="form-input"
-              placeholder="Min"
-              bind:value={minPrice}
-            />
-          </div>
-          <div class="w-1/2">
-            <label for="max-price" class="form-label">Max Price</label>
-            <input
-              type="number"
-              id="max-price"
-              class="form-input"
-              placeholder="Max"
-              bind:value={maxPrice}
-            />
-          </div>
-        </div>
-        <div></div>
-        <div class="flex items-end">
-          <button class="btn btn-secondary w-full" on:click={() => {
-            query = '';
-            category = '';
-            location = '';
-            minPrice = '';
-            maxPrice = '';
-            handleSearch();
-          }}>
-            Clear Filters
-          </button>
-        </div>
-      </div>
+    <!-- Search Filters -->
+    <div class="mb-8">
+      <SearchFilters {filters} on:search={handleSearch} />
     </div>
 
     <!-- Results Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-      <div>
-        <h1 class="text-2xl font-bold text-white drop-shadow-lg">
-          {#if listings.length === 0}
-            No gear found
-          {:else}
-            {listings.length} {listings.length === 1 ? 'item' : 'items'} found
-          {/if}
-
-          {#if query || category || location}
-            <span class="font-normal text-white/80 drop-shadow-md">
-              {#if query}for "{query}"{/if}
-              {#if category}in {categories.find(c => c.id === category)?.name}{/if}
-              {#if location}near {location}{/if}
-            </span>
-          {/if}
-        </h1>
+    <div class="flex justify-between items-center mb-6">
+      <div class="text-sm text-gray-600">
+        {#if loading}
+          Searching...
+        {:else if totalItems > 0}
+          Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} results
+        {:else}
+          No results found
+        {/if}
       </div>
     </div>
 
-    <!-- Results Grid -->
-    {#if listings.length === 0}
-      <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 text-center">
-        <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <h3 class="mt-2 text-lg font-medium text-gray-900">No results found</h3>
-        <p class="mt-1 text-gray-500">Try adjusting your search filters or browse all available gear.</p>
-        <div class="mt-6">
-          <button class="btn btn-primary" on:click={() => {
-            query = '';
-            category = '';
-            location = '';
-            minPrice = '';
-            maxPrice = '';
-            handleSearch();
-          }}>
-            View All Gear
-          </button>
+    <!-- Error Message -->
+    {#if error}
+      <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+        <div class="flex">
+          <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
+          <div class="ml-3">
+            <p class="text-sm text-red-800">{error}</p>
+          </div>
         </div>
       </div>
-    {:else}
+    {/if}
+
+    <!-- Loading State -->
+    {#if loading}
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {#each listings as listing}
-          <a href="/listing/{listing.id}" class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl hover:bg-white/98 transition-all block">
-            <div class="aspect-w-16 aspect-h-9 bg-gray-200">
-              <img src={listing.images[0]} alt={listing.title} class="object-cover w-full h-48" />
-            </div>
+        {#each Array(8) as _}
+          <div class="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+            <div class="h-48 bg-gray-300"></div>
             <div class="p-4">
-              <h3 class="font-medium text-lg mb-1 text-gray-900">{listing.title}</h3>
-              <p class="text-gray-600 text-sm mb-2">{listing.location.city}, {listing.location.state}</p>
-              <div class="flex justify-between items-center">
-                <p class="font-bold text-green-600">{formatCurrency(listing.dailyPrice)}/day</p>
-                <div class="flex items-center text-gray-700">
-                  <span class="text-yellow-400 mr-1">★</span>
-                  <span>{listing.averageRating || 'New'}</span>
-                  {#if listing.reviewCount}
-                    <span class="text-gray-500 ml-1">({listing.reviewCount})</span>
+              <div class="h-4 bg-gray-300 rounded mb-2"></div>
+              <div class="h-3 bg-gray-300 rounded mb-2"></div>
+              <div class="h-3 bg-gray-300 rounded w-1/2"></div>
+            </div>
+          </div>
+        {/each}
+      </div>
+    {:else if gearItems.length > 0}
+      <!-- Gear Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {#each gearItems as item}
+          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <a href="/gear/{item.id}" class="block">
+              <div class="aspect-w-4 aspect-h-3">
+                <img
+                  src={getImageUrl(item.images)}
+                  alt={item.title}
+                  class="w-full h-48 object-cover"
+                  loading="lazy"
+                />
+              </div>
+
+              <div class="p-4">
+                <h3 class="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">
+                  {item.title}
+                </h3>
+
+                <p class="text-sm text-gray-600 mb-2">
+                  {item.city}, {item.state}
+                  {#if item.distance}
+                    • {item.distance.toFixed(1)} mi away
                   {/if}
+                </p>
+
+                <div class="flex items-center justify-between">
+                  <div class="text-lg font-bold text-green-600">
+                    {formatPrice(item.daily_price)}/day
+                  </div>
+
+                  <div class="flex items-center text-sm text-gray-500">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                    {item.rating || 'New'}
+                  </div>
+                </div>
+
+                <div class="mt-2 flex items-center justify-between text-xs text-gray-500">
+                  <span class="capitalize">{item.condition}</span>
+                  <span>{item.owner_name}</span>
                 </div>
               </div>
-              <div class="mt-2 flex flex-wrap gap-1">
-                {#if listing.category}
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-xl text-xs font-medium bg-green-100/80 text-green-800 backdrop-blur-sm">
-                    {listing.category}
-                  </span>
-                {/if}
-                {#if listing.condition}
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-xl text-xs font-medium bg-gray-100/80 text-gray-800 backdrop-blur-sm">
-                    {listing.condition}
-                  </span>
-                {/if}
-              </div>
-            </div>
-          </a>
+            </a>
+          </div>
         {/each}
+      </div>
+
+      <!-- Pagination -->
+      {#if totalPages > 1}
+        <div class="mt-8 flex justify-center">
+          <nav class="flex items-center space-x-2">
+            <button
+              on:click={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+
+            {#each Array(Math.min(5, totalPages)) as _, i}
+              {@const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i}
+              <button
+                on:click={() => handlePageChange(pageNum)}
+                class="px-3 py-2 border rounded-md text-sm font-medium {
+                  pageNum === currentPage
+                    ? 'border-green-500 bg-green-50 text-green-600'
+                    : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                }"
+              >
+                {pageNum}
+              </button>
+            {/each}
+
+            <button
+              on:click={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </nav>
+        </div>
+      {/if}
+    {:else}
+      <!-- No Results -->
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <h3 class="mt-2 text-lg font-medium text-gray-900">No gear found</h3>
+        <p class="mt-1 text-gray-500">Try adjusting your search filters or browse all categories.</p>
+        <div class="mt-4">
+          <button
+            on:click={() => {
+              filters = { ...filters, query: '', category: '', subcategory: '', city: '', state: '', min_price: '', max_price: '', condition: '', brand: '', delivery_options: [], instant_book: false };
+              searchGear(1);
+            }}
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+          >
+            Clear Filters
+          </button>
+        </div>
       </div>
     {/if}
   </div>
