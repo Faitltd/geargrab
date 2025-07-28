@@ -8,6 +8,14 @@
       "_internal.js"
     ]
   },
+  "_SocialLogin.js": {
+    "file": "chunks/SocialLogin.js",
+    "name": "SocialLogin",
+    "imports": [
+      "_index.js",
+      "src/lib/firebase/client.ts"
+    ]
+  },
   "_auth.js": {
     "file": "chunks/auth.js",
     "name": "auth",
@@ -100,7 +108,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.DMG1w1eu.css"
+      "_app/immutable/assets/_layout.CGVRkcnJ.css"
     ]
   },
   "src/routes/+page.svelte": {
@@ -112,7 +120,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_page.BVlUC0oj.css"
+      "_app/immutable/assets/_page.DXQ5t5BG.css"
     ]
   },
   "src/routes/auth/login/+page.svelte": {
@@ -124,7 +132,7 @@
       "_index.js",
       "_exports.js",
       "_state.svelte.js",
-      "_auth.js"
+      "_SocialLogin.js"
     ]
   },
   "src/routes/auth/signup/+page.svelte": {
@@ -136,7 +144,7 @@
       "_index.js",
       "_exports.js",
       "_state.svelte.js",
-      "_auth.js"
+      "_SocialLogin.js"
     ]
   },
   "src/routes/browse/+page.svelte": {

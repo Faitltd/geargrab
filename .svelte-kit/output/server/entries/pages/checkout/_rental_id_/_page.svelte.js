@@ -7,9 +7,6 @@ import "../../../../chunks/state.svelte.js";
 import "../../../../chunks/base44Client.js";
 import "../../../../chunks/auth.js";
 import "@stripe/stripe-js";
-{
-  console.error("Missing Stripe publishable key. Please set VITE_STRIPE_PUBLISHABLE_KEY in your environment variables.");
-}
 function _page($$payload, $$props) {
   push();
   var $$store_subs;

@@ -3,13 +3,13 @@ import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
 const firebaseConfig = {
-  apiKey: void 0,
-  authDomain: void 0,
-  projectId: void 0,
-  storageBucket: void 0,
-  messagingSenderId: void 0,
-  appId: void 0,
-  measurementId: void 0
+  apiKey: "AIzaSyDemoKey123456789",
+  authDomain: "geargrab-demo.firebaseapp.com",
+  projectId: "geargrab-demo",
+  storageBucket: "geargrab-demo.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:demo123456",
+  measurementId: "G-DEMO123456"
 };
 const requiredConfig = ["apiKey", "authDomain", "projectId"];
 const missingConfig = requiredConfig.filter((key) => !firebaseConfig[key]);
