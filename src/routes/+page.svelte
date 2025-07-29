@@ -341,6 +341,7 @@
     top: 172px;
     width: 100%;
     padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.2);
   }
 
   .category-title {
@@ -414,6 +415,7 @@
     border-style: solid;
     border-radius: 16px;
     padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.2);
   }
 
   /* Mobile-only adjustments - preserve desktop */
@@ -474,6 +476,7 @@
     position: relative;
     text-align: center;
     width: 728px;
+    background-color: rgba(255, 255, 255, 0.2);
   }
 
   .cta-title {
@@ -527,6 +530,7 @@
     border-style: solid;
     border-radius: 16px;
     padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.2);
   }
 
   .testimonial-header {
@@ -588,6 +592,7 @@
     text-align: center;
     width: 100%;
     margin: auto;
+    background-color: rgba(255, 255, 255, 0.2);
   }
 
   .final-cta-title {
@@ -665,6 +670,7 @@
     height: 24px;
     position: relative;
     width: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
   }
 
   .footer-container {
