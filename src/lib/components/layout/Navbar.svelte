@@ -1,16 +1,50 @@
 <script lang="ts">
-  // Mock auth store for development
-  const authStore = {
-    subscribe: (callback: (value: { user: null | { displayName?: string; email?: string } }) => void) => {
-      callback({ user: null });
-      return () => {};
-    }
-  };
+  import { user, isAuthenticated, signOut } from '../../stores/auth.js';
+  import LoginPopup from '../auth/LoginPopup.svelte';
 
   let isMenuOpen = false;
+  let showLoginPopup = false;
+  let loginPopupTitle = "Sign in to continue";
+  let loginPopupMessage = "Please sign in to access this feature";
 
   function toggleMenu() {
     isMenuOpen = !isMenuOpen;
+  }
+
+  function handleProtectedAction(event, actionName) {
+    event.preventDefault();
+
+    if (!$isAuthenticated) {
+      // Show login popup with appropriate message
+      if (actionName === 'list-gear') {
+        loginPopupTitle = "Sign in to List Gear";
+        loginPopupMessage = "Please sign in to start listing your outdoor gear for rent";
+      } else if (actionName === 'my-rentals') {
+        loginPopupTitle = "Sign in to View Rentals";
+        loginPopupMessage = "Please sign in to view and manage your rentals";
+      }
+      showLoginPopup = true;
+    } else {
+      // User is authenticated, navigate to the page
+      if (actionName === 'list-gear') {
+        window.location.href = '/list-gear';
+      } else if (actionName === 'my-rentals') {
+        window.location.href = '/my-rentals';
+      }
+    }
+  }
+
+  function handleLoginSuccess() {
+    showLoginPopup = false;
+    // The user will be redirected by the auth system
+  }
+
+  async function handleSignOut() {
+    try {
+      await signOut();
+    } catch (err) {
+      console.error('Sign out failed:', err);
+    }
   }
 </script>
 
@@ -25,26 +59,38 @@
           <a href="/browse" class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 inline-flex items-center px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10">
             Browse
           </a>
-          <a href="/list-gear" class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 inline-flex items-center px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10">
+          <button
+            on:click={(e) => handleProtectedAction(e, 'list-gear')}
+            class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 inline-flex items-center px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10"
+          >
             List Gear
-          </a>
-          <a href="/my-rentals" class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 inline-flex items-center px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10">
+          </button>
+          <button
+            on:click={(e) => handleProtectedAction(e, 'my-rentals')}
+            class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 inline-flex items-center px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10"
+          >
             My Rentals
-          </a>
+          </button>
         </div>
       </div>
       <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-3">
-        {#if $authStore.user}
+        {#if $isAuthenticated}
           <a href="/dashboard" class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10 flex items-center">
             Dashboard
           </a>
-          <button class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10 flex items-center">
+          <button
+            on:click={handleSignOut}
+            class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10 flex items-center"
+          >
             Sign Out
           </button>
         {:else}
-          <a href="/auth/login" class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10 flex items-center">
+          <button
+            on:click={() => showLoginPopup = true}
+            class="bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white/90 hover:text-gray-900 px-3 py-2 rounded-xl text-sm font-medium shadow-md border border-white/30 transition-all h-10 flex items-center"
+          >
             Log In
-          </a>
+          </button>
           <a href="/auth/signup" class="bg-green-600/90 backdrop-blur-sm text-white hover:bg-green-700/90 px-3 py-2 rounded-xl text-sm font-medium shadow-lg border border-green-500/30 transition-all h-10 flex items-center">
             Sign Up
           </a>
@@ -73,40 +119,52 @@
         <a href="/browse" class="bg-white/80 backdrop-blur-sm block px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all">
           Browse
         </a>
-        <a href="/list-gear" class="bg-white/80 backdrop-blur-sm block px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all">
+        <button
+          on:click={(e) => handleProtectedAction(e, 'list-gear')}
+          class="bg-white/80 backdrop-blur-sm block w-full text-left px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all"
+        >
           List Gear
-        </a>
-        <a href="/my-rentals" class="bg-white/80 backdrop-blur-sm block px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all">
+        </button>
+        <button
+          on:click={(e) => handleProtectedAction(e, 'my-rentals')}
+          class="bg-white/80 backdrop-blur-sm block w-full text-left px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all"
+        >
           My Rentals
-        </a>
+        </button>
       </div>
       <div class="pt-4 pb-3 border-t border-white/20 px-3">
-        {#if $authStore.user}
+        {#if $isAuthenticated}
           <div class="flex items-center px-4 bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-white/30 py-3">
             <div class="flex-shrink-0">
               <span class="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-green-600">
                 <span class="text-xl font-medium leading-none text-white">
-                  {$authStore.user.displayName?.[0] || $authStore.user.email?.[0] || 'U'}
+                  {$user?.displayName?.[0] || $user?.email?.[0] || 'U'}
                 </span>
               </span>
             </div>
             <div class="ml-3">
-              <div class="text-base font-medium text-gray-800">{$authStore.user.displayName || $authStore.user.email}</div>
+              <div class="text-base font-medium text-gray-800">{$user?.displayName || $user?.email}</div>
             </div>
           </div>
           <div class="mt-3 space-y-2">
             <a href="/dashboard" class="bg-white/80 backdrop-blur-sm block px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all">
               Dashboard
             </a>
-            <button class="bg-white/80 backdrop-blur-sm block w-full text-left px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all">
+            <button
+              on:click={handleSignOut}
+              class="bg-white/80 backdrop-blur-sm block w-full text-left px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all"
+            >
               Sign out
             </button>
           </div>
         {:else}
           <div class="mt-3 space-y-2">
-            <a href="/auth/login" class="bg-white/80 backdrop-blur-sm block px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all">
+            <button
+              on:click={() => showLoginPopup = true}
+              class="bg-white/80 backdrop-blur-sm block w-full text-left px-3 py-2 rounded-xl text-base font-medium text-gray-700 hover:bg-white/90 hover:text-gray-900 shadow-md border border-white/30 transition-all"
+            >
               Log In
-            </a>
+            </button>
             <a href="/auth/signup" class="bg-green-600/90 backdrop-blur-sm block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-green-700/90 shadow-lg border border-green-500/30 transition-all">
               Sign Up
             </a>
@@ -116,3 +174,12 @@
     </div>
   {/if}
 </nav>
+
+<!-- Login Popup -->
+<LoginPopup
+  bind:isOpen={showLoginPopup}
+  title={loginPopupTitle}
+  message={loginPopupMessage}
+  on:success={handleLoginSuccess}
+  on:close={() => showLoginPopup = false}
+/>

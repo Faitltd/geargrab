@@ -1,4 +1,4 @@
-import { O as head } from "../../chunks/index.js";
+import { S as head } from "../../chunks/index.js";
 function _page($$payload) {
   head($$payload, ($$payload2) => {
     $$payload2.title = `<title>GearGrab - Rent Outdoor Gear from Local Owners</title>`;

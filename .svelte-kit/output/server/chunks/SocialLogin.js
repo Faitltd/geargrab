@@ -1,4 +1,4 @@
-import { P as fallback, Q as ensure_array_like, R as attr_class, F as attr, M as stringify, K as escape_html, S as bind_props, D as pop, z as push } from "./index.js";
+import { E as fallback, T as ensure_array_like, U as attr_class, I as attr, Q as stringify, F as escape_html, K as bind_props, D as pop, z as push } from "./index.js";
 import { GoogleAuthProvider, FacebookAuthProvider, TwitterAuthProvider, GithubAuthProvider, OAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "./client.js";
 function html(value) {

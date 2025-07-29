@@ -1714,6 +1714,24 @@ class Payload {
     this.head.uid = this.uid;
   }
 }
+function copy_payload({ out, css, head: head2, uid }) {
+  const payload = new Payload();
+  payload.out = [...out];
+  payload.css = new Set(css);
+  payload.uid = uid;
+  payload.head = new HeadPayload();
+  payload.head.out = [...head2.out];
+  payload.head.css = new Set(head2.css);
+  payload.head.title = head2.title;
+  payload.head.uid = head2.uid;
+  return payload;
+}
+function assign_payload(p1, p2) {
+  p1.out = [...p2.out];
+  p1.css = p2.css;
+  p1.head = p2.head;
+  p1.uid = p2.uid;
+}
 function props_id_generator(prefix) {
   let uid = 1;
   return () => `${prefix}s${uid++}`;
@@ -1832,26 +1850,28 @@ export {
   BROWSER as B,
   COMMENT_NODE as C,
   pop as D,
-  store_get as E,
-  attr as F,
-  unsubscribe_stores as G,
+  fallback as E,
+  escape_html as F,
+  store_get as G,
   HYDRATION_ERROR as H,
-  attr_style as I,
-  slot as J,
-  escape_html as K,
+  attr as I,
+  unsubscribe_stores as J,
+  bind_props as K,
   LEGACY_PROPS as L,
-  stringify as M,
-  getContext as N,
-  head as O,
-  fallback as P,
-  ensure_array_like as Q,
-  attr_class as R,
-  bind_props as S,
-  maybe_selected as T,
-  noop as U,
-  safe_not_equal as V,
-  subscribe_to_store as W,
-  run_all as X,
+  copy_payload as M,
+  assign_payload as N,
+  attr_style as O,
+  slot as P,
+  stringify as Q,
+  getContext as R,
+  head as S,
+  ensure_array_like as T,
+  attr_class as U,
+  maybe_selected as V,
+  noop as W,
+  safe_not_equal as X,
+  subscribe_to_store as Y,
+  run_all as Z,
   set_active_effect as a,
   active_effect as b,
   active_reaction as c,
