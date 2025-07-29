@@ -425,27 +425,7 @@
     }
   }
 
-  .how-it-works-icon {
-    align-items: center;
-    background-color: rgb(220, 252, 231);
-    height: 4rem;
-    justify-content: center;
-    margin-bottom: 1rem;
-    margin-left: auto;
-    margin-right: auto;
-    width: 4rem;
-    display: flex;
-    border-radius: 16px;
-  }
 
-  .how-it-works-icon svg {
-    color: rgb(22, 163, 74);
-    height: 2rem;
-    overflow-block: hidden;
-    overflow-inline: hidden;
-    width: 2rem;
-    overflow: hidden;
-  }
 
   .how-it-works-title {
     font-size: 20px;
@@ -771,38 +751,18 @@
           <h2 class="section-title">How GearGrab Works</h2>
           <div class="how-it-works-grid">
             <div class="how-it-works-card">
-              <div class="how-it-works-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" fill="none" stroke="#16a34a"></path>
-                </svg>
-              </div>
               <h3 class="how-it-works-title">Find Gear</h3>
               <p class="how-it-works-description">Browse thousands of outdoor gear listings from local owners in your area.</p>
             </div>
             <div class="how-it-works-card">
-              <div class="how-it-works-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" fill="none" stroke="#16a34a"></path>
-                </svg>
-              </div>
               <h3 class="how-it-works-title">Book & Pay</h3>
               <p class="how-it-works-description">Reserve the gear for your dates and pay securely through our platform.</p>
             </div>
             <div class="how-it-works-card">
-              <div class="how-it-works-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" fill="none" stroke="#16a34a"></path>
-                </svg>
-              </div>
               <h3 class="how-it-works-title">Enjoy Outdoors</h3>
               <p class="how-it-works-description">Pick up the gear and enjoy your adventure without the cost of buying.</p>
             </div>
             <div class="how-it-works-card">
-              <div class="how-it-works-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" fill="none" stroke="#16a34a"></path>
-                </svg>
-              </div>
               <h3 class="how-it-works-title">Return & Review</h3>
               <p class="how-it-works-description">Return the gear and share your experience with the community.</p>
             </div>
