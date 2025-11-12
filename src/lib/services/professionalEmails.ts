@@ -38,7 +38,7 @@ export const professionalEmailTemplates = {
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
             line-height: 1.6; 
             color: #1f2937; 
             background-color: #f9fafb;

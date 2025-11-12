@@ -85,7 +85,7 @@ class FCRANoticeService {
         <meta charset="utf-8">
         <title>Pre-Adverse Action Notice</title>
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+          body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
           .header { background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
           .notice-box { background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 20px 0; }
           .contact-info { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; }
@@ -218,7 +218,7 @@ This notice is provided in compliance with the Fair Credit Reporting Act (FCRA).
         <meta charset="utf-8">
         <title>Final Adverse Action Notice</title>
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+          body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
           .header { background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
           .notice-box { background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 5px; margin: 20px 0; }
           .contact-info { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; }

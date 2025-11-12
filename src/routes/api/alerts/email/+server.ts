@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request }) => {
       to,
       subject,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
             <h1>🚨 Critical Error Alert</h1>
             <p>GearGrab System Alert</p>
