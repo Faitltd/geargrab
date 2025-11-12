@@ -1,0 +1,46 @@
+<script lang="ts">
+  export let padding = 'py-8 md:py-16';
+  export let maxWidth = 'max-w-7xl';
+  export let background = 'bg-white/95';
+  export let blur = true;
+  export let shadow = true;
+  export let rounded = true;
+  export let border = true;
+  export let margin = 'my-4 md:my-8';
+  export let animation = 'animate-fade-in-up';
+  export let delay = 0;
+
+  $: containerClasses = [
+    padding,
+    margin,
+    'relative z-10'
+  ].join(' ');
+
+  $: cardClasses = [
+    maxWidth,
+    'mx-auto px-2 sm:px-4 md:px-6 lg:px-8',
+    background,
+    blur ? 'backdrop-blur-sm' : '',
+    shadow ? 'shadow-2xl' : '',
+    rounded ? 'rounded-xl' : '',
+    border ? 'border border-white/20' : '',
+    animation,
+    'opacity-0'
+  ].filter(Boolean).join(' ');
+</script>
+
+<div class="{containerClasses}">
+  <div
+    class="{cardClasses}"
+    style="animation-delay: {delay}ms;"
+  >
+    <slot />
+  </div>
+</div>
+
+<style>
+  /* Ensure animations trigger */
+  div {
+    animation-fill-mode: forwards;
+  }
+</style>

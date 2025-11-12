@@ -45,9 +45,11 @@
   <div 
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
     on:click={handleOverlayClick}
+    on:keydown={(event) => event.key === 'Escape' && closePopup()}
     role="dialog"
     aria-modal="true"
     aria-labelledby="login-title"
+    tabindex="-1"
   >
     <!-- Popup Content -->
     <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/30 p-8 max-w-md w-full mx-4 transform transition-all">

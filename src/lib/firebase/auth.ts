@@ -13,7 +13,7 @@ import {
 } from 'firebase/auth';
 import { firestore } from './client';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
-import type { User as FirestoreUser } from '$types/firestore';
+import type { User as FirestoreUser } from '$lib/types/firestore';
 
 // Sign in with Google
 export async function signInWithGoogle(): Promise<UserCredential> {
@@ -123,5 +123,4 @@ export async function updateUserProfile(
   
   return updateProfile(auth.currentUser, updates);
 }
-
 

@@ -142,6 +142,7 @@
         on:click={getCurrentLocation}
         class="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500"
         title="Use my location"
+        aria-label="Use my current location"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -207,8 +208,9 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <!-- Subcategory -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
+          <label for="subcategory" class="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
           <select
+            id="subcategory"
             bind:value={filters.subcategory}
             disabled={!filters.category}
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -224,8 +226,9 @@
         
         <!-- Location -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+          <label for="filter-city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
           <input
+            id="filter-city"
             type="text"
             bind:value={filters.city}
             placeholder="Enter city"
@@ -234,8 +237,9 @@
         </div>
         
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+          <label for="filter-state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
           <select
+            id="filter-state"
             bind:value={filters.state}
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
           >
@@ -248,8 +252,9 @@
         
         <!-- Price Range -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Min Price/Day</label>
+          <label for="min-price" class="block text-sm font-medium text-gray-700 mb-1">Min Price/Day</label>
           <input
+            id="min-price"
             type="number"
             bind:value={filters.min_price}
             placeholder="$0"
@@ -259,8 +264,9 @@
         </div>
         
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Max Price/Day</label>
+          <label for="max-price" class="block text-sm font-medium text-gray-700 mb-1">Max Price/Day</label>
           <input
+            id="max-price"
             type="number"
             bind:value={filters.max_price}
             placeholder="$1000"
@@ -271,8 +277,9 @@
         
         <!-- Condition -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Condition</label>
+          <label for="condition" class="block text-sm font-medium text-gray-700 mb-1">Condition</label>
           <select
+            id="condition"
             bind:value={filters.condition}
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
           >
@@ -285,8 +292,9 @@
         
         <!-- Brand -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+          <label for="filter-brand" class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
           <input
+            id="filter-brand"
             type="text"
             bind:value={filters.brand}
             placeholder="Enter brand name"

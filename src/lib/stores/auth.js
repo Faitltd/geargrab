@@ -15,6 +15,14 @@ export const error = writable(null);
 // Derived stores
 export const isAuthenticated = derived(user, ($user) => !!$user);
 export const isEmailVerified = derived(user, ($user) => $user?.is_email_verified || false);
+export const authStore = derived(
+  [user, loading, error],
+  ([$user, $loading, $error]) => ({
+    user: $user,
+    loading: $loading,
+    error: $error
+  })
+);
 
 // Firebase auth state listener
 let firebaseUnsubscribe = null;

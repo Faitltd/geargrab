@@ -48,7 +48,7 @@
   }
 </script>
 
-<nav class="backdrop-blur-sm bg-white/10 border-b border-white/20" role="navigation" aria-label="Main">
+<nav class="backdrop-blur-sm bg-white/10 border-b border-white/20" aria-label="Main navigation">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between h-16">
       <div class="flex">

@@ -265,8 +265,13 @@
     
     <!-- Card Element -->
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-2">Card Information</label>
-      <div id="card-element" class="p-3 border border-gray-300 rounded-md bg-white">
+      <p id="card-element-label" class="block text-sm font-medium text-gray-700 mb-2">Card Information</p>
+      <div
+        id="card-element"
+        class="p-3 border border-gray-300 rounded-md bg-white"
+        role="group"
+        aria-labelledby="card-element-label"
+      >
         <!-- Stripe Elements will create form elements here -->
       </div>
     </div>
