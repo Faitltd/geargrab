@@ -558,12 +558,17 @@
   }
 
   .testimonial-name {
-    font-weight: 700;
+    font-family: var(--font-family-base);
+    font-weight: var(--font-weight-bold);
+    font-size: 1.125rem;
+    line-height: 1.5rem;
     height: 24px;
     width: 100%;
   }
 
   .testimonial-location {
+    font-family: var(--font-family-base);
+    font-weight: var(--font-weight-medium);
     color: rgb(75, 85, 99);
     font-size: 14px;
     height: 20px;
@@ -572,6 +577,10 @@
   }
 
   .testimonial-quote {
+    font-family: var(--font-family-base);
+    font-size: 1rem;
+    line-height: 1.65rem;
+    font-weight: var(--font-weight-regular);
     color: rgb(55, 65, 81);
     height: 72px;
     width: 100%;
