@@ -17,7 +17,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-PROJECT_ID="geargrabco"
+PROJECT_ID="geargrab-472418"
 SERVICE_NAME="geargrab"
 REGION="us-central1"
 DOMAIN="geargrab.co"
